@@ -1,32 +1,24 @@
-TINY SIEGE v3.0.0
+TINY SIEGE v5.0.0
+==================
 
-今回の更新:
-- 全9ユニット
-- 新キャラ「ストーンゴーレム」追加（敵兵を無視し建物だけを攻撃）
-- 9体から6体を選ぶデッキ編集画面
-- CPU戦 / オンライン戦の両方で選んだデッキを使用
+今回の内容
+- 全15体 / 対戦デッキは6体
+- ルミナ司祭: 味方ユニット回復
+- フロストシャーマン: 地上敵を減速・ボアのチャージ妨害
+- ストームハーピー: 空中遠距離・最大3体へ連鎖雷
+- アイアンボア: 軽量地上兵を押しのける能力を追加
+- 物理バージョン3
 
-まずCPUで試す:
-  PLAY-OFFLINE.html をダブルクリック
-  -> 「デッキ」を開く
-  -> 6体を選ぶ
-  -> CPU練習を開始
+CPUで確認
+1. PLAY-OFFLINE.html を開く
+2. デッキを開く
+3. 「おすすめに戻す」で新3体+ボアを確認
+4. CPU戦を開始
 
-既存のCloudflare版を更新:
-1. ZIPを展開
-2. 展開したフォルダの中身を GitHub の tiny-siege リポジトリ直下へアップロード
-3. main に Commit（例: Upgrade Tiny Siege to v3.0.0）
-4. CloudflareのDeploymentsで成功を確認
-5. https://あなたのURL/api/config で version 3.0.0 / units 9 / maxDeck 6 を確認
-6. 全端末で Ctrl + F5
-7. 新しいルームで対戦
-
-重要:
-- wavelength側の janken-game / dark-mode-0e8f には上書きしない
-- tiny-siege 用のリポジトリとWorkerを更新する
-- package.json と wrangler.jsonc はGitHubの一番上の階層に置く
-
-詳しい説明:
-  README.md
-  UPDATE-TO-V3.html
-  docs/DEPLOY_CLOUDFLARE.md
+Cloudflare更新
+1. tiny-siege-cloudflare-v5.zip を展開
+2. GitHub Rin447/tiny-siege に「中身全部」を上書きUpload
+3. mainへCommit (例: Upgrade Tiny Siege to v5.0.0)
+4. CloudflareのDeploymentsが成功するまで待つ
+5. /api/config で version 5.0.0 / units 15 / physicsVersion 3 を確認
+6. Ctrl+F5して新規ルームで確認

@@ -61,6 +61,9 @@ function preferredTower(g,u){
   const out=g.towers.find(t=>t.owner===enemy&&t.kind==='tower'&&t.x===u.lane&&t.hp>0);
   return out||g.towers.find(t=>t.owner===enemy&&t.kind==='core'&&t.hp>0);
 }
+function isBacklineTarget(t){
+  return !t.kind&&!t.building&&(!!t.projectile||t.range>=110);
+}
 function getTarget(g,u,entities){
   // Building-only units ignore troops completely and march toward the nearest enemy structure.
   if(u.buildingOnly){
@@ -71,6 +74,16 @@ function getTarget(g,u,entities){
       if(d<bestD){best=t;bestD=d;}
     }
     return best;
+  }
+  // Nightshade looks past the frontline when a ranged/backline target is close enough.
+  if(u.targetPriority==='backline'){
+    let best=null,bestD=Infinity;
+    for(const t of entities){
+      if(!targetable(u,t)||!isBacklineTarget(t))continue;
+      const d=distance(u,t)-t.radius;
+      if(d<=(u.priorityRange||300)&&d<bestD){best=t;bestD=d;}
+    }
+    if(best)return best;
   }
   // Nearest combatant in the aggro radius; buildings never chase.
   const reach=u.kind||u.building?u.range+30:Math.max(205,u.range+35);
@@ -87,31 +100,84 @@ function move(g,u,t,dt){
   if(!u.speed)return;
   const dest=navigationWaypoint(g,u,t,u.range+t.radius);
   const start={x:u.x,y:u.y};
-  const moved=moveBody(g,u,dest,dt);
-  if(moved>.025){faceToward(u,u.x+(u.x-start.x),u.y+(u.y-start.y));u.walk+=moved/Math.max(1,u.speed)*7;u.moving=true;}
+  const moveFactor=(u.slowUntil||0)>g.time?(u.slowMoveFactor||1):1;
+  const moved=moveBody(g,u,dest,dt*moveFactor);
+  if(moved>.025){
+    faceToward(u,u.x+(u.x-start.x),u.y+(u.y-start.y));u.walk+=moved/Math.max(1,u.speed)*7;u.moving=true;
+    if(u.chargeDistance&&u.buildingOnly){
+      u.chargeRun=(u.chargeRun||0)+moved;
+      if(!u.charged&&u.chargeRun>=u.chargeDistance){u.charged=true;event(g,'charge',{x:u.x,y:u.y,owner:u.owner});}
+    }
+  }else if(u.chargeDistance){
+    u.chargeRun=Math.max(0,(u.chargeRun||0)-dt*90);
+    if(u.chargeRun<u.chargeDistance*.55)u.charged=false;
+  }
 }
 function damage(g,t,amount,owner){
   if(t.hp<=0)return;
   t.hp=Math.max(0,t.hp-amount);t.hit=.18;
   if(t.hp===0)event(g,'death',{x:t.x,y:t.y,owner:t.owner,large:!!t.kind});
 }
+function heal(g,t,amount,owner){
+  if(t.hp<=0||t.hp>=t.maxHp||t.kind||t.building)return 0;
+  const before=t.hp;t.hp=Math.min(t.maxHp,t.hp+amount);
+  const restored=t.hp-before;if(restored>0)event(g,'heal',{x:t.x,y:t.y,owner,amount:restored});
+  return restored;
+}
+function applySlow(g,t,p){
+  if(!p.slowDuration||t.kind||t.building||t.air)return;
+  t.slowUntil=Math.max(t.slowUntil||0,g.time+p.slowDuration);
+  t.slowMoveFactor=Math.min(t.slowMoveFactor||1,p.slowMove||1);
+  t.slowAttackFactor=Math.min(t.slowAttackFactor||1,p.slowAttack||1);
+  if(t.chargeDistance){
+    t.chargeRun=Math.max(0,(t.chargeRun||0)-45);
+    if(t.chargeRun<t.chargeDistance*.8)t.charged=false;
+  }
+  event(g,'slow',{x:t.x,y:t.y,owner:p.owner});
+}
 function impact(g,p,entities){
   const target=entities.find(t=>t.id===p.target);
-  if(p.splash){
+  if(p.chainCount&&target&&targetable(p,target)){
+    const points=[];let current=target,amount=p.damage;const hit=new Set();
+    for(let i=0;i<p.chainCount&&current;i++){
+      hit.add(current.id);damage(g,current,Math.round(amount),p.owner);points.push({x:current.x,y:current.y});
+      amount*=p.chainFalloff||.8;
+      const candidates=entities.filter(t=>!hit.has(t.id)&&targetable(p,t)&&!t.kind&&!t.building&&distance(current,t)<=p.chainRange+t.radius)
+        .sort((a,b)=>distance(current,a)-distance(current,b)||String(a.id).localeCompare(String(b.id)));
+      current=candidates[0]||null;
+    }
+    event(g,'chain',{x:p.x,y:p.y,owner:p.owner,points});
+  }else if(p.splash){
     event(g,'blast',{x:p.x,y:p.y,owner:p.owner,radius:p.splash,color:p.kind});
     for(const t of entities)if(targetable(p,t)&&distance(t,p)<=p.splash+t.radius*.35)damage(g,t,p.damage,p.owner);
-  }else if(target&&targetable(p,target))damage(g,target,p.damage,p.owner);
+  }else if(target&&targetable(p,target)){damage(g,target,p.damage,p.owner);applySlow(g,target,p);}
 }
 function attack(g,u,t){
-  u.cd=u.cooldown;u.anim=.35;faceToward(u,t.x,t.y);u.target=t.id;
+  const attackFactor=(u.slowUntil||0)>g.time?(u.slowAttackFactor||1):1;
+  u.cd=u.cooldown/Math.max(.15,attackFactor);u.anim=.35;faceToward(u,t.x,t.y);u.target=t.id;
+  let amount=u.damage;
+  if(u.chargeMultiplier&&u.charged&&(t.kind||t.building)){
+    amount=Math.round(amount*u.chargeMultiplier);u.charged=false;u.chargeRun=0;
+    event(g,'charge-hit',{x:t.x,y:t.y,owner:u.owner,radius:48});
+  }
   if(u.projectile){
     g.projectiles.push({id:`p${g.nextId++}`,owner:u.owner,x:u.x,y:u.y-6,sx:u.x,sy:u.y,tx:t.x,ty:t.y,target:t.id,
-    kind:u.projectile,speed:u.projectile==='bomb'?220:390,damage:u.damage,splash:u.splash||0,
-    targetsAir:u.targetsAir,life:3});
+    kind:u.projectile,speed:u.projectile==='bomb'?220:(u.projectile==='lightning'?520:390),damage:amount,splash:u.splash||0,
+    targetsAir:u.targetsAir,life:3,slowMove:u.slowMove,slowAttack:u.slowAttack,slowDuration:u.slowDuration,
+    chainCount:u.chainCount,chainRange:u.chainRange,chainFalloff:u.chainFalloff});
   }else{
-    damage(g,t,u.damage,u.owner);event(g,'slash',{x:t.x,y:t.y,owner:u.owner,angle:Math.atan2(t.y-u.y,t.x-u.x),kind:u.type});
+    damage(g,t,amount,u.owner);event(g,'slash',{x:t.x,y:t.y,owner:u.owner,angle:Math.atan2(t.y-u.y,t.x-u.x),kind:u.type});
   }
 }
+function healingPulse(g,u,entities){
+  if(!u.healPower||u.healCd>0)return;
+  const allies=entities.filter(t=>t.id!==u.id&&t.owner===u.owner&&!t.kind&&!t.building&&t.hp>0&&t.hp<t.maxHp&&distance(u,t)<=u.healRange+t.radius);
+  if(!allies.length)return;
+  allies.sort((a,b)=>(b.maxHp-b.hp)-(a.maxHp-a.hp)||a.hp/a.maxHp-b.hp/b.maxHp||String(a.id).localeCompare(String(b.id)));
+  const target=allies[0];
+  if(heal(g,target,u.healPower,u.owner)>0){u.healCd=u.healCooldown;u.anim=Math.max(u.anim,.3);faceToward(u,target.x,target.y);}
+}
+
 export function towerScore(g,owner){
   const enemy=g.towers.filter(t=>t.owner!==owner);
   return enemy.some(t=>t.kind==='core'&&t.hp<=0)?3:enemy.filter(t=>t.hp<=0).length;
@@ -167,12 +233,13 @@ export function tick(g,dt=ARENA.tick){
   for(const u of entities){
     if(u.hp<=0)continue;
     u.moving=false;
-    u.hit=Math.max(0,(u.hit||0)-dt);u.anim=Math.max(0,(u.anim||0)-dt);u.cd=Math.max(0,u.cd-dt);
+    u.hit=Math.max(0,(u.hit||0)-dt);u.anim=Math.max(0,(u.anim||0)-dt);u.cd=Math.max(0,u.cd-dt);u.healCd=Math.max(0,(u.healCd||0)-dt);
     if(!u.kind){
       u.age+=dt;
       if(u.lifetime&&u.age>=u.lifetime){damage(g,u,u.hp,1-u.owner);continue;}
       if(u.spawn>0){u.spawn=Math.max(0,u.spawn-dt);continue;}
     }
+    healingPulse(g,u,entities);
     const target=getTarget(g,u,entities);
     if(!target){u.target=null;continue;}
     u.target=target.id;
@@ -198,7 +265,7 @@ export function viewMatch(g,seat=0){
   const p=g.players[seat];
   return {physicsVersion:PHYSICS_VERSION,phase:g.phase,countdown:g.countdown,time:rnd(g.time),overtime:g.overtime,winner:g.winner,reason:g.reason,
     scores:[towerScore(g,0),towerScore(g,1)],energy:rnd(p.energy),hand:[...p.hand],next:p.queue[0],deck:[...p.deck],
-    units:g.units.map(u=>({id:u.id,type:u.type,owner:u.owner,x:rnd(u.x),y:rnd(u.y),hp:u.hp,maxHp:u.maxHp,radius:u.radius,air:u.air,building:!!u.building,anim:u.anim,hit:u.hit,walk:u.walk,spawn:u.spawn,face:u.face,facing:u.facing,moving:!!u.moving,mass:u.mass,age:u.age})),
+    units:g.units.map(u=>({id:u.id,type:u.type,owner:u.owner,x:rnd(u.x),y:rnd(u.y),hp:u.hp,maxHp:u.maxHp,radius:u.radius,air:u.air,building:!!u.building,anim:u.anim,hit:u.hit,walk:u.walk,spawn:u.spawn,face:u.face,facing:u.facing,moving:!!u.moving,mass:u.mass,age:u.age,charged:!!u.charged,chargeRun:rnd(u.chargeRun||0),slowed:(u.slowUntil||0)>g.time,slowRemaining:rnd(Math.max(0,(u.slowUntil||0)-g.time))})),
     towers:g.towers.map(t=>({id:t.id,kind:t.kind,owner:t.owner,x:t.x,y:t.y,hp:t.hp,maxHp:t.maxHp,radius:t.radius,anim:t.anim,hit:t.hit,facing:t.facing})),
     projectiles:g.projectiles.map(p=>({id:p.id,owner:p.owner,x:p.x,y:p.y,tx:p.tx,ty:p.ty,kind:p.kind})),
     events:g.events.map(e=>({...e})),bot:g.bot,difficulty:g.difficulty};

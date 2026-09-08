@@ -1,0 +1,20 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>TINY SIEGE v5 更新手順</title><style>
+body{font-family:"Segoe UI","Meiryo",sans-serif;background:#f5f4ed;color:#203843;margin:0}.wrap{max-width:860px;margin:40px auto;padding:32px;background:#fffef9;border:1px solid #dce1d7;border-radius:20px}h1{margin-top:0}h2{margin-top:30px}.box{padding:15px 18px;border-radius:10px;background:#eef4e4;margin:18px 0}.warn{background:#fff1e8}code,pre{background:#eef0e8;border-radius:6px}code{padding:2px 6px}pre{padding:14px;overflow:auto}.step{display:inline-grid;place-items:center;width:27px;height:27px;border-radius:50%;background:#3b7064;color:white;font-size:13px;margin-right:8px}li{margin:.65em 0;line-height:1.7}a{color:#2f6a60}</style></head><body><main class="wrap">
+<h1>TINY SIEGE v5.0.0</h1><p>ルミナ司祭・フロストシャーマン・ストームハーピーを追加し、アイアンボアの押しのけ能力を強化した15体版への更新手順です。</p>
+<div class="box"><strong>v5:</strong> 全15体 / デッキ6体 / 回復 / 減速 / 連鎖雷 / ボアの軽量兵押しのけ / Physics v3。</div>
+<h2><span class="step">1</span>ZIPを展開</h2><p><code>tiny-siege-cloudflare-v5.zip</code>を展開し、外側フォルダではなく中身を使います。</p>
+<pre>tiny-siege-cloudflare-v5/
+  package.json
+  wrangler.jsonc
+  public/
+  src/
+  tests/
+  docs/
+  ...</pre>
+<h2><span class="step">2</span>GitHubへ上書き</h2><p>GitHubの <code>Rin447/tiny-siege</code> を開き、<b>Add file → Upload files</b>。展開した中身全部をルートへ上書きしてください。</p>
+<h2><span class="step">3</span>mainへCommit</h2><p>例: <code>Upgrade Tiny Siege to v5.0.0</code></p>
+<h2><span class="step">4</span>Cloudflareの成功を待つ</h2><p><b>Workers & Pages → tiny-siege → Deployments</b>で最新Buildが緑のチェックになるまで待ちます。既存のDeploy command <code>npx wrangler deploy</code> は変更不要です。</p>
+<h2><span class="step">5</span>API確認</h2><p>次を開きます。</p><pre>https://tiny-siege.miru0104.workers.dev/api/config</pre><p><code>version: 5.0.0</code>、<code>units: 15</code>、<code>physicsVersion: 3</code>、<code>maxDeck: 6</code>なら成功です。</p>
+<h2><span class="step">6</span>ゲーム確認</h2><ol><li>両PCで <b>Ctrl + F5</b>。</li><li>新しいルームを作る。</li><li>「デッキ → おすすめに戻す」で司祭・シャーマン・ハーピー・ボアを確認。</li><li>司祭が傷ついた味方兵を回復し、建物は回復しない。</li><li>シャーマンの氷弾で地上兵が青い減速表示になる。</li><li>ハーピーの雷が密集した敵兵へ連鎖する。</li><li>ボアがモスリングなど軽量地上兵を押しながら前進できることを確認。</li></ol>
+<div class="box warn">物理ルールがv3へ変わったため、更新前から進行中だった試合は継続せず、新しいPASSのルームで確認してください。</div>
+<p><small>TINY SIEGE v5.0.0 update guide</small></p></main></body></html>

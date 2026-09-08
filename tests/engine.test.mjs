@@ -1,14 +1,14 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {ARENA,UNITS,DECK,DEFAULT_DECK,MAX_DECK,normalizeDeck} from '../public/game/units.js';
-import {createMatch,tick,deploy,canPlace,viewMatch,runBot,inRiver,finish} from '../public/game/engine.js';
+import {createMatch,tick,deploy,canPlace,viewMatch,runBot,inRiver,finish,distance} from '../public/game/engine.js';
 function battle(seed=12){const g=createMatch({seed});g.phase='battle';return g;}
 function deckWith(id){return [id,...DECK.filter(k=>k!==id)].slice(0,MAX_DECK);}
 function ready(g,o,id){const p=g.players[o],deck=deckWith(id);p.energy=10;p.deck=[...deck];p.hand=deck.slice(0,4);p.queue=deck.slice(4);}
 function spawn(g,o,id,x=190,y=o===0?650:390){ready(g,o,id);const r=deploy(g,o,id,x,y);assert.ok(r.ok,r.error);return g.units.at(-1);}
 function advance(g,seconds){for(let i=0;i<Math.round(seconds*10);i++)tick(g,.1);}
-test('nine unique cards, six-card deck rule and valid balance data',()=>{
- assert.equal(DECK.length,9);assert.equal(new Set(DECK).size,9);assert.equal(MAX_DECK,6);assert.equal(DEFAULT_DECK.length,6);assert.deepEqual(normalizeDeck(DEFAULT_DECK),[...DEFAULT_DECK]);
+test('fifteen unique cards, six-card deck rule and valid balance data',()=>{
+ assert.equal(DECK.length,15);assert.equal(new Set(DECK).size,15);assert.equal(MAX_DECK,6);assert.equal(DEFAULT_DECK.length,6);assert.deepEqual(normalizeDeck(DEFAULT_DECK),[...DEFAULT_DECK]);
  for(const d of Object.values(UNITS)){assert.ok(d.hp>0&&d.cost>=1&&d.damage>0);assert.equal(d.id,DECK.find(x=>x===d.id));}
 });
 for(const id of DECK)test(`deploy ${id}: energy, count, card rotation`,()=>{
@@ -80,6 +80,54 @@ test('stone golem ignores enemy troops and damages structures only',()=>{
  golem.spawn=0;enemy.spawn=0;enemy.x=285;enemy.y=600;enemy.speed=0;enemy.damage=0;
  const enemyHp=enemy.hp,target=g.towers.find(t=>t.owner===1&&t.kind==='tower'&&t.x===190),towerHp=target.hp;
  advance(g,32);assert.equal(enemy.hp,enemyHp);assert.ok(target.hp<towerHp,'golem should reach and damage a tower');
+});
+
+
+test('iron boar ignores troops and consumes a charged hit on structures',()=>{
+ const g=battle();g.towers.forEach(t=>{t.damage=0;});
+ const boar=spawn(g,0,'boar',190,650),enemy=spawn(g,1,'blade',190,390);
+ boar.spawn=enemy.spawn=0;enemy.damage=0;enemy.speed=0;enemy.x=190;enemy.y=315;
+ const target=g.towers.find(t=>t.owner===1&&t.kind==='tower'&&t.x===190),hp=target.hp,enemyHp=enemy.hp;
+ boar.x=190;boar.y=295;boar.charged=true;boar.chargeRun=UNITS.boar.chargeDistance;boar.cd=0;
+ tick(g,.1);
+ assert.equal(enemy.hp,enemyHp);assert.equal(target.hp,hp-Math.round(UNITS.boar.damage*UNITS.boar.chargeMultiplier));
+ assert.equal(boar.charged,false);assert.equal(boar.chargeRun,0);
+});
+test('iron boar earns charge by running toward a building',()=>{
+ const g=battle();g.towers.forEach(t=>{t.damage=0;});const boar=spawn(g,0,'boar',190,650);boar.spawn=0;
+ for(let i=0;i<40&&!boar.charged;i++)tick(g,.1);
+ assert.equal(boar.charged,true);assert.ok(boar.chargeRun>=UNITS.boar.chargeDistance);
+});
+test('nightshade prioritizes nearby ranged backline over a closer tank',()=>{
+ const g=battle();g.towers.forEach(t=>{t.damage=0;});
+ const shade=spawn(g,0,'nightshade',190,650),tank=spawn(g,1,'knight',190,390),archer=spawn(g,1,'archer',240,390);
+ shade.spawn=tank.spawn=archer.spawn=0;shade.x=190;shade.y=600;tank.x=190;tank.y=555;archer.x=235;archer.y=525;
+ tank.speed=archer.speed=0;tank.damage=archer.damage=0;tick(g,.1);
+ assert.equal(shade.target,archer.id);
+});
+test('mossling card spawns five legal individual bodies',()=>{
+ const g=battle();ready(g,0,'mossling');const r=deploy(g,0,'mossling',300,680);assert.ok(r.ok,r.error);
+ const pack=g.units.filter(u=>u.type==='mossling');assert.equal(pack.length,5);
+ for(let i=0;i<pack.length;i++)for(let j=i+1;j<pack.length;j++)assert.ok(distance(pack[i],pack[j])>=pack[i].radius+pack[j].radius-.01);
+});
+
+test('lumina priest heals a damaged nearby ally but never a building',()=>{
+ const g=battle();g.towers.forEach(t=>{t.damage=0;});
+ const priest=spawn(g,0,'lumina',300,650),tank=spawn(g,0,'knight',330,650);priest.spawn=tank.spawn=0;priest.damage=0;tank.speed=0;
+ tank.hp-=500;const before=tank.hp, tower=g.towers.find(t=>t.owner===0&&t.kind==='tower');tower.hp-=300;const towerBefore=tower.hp;
+ advance(g,1.4);assert.ok(tank.hp>before);assert.equal(tower.hp,towerBefore);
+});
+test('frost shaman slows ground movement and strips part of a boar charge',()=>{
+ const g=battle();g.towers.forEach(t=>{t.damage=0;});
+ const frost=spawn(g,0,'frost',190,650),boar=spawn(g,1,'boar',190,390);frost.spawn=boar.spawn=0;frost.x=190;frost.y=590;boar.x=190;boar.y=520;boar.speed=0;boar.charged=true;boar.chargeRun=UNITS.boar.chargeDistance;
+ advance(g,1.8);assert.ok((boar.slowUntil||0)>g.time);assert.equal(boar.charged,false);assert.ok(boar.chargeRun<UNITS.boar.chargeDistance);
+});
+test('storm harpy chain lightning damages up to three clustered enemies',()=>{
+ const g=battle();g.towers.forEach(t=>{t.damage=0;});
+ const harpy=spawn(g,0,'harpy',300,650);harpy.spawn=0;harpy.x=300;harpy.y=590;
+ const victims=['mossling','mossling','blade'].map((id,i)=>spawn(g,1,id,270+i*30,390));
+ victims.forEach((u,i)=>{u.spawn=0;u.x=285+i*28;u.y=520;u.speed=0;u.damage=0;});
+ const hp=victims.map(u=>u.hp);advance(g,1.5);assert.ok(victims.every((u,i)=>u.hp<hp[i]));
 });
 
 test('main tower destruction ends match immediately',()=>{

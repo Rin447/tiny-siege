@@ -1,50 +1,26 @@
-# TINY SIEGE v3.0.0 - Test report
+# TINY SIEGE v5 test report
 
-今回のv3実装に対して、ローカル制作環境で以下を確認しました。Cloudflare本番サイトへのデプロイはこの環境から行っていません。
+Local development verification completed on the generated v5 package.
 
-| Check | Result | Evidence |
-|---|---:|---|
-| JavaScript syntax / Worker config | PASS | CHECK_RESULTS.txt |
-| Engine / physics / rooms / Worker automated tests | **102 / 102** | UNIT_TEST_RESULTS.txt |
-| Native HTTP + WebSocket local server flow | **14 / 14** | NETWORK_TEST_RESULTS.txt |
-| v3 browser deck/library/CPU UI flow | **7 / 7** | BROWSER_V3_RESULTS.json |
-| Dense physics stress simulation | PASS | STRESS_RESULTS.json |
+## Automated Node tests
 
-## v3 coverage
+- 116 / 116 passed.
+- Includes the 15-card library, 6-card deck rotation, all previous combat/room/worker checks, Lumina healing, Frost slow/charge disruption, Harpy chain lightning, and Iron Boar lightweight shove through bridge congestion.
 
-Automated checks include:
-- nine unique unit definitions and exact six-card deck validation
-- all nine deployment rotations
-- Stone Golem ignoring enemy troops and damaging structures only
-- four-card hand + six-card deck rotation
-- online Ready rejecting invalid decks
-- per-player online deck use and hidden opponent deck contents
-- server-authoritative placement and owner seat
-- ground/air separation, building collision, pathing, rear-facing data and deterministic simulation
-- room creation/join, reconnect, surrender, rematch and host promotion
-- `/api/config` identifying v3 / nine units / maxDeck six
+## Real local HTTP/WebSocket integration
 
-The v3 Playwright check loads the real self-contained `PLAY-OFFLINE.html` with `set_content`. It verifies a six-unit home deck, nine choices in the deck editor, save rejection at five, save success at six, nine-unit library including Stone Golem, CPU battle start with four hand cards, and no uncaught JavaScript errors across that flow.
+- 14 / 14 passed against the local Node server on an alternate port.
+- Covers `/api/config`, static modules, room create/join, two native WebSockets, deck readiness, authoritative synchronized placement, reconnect, surrender/rematch, host migration and origin rejection.
 
-## Stress result
+## Browser UI
 
-The synthetic congestion scene contains 93 units and runs 1,200 simulation steps (120 simulated seconds). It reported zero enemy same-layer overlap in the measured invariant. Timing in `STRESS_RESULTS.json` is only a local Node measurement, not a Cloudflare CPU/quota guarantee.
+- 6 / 6 passed using local Chromium and the self-contained offline build.
+- Confirmed six saved deck slots, 15 choices, v5 recommended deck, 15-unit front/back library, CPU battle startup and no uncaught JavaScript errors in the tested flow.
 
-## Important boundaries
+## Synthetic congestion
 
-Not verified here: Cloudflare production/workerd behavior, real Internet latency, Windows/phone device-specific rendering, Cloudflare billing/quotas, or live two-browser networking through Cloudflare. After deployment, force-reload both players, create a new room and manually verify separate decks plus Stone Golem behavior.
+- 40-unit / 30-second zero-damage synthetic run completed with finite coordinates and no static-obstacle penetration. This is a local Node synthetic test, not a Cloudflare CPU/quota benchmark.
 
-Browser UI tests use a self-contained offline page and therefore do not prove production browser networking. Native Node HTTP/WebSocket tests exercise the local server networking path separately. Worker platform-service tests use local mocks; they do not establish Cloudflare production compatibility.
+## Limits of this verification
 
-## Reproduce
-
-```sh
-npm run check
-npm test
-npm start
-# another terminal
-npm run test:network
-node tests/stress.mjs
-python tests/browser-v3.py
-npm run build:offline
-```
+Cloudflare production, the user's Windows PCs, mobile browsers and real Internet latency have not been executed from this environment. After deployment, force-reload both clients and create a fresh room before judging online behavior.

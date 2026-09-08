@@ -4,7 +4,7 @@ import {ARENA} from './units.js';
  * Ground bodies live on the lawn/bridges. Air bodies share a separate layer.
  * Buildings are static circles; tree/grass artwork is decorative only.
  */
-export const PHYSICS_VERSION=2;
+export const PHYSICS_VERSION=3;
 export const FIELD={left:34,right:686,top:28,bottom:1012};
 const EPS=0.001,GRID=20,COLS=33,ROWS=49;
 const worldCaches=new WeakMap();
@@ -144,7 +144,9 @@ function allowableFraction(g,u,dx,dy,{allies=true,soft=true}={}){
   for(const v of g.units){
     if(v===u||v.id===u.id||v.hp<=0||!sameLayer(u,v)||isStructure(v))continue;
     if(!allies&&v.owner===u.owner)continue;
-    f=Math.min(f,timeOfContact(start,delta,v,pairDistance(u,v,soft)));
+    const shoveable=!u.air&&!v.air&&u.owner!==v.owner&&u.shovePower&&((v.mass||1)<=u.shoveMassLimit);
+    const collisionRadius=pairDistance(u,v,soft)*(shoveable?(u.shoveCompression||.65):1);
+    f=Math.min(f,timeOfContact(start,delta,v,collisionRadius));
   }
   const end={x:u.x+dx*f,y:u.y+dy*f};
   if(!staticLineFree(g,u,start,end)){
@@ -204,9 +206,13 @@ export function resolveBodies(g,dt=.1){
     const side=(Number(String(a.id).replace(/\D/g,''))%2)?1:-1;
     const nx=len>.001?(a.x-b.x)/len:side,ny=len>.001?(a.y-b.y)/len:0;
     const ally=a.owner===b.owner,ia=1/(a.mass||1),ib=1/(b.mass||1),sum=ia+ib;
-    // Allies gently compress and yield; enemies have rigid personal space.
-    const amount=ally?Math.min(over*.42,dt*18):over+.005;
-    for(const [u,sign,share] of [[a,1,ia/sum],[b,-1,ib/sum]]){
+    const aShoves=!ally&&!a.air&&a.shovePower&&((b.mass||1)<=a.shoveMassLimit);
+    const bShoves=!ally&&!b.air&&b.shovePower&&((a.mass||1)<=b.shoveMassLimit);
+    // Allies gently compress. Enemies stay rigid, except a charging heavy unit can force lightweight troops aside.
+    const amount=ally?Math.min(over*.42,dt*18):(over+.005+((aShoves||bShoves)?Math.min(3.2,dt*((aShoves?a.shovePower:b.shovePower)||0)):0));
+    let shareA=ia/sum,shareB=ib/sum;
+    if(aShoves&&!bShoves){shareA=.06;shareB=.94;} else if(bShoves&&!aShoves){shareA=.94;shareB=.06;}
+    for(const [u,sign,share] of [[a,1,shareA],[b,-1,shareB]]){
       const dx=nx*amount*share*sign,dy=ny*amount*share*sign;
       const f=allowableFraction(g,u,dx,dy,{allies:false,soft:false});u.x+=dx*f;u.y+=dy*f;
     }
@@ -214,10 +220,18 @@ export function resolveBodies(g,dt=.1){
   for(const u of units)projectStatic(g,u);
 }
 /** Find all group-spawn positions before charging energy. No displacement of enemies. */
+function groupOffset(count,i,spacing=24){
+  if(count<=1)return {x:0,y:0};
+  if(count===3)return [{x:-spacing,y:8},{x:0,y:-16},{x:spacing,y:8}][i];
+  if(count===5)return [{x:0,y:-24},{x:-22,y:-5},{x:22,y:-5},{x:-13,y:18},{x:13,y:18}][i];
+  const cols=Math.ceil(Math.sqrt(count)),row=Math.floor(i/cols),col=i%cols;
+  return {x:(col-(cols-1)/2)*spacing,y:(row-(Math.ceil(count/cols)-1)/2)*spacing};
+}
 export function spawnPositions(g,owner,data,x,y){
   const points=[],f=owner===0?1:-1;
   for(let i=0;i<data.count;i++){
-    const wanted={x:x+(data.count===1?0:(i-1)*24)*f,y:y+(data.count===1?0:(i===1?-16:7))*f};
+    const off=groupOffset(data.count,i,data.radius<=10?20:24);
+    const wanted={x:x+off.x*f,y:y+off.y*f};
     let found=null;
     // Ground buildings must remain exactly where clicked, not shift out from under the cursor.
     const rings=data.building?[0]:[0,12,24,36,48];

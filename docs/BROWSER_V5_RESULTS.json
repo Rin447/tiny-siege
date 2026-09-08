@@ -1,0 +1,13 @@
+{
+  "passed": 6,
+  "checks": [
+    "home shows a six-unit saved deck",
+    "deck editor shows fifteen choices including all three v5 units and the upgraded boar",
+    "recommended deck includes boar plus all three v5 support/control units",
+    "front and back library renders all fifteen units",
+    "CPU battle starts with four cards from selected six-card deck",
+    "no uncaught JavaScript errors in v5 flow"
+  ],
+  "errors": [],
+  "note": "Self-contained offline HTML loaded with Playwright set_content; not Cloudflare production or native browser networking."
+}

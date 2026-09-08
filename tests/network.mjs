@@ -24,7 +24,7 @@ async function wait(fn,message){
 let a,b,c,room,other;
 try{
  await check('health and game config identify the correct game',async()=>{
-  const r=await fetch(base+'/api/config'),j=await r.json();assert.equal(j.version,'3.0.0');assert.equal(j.physicsVersion,2);assert.equal(j.units,9);assert.equal(j.maxDeck,6);assert.equal(j.game,'tiny-siege');
+  const r=await fetch(base+'/api/config'),j=await r.json();assert.equal(j.version,'5.0.0');assert.equal(j.physicsVersion,3);assert.equal(j.units,15);assert.equal(j.maxDeck,6);assert.equal(j.game,'tiny-siege');
  });
  await check('HTML, style and module assets load',async()=>{
   for(const url of ['/','/app.js','/styles.css','/game/engine.js','/game/art.js','/game/physics.js']){
@@ -59,8 +59,8 @@ try{
   await wait(()=>a.last().game.units.some(u=>u.owner===0)&&b.last().game.units.some(u=>u.owner===0),'deployment synchronization');
   const ua=a.last().game.units.find(u=>u.owner===0),ub=b.last().game.units.find(u=>u.id===ua.id);assert.ok(ub);assert.equal(ua.type,ub.type);
  });
- await check('server sends v3 facing and collision metadata identically to both seats',async()=>{
-  const ga=a.last().game,u=ga.units[0];assert.equal(ga.physicsVersion,2);assert.equal(typeof u.facing,'number');assert.equal(typeof u.mass,'number');
+ await check('server sends v5 facing and collision metadata identically to both seats',async()=>{
+  const ga=a.last().game,u=ga.units[0];assert.equal(ga.physicsVersion,3);assert.equal(typeof u.facing,'number');assert.equal(typeof u.mass,'number');
   assert.equal(Object.hasOwn(u,'_nav'),false);assert.equal(Object.hasOwn(u,'_stuck'),false);
   const matching=[...b.messages].reverse().find(m=>m.type==='state'&&m.game?.time===ga.time&&m.game.units.some(v=>v.id===u.id));
   assert.ok(matching);assert.deepEqual(matching.game.units.find(v=>v.id===u.id),u);

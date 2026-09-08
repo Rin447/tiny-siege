@@ -12,10 +12,10 @@ function advance(g,n){for(let i=0;i<n;i++)tick(g,.1);}
 function body(g,type,owner,x,y){const u={...UNITS[type],id:`u${g.nextId++}`,type,owner,x,y,maxHp:UNITS[type].hp,spawn:0,cd:999,walk:0,age:0,anim:0,hit:0,lane:x<360?190:530,face:owner===0?-1:1};g.units.push(u);return u;}
 function checkStatics(g){for(const u of g.units)if(!u.building)assert.ok(staticFree(g,u,u),`${u.id} ${u.type} in static at ${u.x},${u.y}`);}
 
-test('v2 physics version and mass/radius data are explicit',()=>{
- assert.equal(VERSION,'3.0.0');assert.equal(PHYSICS_VERSION,2);
+test('v3 physics version and mass/radius data are explicit',()=>{
+ assert.equal(VERSION,'5.0.0');assert.equal(PHYSICS_VERSION,3);
  assert.ok(UNITS.knight.mass>UNITS.archer.mass);assert.ok(UNITS.knight.radius>UNITS.archer.radius);
- assert.equal(createMatch().physicsVersion,2);
+ assert.equal(createMatch().physicsVersion,3);
 });
 test('body may not put its edge across the river even if its centre is on land',()=>{
  const u=UNITS.knight;assert.equal(terrainFree(u,{x:350,y:480}),false);
@@ -89,6 +89,15 @@ test('enemy bodies block, but are not an infinite wall across the whole lane',()
  for(let i=0;i<60;i++){moveBody(g,a,{x:300,y:600},.1);assert.ok(distance(a,b)>=a.radius+b.radius-.01);if(a.y<650)passed=true;}
  assert.ok(passed,'should be able to walk around a single blocker');
 });
+test('iron boar can shove lightweight enemy troops and keep moving through bridge congestion',()=>{
+ const g=game(),boar=body(g,'boar',0,190,620);boar.facing=-Math.PI/2;
+ const pack=[body(g,'mossling',1,190,584),body(g,'mossling',1,177,575),body(g,'archer',1,203,575)];
+ const before=pack.map(u=>({x:u.x,y:u.y}));
+ for(let i=0;i<35;i++){moveBody(g,boar,{x:190,y:500},.1);resolveBodies(g,.1);}
+ assert.ok(boar.y<585,`boar stuck at ${boar.x},${boar.y}`);
+ assert.ok(pack.some((u,i)=>distance(u,before[i])>8),'at least one lightweight blocker should be displaced');
+ for(const u of [boar,...pack])assert.ok(staticFree(g,u,u));
+});
 test('crowd separation does not push units into a solid tower or water',()=>{
  const g=game();
  for(let i=0;i<8;i++)body(g,i%2?'archer':'knight',0,190+(i%3)*8,580+Math.floor(i/3)*10);
@@ -136,7 +145,7 @@ test('rendering depth mixes towers and ground troops; air is always after ground
  assert.deepEqual(renderOrder(g,1).map(x=>x.entity.id),['front','tower','rear','air']);
 });
 test('server snapshots expose facing/mass/layer but not pathfinding internals',()=>{
- const g=game(),u=unit(g,'knight',0,190,930);advance(g,15);const snap=viewMatch(g,0);assert.equal(snap.physicsVersion,2);
+ const g=game(),u=unit(g,'knight',0,190,930);advance(g,15);const snap=viewMatch(g,0);assert.equal(snap.physicsVersion,3);
  assert.equal(snap.units[0].mass,6);assert.equal(typeof snap.units[0].facing,'number');assert.ok(!('_nav' in snap.units[0]));
 });
 test('legacy active matches terminate safely instead of resuming inside new obstacles',()=>{

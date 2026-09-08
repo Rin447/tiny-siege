@@ -21,7 +21,7 @@ export default {
   async fetch(request,env){
     try{
       const u=new URL(request.url),path=u.pathname;
-      if(path==='/api/config')return json({ok:true,game:'tiny-siege',version:VERSION,units:DECK.length,physicsVersion:PHYSICS_VERSION,features:['back-views','ground-air-layers','solid-buildings','body-size-mass','depth-sorting','custom-deck','building-only-golem'],online:'durable-objects-websocket',maxPlayers:2,maxDeck:MAX_DECK});
+      if(path==='/api/config')return json({ok:true,game:'tiny-siege',version:VERSION,units:DECK.length,physicsVersion:PHYSICS_VERSION,features:['back-views','ground-air-layers','solid-buildings','body-size-mass','depth-sorting','custom-deck','building-only-golem','charging-boar','backline-assassin','five-unit-swarm','healing-priest','frost-slow','chain-lightning','boar-shove'],online:'durable-objects-websocket',maxPlayers:2,maxDeck:MAX_DECK});
       if(path==='/health')return json({ok:true});
       if(path.startsWith('/api/')){
         if(!originOK(request))return json({ok:false,error:'異なるサイトからの操作は拒否しました。'},403);

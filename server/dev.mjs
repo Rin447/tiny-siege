@@ -36,7 +36,7 @@ const server=http.createServer(async(req,res)=>{
   try{
     const u=new URL(req.url,`http://${req.headers.host}`);
     if(u.pathname==='/health')return sendJSON(res,{ok:true});
-    if(u.pathname==='/api/config')return sendJSON(res,{ok:true,game:'tiny-siege',version:VERSION,units:DECK.length,physicsVersion:PHYSICS_VERSION,features:['back-views','ground-air-layers','solid-buildings','body-size-mass','depth-sorting','custom-deck','building-only-golem'],online:'local-node-websocket',maxPlayers:2,maxDeck:MAX_DECK});
+    if(u.pathname==='/api/config')return sendJSON(res,{ok:true,game:'tiny-siege',version:VERSION,units:DECK.length,physicsVersion:PHYSICS_VERSION,features:['back-views','ground-air-layers','solid-buildings','body-size-mass','depth-sorting','custom-deck','building-only-golem','charging-boar','boar-shove','backline-assassin','five-unit-swarm','healing-priest','frost-slow','chain-lightning'],online:'local-node-websocket',maxPlayers:2,maxDeck:MAX_DECK});
     if(u.pathname.startsWith('/api/')){
       if(!allowed(req))return sendJSON(res,{ok:false,error:'異なるサイトからの操作は拒否しました。'},403);
       if(!limit(req))return sendJSON(res,{ok:false,error:'リクエストが多すぎます。'},429);

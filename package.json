@@ -1,9 +1,9 @@
 {
   "name": "tiny-siege",
-  "version": "3.0.0",
+  "version": "5.0.0",
   "private": true,
   "type": "module",
-  "description": "Original nine-unit 2D lane battler with six-card custom decks. CPU practice and private 1v1 on Cloudflare Workers.",
+  "description": "Original fifteen-unit 2D lane battler with six-card decks, healing, slowing, chain lightning, charge/shove physics, CPU practice and private 1v1 on Cloudflare Workers.",
   "engines": {
     "node": ">=22"
   },

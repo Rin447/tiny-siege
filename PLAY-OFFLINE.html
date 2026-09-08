@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#182f39">
-<title>TINY SIEGE — 9体から6体を選ぶ小さな攻城戦</title>
+<title>TINY SIEGE — 15体から6体を選ぶ小さな攻城戦</title>
 
 <style>:root{--paper:#f6f5ef;--ink:#203843;--muted:#7b8c8d;--line:#dce1d7;--green:#47796d;--mint:#dce9c8;--coral:#d6896c;--card:#fffef8;--board: min(420px,calc((100dvh - 282px)*.6923));font-family:"Segoe UI","Noto Sans JP","Hiragino Kaku Gothic ProN","Meiryo",sans-serif;color:var(--ink);background:var(--paper)}
 *{box-sizing:border-box}body{margin:0}button,input{font:inherit}button{cursor:pointer;transition:background .16s,transform .16s,border-color .16s}button:disabled{cursor:not-allowed;opacity:.44}button:focus-visible,input:focus-visible,canvas:focus-visible{outline:3px solid #d89e5c;outline-offset:3px}
@@ -63,7 +63,7 @@ dialog{border:1px solid #d7dfcf;background:#f9faf3;color:var(--ink);border-radiu
   <nav>
     <span id="connection" class="status"><i></i>接続確認中</span>
     <button id="deckBtn" class="navbtn">デッキ <span>6</span></button>
-    <button id="libraryBtn" class="navbtn">部隊図鑑 <span>09</span></button>
+    <button id="libraryBtn" class="navbtn">部隊図鑑 <span>12</span></button>
     <button id="helpBtn" class="navbtn">遊び方</button>
     <button id="soundBtn" class="iconbtn" aria-label="効果音を切り替え" title="効果音">♪</button>
   </nav>
@@ -73,10 +73,10 @@ dialog{border:1px solid #d7dfcf;background:#f9faf3;color:var(--ink);border-radiu
   <section class="hero-copy">
     <div class="eyebrow"><span></span> PRIVATE 1V1 · REALTIME TACTICS</div>
     <h1>その一枚で、<br>戦況を<span>変えよう。</span></h1>
-    <p class="hero-desc">前衛で守る。後衛で射抜く。<br>9種類の仲間から6体を選び、<br>自分の編成で挑む2Dリアルタイム攻城戦。</p>
-    <div class="hero-stats"><div><strong>9</strong><small>個性的なユニット</small></div><div><strong>3<span> min</span></strong><small>一手が変える攻防</small></div><div><strong>1v1</strong><small>友だちとオンライン</small></div></div>
+    <p class="hero-desc">前衛で守る。後衛で射抜く。<br>12種類の仲間から6体を選び、<br>自分の編成で挑む2Dリアルタイム攻城戦。</p>
+    <div class="hero-stats"><div><strong>12</strong><small>個性的なユニット</small></div><div><strong>3<span> min</span></strong><small>一手が変える攻防</small></div><div><strong>1v1</strong><small>友だちとオンライン</small></div></div>
     <div class="hero-note"><span class="note-dot"></span><p>通話はいつものVCで。<br>ここでは、戦いに集中しよう。</p></div>
-    <div class="version-stamp">CUSTOM DECK + STONE GOLEM <span>03 / BUILD YOUR SIX</span></div>
+    <div class="version-stamp">CHARGE · ASSASSIN · SWARM <span>04 / TWELVE UNIT ROSTER</span></div>
   </section>
   <section class="demo-area" aria-label="ゲームの自動デモ">
     <div class="demo-label"><span class="live-dot"></span> LIVE ARENA PREVIEW <span>AUTOPLAY</span></div>
@@ -90,7 +90,7 @@ dialog{border:1px solid #d7dfcf;background:#f9faf3;color:var(--ink);border-radiu
     <div class="deck-summary">
       <div class="block-title"><span>DECK</span><h3>今回使う6体</h3><button id="homeDeckBtn" class="textbtn" type="button">編集する</button></div>
       <div id="homeDeck" class="mini-roster deck-mini"></div>
-      <p class="field-help">9体の中から6体を選択。対戦開始前なら何度でも変更できます。</p>
+      <p class="field-help">15体の中から6体を選択。対戦開始前なら何度でも変更できます。</p>
     </div>
     <div class="practice-block">
       <div class="block-title"><span>01</span><h3>ひとりで練習</h3><small>CPU BATTLE</small></div>
@@ -160,36 +160,36 @@ dialog{border:1px solid #d7dfcf;background:#f9faf3;color:var(--ink);border-radiu
     <div class="match-rules"><h4>この一戦のルール</h4><p>本拠地を壊せば即勝利。3分で同数なら延長戦。延長後も同数なら残りタワーHPで決着。</p><p>残り1分からエナジー回復が2倍。切り札を重ねて攻めよう。</p></div>
   </aside>
 </main>
-<footer id="footer"><span>ひとつのURLから、小さな戦場へ。</span><span>TINY SIEGE <i>/</i> v3.0.0 · CUSTOM DECK</span></footer>
+<footer id="footer"><span>ひとつのURLから、小さな戦場へ。</span><span>TINY SIEGE <i>/</i> v5.0.0 · 15 UNIT ROSTER</span></footer>
 
 <div id="toast" class="toast" role="status" hidden></div>
 <dialog id="deckModal" class="deck-modal">
   <div class="modal-head"><div><span class="eyebrow">BUILD YOUR SIX</span><h2>デッキ編集</h2></div><button class="close-modal iconbtn" aria-label="閉じる">×</button></div>
-  <div class="deck-editor-head"><div><strong id="deckCount">6 / 6</strong><span>選択中</span></div><p>9体から6体を選択。カードをクリックすると入れ替えできます。</p></div>
+  <div class="deck-editor-head"><div><strong id="deckCount">6 / 6</strong><span>選択中</span></div><p>15体から6体を選択。カードをクリックすると入れ替えできます。</p></div>
   <div id="deckSlots" class="deck-slots"></div>
   <div id="deckPool" class="deck-pool"></div>
   <div class="deck-actions"><button id="deckDefaultBtn" class="btn outline">おすすめに戻す</button><button id="deckSaveBtn" class="btn dark">この6体で保存</button></div>
   <p id="deckError" class="error" hidden></p>
 </dialog>
-<dialog id="libraryModal"><div class="modal-head"><div><span class="eyebrow">MEET YOUR NINE</span><h2>小さな部隊図鑑</h2></div><button class="close-modal iconbtn" aria-label="閉じる">×</button></div><p class="muted">全9体の性能を確認できます。実戦に持ち込めるのはデッキで選んだ6体です。</p><div class="roster-tools"><button id="libraryFacingBtn" class="btn outline" aria-pressed="false">後ろ姿を見る ↻</button><small>戦場では進行・攻撃方向で自動切り替え。</small></div><div id="libraryGrid" class="library-grid"></div></dialog>
+<dialog id="libraryModal"><div class="modal-head"><div><span class="eyebrow">MEET YOUR FIFTEEN</span><h2>小さな部隊図鑑</h2></div><button class="close-modal iconbtn" aria-label="閉じる">×</button></div><p class="muted">全15体の性能を確認できます。実戦に持ち込めるのはデッキで選んだ6体です。</p><div class="roster-tools"><button id="libraryFacingBtn" class="btn outline" aria-pressed="false">後ろ姿を見る ↻</button><small>戦場では進行・攻撃方向で自動切り替え。</small></div><div id="libraryGrid" class="library-grid"></div></dialog>
 <dialog id="helpModal"><div class="modal-head"><div><span class="eyebrow">HOW TO PLAY</span><h2>3分でわかる、攻城戦。</h2></div><button class="close-modal iconbtn" aria-label="閉じる">×</button></div>
   <div class="help-steps">
     <section><b>01</b><div><h3>まずはCPU戦から</h3><p>名前を入れて「CPUと対戦する」。オンラインはルームを作り、URLと6桁PASSを友だちへ共有します。</p></div></section>
     <section><b>02</b><div><h3>カード → 自分の陣地</h3><p>手札4枚から1枚を選び、画面下側の自陣にタップで配置。カードをフィールドへドラッグしてもOK。ユニットは自動で移動・攻撃します。</p></div></section>
     <section><b>03</b><div><h3>エナジーを使い分ける</h3><p>カード左上の数字が必要コスト。エナジーは最大10まで回復します。使ったカードは待機列へ入り、次の1枚が手札に補充されます。</p></div></section>
-    <section><b>04</b><div><h3>9体から6体を選ぶ</h3><p>「デッキ」から出撃メンバー6体を編集。衛士＋弓兵、バット＋術師、建物だけを狙うストーンゴーレムなど、自分の勝ち筋を作ります。</p></div></section>
+    <section><b>04</b><div><h3>15体から6体を選ぶ</h3><p>「デッキ」から出撃メンバー6体を編集。回復のルミナ司祭、減速のフロストシャーマン、連鎖雷のストームハーピー、押しのけ強化されたアイアンボアも選べます。</p></div></section>
     <section><b>05</b><div><h3>本拠地を破壊したら勝利</h3><p>後方中央の本拠地を壊すと3ポイントで即勝利。3分終了時はタワー破壊数を比較。同数なら最大1分の延長で先にタワーを壊した側が勝ち。延長終了後は残りタワーHPの合計、同じなら引き分けです。</p></div></section>
     <section><b>06</b><div><h3>通話はいつものVCで</h3><p>オンラインで切断したら最大45秒間一時停止して再接続を待ちます。戻れなければ切断側の敗北、両方切断は引き分け。CPU戦ではタブを離れると一時停止します。</p></div></section>
     <section><b>07</b><div><h3>タワーを回り込む配置</h3><p>地上の部隊はタワー・砲台をすり抜けません。後ろに置くと回り道の時間が生まれます。破壊した建物の土台は通行可能。木や石は飾りです。</p></div></section>
     <section><b>08</b><div><h3>大きさと地上／空中</h3><p>味方は同じ高度で軽く押し合い、敵とはすり抜けず接触します。大きな衛士は押されにくく、細い道で場所を取ります。飛行は地上の部隊・建物を無視。対空攻撃ができることと、飛んでいることは別です。</p></div></section>
     <section><b>09</b><div><h3>向きと判定を確認</h3><p>敵陣へ進む自分の部隊は背中が見え、後ろの敵を狙えば正面を向きます。図鑑で正面／背面を切り替え。「当たり判定を表示」で足元の円を確認できます。矢・魔法は味方や建物で遮られません。</p></div></section>
-    <section><b>10</b><div><h3>ストーンゴーレムは建物だけを見る</h3><p>敵ユニットに殴られても足を止めず、敵のタワーや砲台だけを目指します。HPと建物ダメージは非常に高い一方、コスト6・移動速度は最遅。後ろから出して援護部隊を重ねるのが基本です。</p></div></section>
+    <section><b>10</b><div><h3>建物特攻と新しい相性</h3><p>ゴーレムとアイアンボアは敵兵を攻撃せず建物へ。ナイトシェイドは後衛を優先、モスリング隊は5体で大型を囲みます。単体・群体・範囲・暗殺の相性を見て6体を組みましょう。</p></div></section>
   </div>
   <p class="help-note">オリジナルの試作ルールです。外部ゲームのキャラクター・画像・音源は使用していません。オンライン対戦はCloudflareへのサーバー込みの公開が必要です。</p>
 </dialog>
 <script type="module">window.TINY_OFFLINE=true;
 /** Balance data: original prototype values. Both browser and server import this file. */
-const VERSION = '3.0.0';
+const VERSION = '5.0.0';
 const MAX_DECK = 6;
 const ARENA = Object.freeze({
   width:720, height:1040, riverTop:482, riverBottom:558, bridges:[190,530],
@@ -205,10 +205,16 @@ const UNITS = Object.freeze({
   bat:{id:'bat',mass:0.6,name:'ムーンバット',short:'バット',role:'飛行・3体編成',cost:2,hp:145,damage:46,speed:82,range:28,cooldown:0.85,radius:11,count:3,air:true,targetsAir:true,color:'#b7a7dc',desc:'3体で出撃し、川を飛び越える。対空できない敵に強い。'},
   bomber:{id:'bomber',mass:2,name:'ポット爆弾兵',short:'爆弾兵',role:'地上範囲攻撃',cost:3,hp:470,damage:174,speed:42,range:145,cooldown:1.8,radius:16,count:1,air:false,targetsAir:false,projectile:'bomb',splash:66,color:'#edaa66',desc:'爆弾で地上の密集を崩す。空中の敵には攻撃できない。'},
   cannon:{id:'cannon',mass:1000000,name:'ボルト砲台',short:'砲台',role:'防衛建物',cost:4,hp:1080,damage:140,speed:0,range:218,cooldown:1.4,radius:24,count:1,air:false,targetsAir:false,projectile:'shell',building:true,lifetime:32,color:'#8dbfb3',desc:'動かない防衛建物。地上の敵を迎撃し、32秒で消える。'},
-  golem:{id:'golem',mass:16,name:'ストーンゴーレム',short:'ゴーレム',role:'建物特攻・超重量',cost:6,hp:3350,damage:295,speed:21,range:42,cooldown:1.85,radius:30,count:1,air:false,targetsAir:false,buildingOnly:true,color:'#8ea37d',desc:'敵ユニットを無視し、建物だけを目指す超重量タンク。非常に硬く一撃も重いが、歩みは遅い。'}
+  golem:{id:'golem',mass:16,name:'ストーンゴーレム',short:'ゴーレム',role:'建物特攻・超重量',cost:6,hp:3350,damage:295,speed:21,range:42,cooldown:1.85,radius:30,count:1,air:false,targetsAir:false,buildingOnly:true,color:'#8ea37d',desc:'敵ユニットを無視し、建物だけを目指す超重量タンク。非常に硬く一撃も重いが、歩みは遅い。'},
+  boar:{id:'boar',mass:9.5,name:'アイアンボア',short:'ボア',role:'建物突撃・チャージ',cost:4,hp:980,damage:178,speed:78,range:28,cooldown:1.05,radius:18,count:1,air:false,targetsAir:false,buildingOnly:true,chargeDistance:105,chargeMultiplier:2.25,shovePower:14,shoveMassLimit:2.2,shoveCompression:.62,color:'#b4785f',desc:'敵兵を無視して建物へ突進。軽量な地上兵を押しのけながら進み、105px走ると最初の体当たりが2.25倍になる。'},
+  nightshade:{id:'nightshade',mass:1.05,name:'ナイトシェイド',short:'シェイド',role:'暗殺・後衛優先',cost:4,hp:520,damage:228,speed:88,range:30,cooldown:.82,radius:13,count:1,air:false,targetsAir:false,targetPriority:'backline',priorityRange:325,color:'#6f668f',desc:'弓兵・術師・爆弾兵などの後衛を優先して追う高速暗殺者。高火力だが耐久は低い。'},
+  mossling:{id:'mossling',mass:.45,name:'モスリング隊',short:'モス隊',role:'群体・5体編成',cost:3,hp:155,damage:45,speed:72,range:21,cooldown:.8,radius:9,count:5,air:false,targetsAir:false,color:'#8fb56b',desc:'小さな森の精霊5体で取り囲む群体。単体攻撃の大型に強いが、爆弾や範囲魔法にはとても弱い。'},
+  lumina:{id:'lumina',mass:1.4,name:'ルミナ司祭',short:'司祭',role:'回復支援・後衛',cost:4,hp:590,damage:38,speed:44,range:145,cooldown:1.55,radius:15,count:1,air:false,targetsAir:false,projectile:'light',healPower:115,healRange:128,healCooldown:1.25,color:'#e7dba8',desc:'弱い光弾を放ちながら、周囲で最も傷ついた味方ユニットを回復する。タンクと好相性だが暗殺者に狙われやすい。'},
+  frost:{id:'frost',mass:1.5,name:'フロストシャーマン',short:'シャーマン',role:'妨害・減速',cost:4,hp:535,damage:74,speed:42,range:170,cooldown:1.4,radius:15,count:1,air:false,targetsAir:false,projectile:'frost',slowMove:.62,slowAttack:.72,slowDuration:3,color:'#9ccfe2',desc:'氷弾で地上の敵を減速。移動と攻撃のテンポを奪い、ボアのチャージも削るため大型・突進系への時間稼ぎに強い。'},
+  harpy:{id:'harpy',mass:1.05,name:'ストームハーピー',short:'ハーピー',role:'空中遠距離・連鎖雷',cost:4,hp:505,damage:94,speed:64,range:175,cooldown:1.25,radius:16,count:1,air:true,targetsAir:true,projectile:'lightning',chainCount:3,chainRange:105,chainFalloff:.78,color:'#8fa9d8',desc:'空から雷を放ち、近くの敵へ最大3体まで連鎖する。群体に強いが、弓兵などの対空遠距離に弱い。'}
 });
 const DECK = Object.freeze(Object.keys(UNITS));
-const DEFAULT_DECK = Object.freeze(['blade','knight','archer','mage','bomber','golem']);
+const DEFAULT_DECK = Object.freeze(['knight','archer','lumina','frost','harpy','boar']);
 const ROLE_ORDER = DECK;
 const TEAM_COLORS = ['#58b9ae','#ee9b81'];
 function normalizeDeck(value,{fallback=true}={}){
@@ -223,7 +229,7 @@ function normalizeDeck(value,{fallback=true}={}){
  * Ground bodies live on the lawn/bridges. Air bodies share a separate layer.
  * Buildings are static circles; tree/grass artwork is decorative only.
  */
-const PHYSICS_VERSION=2;
+const PHYSICS_VERSION=3;
 const FIELD={left:34,right:686,top:28,bottom:1012};
 const EPS=0.001,GRID=20,COLS=33,ROWS=49;
 const worldCaches=new WeakMap();
@@ -363,7 +369,9 @@ function allowableFraction(g,u,dx,dy,{allies=true,soft=true}={}){
   for(const v of g.units){
     if(v===u||v.id===u.id||v.hp<=0||!sameLayer(u,v)||isStructure(v))continue;
     if(!allies&&v.owner===u.owner)continue;
-    f=Math.min(f,timeOfContact(start,delta,v,pairDistance(u,v,soft)));
+    const shoveable=!u.air&&!v.air&&u.owner!==v.owner&&u.shovePower&&((v.mass||1)<=u.shoveMassLimit);
+    const collisionRadius=pairDistance(u,v,soft)*(shoveable?(u.shoveCompression||.65):1);
+    f=Math.min(f,timeOfContact(start,delta,v,collisionRadius));
   }
   const end={x:u.x+dx*f,y:u.y+dy*f};
   if(!staticLineFree(g,u,start,end)){
@@ -423,9 +431,13 @@ function resolveBodies(g,dt=.1){
     const side=(Number(String(a.id).replace(/\D/g,''))%2)?1:-1;
     const nx=len>.001?(a.x-b.x)/len:side,ny=len>.001?(a.y-b.y)/len:0;
     const ally=a.owner===b.owner,ia=1/(a.mass||1),ib=1/(b.mass||1),sum=ia+ib;
-    // Allies gently compress and yield; enemies have rigid personal space.
-    const amount=ally?Math.min(over*.42,dt*18):over+.005;
-    for(const [u,sign,share] of [[a,1,ia/sum],[b,-1,ib/sum]]){
+    const aShoves=!ally&&!a.air&&a.shovePower&&((b.mass||1)<=a.shoveMassLimit);
+    const bShoves=!ally&&!b.air&&b.shovePower&&((a.mass||1)<=b.shoveMassLimit);
+    // Allies gently compress. Enemies stay rigid, except a charging heavy unit can force lightweight troops aside.
+    const amount=ally?Math.min(over*.42,dt*18):(over+.005+((aShoves||bShoves)?Math.min(3.2,dt*((aShoves?a.shovePower:b.shovePower)||0)):0));
+    let shareA=ia/sum,shareB=ib/sum;
+    if(aShoves&&!bShoves){shareA=.06;shareB=.94;} else if(bShoves&&!aShoves){shareA=.94;shareB=.06;}
+    for(const [u,sign,share] of [[a,1,shareA],[b,-1,shareB]]){
       const dx=nx*amount*share*sign,dy=ny*amount*share*sign;
       const f=allowableFraction(g,u,dx,dy,{allies:false,soft:false});u.x+=dx*f;u.y+=dy*f;
     }
@@ -433,10 +445,18 @@ function resolveBodies(g,dt=.1){
   for(const u of units)projectStatic(g,u);
 }
 /** Find all group-spawn positions before charging energy. No displacement of enemies. */
+function groupOffset(count,i,spacing=24){
+  if(count<=1)return {x:0,y:0};
+  if(count===3)return [{x:-spacing,y:8},{x:0,y:-16},{x:spacing,y:8}][i];
+  if(count===5)return [{x:0,y:-24},{x:-22,y:-5},{x:22,y:-5},{x:-13,y:18},{x:13,y:18}][i];
+  const cols=Math.ceil(Math.sqrt(count)),row=Math.floor(i/cols),col=i%cols;
+  return {x:(col-(cols-1)/2)*spacing,y:(row-(Math.ceil(count/cols)-1)/2)*spacing};
+}
 function spawnPositions(g,owner,data,x,y){
   const points=[],f=owner===0?1:-1;
   for(let i=0;i<data.count;i++){
-    const wanted={x:x+(data.count===1?0:(i-1)*24)*f,y:y+(data.count===1?0:(i===1?-16:7))*f};
+    const off=groupOffset(data.count,i,data.radius<=10?20:24);
+    const wanted={x:x+off.x*f,y:y+off.y*f};
     let found=null;
     // Ground buildings must remain exactly where clicked, not shift out from under the cursor.
     const rings=data.building?[0]:[0,12,24,36,48];
@@ -519,6 +539,9 @@ function preferredTower(g,u){
   const out=g.towers.find(t=>t.owner===enemy&&t.kind==='tower'&&t.x===u.lane&&t.hp>0);
   return out||g.towers.find(t=>t.owner===enemy&&t.kind==='core'&&t.hp>0);
 }
+function isBacklineTarget(t){
+  return !t.kind&&!t.building&&(!!t.projectile||t.range>=110);
+}
 function getTarget(g,u,entities){
   // Building-only units ignore troops completely and march toward the nearest enemy structure.
   if(u.buildingOnly){
@@ -529,6 +552,16 @@ function getTarget(g,u,entities){
       if(d<bestD){best=t;bestD=d;}
     }
     return best;
+  }
+  // Nightshade looks past the frontline when a ranged/backline target is close enough.
+  if(u.targetPriority==='backline'){
+    let best=null,bestD=Infinity;
+    for(const t of entities){
+      if(!targetable(u,t)||!isBacklineTarget(t))continue;
+      const d=distance(u,t)-t.radius;
+      if(d<=(u.priorityRange||300)&&d<bestD){best=t;bestD=d;}
+    }
+    if(best)return best;
   }
   // Nearest combatant in the aggro radius; buildings never chase.
   const reach=u.kind||u.building?u.range+30:Math.max(205,u.range+35);
@@ -545,31 +578,84 @@ function move(g,u,t,dt){
   if(!u.speed)return;
   const dest=navigationWaypoint(g,u,t,u.range+t.radius);
   const start={x:u.x,y:u.y};
-  const moved=moveBody(g,u,dest,dt);
-  if(moved>.025){faceToward(u,u.x+(u.x-start.x),u.y+(u.y-start.y));u.walk+=moved/Math.max(1,u.speed)*7;u.moving=true;}
+  const moveFactor=(u.slowUntil||0)>g.time?(u.slowMoveFactor||1):1;
+  const moved=moveBody(g,u,dest,dt*moveFactor);
+  if(moved>.025){
+    faceToward(u,u.x+(u.x-start.x),u.y+(u.y-start.y));u.walk+=moved/Math.max(1,u.speed)*7;u.moving=true;
+    if(u.chargeDistance&&u.buildingOnly){
+      u.chargeRun=(u.chargeRun||0)+moved;
+      if(!u.charged&&u.chargeRun>=u.chargeDistance){u.charged=true;event(g,'charge',{x:u.x,y:u.y,owner:u.owner});}
+    }
+  }else if(u.chargeDistance){
+    u.chargeRun=Math.max(0,(u.chargeRun||0)-dt*90);
+    if(u.chargeRun<u.chargeDistance*.55)u.charged=false;
+  }
 }
 function damage(g,t,amount,owner){
   if(t.hp<=0)return;
   t.hp=Math.max(0,t.hp-amount);t.hit=.18;
   if(t.hp===0)event(g,'death',{x:t.x,y:t.y,owner:t.owner,large:!!t.kind});
 }
+function heal(g,t,amount,owner){
+  if(t.hp<=0||t.hp>=t.maxHp||t.kind||t.building)return 0;
+  const before=t.hp;t.hp=Math.min(t.maxHp,t.hp+amount);
+  const restored=t.hp-before;if(restored>0)event(g,'heal',{x:t.x,y:t.y,owner,amount:restored});
+  return restored;
+}
+function applySlow(g,t,p){
+  if(!p.slowDuration||t.kind||t.building||t.air)return;
+  t.slowUntil=Math.max(t.slowUntil||0,g.time+p.slowDuration);
+  t.slowMoveFactor=Math.min(t.slowMoveFactor||1,p.slowMove||1);
+  t.slowAttackFactor=Math.min(t.slowAttackFactor||1,p.slowAttack||1);
+  if(t.chargeDistance){
+    t.chargeRun=Math.max(0,(t.chargeRun||0)-45);
+    if(t.chargeRun<t.chargeDistance*.8)t.charged=false;
+  }
+  event(g,'slow',{x:t.x,y:t.y,owner:p.owner});
+}
 function impact(g,p,entities){
   const target=entities.find(t=>t.id===p.target);
-  if(p.splash){
+  if(p.chainCount&&target&&targetable(p,target)){
+    const points=[];let current=target,amount=p.damage;const hit=new Set();
+    for(let i=0;i<p.chainCount&&current;i++){
+      hit.add(current.id);damage(g,current,Math.round(amount),p.owner);points.push({x:current.x,y:current.y});
+      amount*=p.chainFalloff||.8;
+      const candidates=entities.filter(t=>!hit.has(t.id)&&targetable(p,t)&&!t.kind&&!t.building&&distance(current,t)<=p.chainRange+t.radius)
+        .sort((a,b)=>distance(current,a)-distance(current,b)||String(a.id).localeCompare(String(b.id)));
+      current=candidates[0]||null;
+    }
+    event(g,'chain',{x:p.x,y:p.y,owner:p.owner,points});
+  }else if(p.splash){
     event(g,'blast',{x:p.x,y:p.y,owner:p.owner,radius:p.splash,color:p.kind});
     for(const t of entities)if(targetable(p,t)&&distance(t,p)<=p.splash+t.radius*.35)damage(g,t,p.damage,p.owner);
-  }else if(target&&targetable(p,target))damage(g,target,p.damage,p.owner);
+  }else if(target&&targetable(p,target)){damage(g,target,p.damage,p.owner);applySlow(g,target,p);}
 }
 function attack(g,u,t){
-  u.cd=u.cooldown;u.anim=.35;faceToward(u,t.x,t.y);u.target=t.id;
+  const attackFactor=(u.slowUntil||0)>g.time?(u.slowAttackFactor||1):1;
+  u.cd=u.cooldown/Math.max(.15,attackFactor);u.anim=.35;faceToward(u,t.x,t.y);u.target=t.id;
+  let amount=u.damage;
+  if(u.chargeMultiplier&&u.charged&&(t.kind||t.building)){
+    amount=Math.round(amount*u.chargeMultiplier);u.charged=false;u.chargeRun=0;
+    event(g,'charge-hit',{x:t.x,y:t.y,owner:u.owner,radius:48});
+  }
   if(u.projectile){
     g.projectiles.push({id:`p${g.nextId++}`,owner:u.owner,x:u.x,y:u.y-6,sx:u.x,sy:u.y,tx:t.x,ty:t.y,target:t.id,
-    kind:u.projectile,speed:u.projectile==='bomb'?220:390,damage:u.damage,splash:u.splash||0,
-    targetsAir:u.targetsAir,life:3});
+    kind:u.projectile,speed:u.projectile==='bomb'?220:(u.projectile==='lightning'?520:390),damage:amount,splash:u.splash||0,
+    targetsAir:u.targetsAir,life:3,slowMove:u.slowMove,slowAttack:u.slowAttack,slowDuration:u.slowDuration,
+    chainCount:u.chainCount,chainRange:u.chainRange,chainFalloff:u.chainFalloff});
   }else{
-    damage(g,t,u.damage,u.owner);event(g,'slash',{x:t.x,y:t.y,owner:u.owner,angle:Math.atan2(t.y-u.y,t.x-u.x),kind:u.type});
+    damage(g,t,amount,u.owner);event(g,'slash',{x:t.x,y:t.y,owner:u.owner,angle:Math.atan2(t.y-u.y,t.x-u.x),kind:u.type});
   }
 }
+function healingPulse(g,u,entities){
+  if(!u.healPower||u.healCd>0)return;
+  const allies=entities.filter(t=>t.id!==u.id&&t.owner===u.owner&&!t.kind&&!t.building&&t.hp>0&&t.hp<t.maxHp&&distance(u,t)<=u.healRange+t.radius);
+  if(!allies.length)return;
+  allies.sort((a,b)=>(b.maxHp-b.hp)-(a.maxHp-a.hp)||a.hp/a.maxHp-b.hp/b.maxHp||String(a.id).localeCompare(String(b.id)));
+  const target=allies[0];
+  if(heal(g,target,u.healPower,u.owner)>0){u.healCd=u.healCooldown;u.anim=Math.max(u.anim,.3);faceToward(u,target.x,target.y);}
+}
+
 function towerScore(g,owner){
   const enemy=g.towers.filter(t=>t.owner!==owner);
   return enemy.some(t=>t.kind==='core'&&t.hp<=0)?3:enemy.filter(t=>t.hp<=0).length;
@@ -625,12 +711,13 @@ function tick(g,dt=ARENA.tick){
   for(const u of entities){
     if(u.hp<=0)continue;
     u.moving=false;
-    u.hit=Math.max(0,(u.hit||0)-dt);u.anim=Math.max(0,(u.anim||0)-dt);u.cd=Math.max(0,u.cd-dt);
+    u.hit=Math.max(0,(u.hit||0)-dt);u.anim=Math.max(0,(u.anim||0)-dt);u.cd=Math.max(0,u.cd-dt);u.healCd=Math.max(0,(u.healCd||0)-dt);
     if(!u.kind){
       u.age+=dt;
       if(u.lifetime&&u.age>=u.lifetime){damage(g,u,u.hp,1-u.owner);continue;}
       if(u.spawn>0){u.spawn=Math.max(0,u.spawn-dt);continue;}
     }
+    healingPulse(g,u,entities);
     const target=getTarget(g,u,entities);
     if(!target){u.target=null;continue;}
     u.target=target.id;
@@ -656,7 +743,7 @@ function viewMatch(g,seat=0){
   const p=g.players[seat];
   return {physicsVersion:PHYSICS_VERSION,phase:g.phase,countdown:g.countdown,time:rnd(g.time),overtime:g.overtime,winner:g.winner,reason:g.reason,
     scores:[towerScore(g,0),towerScore(g,1)],energy:rnd(p.energy),hand:[...p.hand],next:p.queue[0],deck:[...p.deck],
-    units:g.units.map(u=>({id:u.id,type:u.type,owner:u.owner,x:rnd(u.x),y:rnd(u.y),hp:u.hp,maxHp:u.maxHp,radius:u.radius,air:u.air,building:!!u.building,anim:u.anim,hit:u.hit,walk:u.walk,spawn:u.spawn,face:u.face,facing:u.facing,moving:!!u.moving,mass:u.mass,age:u.age})),
+    units:g.units.map(u=>({id:u.id,type:u.type,owner:u.owner,x:rnd(u.x),y:rnd(u.y),hp:u.hp,maxHp:u.maxHp,radius:u.radius,air:u.air,building:!!u.building,anim:u.anim,hit:u.hit,walk:u.walk,spawn:u.spawn,face:u.face,facing:u.facing,moving:!!u.moving,mass:u.mass,age:u.age,charged:!!u.charged,chargeRun:rnd(u.chargeRun||0),slowed:(u.slowUntil||0)>g.time,slowRemaining:rnd(Math.max(0,(u.slowUntil||0)-g.time))})),
     towers:g.towers.map(t=>({id:t.id,kind:t.kind,owner:t.owner,x:t.x,y:t.y,hp:t.hp,maxHp:t.maxHp,radius:t.radius,anim:t.anim,hit:t.hit,facing:t.facing})),
     projectiles:g.projectiles.map(p=>({id:p.id,owner:p.owner,x:p.x,y:p.y,tx:p.tx,ty:p.ty,kind:p.kind})),
     events:g.events.map(e=>({...e})),bot:g.bot,difficulty:g.difficulty};
@@ -765,6 +852,131 @@ function drawBackHumanoid(c,type,opts){
  if(opts.hit){c.globalAlpha*=.55;ellipse(c,0,-28,19,30,'#fff8db');}c.restore();
 }
 
+
+function drawIronBoar(c,opts={}){
+  const t=opts.time||0,walk=opts.walk||0,attack=opts.anim||0,moving=opts.moving??walk!==0,back=!!opts.back;
+  const ink='#263b40',fur='#765744',fur2='#9a7156',iron='#6f7e7d',iron2='#aab6ae',red='#b86655',tusk='#ead8ae',team=TEAM_COLORS[opts.owner||0];
+  const bob=(moving?Math.sin(walk*1.2)*1.6:Math.sin(t*2)*.45),kick=attack?Math.sin((1-attack/.35)*Math.PI):0;
+  c.save();c.translate(0,bob);
+  // Four short legs, intentionally squat so the silhouette reads as a charging boar at game size.
+  for(const side of [-1,1])for(const front of [-1,1]){
+    const phase=walk+(side*front>0?Math.PI:0),x=side*(front>0?16:13),y=front>0?-4:0;
+    c.save();c.translate(x,y);c.rotate(Math.sin(phase)*(moving?.18:0));
+    rr(c,-5,0,10,18,4,'#4f4740',ink);rr(c,-6,14,12,7,3,'#343b3a',ink);c.restore();
+  }
+  ellipse(c,0,-18,31,23,fur);path(c,[[-28,-20],[-17,-39],[12,-42],[30,-24],[25,-5],[-22,-4]],fur2,ink,2);
+  // Armoured spine and side plates.
+  path(c,[[-18,-39],[-5,-52],[13,-47],[23,-34],[13,-26],[-13,-28]],iron,ink,1.8);
+  rr(c,-14,-40,28,9,3,team,ink);for(const x of [-9,0,9])ellipse(c,x,-36,1.8,1.8,'#e2cb91');
+  if(back){
+    path(c,[[-24,-22],[-10,-34],[12,-33],[27,-18],[21,-5],[-19,-5]],fur,ink,1.5);
+    path(c,[[-14,-38],[0,-48],[15,-38],[12,-24],[-12,-24]],iron2,ink,1.5);
+    rr(c,-10,-33,20,7,2,team);path(c,[[-5,-7],[0,2],[5,-7]],'#4b3b33',ink,1);
+    for(const side of [-1,1])path(c,[[side*17,-23],[side*29,-32],[side*24,-15]],iron,ink,1.3);
+  }else{
+    // Head plate lowers during the impact frame.
+    c.save();c.translate(0,kick*5);
+    path(c,[[-25,-29],[-12,-48],[12,-48],[26,-29],[18,-10],[-18,-10]],iron2,ink,2);
+    path(c,[[-18,-42],[0,-52],[18,-42],[12,-31],[-12,-31]],iron,ink,1.4);
+    rr(c,-17,-31,34,12,4,'#423d3a',ink);ellipse(c,-7,-25,2.7,2.4,'#f09a66');ellipse(c,7,-25,2.7,2.4,'#f09a66');
+    path(c,[[-18,-17],[-31,-8],[-22,-25]],tusk,ink,1.1);path(c,[[18,-17],[31,-8],[22,-25]],tusk,ink,1.1);
+    ellipse(c,0,-14,8,5,'#4a3530');ellipse(c,-3,-15,1.2,1.2,'#171f20');ellipse(c,3,-15,1.2,1.2,'#171f20');c.restore();
+  }
+  if(opts.charged){c.save();c.globalAlpha=.75+.2*Math.sin(t*8);c.strokeStyle='#ffd36c';c.lineWidth=2.5;c.beginPath();c.arc(0,-23,35,0,TAU);c.stroke();c.restore();}
+  if(opts.hit){c.globalAlpha*=.42;ellipse(c,0,-22,30,31,'#fff1c2');}
+  c.restore();
+}
+
+function drawNightshade(c,opts={}){
+  const t=opts.time||0,walk=opts.walk||0,attack=opts.anim||0,moving=opts.moving??walk!==0,back=!!opts.back;
+  const ink='#1e2932',cloth='#343247',cloth2='#5b5276',accent='#8fe0b5',skin='#c49a82',team=TEAM_COLORS[opts.owner||0];
+  const bob=Math.sin(walk)*1.1+(opts.idle?Math.sin(t*2.7)*.45:0),slash=attack?Math.sin((1-attack/.35)*Math.PI):0;
+  c.save();c.translate(0,bob);
+  for(const side of [-1,1]){c.save();c.translate(side*6,-9);c.rotate(Math.sin(walk+(side>0?Math.PI:0))*(moving?.48:0));line(c,0,0,0,15,'#2e3039',7);rr(c,-5,11,10,6,2,ink);c.restore();}
+  // Short split cloak makes the rear silhouette immediately distinct.
+  path(c,[[-14,-36],[14,-36],[18,-4],[4,-13],[0,1],[-5,-12],[-18,-4]],back?'#29293b':cloth2,ink,1.4);
+  rr(c,-13,-38,26,27,6,cloth,ink);rr(c,-13,-35,26,6,2,team);
+  // crossed straps / back emblem
+  if(back){line(c,-9,-31,9,-14,'#746f76',3);line(c,9,-31,-9,-14,'#5d5964',2);path(c,[[-5,-28],[0,-34],[5,-28],[0,-22]],accent,ink,1);}
+  const swing=.18*Math.sin(walk)+slash*1.6;
+  for(const side of [-1,1]){
+    c.save();c.translate(side*14,-32);c.rotate(side*(.18+swing));line(c,0,0,side*2,14,cloth2,7);ellipse(c,side*2,14,3.5,3.5,skin);c.translate(side*2,14);
+    c.rotate(side*(back?-.2:.3));path(c,[[-2,2],[-2,-23],[0,-31],[3,-23],[2,2]],'#b7d2cc',ink,1);rr(c,-6,1,12,3,1,accent);c.restore();
+  }
+  // hood and mask
+  path(c,[[-14,-49],[-8,-65],[0,-72],[9,-65],[14,-49],[9,-39],[-9,-39]],back?'#28283a':cloth2,ink,1.6);
+  if(back){line(c,0,-65,0,-43,'#5c5674',1.5);path(c,[[-5,-45],[0,-39],[5,-45]],accent,null);}
+  else{rr(c,-11,-53,22,12,4,'#252d35',ink);ellipse(c,-4,-48,1.8,1.8,accent);ellipse(c,4,-48,1.8,1.8,accent);path(c,[[-8,-41],[0,-37],[8,-41],[5,-31],[-5,-31]],'#292838',ink,1);}
+  if(opts.hit){c.globalAlpha*=.5;ellipse(c,0,-31,19,28,'#eee5ff');}c.restore();
+}
+
+function drawMossling(c,opts={}){
+  const t=opts.time||0,walk=opts.walk||0,attack=opts.anim||0,moving=opts.moving??walk!==0,back=!!opts.back;
+  const ink='#2c443a',body='#72915a',body2='#9cb96e',leaf='#496f4d',flower='#f2d39a',team=TEAM_COLORS[opts.owner||0];
+  const hop=(moving?Math.abs(Math.sin(walk*1.4))*3:Math.sin(t*3)*.45),jab=attack?Math.sin((1-attack/.35)*Math.PI):0;
+  c.save();c.translate(0,-hop);
+  for(const side of [-1,1]){line(c,side*4,-4,side*6,8,ink,4);ellipse(c,side*7,9,5,3,'#465b43');}
+  ellipse(c,0,-13,12,14,body);path(c,[[-10,-20],[-17,-30],[-5,-27],[0,-38],[6,-27],[17,-31],[11,-19]],leaf,ink,1.2);
+  rr(c,-10,-16,20,6,3,team);
+  for(const side of [-1,1]){c.save();c.translate(side*11,-14);c.rotate(side*(.3+jab*.7));line(c,0,0,side*8,8,body2,5);ellipse(c,side*8,8,3,3,leaf);c.restore();}
+  if(back){path(c,[[-8,-19],[0,-25],[8,-19],[6,-8],[0,-4],[-6,-8]],'#5c7d50',ink,1);line(c,0,-25,0,-5,'#b1cb7b',1.3);}
+  else{ellipse(c,-4,-16,2,2,'#fff0b0');ellipse(c,4,-16,2,2,'#fff0b0');path(c,[[-4,-9],[0,-6],[4,-9]],null,ink,1.2);ellipse(c,8,-28,2.5,2.5,flower);}
+  if(opts.hit){c.globalAlpha*=.55;ellipse(c,0,-14,13,17,'#f7f1c1');}c.restore();
+}
+
+
+function drawLumina(c,opts={}){
+  const t=opts.time||0,walk=opts.walk||0,attack=opts.anim||0,moving=opts.moving??walk!==0,back=!!opts.back;
+  const ink='#32434a',white='#eee9d7',gold='#d8b766',blue='#9fd7dc',skin='#e7bd9c',team=TEAM_COLORS[opts.owner||0];
+  const bob=Math.sin(walk)*.9+(moving?0:Math.sin(t*2.2)*.45),cast=attack?Math.sin((1-attack/.35)*Math.PI):0;
+  c.save();c.translate(0,bob);
+  for(const side of [-1,1]){c.save();c.translate(side*6,-7);c.rotate(Math.sin(walk+(side>0?Math.PI:0))*(moving?.25:0));line(c,0,0,0,14,'#8f897a',7);rr(c,-5,10,10,6,2,ink);c.restore();}
+  path(c,[[-17,-40],[17,-40],[22,-4],[5,-12],[0,2],[-5,-12],[-22,-4]],white,ink,1.5);rr(c,-15,-38,30,8,3,team);
+  if(back){line(c,-9,-31,9,-14,'#c2a85e',3);line(c,9,-31,-9,-14,'#d8c37a',2);path(c,[[-6,-24],[0,-31],[6,-24],[0,-16]],blue,ink,1);}
+  else{path(c,[[-8,-31],[0,-37],[8,-31],[5,-20],[0,-15],[-5,-20]],'#fff4c9',ink,1);ellipse(c,0,-25,3,3,blue);}
+  // staff hand
+  c.save();c.translate(15,-32);c.rotate(-.15-cast*.5);line(c,0,0,2,15,white,8);ellipse(c,2,15,3.5,3.5,skin);line(c,2,15,2,-34,'#9b7e55',4);ellipse(c,2,-38,8,8,gold);ellipse(c,2,-38,4.5,4.5,blue);c.restore();
+  c.save();c.translate(-15,-32);c.rotate(.1+cast*.35);line(c,0,0,-2,14,white,8);ellipse(c,-2,14,3.5,3.5,skin);c.restore();
+  const hy=-53;path(c,[[-13,hy+9],[-14,hy-9],[0,hy-19],[14,hy-9],[13,hy+9]],white,ink,1.4);
+  if(back){path(c,[[-10,hy-5],[0,hy-15],[10,hy-5],[8,hy+8],[-8,hy+8]],'#d9d3c5',ink,1);}
+  else{ellipse(c,0,hy,10,11,skin);ellipse(c,-3,hy-1,1.3,1.5,ink);ellipse(c,4,hy-1,1.3,1.5,ink);line(c,-4,hy+5,4,hy+5,'#9d715e',1);}
+  c.strokeStyle=gold;c.lineWidth=2;c.beginPath();c.ellipse(0,hy-20,13,4,0,0,TAU);c.stroke();
+  if(opts.hit){c.globalAlpha*=.5;ellipse(c,0,-31,20,31,'#fff9d7');}c.restore();
+}
+
+function drawFrostShaman(c,opts={}){
+  const t=opts.time||0,walk=opts.walk||0,attack=opts.anim||0,moving=opts.moving??walk!==0,back=!!opts.back;
+  const ink='#283b46',fur='#dbe6e4',cloth='#54778a',ice='#9fe9ff',dark='#365363',skin='#d9b391',team=TEAM_COLORS[opts.owner||0];
+  const bob=Math.sin(walk)*1+(moving?0:Math.sin(t*2.1)*.4),cast=attack?Math.sin((1-attack/.35)*Math.PI):0;
+  c.save();c.translate(0,bob);
+  for(const side of [-1,1]){c.save();c.translate(side*6,-8);c.rotate(Math.sin(walk+(side>0?Math.PI:0))*(moving?.28:0));line(c,0,0,0,15,dark,7);rr(c,-5,11,10,6,2,ink);c.restore();}
+  path(c,[[-17,-41],[17,-41],[20,-5],[5,-13],[0,0],[-6,-13],[-21,-5]],cloth,ink,1.4);rr(c,-15,-39,30,7,3,team);
+  for(const side of [-1,1]){c.save();c.translate(side*15,-33);c.rotate(side*(.1+cast*.25));line(c,0,0,side*2,14,fur,8);ellipse(c,side*2,14,3.5,3.5,skin);c.restore();}
+  // crooked ice staff
+  line(c,17,-18,20,-70,'#836d55',4);path(c,[[20,-82],[11,-70],[18,-59],[28,-69]],ice,ink,1.2);ellipse(c,20,-70,4,5,'#e7fbff');
+  const hy=-55;path(c,[[-17,hy+8],[-16,hy-11],[0,hy-23],[17,hy-11],[16,hy+8],[8,hy+14],[-8,hy+14]],fur,ink,1.4);
+  if(back){path(c,[[-11,hy-7],[0,hy-17],[11,hy-7],[8,hy+11],[-8,hy+11]],dark,ink,1);line(c,0,hy-14,0,hy+10,ice,1.4);}
+  else{ellipse(c,0,hy,10,10,skin);rr(c,-10,hy-5,20,8,3,dark,ink);ellipse(c,-4,hy-1,1.5,1.7,ice);ellipse(c,4,hy-1,1.5,1.7,ice);}
+  for(const a of [0,2.1,4.2]){const r=26+Math.sin(t*3+a)*2;ellipse(c,Math.cos(a+t*.3)*r,hy+Math.sin(a+t*.3)*r*.25,1.6,1.6,ice);}
+  if(opts.hit){c.globalAlpha*=.48;ellipse(c,0,-34,20,31,'#dcf8ff');}c.restore();
+}
+
+function drawStormHarpy(c,opts={}){
+  const t=opts.time||0,walk=opts.walk||0,attack=opts.anim||0,back=!!opts.back;
+  const ink='#29384a',feather='#526b99',feather2='#86a6d8',storm='#ffd86c',cloth='#344a70',skin='#d9ad91',team=TEAM_COLORS[opts.owner||0];
+  const flap=Math.sin(t*9+walk)*.38,cast=attack?Math.sin((1-attack/.35)*Math.PI):0;
+  c.save();c.translate(0,-18+Math.sin(t*4)*1.8);
+  for(const side of [-1,1]){c.save();c.scale(side,1);c.rotate(flap);path(c,[[4,-25],[24,-47],[37,-43],[28,-26],[42,-17],[25,-14],[32,0],[13,-10],[7,2]],feather,ink,1.5);path(c,[[8,-21],[27,-36],[21,-18],[34,-16],[18,-8]],feather2,null);c.restore();}
+  path(c,[[-11,-36],[11,-36],[14,-8],[0,0],[-14,-8]],cloth,ink,1.4);rr(c,-11,-34,22,6,2,team);
+  // arms channel lightning
+  for(const side of [-1,1]){c.save();c.translate(side*11,-30);c.rotate(side*(.3+cast*.5));line(c,0,0,side*7,14,skin,6);ellipse(c,side*7,14,3,3,skin);if(!back){line(c,side*8,15,side*14,7,storm,2);line(c,side*14,7,side*10,2,storm,2);}c.restore();}
+  path(c,[[-10,-47],[-7,-62],[0,-70],[8,-62],[11,-47]],feather,ink,1.4);
+  if(back){path(c,[[-8,-55],[0,-64],[8,-55],[6,-42],[-6,-42]],cloth,ink,1);}
+  else{ellipse(c,0,-51,9,10,skin);ellipse(c,-3,-52,1.5,1.7,storm);ellipse(c,4,-52,1.5,1.7,storm);path(c,[[-8,-59],[0,-70],[8,-59]],feather2,ink,1);}
+  for(const side of [-1,1]){path(c,[[side*6,-5],[side*10,12],[side*2,20]],'#7b6a65',ink,1);line(c,side*2,20,side*8,24,'#493f41',2);}
+  if(opts.hit){c.globalAlpha*=.5;ellipse(c,0,-32,19,31,'#e9eeff');}c.restore();
+}
+
 function drawStoneGolem(c,opts={}){
   const t=opts.time||0,walk=opts.walk||0,attack=opts.anim||0,moving=opts.moving??walk!==0;
   const ink='#263d41',stone='#8c9484',stoneLight='#b7b8a2',stoneDark='#636f66',moss='#71885a',moss2='#93a96d',rune='#70d8ff';
@@ -837,9 +1049,15 @@ function drawUnit(c,type,x,y,scale=1,opts={}){
   const moving=opts.moving??walk!==0,bob=Math.sin(walk)*1.5+(opts.idle?Math.sin(t*2)*.65:0);
   c.save();c.translate(x,y);c.scale(scale,scale);
   if(opts.alpha!=null)c.globalAlpha=opts.alpha;
-  if(!opts.noShadow)ellipse(c,0,5,type==='golem'?32:type==='knight'?23:18,type==='golem'?9:6,'#172f3435');
+  if(!opts.noShadow){const sr=type==='golem'?32:type==='boar'?25:type==='knight'?23:type==='mossling'?12:type==='harpy'?20:18;ellipse(c,0,5,sr,type==='golem'?9:type==='boar'?8:6,'#172f3435');}
   if(opts.mirror)c.scale(-1,1);
   if(type==='golem'){drawStoneGolem(c,opts);c.restore();return;}
+  if(type==='boar'){drawIronBoar(c,opts);c.restore();return;}
+  if(type==='nightshade'){drawNightshade(c,opts);c.restore();return;}
+  if(type==='mossling'){drawMossling(c,opts);c.restore();return;}
+  if(type==='lumina'){drawLumina(c,opts);c.restore();return;}
+  if(type==='frost'){drawFrostShaman(c,opts);c.restore();return;}
+  if(type==='harpy'){drawStormHarpy(c,opts);c.restore();return;}
   if(opts.back&&type!=='bat'&&type!=='cannon'){drawBackHumanoid(c,type,opts);c.restore();return;}
   if(type==='bat'){
     const flap=Math.sin(t*13+walk)*.55;
@@ -1035,8 +1253,9 @@ function drawArena(canvas,snapshot,options={}){
     if(item.tower){drawTower(c,item.entity,seat,time);continue;}
     const u=item.entity,p=orient(u,seat),owner=u.owner===seat?0:1,facing=visualFacing(u,seat);
     c.strokeStyle=TEAM_COLORS[owner]+'b0';c.lineWidth=2;c.beginPath();c.ellipse(p.x,p.y+4,u.radius+4,(u.radius+4)*.34,0,0,TAU);c.stroke();
-    drawUnit(c,u.type,p.x,p.y,u.type==='bat'?.93:.95,{time,walk:u.walk,moving:u.moving,owner,anim:u.anim,hit:u.hit,alpha:u.spawn>0?.5:1,back:facing.back,mirror:u.building?false:facing.mirror,facing:facing.angle});
-    const hp=u.hp/u.maxHp,w=u.type==='golem'?50:u.type==='knight'?38:28;
+    drawUnit(c,u.type,p.x,p.y,u.type==='mossling'?.9:u.type==='bat'?.93:u.type==='golem'?.92:u.type==='harpy'?.9:.95,{time,walk:u.walk,moving:u.moving,owner,anim:u.anim,hit:u.hit,charged:u.charged,alpha:u.spawn>0?.5:1,back:facing.back,mirror:u.building?false:facing.mirror,facing:facing.angle});
+    if(u.slowed){c.save();c.strokeStyle='#a9ebffcc';c.lineWidth=2;c.setLineDash([3,4]);c.beginPath();c.ellipse(p.x,p.y+3,u.radius+8,(u.radius+8)*.42,0,0,TAU);c.stroke();c.restore();}
+    const hp=u.hp/u.maxHp,w=u.type==='golem'?50:u.type==='boar'?38:u.type==='knight'?38:u.type==='mossling'?20:28;
     if(hp<.999){rr(c,p.x-w/2,p.y-(u.air?48:82),w,5,2,'#25363eaa');rr(c,p.x-w/2+1,p.y-(u.air?47:81),(w-2)*hp,3,1,TEAM_COLORS[owner]);}
     if(owner===0&&!u.air&&!u.building&&g.towers.some(t=>{const q=orient(t,seat);return t.hp>0&&q.y>p.y&&q.y-p.y<90&&Math.abs(q.x-p.x)<t.radius+8;}))markerUnits.push(p);
   }
@@ -1052,6 +1271,9 @@ function drawArena(canvas,snapshot,options={}){
     c.save();c.translate(pos.x,pos.y-10);c.rotate(angle);
     if(p.kind==='arrow'){line(c,-10,0,7,0,'#f2dfb8',2);path(c,[[6,-3],[13,0],[6,3]],'#edf5df');}
     else if(p.kind==='bomb'){ellipse(c,0,0,8,8,'#2a3941');line(c,0,-7,4,-11,'#fbd078',2);}
+    else if(p.kind==='frost'){path(c,[[-9,0],[0,-8],[10,0],[0,8]],'#a8edff','#4c8297',1);ellipse(c,0,0,3,3,'#effdff');}
+    else if(p.kind==='lightning'){line(c,-10,0,-2,-5,'#ffe074',3);line(c,-2,-5,3,4,'#fff1a4',3);line(c,3,4,12,0,'#ffe074',3);}
+    else if(p.kind==='light'){ellipse(c,0,0,7,7,'#ffe7a3');ellipse(c,0,0,3,3,'#e6ffff');}
     else{ellipse(c,0,0,p.kind==='orb'?8:5,p.kind==='orb'?8:5,p.kind==='orb'?'#c8b0f1':'#f9d494');ellipse(c,-4,0,3,3,'#fff3ca');}
     c.restore();
   }
@@ -1059,8 +1281,18 @@ function drawArena(canvas,snapshot,options={}){
     const p=orient(e,seat),fade=clamp(e.life/(e.type==='death'?.9:.5),0,1);c.save();c.globalAlpha=fade;
     if(e.type==='spawn'){
       c.strokeStyle=TEAM_COLORS[e.owner===seat?0:1];c.lineWidth=3;c.beginPath();c.ellipse(p.x,p.y,30*(1-fade)+15,10*(1-fade)+5,0,0,TAU);c.stroke();
+    }else if(e.type==='charge'){
+      c.strokeStyle='#ffd46b';c.lineWidth=3;c.beginPath();c.arc(p.x,p.y-18,16+(1-fade)*24,0,TAU);c.stroke();
+    }else if(e.type==='charge-hit'){
+      for(let i=0;i<10;i++){const a=i*TAU/10,len=(1-fade)*42;ellipse(c,p.x+Math.cos(a)*len,p.y-10+Math.sin(a)*len*.6,3+fade*6,3+fade*4,i%2?'#d1a873':'#f4d177');}
     }else if(e.type==='slash'){
       c.strokeStyle='#fff1c0';c.lineWidth=4;c.beginPath();c.arc(p.x,p.y-18,20+(1-fade)*13,-2.5,-.3);c.stroke();
+    }else if(e.type==='heal'){
+      c.strokeStyle='#dff6bd';c.lineWidth=3;c.beginPath();c.arc(p.x,p.y-18,10+(1-fade)*24,0,TAU);c.stroke();line(c,p.x-6,p.y-18,p.x+6,p.y-18,'#f6e9a9',3);line(c,p.x,p.y-24,p.x,p.y-12,'#f6e9a9',3);
+    }else if(e.type==='slow'){
+      c.strokeStyle='#a7ebff';c.lineWidth=2;c.beginPath();c.arc(p.x,p.y-15,12+(1-fade)*18,0,TAU);c.stroke();for(let i=0;i<6;i++){const a=i*TAU/6;line(c,p.x+Math.cos(a)*12,p.y-15+Math.sin(a)*12,p.x+Math.cos(a)*18,p.y-15+Math.sin(a)*18,'#dffaff',1.5);}
+    }else if(e.type==='chain'){
+      if(e.points?.length){let a=orient({x:e.x,y:e.y},seat);for(const q0 of e.points){const q=orient(q0,seat),mx=(a.x+q.x)/2+((String(e.id).length%2)?5:-5);line(c,a.x,a.y-10,mx,(a.y+q.y)/2-16,'#ffe16e',3);line(c,mx,(a.y+q.y)/2-16,q.x,q.y-10,'#fff3b1',2);a=q;}}
     }else if(e.type==='death'||e.type==='blast'){
       for(let i=0;i<8;i++){
         const a=i*TAU/8+e.id,len=(1-fade)*(e.type==='blast'?e.radius:35);
@@ -1086,8 +1318,9 @@ function drawPortrait(canvas,type,time=0,owner=0,selected=false,back=false){
   const g=c.createRadialGradient(60,48,10,60,64,70);g.addColorStop(0,col+'99');g.addColorStop(1,col+'00');
   c.fillStyle=g;c.fillRect(0,0,120,120);
   ellipse(c,60,105,40,8,'#1f39451b');
-  const scale=type==='golem'?.92:type==='bat'?1.6:type==='cannon'?1.5:type==='mage'?1.12:1.32;
-  drawUnit(c,type,60,type==='golem'?112:type==='bat'?83:type==='cannon'?(back?94:80):104,scale,{time,owner,idle:true,noShadow:true,anim:0,back,facing:back?-Math.PI/2:Math.PI/2});
+  const scale=type==='golem'?.92:type==='boar'?1.28:type==='mossling'?2.05:type==='harpy'?1.45:type==='bat'?1.6:type==='cannon'?1.5:type==='mage'?1.12:type==='nightshade'?1.28:type==='lumina'?1.22:type==='frost'?1.2:1.32;
+  const py=type==='golem'?112:type==='boar'?96:type==='mossling'?91:type==='harpy'?91:type==='bat'?83:type==='cannon'?(back?94:80):104;
+  drawUnit(c,type,60,py,scale,{time,owner,idle:true,noShadow:true,anim:0,back,facing:back?-Math.PI/2:Math.PI/2});
   c.restore();
 }
 
@@ -1113,10 +1346,10 @@ function safeStorage(store,key,value){
 const remembered=safeStorage('local','tiny-name');if(remembered)el('nickname').value=remembered;
 soundOn=safeStorage('local','tiny-sound')==='true';
 function loadDeck(){
-  try{const raw=JSON.parse(safeStorage('local','tiny-deck-v3')||'null');return normalizeDeck(raw);}catch{return [...DEFAULT_DECK];}
+  try{const raw=JSON.parse(safeStorage('local','tiny-deck-v5')||safeStorage('local','tiny-deck-v4')||safeStorage('local','tiny-deck-v3')||'null');return normalizeDeck(raw);}catch{return [...DEFAULT_DECK];}
 }
 let playerDeck=loadDeck();
-function persistDeck(){safeStorage('local','tiny-deck-v3',JSON.stringify(playerDeck));renderDeckSummaries();}
+function persistDeck(){safeStorage('local','tiny-deck-v5',JSON.stringify(playerDeck));renderDeckSummaries();}
 function deckReady(deck=playerDeck){return Array.isArray(deck)&&deck.length===MAX_DECK&&new Set(deck).size===MAX_DECK&&deck.every(id=>Object.hasOwn(UNITS,id));}
 function sound(kind='place'){
   if(!soundOn)return;
@@ -1382,7 +1615,7 @@ function updateInspector(id){
   inspectId=id;const d=UNITS[id];
   el('inspectorRole').textContent=d.role;el('inspectorName').textContent=d.name;el('inspectorDesc').textContent=d.desc;
   el('inspectorStats').replaceChildren();
-  for(const [label,value] of [['COST',d.cost],['HP',d.hp+(d.count>1?' ×3':'')],['DMG',d.damage]]){
+  for(const [label,value] of [['COST',d.cost],['HP',d.hp+(d.count>1?` ×${d.count}`:'')],['DMG',d.damage]]){
     const div=document.createElement('div'),s=document.createElement('small'),strong=document.createElement('strong');s.textContent=label;strong.textContent=value;div.append(s,strong);el('inspectorStats').append(div);
   }
   el('tacticalTip').textContent=d.desc;
@@ -1490,7 +1723,7 @@ for(const id of DECK){
   const role=document.createElement('small');role.textContent=d.role;
   const h=document.createElement('h3');h.textContent=d.name;
   const p=document.createElement('p');p.textContent=d.desc;
-  const stat=document.createElement('div');stat.className='library-stat';stat.textContent=`HP ${d.hp}${d.count>1?' ×3':''}　攻撃 ${d.damage}`;
+  const stat=document.createElement('div');stat.className='library-stat';stat.textContent=`HP ${d.hp}${d.count>1?` ×${d.count}`:''}　攻撃 ${d.damage}`;
   card.append(badge,can,role,h,p,stat);el('libraryGrid').append(card);
 }
 function interpolate(g,now){
