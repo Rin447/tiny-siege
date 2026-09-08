@@ -1,5 +1,5 @@
 import {PHYSICS_VERSION} from '../public/game/physics.js';
-import {VERSION, DECK} from '../public/game/units.js';
+import {VERSION, DECK, MAX_DECK} from '../public/game/units.js';
 import {RoomModel,newRoom,ROOM_TTL,cleanName} from './room-model.js';
 import {finish} from '../public/game/engine.js';
 
@@ -21,7 +21,7 @@ export default {
   async fetch(request,env){
     try{
       const u=new URL(request.url),path=u.pathname;
-      if(path==='/api/config')return json({ok:true,game:'tiny-siege',version:VERSION,units:DECK.length,physicsVersion:PHYSICS_VERSION,features:['back-views','ground-air-layers','solid-buildings','body-size-mass','depth-sorting'],online:'durable-objects-websocket',maxPlayers:2});
+      if(path==='/api/config')return json({ok:true,game:'tiny-siege',version:VERSION,units:DECK.length,physicsVersion:PHYSICS_VERSION,features:['back-views','ground-air-layers','solid-buildings','body-size-mass','depth-sorting','custom-deck','building-only-golem'],online:'durable-objects-websocket',maxPlayers:2,maxDeck:MAX_DECK});
       if(path==='/health')return json({ok:true});
       if(path.startsWith('/api/')){
         if(!originOK(request))return json({ok:false,error:'異なるサイトからの操作は拒否しました。'},403);

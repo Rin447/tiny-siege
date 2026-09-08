@@ -1,4 +1,4 @@
-import {VERSION,ARENA,UNITS,DECK} from './game/units.js';
+import {VERSION,ARENA,UNITS,DECK,DEFAULT_DECK,MAX_DECK,normalizeDeck} from './game/units.js';
 import {createMatch,tick,runBot,deploy,viewMatch,clamp,canPlace} from './game/engine.js';
 import {drawArena,drawPortrait,orient} from './game/art.js';
 
@@ -11,7 +11,7 @@ let localGame=null,localTimer=null,lastLocal=0,localPaused=false,gameMode=null,d
 let demoGame=createMatch({seed:48164,bot:true}),demoLast=0,demoAutoAt=0,animationLast=0;
 let handSignature='',memberSignature='',lobbyCode='',previousPhase='',soundOn=false,audio=null,toastTimer;
 let serverAvailable=false,apiChecked=false,onlineBusy=false;
-let physicsOverlay=false,rosterBack=false,incompatibleVersion=false;
+let physicsOverlay=false,rosterBack=false,incompatibleVersion=false,editingDeck=[];
 const standalone=!!window.TINY_OFFLINE||location.protocol==='file:';
 function safeStorage(store,key,value){
   try{const storage=store==='session'?window.sessionStorage:window.localStorage;
@@ -20,6 +20,12 @@ function safeStorage(store,key,value){
 }
 const remembered=safeStorage('local','tiny-name');if(remembered)el('nickname').value=remembered;
 soundOn=safeStorage('local','tiny-sound')==='true';
+function loadDeck(){
+  try{const raw=JSON.parse(safeStorage('local','tiny-deck-v3')||'null');return normalizeDeck(raw);}catch{return [...DEFAULT_DECK];}
+}
+let playerDeck=loadDeck();
+function persistDeck(){safeStorage('local','tiny-deck-v3',JSON.stringify(playerDeck));renderDeckSummaries();}
+function deckReady(deck=playerDeck){return Array.isArray(deck)&&deck.length===MAX_DECK&&new Set(deck).size===MAX_DECK&&deck.every(id=>Object.hasOwn(UNITS,id));}
 function sound(kind='place'){
   if(!soundOn)return;
   try{
@@ -146,7 +152,7 @@ function renderLobby(){
       const avatar=document.createElement('span');avatar.className='member-avatar';avatar.textContent=p?[...p.name][0]:'+';
       const text=document.createElement('div'),name=document.createElement('strong'),sub=document.createElement('small');
       name.textContent=p?(p.name+(p.seat===seat?' · あなた':'')):'対戦相手を待っています';
-      sub.textContent=p?(p.connected?(p.seat===room.host?'ホスト':'メンバー'):'接続を待っています'):'同じPASSで参加';
+      sub.textContent=p?(p.connected?`${p.seat===room.host?'ホスト':'メンバー'} · デッキ ${p.seat===seat?playerDeck.length:(p.deckCount||0)}/${MAX_DECK}`:'接続を待っています'):'同じPASSで参加';
       text.append(name,sub);box.append(avatar,text);
       if(p?.ready){const b=document.createElement('em');b.textContent='✓ OK';box.append(b);}
       el('members').append(box);
@@ -158,8 +164,10 @@ function renderLobby(){
   if(lobbyCode!==room.code){
     lobbyCode=room.code;el('inviteCode').textContent=room.code;el('inviteURL').value=location.origin+'/';
   }
+  renderDeckSummaries();
+  el('lobbyDeckBtn').disabled=!!mine?.ready;
 }
-el('readyBtn').addEventListener('click',()=>send({type:'ready',ready:!room?.members[seat]?.ready}));
+el('readyBtn').addEventListener('click',()=>{const next=!room?.members[seat]?.ready;if(next&&!deckReady()){openDeckEditor();toast('対戦には6体のデッキが必要です。');return;}send({type:'ready',ready:next,deck:next?[...playerDeck]:undefined});});
 el('startBtn').addEventListener('click',()=>send({type:'start'}));
 el('leaveLobby').addEventListener('click',leaveOnline);
 async function copyText(text){
@@ -176,14 +184,15 @@ function startPractice(){
   let name;try{name=inputName();}catch(e){entryError(e.message);return;}
   if(session)leaveOnline();
   clearInterval(localTimer);gameMode='cpu';seat=0;room=null;previous=null;previousPhase='';handSignature='';
-  localGame=createMatch({seed:crypto.getRandomValues(new Uint32Array(1))[0],bot:true,difficulty});
+  if(!deckReady()){openDeckEditor();entryError('対戦には6体のデッキが必要です。');return;}
+  localGame=createMatch({seed:crypto.getRandomValues(new Uint32Array(1))[0],bot:true,difficulty,decks:[playerDeck,DEFAULT_DECK]});
   snapshot=viewMatch(localGame,0);selected=null;hover=null;localPaused=false;
   el('matchType').textContent='CPU PRACTICE · '+({easy:'EASY',normal:'NORMAL',hard:'HARD'}[difficulty]);
   el('ownName').textContent=name;el('enemyName').textContent='CPU · '+({easy:'やさしい',normal:'ふつう',hard:'手ごわい'}[difficulty]);
   showView('battle');status('CPU練習中');lastLocal=performance.now();
   localTimer=setInterval(()=>{
     const now=performance.now();
-    localPaused=document.hidden||el('helpModal').open||el('libraryModal').open;
+    localPaused=document.hidden||el('helpModal').open||el('libraryModal').open||el('deckModal').open;
     if(!localPaused&&localGame&&localGame.phase!=='ended'){
       tick(localGame,.1);acceptSnapshot(viewMatch(localGame,0));
     }
@@ -307,7 +316,7 @@ function place(p){
   }else send({type:'deploy',card:selected,x:pos.x,y:pos.y});
 }
 document.addEventListener('keydown',e=>{
-  if(currentView!=='battle'||['INPUT','TEXTAREA'].includes(document.activeElement.tagName)||el('helpModal').open||el('libraryModal').open)return;
+  if(currentView!=='battle'||['INPUT','TEXTAREA'].includes(document.activeElement.tagName)||el('helpModal').open||el('libraryModal').open||el('deckModal').open)return;
   if(/^[1-4]$/.test(e.key)){e.preventDefault();choose(snapshot.hand[Number(e.key)-1]);}
   if(e.key==='Escape'){selected=null;hover=null;updateHand();}
 });
@@ -335,11 +344,51 @@ el('soundBtn').onclick=()=>{
 el('soundBtn').textContent='♪';el('soundBtn').classList.toggle('sound-muted',!soundOn);el('soundBtn').title=soundOn?'効果音 ON':'効果音 OFF';
 el('physicsBtn').onclick=()=>{physicsOverlay=!physicsOverlay;el('physicsBtn').setAttribute('aria-pressed',String(physicsOverlay));el('physicsBtn').textContent=physicsOverlay?'当たり判定を隠す':'当たり判定を表示';el('physicsLegend').textContent=physicsOverlay?'緑: 地上 / 紫: 空中 / 黄: 建物':'地上と空中は別レイヤー';};
 el('libraryFacingBtn').onclick=()=>{rosterBack=!rosterBack;el('libraryFacingBtn').setAttribute('aria-pressed',String(rosterBack));el('libraryFacingBtn').textContent=rosterBack?'正面を見る ↻':'後ろ姿を見る ↻';};
+function makeMiniRoster(container,ids,interactive=false){
+  container.replaceChildren();
+  for(const id of ids){
+    const d=UNITS[id],mini=document.createElement('button');mini.type='button';mini.title=d.name;
+    const mc=document.createElement('canvas');mc.width=120;mc.height=120;mc.dataset.portrait=id;
+    const mn=document.createElement('span');mn.textContent=d.short;mini.append(mc,mn);
+    if(interactive)mini.onclick=openDeckEditor;container.append(mini);
+  }
+}
+function renderDeckSummaries(){
+  makeMiniRoster(el('homeDeck'),playerDeck,true);makeMiniRoster(el('lobbyRoster'),playerDeck,true);
+}
+function renderDeckEditor(){
+  el('deckCount').textContent=`${editingDeck.length} / ${MAX_DECK}`;el('deckError').hidden=true;
+  el('deckSaveBtn').disabled=editingDeck.length!==MAX_DECK;
+  el('deckSlots').replaceChildren();
+  for(let i=0;i<MAX_DECK;i++){
+    const id=editingDeck[i],slot=document.createElement('button');slot.type='button';slot.className='deck-slot '+(id?'filled':'empty');
+    const n=document.createElement('em');n.textContent=String(i+1);slot.append(n);
+    if(id){const can=document.createElement('canvas');can.width=120;can.height=120;can.dataset.portrait=id;const name=document.createElement('strong');name.textContent=UNITS[id].short;slot.append(can,name);slot.onclick=()=>{editingDeck.splice(i,1);renderDeckEditor();};}
+    el('deckSlots').append(slot);
+  }
+  el('deckPool').replaceChildren();
+  for(const id of DECK){
+    const d=UNITS[id],selected=editingDeck.includes(id),b=document.createElement('button');b.type='button';b.className='deck-choice'+(selected?' selected':'');
+    const can=document.createElement('canvas');can.width=120;can.height=120;can.dataset.portrait=id;
+    const cost=document.createElement('span');cost.className='deck-cost';cost.textContent=d.cost;
+    const copy=document.createElement('div');copy.className='deck-copy';const h=document.createElement('h3');h.textContent=d.name;const sm=document.createElement('small');sm.textContent=d.role;const desc=document.createElement('p');desc.textContent=d.desc;copy.append(h,sm,desc);b.append(can,cost,copy);
+    if(selected){const chk=document.createElement('span');chk.className='deck-check';chk.textContent='選択中';b.append(chk);}
+    b.onclick=()=>{const at=editingDeck.indexOf(id);if(at>=0)editingDeck.splice(at,1);else if(editingDeck.length<MAX_DECK)editingDeck.push(id);else{el('deckError').textContent='デッキは最大6体です。1体外してから追加してください。';el('deckError').hidden=false;return;}renderDeckEditor();};
+    el('deckPool').append(b);
+  }
+}
+function openDeckEditor(){
+  if(currentView==='battle'&&snapshot?.phase!=='ended'){toast('対戦中はデッキを変更できません。');return;}
+  editingDeck=[...playerDeck];renderDeckEditor();el('deckModal').showModal();
+}
+el('deckBtn').onclick=openDeckEditor;el('homeDeckBtn').onclick=openDeckEditor;el('lobbyDeckBtn').onclick=()=>{if(room?.members[seat]?.ready){toast('準備OKを取り消してから編集してください。');return;}openDeckEditor();};
+el('deckDefaultBtn').onclick=()=>{editingDeck=[...DEFAULT_DECK];renderDeckEditor();};
+el('deckSaveBtn').onclick=()=>{if(!deckReady(editingDeck)){el('deckError').textContent='対戦に使う6体を選んでください。';el('deckError').hidden=false;return;}playerDeck=[...editingDeck];persistDeck();el('deckModal').close();toast('デッキを保存しました。');};
 el('libraryBtn').onclick=()=>{el('libraryModal').showModal();};
 el('helpBtn').onclick=()=>{el('helpModal').showModal();};
 for(const b of document.querySelectorAll('.close-modal'))b.onclick=()=>b.closest('dialog').close();
 for(const dlg of document.querySelectorAll('dialog'))dlg.addEventListener('close',()=>{
-  if(gameMode==='cpu'){localPaused=document.hidden||el('helpModal').open||el('libraryModal').open;updateHUD();}
+  if(gameMode==='cpu'){localPaused=document.hidden||el('helpModal').open||el('libraryModal').open||el('deckModal').open;updateHUD();}
 });
 for(const dlg of document.querySelectorAll('dialog'))dlg.addEventListener('click',e=>{const r=dlg.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dlg.close();});
 for(const id of DECK){
@@ -351,9 +400,6 @@ for(const id of DECK){
   const p=document.createElement('p');p.textContent=d.desc;
   const stat=document.createElement('div');stat.className='library-stat';stat.textContent=`HP ${d.hp}${d.count>1?' ×3':''}　攻撃 ${d.damage}`;
   card.append(badge,can,role,h,p,stat);el('libraryGrid').append(card);
-  const mini=document.createElement('button');mini.title=d.name;
-  const mc=document.createElement('canvas');mc.width=120;mc.height=120;mc.dataset.portrait=id;
-  const mn=document.createElement('span');mn.textContent=d.short;mini.append(mc,mn);mini.onclick=()=>el('libraryModal').showModal();el('lobbyRoster').append(mini);
 }
 function interpolate(g,now){
   if(!previous||g.phase==='ended'||previous.units.length===0)return g;
@@ -384,13 +430,14 @@ function animation(now){
   }
 }
 requestAnimationFrame(animation);
-updateInspector('blade');
+updateInspector('blade');renderDeckSummaries();
 async function boot(){
   if(standalone){status('CPU練習・オフライン版');el('onlineBtn').disabled=true;entryError('このファイルはCPU練習用です。オンライン対戦は同梱のプロジェクトをCloudflareに公開してください。');return;}
   try{
     const config=await api('/api/config');
     if(config.version!==VERSION){incompatibleVersion=true;setOnlineBusy(false);entryError('ゲームが更新されています。Ctrl + F5で再読み込みしてください。');throw new Error('Version mismatch');}
     if(config.game!=='tiny-siege')throw new Error('別のゲームのAPIが応答しています。');
+    if(config.maxDeck!==MAX_DECK)throw new Error('デッキ仕様が更新されています。');
     serverAvailable=true;status('オンライン対応');
     const saved=safeStorage('session','tiny-session');
     if(saved){

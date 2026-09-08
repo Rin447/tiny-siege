@@ -1,4 +1,4 @@
-import {ARENA, UNITS, DECK} from './units.js';
+import {ARENA, UNITS, DECK, DEFAULT_DECK, MAX_DECK, normalizeDeck} from './units.js';
 import {PHYSICS_VERSION, staticFree, spawnPositions, navigationWaypoint, moveBody, resolveBodies, faceToward} from './physics.js';
 
 export function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
@@ -7,13 +7,15 @@ export function random(g){
   let x=g.rng|0; x^=x<<13; x^=x>>>17; x^=x<<5;
   g.rng=x>>>0; return g.rng/4294967296;
 }
-function shuffled(g){const a=[...DECK];for(let i=a.length-1;i>0;i--){const j=Math.floor(random(g)*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
-export function createMatch({seed=12345,bot=false,difficulty='normal'}={}){
+function shuffled(g,source=DEFAULT_DECK){const a=[...source];for(let i=a.length-1;i>0;i--){const j=Math.floor(random(g)*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+export function validateDeck(value){return normalizeDeck(value,{fallback:false});}
+export function createMatch({seed=12345,bot=false,difficulty='normal',decks=[DEFAULT_DECK,DEFAULT_DECK]}={}){
   const g={physicsVersion:PHYSICS_VERSION,phase:'countdown',countdown:3,time:0,overtime:false,rng:seed||1,units:[],projectiles:[],events:[],nextId:1,step:0,
     winner:null,reason:'',bot,difficulty,botNext:1.5,
-    players:[{energy:5,hand:[],queue:[]},{energy:5,hand:[],queue:[]}],towers:[]};
+    players:[{energy:5,hand:[],queue:[],deck:[]},{energy:5,hand:[],queue:[],deck:[]}],towers:[]};
+  const safeDecks=[normalizeDeck(decks?.[0]),normalizeDeck(decks?.[1])];
   for(let owner=0;owner<2;owner++){
-    const d=shuffled(g);g.players[owner].hand=d.slice(0,4);g.players[owner].queue=d.slice(4);
+    const d=shuffled(g,safeDecks[owner]);g.players[owner].deck=[...safeDecks[owner]];g.players[owner].hand=d.slice(0,4);g.players[owner].queue=d.slice(4);
     for(let i=0;i<3;i++){
       const core=i===2,x=core?360:(i===0?190:530);
       g.towers.push({id:`t${owner}${i}`,kind:core?'core':'tower',owner,x,y:owner===0?(core?905:805):(core?135:235),
@@ -60,6 +62,16 @@ function preferredTower(g,u){
   return out||g.towers.find(t=>t.owner===enemy&&t.kind==='core'&&t.hp>0);
 }
 function getTarget(g,u,entities){
+  // Building-only units ignore troops completely and march toward the nearest enemy structure.
+  if(u.buildingOnly){
+    let best=null,bestD=Infinity;
+    for(const t of entities){
+      if(!targetable(u,t)||!(t.kind||t.building))continue;
+      const d=distance(u,t)-t.radius;
+      if(d<bestD){best=t;bestD=d;}
+    }
+    return best;
+  }
   // Nearest combatant in the aggro radius; buildings never chase.
   const reach=u.kind||u.building?u.range+30:Math.max(205,u.range+35);
   let best=null,bestD=Infinity;
@@ -185,7 +197,7 @@ const rnd=v=>Math.round(v*100)/100;
 export function viewMatch(g,seat=0){
   const p=g.players[seat];
   return {physicsVersion:PHYSICS_VERSION,phase:g.phase,countdown:g.countdown,time:rnd(g.time),overtime:g.overtime,winner:g.winner,reason:g.reason,
-    scores:[towerScore(g,0),towerScore(g,1)],energy:rnd(p.energy),hand:[...p.hand],next:p.queue[0],
+    scores:[towerScore(g,0),towerScore(g,1)],energy:rnd(p.energy),hand:[...p.hand],next:p.queue[0],deck:[...p.deck],
     units:g.units.map(u=>({id:u.id,type:u.type,owner:u.owner,x:rnd(u.x),y:rnd(u.y),hp:u.hp,maxHp:u.maxHp,radius:u.radius,air:u.air,building:!!u.building,anim:u.anim,hit:u.hit,walk:u.walk,spawn:u.spawn,face:u.face,facing:u.facing,moving:!!u.moving,mass:u.mass,age:u.age})),
     towers:g.towers.map(t=>({id:t.id,kind:t.kind,owner:t.owner,x:t.x,y:t.y,hp:t.hp,maxHp:t.maxHp,radius:t.radius,anim:t.anim,hit:t.hit,facing:t.facing})),
     projectiles:g.projectiles.map(p=>({id:p.id,owner:p.owner,x:p.x,y:p.y,tx:p.tx,ty:p.ty,kind:p.kind})),

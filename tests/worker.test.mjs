@@ -22,8 +22,8 @@ function env(){
 function req(url,method='GET',data=null,origin='https://test.invalid'){
  return new Request('https://test.invalid'+url,{method,headers:{'Content-Type':'application/json','Origin':origin},body:data?JSON.stringify(data):undefined});
 }
-test('worker health and config identify eight unit game',async()=>{
- const r=await worker.fetch(req('/api/config'),env());const b=await r.json();assert.equal(b.units,8);assert.equal(b.game,'tiny-siege');
+test('worker health and config identify nine unit custom-deck game',async()=>{
+ const r=await worker.fetch(req('/api/config'),env());const b=await r.json();assert.equal(b.units,9);assert.equal(b.maxDeck,6);assert.equal(b.game,'tiny-siege');
 });
 test('worker static assets use ASSETS binding',async()=>{
  const r=await worker.fetch(req('/'),env());assert.equal(await r.text(),'asset');

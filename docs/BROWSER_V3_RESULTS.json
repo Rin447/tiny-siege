@@ -1,0 +1,14 @@
+{
+  "passed": 7,
+  "checks": [
+    "home shows a six-unit saved deck",
+    "deck editor shows nine choices and six selected slots",
+    "five-card deck cannot be saved",
+    "six unique cards can be saved",
+    "library contains all nine units including Stone Golem",
+    "CPU battle starts with four cards from the six-card deck",
+    "no uncaught JavaScript errors in v3 deck/library/CPU flow"
+  ],
+  "errors": [],
+  "note": "Self-contained offline HTML loaded with Playwright set_content; not Cloudflare production or native browser networking."
+}

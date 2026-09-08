@@ -13,7 +13,7 @@ function body(g,type,owner,x,y){const u={...UNITS[type],id:`u${g.nextId++}`,type
 function checkStatics(g){for(const u of g.units)if(!u.building)assert.ok(staticFree(g,u,u),`${u.id} ${u.type} in static at ${u.x},${u.y}`);}
 
 test('v2 physics version and mass/radius data are explicit',()=>{
- assert.equal(VERSION,'2.0.0');assert.equal(PHYSICS_VERSION,2);
+ assert.equal(VERSION,'3.0.0');assert.equal(PHYSICS_VERSION,2);
  assert.ok(UNITS.knight.mass>UNITS.archer.mass);assert.ok(UNITS.knight.radius>UNITS.archer.radius);
  assert.equal(createMatch().physicsVersion,2);
 });

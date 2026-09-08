@@ -1,5 +1,5 @@
 
-> tiny-siege@2.0.0 check
+> tiny-siege@3.0.0 check
 > node scripts/check.mjs
 
 PASS: 16 JavaScript files parse; Cloudflare configuration and separate Worker name checked.

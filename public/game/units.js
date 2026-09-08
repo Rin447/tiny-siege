@@ -1,5 +1,6 @@
 /** Balance data: original prototype values. Both browser and server import this file. */
-export const VERSION = '2.0.0';
+export const VERSION = '3.0.0';
+export const MAX_DECK = 6;
 export const ARENA = Object.freeze({
   width:720, height:1040, riverTop:482, riverBottom:558, bridges:[190,530],
   bridgeHalf:42, deployBottom:600, deployTop:440, maxUnits:100,
@@ -13,8 +14,16 @@ export const UNITS = Object.freeze({
   spear:{id:'spear',mass:1.2,name:'スパーク槍兵',short:'槍兵',role:'中距離・低コスト',cost:2,hp:410,damage:82,speed:64,range:68,cooldown:0.9,radius:14,count:1,air:false,targetsAir:false,color:'#f6a98d',desc:'長い槍で剣士より少し離れて攻撃。素早い援軍や防衛に。'},
   bat:{id:'bat',mass:0.6,name:'ムーンバット',short:'バット',role:'飛行・3体編成',cost:2,hp:145,damage:46,speed:82,range:28,cooldown:0.85,radius:11,count:3,air:true,targetsAir:true,color:'#b7a7dc',desc:'3体で出撃し、川を飛び越える。対空できない敵に強い。'},
   bomber:{id:'bomber',mass:2,name:'ポット爆弾兵',short:'爆弾兵',role:'地上範囲攻撃',cost:3,hp:470,damage:174,speed:42,range:145,cooldown:1.8,radius:16,count:1,air:false,targetsAir:false,projectile:'bomb',splash:66,color:'#edaa66',desc:'爆弾で地上の密集を崩す。空中の敵には攻撃できない。'},
-  cannon:{id:'cannon',mass:1000000,name:'ボルト砲台',short:'砲台',role:'防衛建物',cost:4,hp:1080,damage:140,speed:0,range:218,cooldown:1.4,radius:24,count:1,air:false,targetsAir:false,projectile:'shell',building:true,lifetime:32,color:'#8dbfb3',desc:'動かない防衛建物。地上の敵を迎撃し、32秒で消える。'}
+  cannon:{id:'cannon',mass:1000000,name:'ボルト砲台',short:'砲台',role:'防衛建物',cost:4,hp:1080,damage:140,speed:0,range:218,cooldown:1.4,radius:24,count:1,air:false,targetsAir:false,projectile:'shell',building:true,lifetime:32,color:'#8dbfb3',desc:'動かない防衛建物。地上の敵を迎撃し、32秒で消える。'},
+  golem:{id:'golem',mass:16,name:'ストーンゴーレム',short:'ゴーレム',role:'建物特攻・超重量',cost:6,hp:3350,damage:295,speed:21,range:42,cooldown:1.85,radius:30,count:1,air:false,targetsAir:false,buildingOnly:true,color:'#8ea37d',desc:'敵ユニットを無視し、建物だけを目指す超重量タンク。非常に硬く一撃も重いが、歩みは遅い。'}
 });
 export const DECK = Object.freeze(Object.keys(UNITS));
+export const DEFAULT_DECK = Object.freeze(['blade','knight','archer','mage','bomber','golem']);
 export const ROLE_ORDER = DECK;
 export const TEAM_COLORS = ['#58b9ae','#ee9b81'];
+export function normalizeDeck(value,{fallback=true}={}){
+  const out=[];
+  if(Array.isArray(value))for(const id of value){if(typeof id==='string'&&Object.hasOwn(UNITS,id)&&!out.includes(id))out.push(id);if(out.length===MAX_DECK)break;}
+  if(out.length===MAX_DECK)return out;
+  return fallback?[...DEFAULT_DECK]:null;
+}

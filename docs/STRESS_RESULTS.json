@@ -2,9 +2,9 @@
   "units": 93,
   "steps": 1200,
   "simulatedSeconds": 120,
-  "meanMs": 11.811847676666662,
-  "p95Ms": 15.728117999999995,
-  "maxFrameMs": 144.69062099999974,
+  "meanMs": 8.457154948333313,
+  "p95Ms": 10.071458000000348,
+  "maxFrameMs": 69.59630000000001,
   "maxEnemyOverlap": 0,
   "runtime": "v22.16.0",
   "note": "Synthetic zero-damage congestion test on local Node. Not a Cloudflare CPU/quota benchmark."

@@ -101,6 +101,63 @@ function drawBackHumanoid(c,type,opts){
  }
  if(opts.hit){c.globalAlpha*=.55;ellipse(c,0,-28,19,30,'#fff8db');}c.restore();
 }
+
+function drawStoneGolem(c,opts={}){
+  const t=opts.time||0,walk=opts.walk||0,attack=opts.anim||0,moving=opts.moving??walk!==0;
+  const ink='#263d41',stone='#8c9484',stoneLight='#b7b8a2',stoneDark='#636f66',moss='#71885a',moss2='#93a96d',rune='#70d8ff';
+  const team=TEAM_COLORS[opts.owner||0],back=!!opts.back;
+  const bob=(moving?Math.sin(walk)*1.25:Math.sin(t*1.5)*.35);
+  c.save();c.translate(0,bob);
+  // Heavy legs: short steps, broad feet and visible knee blocks.
+  for(const side of [-1,1]){
+    const step=Math.sin(walk+(side>0?Math.PI:0))*(moving?.16:0);
+    c.save();c.translate(side*15,-7);c.rotate(step);
+    path(c,[[-10,-6],[8,-8],[12,6],[7,17],[-11,16],[-14,5]],stoneDark,ink,1.6);
+    rr(c,-14,12,29,11,4,'#525d58',ink);line(c,-8,16,10,16,'#9aa18f',1);c.restore();
+  }
+  // Back shoulder/torso mass first.
+  path(c,[[-29,-50],[-19,-67],[0,-73],[20,-66],[31,-48],[27,-15],[10,-3],[-10,-3],[-29,-16]],stone,ink,2);
+  path(c,[[-22,-54],[-7,-69],[9,-68],[24,-50],[15,-43],[-14,-43]],stoneLight,null);
+  path(c,[[-31,-46],[-22,-63],[-12,-58],[-18,-40]],moss,ink,1);
+  path(c,[[9,-67],[25,-59],[30,-44],[16,-48]],moss2,ink,1);
+  // Team pennant/strap keeps side identity clear without changing the character palette.
+  rr(c,-5,-64,10,39,3,team,ink);line(c,0,-60,0,-30,'#ead79c',1.4);
+  // Arms are oversized; attack throws the leading fist forward.
+  const thrust=attack?Math.sin((1-attack/.35)*Math.PI):0;
+  for(const side of [-1,1]){
+    c.save();c.translate(side*29,-48);c.rotate(side*(.14+Math.sin(walk)*.04)+(side>0?-.28:0)*thrust);
+    path(c,[[-9,-5],[8,-8],[14,7],[11,25],[-8,27],[-15,10]],side>0?stoneLight:stone,ink,1.7);
+    path(c,[[-11,3],[-4,-5],[3,-3],[-1,10]],moss,null);
+    c.translate(side>0?2*thrust:0,22+10*thrust);
+    path(c,[[-12,-5],[9,-8],[16,2],[11,14],[-11,15],[-17,4]],'#69736c',ink,1.8);
+    for(const x of [-8,0,8])line(c,x,7,x+2,12,'#a6aa99',1.4);
+    c.restore();
+  }
+  // Head block and identity details.
+  if(back){
+    rr(c,-17,-84,34,27,7,'#777f74',ink);rr(c,-12,-80,24,9,3,'#626d66');
+    path(c,[[-11,-76],[-2,-84],[10,-80],[14,-69],[-4,-67]],moss,ink,1);
+    // Large rear rune: visible when the player's unit walks away from camera.
+    c.strokeStyle=rune;c.lineWidth=2.7;c.beginPath();c.arc(0,-41,9,.2,Math.PI*1.8);c.stroke();
+    line(c,6,-45,12,-40,rune,2);ellipse(c,0,-41,2.6,2.6,'#baf3ff');
+    // Small stone banner mount.
+    rr(c,-11,-92,22,10,3,'#5d665f',ink);rr(c,-7,-99,14,8,2,'#899184',ink);
+  }else{
+    rr(c,-18,-85,36,29,8,'#92988b',ink);path(c,[[-18,-79],[0,-91],[18,-79],[13,-62],[-13,-62]],stoneLight,ink,1.4);
+    rr(c,-14,-77,28,11,3,'#44555a',ink);
+    ellipse(c,-7,-72,3.5,3.2,rune);ellipse(c,7,-72,3.5,3.2,rune);
+    if(opts.hit){ellipse(c,-7,-72,6,5,'#d8fbff');ellipse(c,7,-72,6,5,'#d8fbff');}
+    path(c,[[-8,-58],[0,-53],[8,-58],[5,-48],[-5,-48]],stoneDark,ink,1);
+    // Shoulder rune references the concept art while remaining readable at game scale.
+    c.strokeStyle=rune;c.lineWidth=2.2;c.beginPath();c.arc(18,-51,7,.2,Math.PI*1.8);c.stroke();line(c,22,-55,27,-52,rune,1.7);
+  }
+  // Moss drapes make the silhouette organic and distinct from the metal knight.
+  path(c,[[-24,-43],[-18,-35],[-21,-27],[-12,-31],[-8,-19],[-2,-31],[-5,-47]],moss2,null);
+  path(c,[[13,-63],[23,-55],[20,-45],[29,-39],[18,-34],[13,-42]],moss,null);
+  if(opts.hit){c.globalAlpha*=.38;ellipse(c,0,-43,34,42,'#fff5c9');}
+  c.restore();
+}
+
 export function visualFacing(u,seat=0){
  const world=u.facing??((u.face??(u.owner===0?-1:1))<0?-Math.PI/2:Math.PI/2);
  const angle=world+(seat===1?Math.PI:0),face=(u.face??(u.owner===0?-1:1))*(seat===1?-1:1);
@@ -117,8 +174,9 @@ export function drawUnit(c,type,x,y,scale=1,opts={}){
   const moving=opts.moving??walk!==0,bob=Math.sin(walk)*1.5+(opts.idle?Math.sin(t*2)*.65:0);
   c.save();c.translate(x,y);c.scale(scale,scale);
   if(opts.alpha!=null)c.globalAlpha=opts.alpha;
-  if(!opts.noShadow)ellipse(c,0,5,type==='knight'?23:18,6,'#172f3435');
+  if(!opts.noShadow)ellipse(c,0,5,type==='golem'?32:type==='knight'?23:18,type==='golem'?9:6,'#172f3435');
   if(opts.mirror)c.scale(-1,1);
+  if(type==='golem'){drawStoneGolem(c,opts);c.restore();return;}
   if(opts.back&&type!=='bat'&&type!=='cannon'){drawBackHumanoid(c,type,opts);c.restore();return;}
   if(type==='bat'){
     const flap=Math.sin(t*13+walk)*.55;
@@ -315,7 +373,7 @@ export function drawArena(canvas,snapshot,options={}){
     const u=item.entity,p=orient(u,seat),owner=u.owner===seat?0:1,facing=visualFacing(u,seat);
     c.strokeStyle=TEAM_COLORS[owner]+'b0';c.lineWidth=2;c.beginPath();c.ellipse(p.x,p.y+4,u.radius+4,(u.radius+4)*.34,0,0,TAU);c.stroke();
     drawUnit(c,u.type,p.x,p.y,u.type==='bat'?.93:.95,{time,walk:u.walk,moving:u.moving,owner,anim:u.anim,hit:u.hit,alpha:u.spawn>0?.5:1,back:facing.back,mirror:u.building?false:facing.mirror,facing:facing.angle});
-    const hp=u.hp/u.maxHp,w=u.type==='knight'?38:28;
+    const hp=u.hp/u.maxHp,w=u.type==='golem'?50:u.type==='knight'?38:28;
     if(hp<.999){rr(c,p.x-w/2,p.y-(u.air?48:82),w,5,2,'#25363eaa');rr(c,p.x-w/2+1,p.y-(u.air?47:81),(w-2)*hp,3,1,TEAM_COLORS[owner]);}
     if(owner===0&&!u.air&&!u.building&&g.towers.some(t=>{const q=orient(t,seat);return t.hp>0&&q.y>p.y&&q.y-p.y<90&&Math.abs(q.x-p.x)<t.radius+8;}))markerUnits.push(p);
   }
@@ -365,7 +423,7 @@ export function drawPortrait(canvas,type,time=0,owner=0,selected=false,back=fals
   const g=c.createRadialGradient(60,48,10,60,64,70);g.addColorStop(0,col+'99');g.addColorStop(1,col+'00');
   c.fillStyle=g;c.fillRect(0,0,120,120);
   ellipse(c,60,105,40,8,'#1f39451b');
-  const scale=type==='bat'?1.6:type==='cannon'?1.5:type==='mage'?1.12:1.32;
-  drawUnit(c,type,60,type==='bat'?83:type==='cannon'?(back?94:80):104,scale,{time,owner,idle:true,noShadow:true,anim:0,back,facing:back?-Math.PI/2:Math.PI/2});
+  const scale=type==='golem'?.92:type==='bat'?1.6:type==='cannon'?1.5:type==='mage'?1.12:1.32;
+  drawUnit(c,type,60,type==='golem'?112:type==='bat'?83:type==='cannon'?(back?94:80):104,scale,{time,owner,idle:true,noShadow:true,anim:0,back,facing:back?-Math.PI/2:Math.PI/2});
   c.restore();
 }

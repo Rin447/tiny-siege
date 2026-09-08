@@ -1,3 +1,4 @@
+import {DEFAULT_DECK,UNITS} from '../public/game/units.js';
 /** Real HTTP + native Node WebSocket test. Start `npm start` in another terminal first. */
 import assert from 'node:assert/strict';
 const base=process.env.TEST_URL||'http://127.0.0.1:3000';
@@ -23,7 +24,7 @@ async function wait(fn,message){
 let a,b,c,room,other;
 try{
  await check('health and game config identify the correct game',async()=>{
-  const r=await fetch(base+'/api/config'),j=await r.json();assert.equal(j.version,'2.0.0');assert.equal(j.physicsVersion,2);assert.equal(j.units,8);assert.equal(j.game,'tiny-siege');
+  const r=await fetch(base+'/api/config'),j=await r.json();assert.equal(j.version,'3.0.0');assert.equal(j.physicsVersion,2);assert.equal(j.units,9);assert.equal(j.maxDeck,6);assert.equal(j.game,'tiny-siege');
  });
  await check('HTML, style and module assets load',async()=>{
   for(const url of ['/','/app.js','/styles.css','/game/engine.js','/game/art.js','/game/physics.js']){
@@ -48,17 +49,17 @@ try{
  });
  await check('non-host cannot start; both ready and host starts',async()=>{
   b.send({type:'start'});await wait(()=>b.messages.some(m=>m.type==='error'),'host permission');
-  a.send({type:'ready',ready:true});b.send({type:'ready',ready:true});
+  a.send({type:'ready',ready:true,deck:[...DEFAULT_DECK]});b.send({type:'ready',ready:true,deck:[...DEFAULT_DECK]});
   await wait(()=>a.last().members.every(p=>p.ready),'ready');
   a.send({type:'start'});await wait(()=>a.last()?.game?.phase==='battle'&&b.last()?.game?.phase==='battle','countdown');
  });
  await check('validated deployment is synchronized to both players',async()=>{
-  const g=a.last().game,id=g.hand.find(k=>k!=='knight'&&k!=='mage'&&k!=='cannon')||g.hand[0];
+  const g=a.last().game,id=g.hand.find(k=>UNITS[k].cost<=g.energy&&k!=='cannon')||g.hand.find(k=>UNITS[k].cost<=g.energy);
   a.send({type:'deploy',card:id,x:105,y:665});
   await wait(()=>a.last().game.units.some(u=>u.owner===0)&&b.last().game.units.some(u=>u.owner===0),'deployment synchronization');
   const ua=a.last().game.units.find(u=>u.owner===0),ub=b.last().game.units.find(u=>u.id===ua.id);assert.ok(ub);assert.equal(ua.type,ub.type);
  });
- await check('server sends v2 facing and collision metadata identically to both seats',async()=>{
+ await check('server sends v3 facing and collision metadata identically to both seats',async()=>{
   const ga=a.last().game,u=ga.units[0];assert.equal(ga.physicsVersion,2);assert.equal(typeof u.facing,'number');assert.equal(typeof u.mass,'number');
   assert.equal(Object.hasOwn(u,'_nav'),false);assert.equal(Object.hasOwn(u,'_stuck'),false);
   const matching=[...b.messages].reverse().find(m=>m.type==='state'&&m.game?.time===ga.time&&m.game.units.some(v=>v.id===u.id));

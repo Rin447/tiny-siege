@@ -1,13 +1,32 @@
-TINY SIEGE v2.0.0　更新ガイド
+TINY SIEGE v3.0.0
 
-PLAY-OFFLINE.html を保存し、Edge や Chrome で開きます。名前を入力し「CPUと対戦する」を押してください。インストール不要のCPU専用版です。
+今回の更新:
+- 全9ユニット
+- 新キャラ「ストーンゴーレム」追加（敵兵を無視し建物だけを攻撃）
+- 9体から6体を選ぶデッキ編集画面
+- CPU戦 / オンライン戦の両方で選んだデッキを使用
 
-公開中のサイトは、こちらから変更していません。ウェーブレングス用の janken-game / dark-mode-0e8f には上書きしないでください。
+まずCPUで試す:
+  PLAY-OFFLINE.html をダブルクリック
+  -> 「デッキ」を開く
+  -> 6体を選ぶ
+  -> CPU練習を開始
 
-GitHubでTINY SIEGE用リポジトリ（前回の案内どおりなら tiny-siege）を開き、Add file > Upload files を選択します。
-展開したフォルダの「中身全部」を上書きアップロードします。public、src、server、scripts、tests、docsは、それぞれフォルダのまま入れてください。
-Commit directly to the main branch を選び、Commit changes で保存します。例: Upgrade Tiny Siege to v2.0.0
-Cloudflare > Workers & Pages > tiny-siege > Deployments でビルド成功とActive deploymentの更新を確認します。現在のWorkerの削除や、新規Workerの作成は不要です。
-全員がゲームを Ctrl + F5 で再読み込みし、新しいルームで確認します。更新中の対戦は継続せず、再戦してください。
+既存のCloudflare版を更新:
+1. ZIPを展開
+2. 展開したフォルダの中身を GitHub の tiny-siege リポジトリ直下へアップロード
+3. main に Commit（例: Upgrade Tiny Siege to v3.0.0）
+4. CloudflareのDeploymentsで成功を確認
+5. https://あなたのURL/api/config で version 3.0.0 / units 9 / maxDeck 6 を確認
+6. 全端末で Ctrl + F5
+7. 新しいルームで対戦
 
-UPDATE-TO-V2.html / README.md
+重要:
+- wavelength側の janken-game / dark-mode-0e8f には上書きしない
+- tiny-siege 用のリポジトリとWorkerを更新する
+- package.json と wrangler.jsonc はGitHubの一番上の階層に置く
+
+詳しい説明:
+  README.md
+  UPDATE-TO-V3.html
+  docs/DEPLOY_CLOUDFLARE.md

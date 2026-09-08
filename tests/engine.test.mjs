@@ -1,20 +1,21 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {ARENA,UNITS,DECK} from '../public/game/units.js';
+import {ARENA,UNITS,DECK,DEFAULT_DECK,MAX_DECK,normalizeDeck} from '../public/game/units.js';
 import {createMatch,tick,deploy,canPlace,viewMatch,runBot,inRiver,finish} from '../public/game/engine.js';
 function battle(seed=12){const g=createMatch({seed});g.phase='battle';return g;}
-function ready(g,o,id){const p=g.players[o];p.energy=10;p.hand=[id,...DECK.filter(k=>k!==id).slice(0,3)];p.queue=DECK.filter(k=>!p.hand.includes(k));}
+function deckWith(id){return [id,...DECK.filter(k=>k!==id)].slice(0,MAX_DECK);}
+function ready(g,o,id){const p=g.players[o],deck=deckWith(id);p.energy=10;p.deck=[...deck];p.hand=deck.slice(0,4);p.queue=deck.slice(4);}
 function spawn(g,o,id,x=190,y=o===0?650:390){ready(g,o,id);const r=deploy(g,o,id,x,y);assert.ok(r.ok,r.error);return g.units.at(-1);}
 function advance(g,seconds){for(let i=0;i<Math.round(seconds*10);i++)tick(g,.1);}
-test('eight unique cards and valid balance data',()=>{
- assert.equal(DECK.length,8);assert.equal(new Set(DECK).size,8);
+test('nine unique cards, six-card deck rule and valid balance data',()=>{
+ assert.equal(DECK.length,9);assert.equal(new Set(DECK).size,9);assert.equal(MAX_DECK,6);assert.equal(DEFAULT_DECK.length,6);assert.deepEqual(normalizeDeck(DEFAULT_DECK),[...DEFAULT_DECK]);
  for(const d of Object.values(UNITS)){assert.ok(d.hp>0&&d.cost>=1&&d.damage>0);assert.equal(d.id,DECK.find(x=>x===d.id));}
 });
 for(const id of DECK)test(`deploy ${id}: energy, count, card rotation`,()=>{
  const g=battle();ready(g,0,id);const next=g.players[0].queue[0],r=deploy(g,0,id,190,650);
  assert.ok(r.ok);assert.equal(g.units.length,UNITS[id].count);assert.equal(g.players[0].energy,10-UNITS[id].cost);
  assert.equal(g.players[0].hand[0],next);assert.equal(g.players[0].queue.at(-1),id);
- assert.equal(new Set([...g.players[0].hand,...g.players[0].queue]).size,8);
+ assert.equal(new Set([...g.players[0].hand,...g.players[0].queue]).size,MAX_DECK);
 });
 test('countdown blocks deployments and becomes battle after three seconds',()=>{
  const g=createMatch();assert.equal(deploy(g,0,g.players[0].hand[0],100,660).ok,false);advance(g,3);assert.equal(g.phase,'battle');
@@ -73,6 +74,14 @@ test('bomber splash damages two close ground targets',()=>{
  b.y=570;c.y=570;a.spawn=b.spawn=c.spawn=0;b.speed=c.speed=0;const hp1=b.hp,hp2=c.hp;
  advance(g,1.2);assert.ok(b.hp<hp1);assert.ok(c.hp<hp2);
 });
+test('stone golem ignores enemy troops and damages structures only',()=>{
+ const g=battle();g.towers.forEach(t=>{t.damage=0;});
+ const golem=spawn(g,0,'golem',190,650),enemy=spawn(g,1,'blade',190,390);
+ golem.spawn=0;enemy.spawn=0;enemy.x=285;enemy.y=600;enemy.speed=0;enemy.damage=0;
+ const enemyHp=enemy.hp,target=g.towers.find(t=>t.owner===1&&t.kind==='tower'&&t.x===190),towerHp=target.hp;
+ advance(g,32);assert.equal(enemy.hp,enemyHp);assert.ok(target.hp<towerHp,'golem should reach and damage a tower');
+});
+
 test('main tower destruction ends match immediately',()=>{
  const g=battle();g.towers.find(t=>t.id==='t12').hp=0;tick(g,.1);assert.equal(g.phase,'ended');assert.equal(g.winner,0);
 });

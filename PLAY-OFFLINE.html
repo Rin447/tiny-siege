@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#182f39">
-<title>TINY SIEGE — 8人の小さな攻城戦</title>
+<title>TINY SIEGE — 9体から6体を選ぶ小さな攻城戦</title>
 
 <style>:root{--paper:#f6f5ef;--ink:#203843;--muted:#7b8c8d;--line:#dce1d7;--green:#47796d;--mint:#dce9c8;--coral:#d6896c;--card:#fffef8;--board: min(420px,calc((100dvh - 282px)*.6923));font-family:"Segoe UI","Noto Sans JP","Hiragino Kaku Gothic ProN","Meiryo",sans-serif;color:var(--ink);background:var(--paper)}
 *{box-sizing:border-box}body{margin:0}button,input{font:inherit}button{cursor:pointer;transition:background .16s,transform .16s,border-color .16s}button:disabled{cursor:not-allowed;opacity:.44}button:focus-visible,input:focus-visible,canvas:focus-visible{outline:3px solid #d89e5c;outline-offset:3px}
@@ -46,6 +46,12 @@ dialog{border:1px solid #d7dfcf;background:#f9faf3;color:var(--ink);border-radiu
 .roster-tools{display:flex;align-items:center;gap:16px;margin:18px 0}.roster-tools .btn{width:auto;min-width:150px}.roster-tools small{font-size:11px;color:var(--muted)}
 .battle-tools{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:3px;font-size:9px;color:var(--muted)}.battle-tools .textbtn{font-size:10px;padding:5px 0;margin:0}.battle-tools [aria-pressed="true"]{color:#387363;text-decoration:underline}
 @media(max-width:600px){.roster-tools{flex-wrap:wrap;gap:8px}.battle-tools{font-size:8px}.battle-hint{font-size:9px}.battle-tools .textbtn{font-size:9px}}
+
+/* v3 custom deck editor */
+.deck-summary{margin-top:20px;padding:15px 14px 13px;border:1px solid #dce3d5;border-radius:12px;background:#f8faf1}.deck-summary .block-title{margin-bottom:10px}.deck-summary .block-title .textbtn{margin-left:auto;padding:2px 0;font-size:10px;color:#54776c}.deck-mini{grid-template-columns:repeat(6,1fr)!important;gap:5px}.deck-mini button{pointer-events:none}.deck-mini canvas{max-height:58px;object-fit:contain}.deck-mini span{font-size:7px}.lobby-deck-btn{width:auto;min-width:150px;margin-top:12px;padding:9px 14px;min-height:36px}
+.deck-modal{width:min(1080px,95vw)}.deck-editor-head{display:flex;align-items:center;justify-content:space-between;gap:28px;padding:15px 17px;border:1px solid #dce3d5;border-radius:13px;background:#f1f5e7}.deck-editor-head>div{display:flex;align-items:baseline;gap:9px;white-space:nowrap}.deck-editor-head strong{font-size:28px}.deck-editor-head span{font-size:9px;color:#819185;letter-spacing:1px}.deck-editor-head p{font-size:10px;line-height:1.8;color:#71867c}.deck-slots{display:grid;grid-template-columns:repeat(6,1fr);gap:9px;margin:18px 0 22px}.deck-slot{min-height:98px;border:1px dashed #cbd7c7;border-radius:12px;background:#fbfcf5;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;padding:4px}.deck-slot.filled{border-style:solid;background:#fffef8}.deck-slot canvas{width:100%;max-width:105px;height:auto}.deck-slot strong{font-size:9px;margin-top:-4px}.deck-slot em{position:absolute;top:5px;left:6px;font-style:normal;font-size:8px;color:#8da08d}.deck-slot.empty:after{content:'＋';font-size:24px;color:#b4c0af}.deck-pool{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.deck-choice{position:relative;display:grid;grid-template-columns:88px 1fr;gap:10px;text-align:left;border:1px solid var(--line);background:#fffef8;border-radius:13px;padding:10px;min-height:112px;color:var(--ink)}.deck-choice:hover{background:#f7faee}.deck-choice.selected{border-color:#95b47f;background:#eef5df;box-shadow:inset 0 0 0 1px #b8cda4}.deck-choice canvas{width:88px;height:88px}.deck-choice .deck-copy{min-width:0;padding-top:5px}.deck-choice h3{font-size:12px;margin-bottom:5px}.deck-choice small{font-size:8px;color:#899b8e}.deck-choice p{font-size:9px;color:#7c8c84;line-height:1.55;margin-top:6px}.deck-choice .deck-cost{position:absolute;left:7px;top:7px;width:23px;height:25px;border-radius:8px;background:#9c86b3;color:#fff;border:2px solid #f7f2e7;display:grid;place-items:center;font-size:12px;font-weight:700}.deck-choice .deck-check{position:absolute;right:8px;top:8px;border-radius:20px;background:#7e9c68;color:#fff;font-size:8px;padding:4px 6px}.deck-actions{display:grid;grid-template-columns:1fr 1.4fr;gap:12px;margin-top:20px}.deck-actions .btn{margin:0}
+@media(max-width:800px){.deck-pool{grid-template-columns:repeat(2,1fr)}.deck-slots{grid-template-columns:repeat(3,1fr)}.deck-editor-head{align-items:flex-start;flex-direction:column;gap:5px}.deck-choice{grid-template-columns:70px 1fr}.deck-choice canvas{width:70px;height:70px}.deck-mini{grid-template-columns:repeat(6,1fr)!important}}
+@media(max-width:520px){.deck-pool{grid-template-columns:1fr}.deck-slots{grid-template-columns:repeat(3,1fr);gap:6px}.deck-slot{min-height:82px}.deck-actions{grid-template-columns:1fr}.deck-modal{padding:18px}.deck-choice{grid-template-columns:82px 1fr}.deck-choice canvas{width:82px;height:82px}.deck-summary{padding:12px 10px}.deck-mini{gap:3px}.deck-mini span{font-size:6px}}
 </style>
 </head>
 <body>
@@ -56,7 +62,8 @@ dialog{border:1px solid #d7dfcf;background:#f9faf3;color:var(--ink);border-radiu
   </button>
   <nav>
     <span id="connection" class="status"><i></i>接続確認中</span>
-    <button id="libraryBtn" class="navbtn">部隊図鑑 <span>08</span></button>
+    <button id="deckBtn" class="navbtn">デッキ <span>6</span></button>
+    <button id="libraryBtn" class="navbtn">部隊図鑑 <span>09</span></button>
     <button id="helpBtn" class="navbtn">遊び方</button>
     <button id="soundBtn" class="iconbtn" aria-label="効果音を切り替え" title="効果音">♪</button>
   </nav>
@@ -66,10 +73,10 @@ dialog{border:1px solid #d7dfcf;background:#f9faf3;color:var(--ink);border-radiu
   <section class="hero-copy">
     <div class="eyebrow"><span></span> PRIVATE 1V1 · REALTIME TACTICS</div>
     <h1>その一枚で、<br>戦況を<span>変えよう。</span></h1>
-    <p class="hero-desc">前衛で守る。後衛で射抜く。<br>8種類の仲間を組み合わせる、<br>小さな2Dリアルタイム攻城戦。</p>
-    <div class="hero-stats"><div><strong>8</strong><small>個性的なユニット</small></div><div><strong>3<span> min</span></strong><small>一手が変える攻防</small></div><div><strong>1v1</strong><small>友だちとオンライン</small></div></div>
+    <p class="hero-desc">前衛で守る。後衛で射抜く。<br>9種類の仲間から6体を選び、<br>自分の編成で挑む2Dリアルタイム攻城戦。</p>
+    <div class="hero-stats"><div><strong>9</strong><small>個性的なユニット</small></div><div><strong>3<span> min</span></strong><small>一手が変える攻防</small></div><div><strong>1v1</strong><small>友だちとオンライン</small></div></div>
     <div class="hero-note"><span class="note-dot"></span><p>通話はいつものVCで。<br>ここでは、戦いに集中しよう。</p></div>
-    <div class="version-stamp">BACK VIEWS + TWO-LAYER PHYSICS <span>02 / FORMATION & FACING</span></div>
+    <div class="version-stamp">CUSTOM DECK + STONE GOLEM <span>03 / BUILD YOUR SIX</span></div>
   </section>
   <section class="demo-area" aria-label="ゲームの自動デモ">
     <div class="demo-label"><span class="live-dot"></span> LIVE ARENA PREVIEW <span>AUTOPLAY</span></div>
@@ -80,11 +87,16 @@ dialog{border:1px solid #d7dfcf;background:#f9faf3;color:var(--ink);border-radiu
     <div class="eyebrow">LET'S PLAY</div><h2>まずは、ひと勝負。</h2>
     <label class="field-label" for="nickname">あなたの名前 <span>1〜16文字</span></label>
     <input id="nickname" maxlength="32" placeholder="例：りん" autocomplete="nickname">
+    <div class="deck-summary">
+      <div class="block-title"><span>DECK</span><h3>今回使う6体</h3><button id="homeDeckBtn" class="textbtn" type="button">編集する</button></div>
+      <div id="homeDeck" class="mini-roster deck-mini"></div>
+      <p class="field-help">9体の中から6体を選択。対戦開始前なら何度でも変更できます。</p>
+    </div>
     <div class="practice-block">
       <div class="block-title"><span>01</span><h3>ひとりで練習</h3><small>CPU BATTLE</small></div>
       <div id="difficulty" class="segmented"><button data-level="easy">やさしい</button><button data-level="normal" class="active">ふつう</button><button data-level="hard">手ごわい</button></div>
       <button id="practiceBtn" class="btn primary">CPUと対戦する <span>↗</span></button>
-      <p class="field-help">登録不要。操作と8枚のカードを試そう。</p>
+      <p class="field-help">登録不要。編集した6体デッキでCPU戦を試せます。</p>
     </div>
     <div class="divider"></div>
     <div class="block-title"><span>02</span><h3>友だちと対戦</h3><small>ONLINE 1V1</small></div>
@@ -103,8 +115,8 @@ dialog{border:1px solid #d7dfcf;background:#f9faf3;color:var(--ink);border-radiu
     <p class="muted">2人とも「準備OK」にしたら、ホストが対戦を開始できます。</p>
     <div id="members" class="members"></div>
     <div class="lobby-actions"><button id="readyBtn" class="btn primary">準備OK</button><button id="startBtn" class="btn dark" disabled>対戦を開始</button></div>
-    <div class="lobby-rules"><div><small>バトル</small><strong>3分 ＋ 延長1分</strong></div><div><small>デッキ</small><strong>8枚 / 手札4枚</strong></div><div><small>勝利条件</small><strong>相手の本拠地を破壊</strong></div></div>
-    <h3 class="section-label">YOUR SQUAD <span>8種類すべてを使えます</span></h3><div id="lobbyRoster" class="mini-roster"></div>
+    <div class="lobby-rules"><div><small>バトル</small><strong>3分 ＋ 延長1分</strong></div><div><small>デッキ</small><strong>6体 / 手札4枚</strong></div><div><small>勝利条件</small><strong>相手の本拠地を破壊</strong></div></div>
+    <h3 class="section-label">YOUR DECK <span>選んだ6体で出撃</span></h3><div id="lobbyRoster" class="mini-roster deck-mini"></div><button id="lobbyDeckBtn" class="btn outline lobby-deck-btn">デッキを編集</button>
   </section>
   <aside class="invite-panel">
     <div class="eyebrow">INVITE YOUR RIVAL</div><h2>友だちを招待</h2><p class="muted">同じURLを開き、このPASSで参加。</p>
@@ -148,27 +160,37 @@ dialog{border:1px solid #d7dfcf;background:#f9faf3;color:var(--ink);border-radiu
     <div class="match-rules"><h4>この一戦のルール</h4><p>本拠地を壊せば即勝利。3分で同数なら延長戦。延長後も同数なら残りタワーHPで決着。</p><p>残り1分からエナジー回復が2倍。切り札を重ねて攻めよう。</p></div>
   </aside>
 </main>
-<footer id="footer"><span>ひとつのURLから、小さな戦場へ。</span><span>TINY SIEGE <i>/</i> v2.0.0 · ORIGINAL PROTOTYPE</span></footer>
+<footer id="footer"><span>ひとつのURLから、小さな戦場へ。</span><span>TINY SIEGE <i>/</i> v3.0.0 · CUSTOM DECK</span></footer>
 
 <div id="toast" class="toast" role="status" hidden></div>
-<dialog id="libraryModal"><div class="modal-head"><div><span class="eyebrow">MEET YOUR EIGHT</span><h2>小さな部隊図鑑</h2></div><button class="close-modal iconbtn" aria-label="閉じる">×</button></div><p class="muted">全員が同じ8枚のデッキ。役割を組み合わせて、自分の戦術を作ろう。</p><div class="roster-tools"><button id="libraryFacingBtn" class="btn outline" aria-pressed="false">後ろ姿を見る ↻</button><small>戦場では進行・攻撃方向で自動切り替え。</small></div><div id="libraryGrid" class="library-grid"></div></dialog>
+<dialog id="deckModal" class="deck-modal">
+  <div class="modal-head"><div><span class="eyebrow">BUILD YOUR SIX</span><h2>デッキ編集</h2></div><button class="close-modal iconbtn" aria-label="閉じる">×</button></div>
+  <div class="deck-editor-head"><div><strong id="deckCount">6 / 6</strong><span>選択中</span></div><p>9体から6体を選択。カードをクリックすると入れ替えできます。</p></div>
+  <div id="deckSlots" class="deck-slots"></div>
+  <div id="deckPool" class="deck-pool"></div>
+  <div class="deck-actions"><button id="deckDefaultBtn" class="btn outline">おすすめに戻す</button><button id="deckSaveBtn" class="btn dark">この6体で保存</button></div>
+  <p id="deckError" class="error" hidden></p>
+</dialog>
+<dialog id="libraryModal"><div class="modal-head"><div><span class="eyebrow">MEET YOUR NINE</span><h2>小さな部隊図鑑</h2></div><button class="close-modal iconbtn" aria-label="閉じる">×</button></div><p class="muted">全9体の性能を確認できます。実戦に持ち込めるのはデッキで選んだ6体です。</p><div class="roster-tools"><button id="libraryFacingBtn" class="btn outline" aria-pressed="false">後ろ姿を見る ↻</button><small>戦場では進行・攻撃方向で自動切り替え。</small></div><div id="libraryGrid" class="library-grid"></div></dialog>
 <dialog id="helpModal"><div class="modal-head"><div><span class="eyebrow">HOW TO PLAY</span><h2>3分でわかる、攻城戦。</h2></div><button class="close-modal iconbtn" aria-label="閉じる">×</button></div>
   <div class="help-steps">
     <section><b>01</b><div><h3>まずはCPU戦から</h3><p>名前を入れて「CPUと対戦する」。オンラインはルームを作り、URLと6桁PASSを友だちへ共有します。</p></div></section>
     <section><b>02</b><div><h3>カード → 自分の陣地</h3><p>手札4枚から1枚を選び、画面下側の自陣にタップで配置。カードをフィールドへドラッグしてもOK。ユニットは自動で移動・攻撃します。</p></div></section>
     <section><b>03</b><div><h3>エナジーを使い分ける</h3><p>カード左上の数字が必要コスト。エナジーは最大10まで回復します。使ったカードは待機列へ入り、次の1枚が手札に補充されます。</p></div></section>
-    <section><b>04</b><div><h3>8枚の役割を組み合わせる</h3><p>衛士で攻撃を受けて弓兵で援護。敵が密集したら術師や爆弾兵。バットは川を飛び越えますが、対空攻撃が弱点。砲台は動かず32秒間守ります。</p></div></section>
+    <section><b>04</b><div><h3>9体から6体を選ぶ</h3><p>「デッキ」から出撃メンバー6体を編集。衛士＋弓兵、バット＋術師、建物だけを狙うストーンゴーレムなど、自分の勝ち筋を作ります。</p></div></section>
     <section><b>05</b><div><h3>本拠地を破壊したら勝利</h3><p>後方中央の本拠地を壊すと3ポイントで即勝利。3分終了時はタワー破壊数を比較。同数なら最大1分の延長で先にタワーを壊した側が勝ち。延長終了後は残りタワーHPの合計、同じなら引き分けです。</p></div></section>
     <section><b>06</b><div><h3>通話はいつものVCで</h3><p>オンラインで切断したら最大45秒間一時停止して再接続を待ちます。戻れなければ切断側の敗北、両方切断は引き分け。CPU戦ではタブを離れると一時停止します。</p></div></section>
     <section><b>07</b><div><h3>タワーを回り込む配置</h3><p>地上の部隊はタワー・砲台をすり抜けません。後ろに置くと回り道の時間が生まれます。破壊した建物の土台は通行可能。木や石は飾りです。</p></div></section>
     <section><b>08</b><div><h3>大きさと地上／空中</h3><p>味方は同じ高度で軽く押し合い、敵とはすり抜けず接触します。大きな衛士は押されにくく、細い道で場所を取ります。飛行は地上の部隊・建物を無視。対空攻撃ができることと、飛んでいることは別です。</p></div></section>
     <section><b>09</b><div><h3>向きと判定を確認</h3><p>敵陣へ進む自分の部隊は背中が見え、後ろの敵を狙えば正面を向きます。図鑑で正面／背面を切り替え。「当たり判定を表示」で足元の円を確認できます。矢・魔法は味方や建物で遮られません。</p></div></section>
+    <section><b>10</b><div><h3>ストーンゴーレムは建物だけを見る</h3><p>敵ユニットに殴られても足を止めず、敵のタワーや砲台だけを目指します。HPと建物ダメージは非常に高い一方、コスト6・移動速度は最遅。後ろから出して援護部隊を重ねるのが基本です。</p></div></section>
   </div>
   <p class="help-note">オリジナルの試作ルールです。外部ゲームのキャラクター・画像・音源は使用していません。オンライン対戦はCloudflareへのサーバー込みの公開が必要です。</p>
 </dialog>
 <script type="module">window.TINY_OFFLINE=true;
 /** Balance data: original prototype values. Both browser and server import this file. */
-const VERSION = '2.0.0';
+const VERSION = '3.0.0';
+const MAX_DECK = 6;
 const ARENA = Object.freeze({
   width:720, height:1040, riverTop:482, riverBottom:558, bridges:[190,530],
   bridgeHalf:42, deployBottom:600, deployTop:440, maxUnits:100,
@@ -182,11 +204,19 @@ const UNITS = Object.freeze({
   spear:{id:'spear',mass:1.2,name:'スパーク槍兵',short:'槍兵',role:'中距離・低コスト',cost:2,hp:410,damage:82,speed:64,range:68,cooldown:0.9,radius:14,count:1,air:false,targetsAir:false,color:'#f6a98d',desc:'長い槍で剣士より少し離れて攻撃。素早い援軍や防衛に。'},
   bat:{id:'bat',mass:0.6,name:'ムーンバット',short:'バット',role:'飛行・3体編成',cost:2,hp:145,damage:46,speed:82,range:28,cooldown:0.85,radius:11,count:3,air:true,targetsAir:true,color:'#b7a7dc',desc:'3体で出撃し、川を飛び越える。対空できない敵に強い。'},
   bomber:{id:'bomber',mass:2,name:'ポット爆弾兵',short:'爆弾兵',role:'地上範囲攻撃',cost:3,hp:470,damage:174,speed:42,range:145,cooldown:1.8,radius:16,count:1,air:false,targetsAir:false,projectile:'bomb',splash:66,color:'#edaa66',desc:'爆弾で地上の密集を崩す。空中の敵には攻撃できない。'},
-  cannon:{id:'cannon',mass:1000000,name:'ボルト砲台',short:'砲台',role:'防衛建物',cost:4,hp:1080,damage:140,speed:0,range:218,cooldown:1.4,radius:24,count:1,air:false,targetsAir:false,projectile:'shell',building:true,lifetime:32,color:'#8dbfb3',desc:'動かない防衛建物。地上の敵を迎撃し、32秒で消える。'}
+  cannon:{id:'cannon',mass:1000000,name:'ボルト砲台',short:'砲台',role:'防衛建物',cost:4,hp:1080,damage:140,speed:0,range:218,cooldown:1.4,radius:24,count:1,air:false,targetsAir:false,projectile:'shell',building:true,lifetime:32,color:'#8dbfb3',desc:'動かない防衛建物。地上の敵を迎撃し、32秒で消える。'},
+  golem:{id:'golem',mass:16,name:'ストーンゴーレム',short:'ゴーレム',role:'建物特攻・超重量',cost:6,hp:3350,damage:295,speed:21,range:42,cooldown:1.85,radius:30,count:1,air:false,targetsAir:false,buildingOnly:true,color:'#8ea37d',desc:'敵ユニットを無視し、建物だけを目指す超重量タンク。非常に硬く一撃も重いが、歩みは遅い。'}
 });
 const DECK = Object.freeze(Object.keys(UNITS));
+const DEFAULT_DECK = Object.freeze(['blade','knight','archer','mage','bomber','golem']);
 const ROLE_ORDER = DECK;
 const TEAM_COLORS = ['#58b9ae','#ee9b81'];
+function normalizeDeck(value,{fallback=true}={}){
+  const out=[];
+  if(Array.isArray(value))for(const id of value){if(typeof id==='string'&&Object.hasOwn(UNITS,id)&&!out.includes(id))out.push(id);if(out.length===MAX_DECK)break;}
+  if(out.length===MAX_DECK)return out;
+  return fallback?[...DEFAULT_DECK]:null;
+}
 
 
 /** Shared deterministic navigation and collision geometry. No browser APIs.
@@ -435,13 +465,15 @@ function random(g){
   let x=g.rng|0; x^=x<<13; x^=x>>>17; x^=x<<5;
   g.rng=x>>>0; return g.rng/4294967296;
 }
-function shuffled(g){const a=[...DECK];for(let i=a.length-1;i>0;i--){const j=Math.floor(random(g)*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
-function createMatch({seed=12345,bot=false,difficulty='normal'}={}){
+function shuffled(g,source=DEFAULT_DECK){const a=[...source];for(let i=a.length-1;i>0;i--){const j=Math.floor(random(g)*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function validateDeck(value){return normalizeDeck(value,{fallback:false});}
+function createMatch({seed=12345,bot=false,difficulty='normal',decks=[DEFAULT_DECK,DEFAULT_DECK]}={}){
   const g={physicsVersion:PHYSICS_VERSION,phase:'countdown',countdown:3,time:0,overtime:false,rng:seed||1,units:[],projectiles:[],events:[],nextId:1,step:0,
     winner:null,reason:'',bot,difficulty,botNext:1.5,
-    players:[{energy:5,hand:[],queue:[]},{energy:5,hand:[],queue:[]}],towers:[]};
+    players:[{energy:5,hand:[],queue:[],deck:[]},{energy:5,hand:[],queue:[],deck:[]}],towers:[]};
+  const safeDecks=[normalizeDeck(decks?.[0]),normalizeDeck(decks?.[1])];
   for(let owner=0;owner<2;owner++){
-    const d=shuffled(g);g.players[owner].hand=d.slice(0,4);g.players[owner].queue=d.slice(4);
+    const d=shuffled(g,safeDecks[owner]);g.players[owner].deck=[...safeDecks[owner]];g.players[owner].hand=d.slice(0,4);g.players[owner].queue=d.slice(4);
     for(let i=0;i<3;i++){
       const core=i===2,x=core?360:(i===0?190:530);
       g.towers.push({id:`t${owner}${i}`,kind:core?'core':'tower',owner,x,y:owner===0?(core?905:805):(core?135:235),
@@ -488,6 +520,16 @@ function preferredTower(g,u){
   return out||g.towers.find(t=>t.owner===enemy&&t.kind==='core'&&t.hp>0);
 }
 function getTarget(g,u,entities){
+  // Building-only units ignore troops completely and march toward the nearest enemy structure.
+  if(u.buildingOnly){
+    let best=null,bestD=Infinity;
+    for(const t of entities){
+      if(!targetable(u,t)||!(t.kind||t.building))continue;
+      const d=distance(u,t)-t.radius;
+      if(d<bestD){best=t;bestD=d;}
+    }
+    return best;
+  }
   // Nearest combatant in the aggro radius; buildings never chase.
   const reach=u.kind||u.building?u.range+30:Math.max(205,u.range+35);
   let best=null,bestD=Infinity;
@@ -613,7 +655,7 @@ const rnd=v=>Math.round(v*100)/100;
 function viewMatch(g,seat=0){
   const p=g.players[seat];
   return {physicsVersion:PHYSICS_VERSION,phase:g.phase,countdown:g.countdown,time:rnd(g.time),overtime:g.overtime,winner:g.winner,reason:g.reason,
-    scores:[towerScore(g,0),towerScore(g,1)],energy:rnd(p.energy),hand:[...p.hand],next:p.queue[0],
+    scores:[towerScore(g,0),towerScore(g,1)],energy:rnd(p.energy),hand:[...p.hand],next:p.queue[0],deck:[...p.deck],
     units:g.units.map(u=>({id:u.id,type:u.type,owner:u.owner,x:rnd(u.x),y:rnd(u.y),hp:u.hp,maxHp:u.maxHp,radius:u.radius,air:u.air,building:!!u.building,anim:u.anim,hit:u.hit,walk:u.walk,spawn:u.spawn,face:u.face,facing:u.facing,moving:!!u.moving,mass:u.mass,age:u.age})),
     towers:g.towers.map(t=>({id:t.id,kind:t.kind,owner:t.owner,x:t.x,y:t.y,hp:t.hp,maxHp:t.maxHp,radius:t.radius,anim:t.anim,hit:t.hit,facing:t.facing})),
     projectiles:g.projectiles.map(p=>({id:p.id,owner:p.owner,x:p.x,y:p.y,tx:p.tx,ty:p.ty,kind:p.kind})),
@@ -722,6 +764,63 @@ function drawBackHumanoid(c,type,opts){
  }
  if(opts.hit){c.globalAlpha*=.55;ellipse(c,0,-28,19,30,'#fff8db');}c.restore();
 }
+
+function drawStoneGolem(c,opts={}){
+  const t=opts.time||0,walk=opts.walk||0,attack=opts.anim||0,moving=opts.moving??walk!==0;
+  const ink='#263d41',stone='#8c9484',stoneLight='#b7b8a2',stoneDark='#636f66',moss='#71885a',moss2='#93a96d',rune='#70d8ff';
+  const team=TEAM_COLORS[opts.owner||0],back=!!opts.back;
+  const bob=(moving?Math.sin(walk)*1.25:Math.sin(t*1.5)*.35);
+  c.save();c.translate(0,bob);
+  // Heavy legs: short steps, broad feet and visible knee blocks.
+  for(const side of [-1,1]){
+    const step=Math.sin(walk+(side>0?Math.PI:0))*(moving?.16:0);
+    c.save();c.translate(side*15,-7);c.rotate(step);
+    path(c,[[-10,-6],[8,-8],[12,6],[7,17],[-11,16],[-14,5]],stoneDark,ink,1.6);
+    rr(c,-14,12,29,11,4,'#525d58',ink);line(c,-8,16,10,16,'#9aa18f',1);c.restore();
+  }
+  // Back shoulder/torso mass first.
+  path(c,[[-29,-50],[-19,-67],[0,-73],[20,-66],[31,-48],[27,-15],[10,-3],[-10,-3],[-29,-16]],stone,ink,2);
+  path(c,[[-22,-54],[-7,-69],[9,-68],[24,-50],[15,-43],[-14,-43]],stoneLight,null);
+  path(c,[[-31,-46],[-22,-63],[-12,-58],[-18,-40]],moss,ink,1);
+  path(c,[[9,-67],[25,-59],[30,-44],[16,-48]],moss2,ink,1);
+  // Team pennant/strap keeps side identity clear without changing the character palette.
+  rr(c,-5,-64,10,39,3,team,ink);line(c,0,-60,0,-30,'#ead79c',1.4);
+  // Arms are oversized; attack throws the leading fist forward.
+  const thrust=attack?Math.sin((1-attack/.35)*Math.PI):0;
+  for(const side of [-1,1]){
+    c.save();c.translate(side*29,-48);c.rotate(side*(.14+Math.sin(walk)*.04)+(side>0?-.28:0)*thrust);
+    path(c,[[-9,-5],[8,-8],[14,7],[11,25],[-8,27],[-15,10]],side>0?stoneLight:stone,ink,1.7);
+    path(c,[[-11,3],[-4,-5],[3,-3],[-1,10]],moss,null);
+    c.translate(side>0?2*thrust:0,22+10*thrust);
+    path(c,[[-12,-5],[9,-8],[16,2],[11,14],[-11,15],[-17,4]],'#69736c',ink,1.8);
+    for(const x of [-8,0,8])line(c,x,7,x+2,12,'#a6aa99',1.4);
+    c.restore();
+  }
+  // Head block and identity details.
+  if(back){
+    rr(c,-17,-84,34,27,7,'#777f74',ink);rr(c,-12,-80,24,9,3,'#626d66');
+    path(c,[[-11,-76],[-2,-84],[10,-80],[14,-69],[-4,-67]],moss,ink,1);
+    // Large rear rune: visible when the player's unit walks away from camera.
+    c.strokeStyle=rune;c.lineWidth=2.7;c.beginPath();c.arc(0,-41,9,.2,Math.PI*1.8);c.stroke();
+    line(c,6,-45,12,-40,rune,2);ellipse(c,0,-41,2.6,2.6,'#baf3ff');
+    // Small stone banner mount.
+    rr(c,-11,-92,22,10,3,'#5d665f',ink);rr(c,-7,-99,14,8,2,'#899184',ink);
+  }else{
+    rr(c,-18,-85,36,29,8,'#92988b',ink);path(c,[[-18,-79],[0,-91],[18,-79],[13,-62],[-13,-62]],stoneLight,ink,1.4);
+    rr(c,-14,-77,28,11,3,'#44555a',ink);
+    ellipse(c,-7,-72,3.5,3.2,rune);ellipse(c,7,-72,3.5,3.2,rune);
+    if(opts.hit){ellipse(c,-7,-72,6,5,'#d8fbff');ellipse(c,7,-72,6,5,'#d8fbff');}
+    path(c,[[-8,-58],[0,-53],[8,-58],[5,-48],[-5,-48]],stoneDark,ink,1);
+    // Shoulder rune references the concept art while remaining readable at game scale.
+    c.strokeStyle=rune;c.lineWidth=2.2;c.beginPath();c.arc(18,-51,7,.2,Math.PI*1.8);c.stroke();line(c,22,-55,27,-52,rune,1.7);
+  }
+  // Moss drapes make the silhouette organic and distinct from the metal knight.
+  path(c,[[-24,-43],[-18,-35],[-21,-27],[-12,-31],[-8,-19],[-2,-31],[-5,-47]],moss2,null);
+  path(c,[[13,-63],[23,-55],[20,-45],[29,-39],[18,-34],[13,-42]],moss,null);
+  if(opts.hit){c.globalAlpha*=.38;ellipse(c,0,-43,34,42,'#fff5c9');}
+  c.restore();
+}
+
 function visualFacing(u,seat=0){
  const world=u.facing??((u.face??(u.owner===0?-1:1))<0?-Math.PI/2:Math.PI/2);
  const angle=world+(seat===1?Math.PI:0),face=(u.face??(u.owner===0?-1:1))*(seat===1?-1:1);
@@ -738,8 +837,9 @@ function drawUnit(c,type,x,y,scale=1,opts={}){
   const moving=opts.moving??walk!==0,bob=Math.sin(walk)*1.5+(opts.idle?Math.sin(t*2)*.65:0);
   c.save();c.translate(x,y);c.scale(scale,scale);
   if(opts.alpha!=null)c.globalAlpha=opts.alpha;
-  if(!opts.noShadow)ellipse(c,0,5,type==='knight'?23:18,6,'#172f3435');
+  if(!opts.noShadow)ellipse(c,0,5,type==='golem'?32:type==='knight'?23:18,type==='golem'?9:6,'#172f3435');
   if(opts.mirror)c.scale(-1,1);
+  if(type==='golem'){drawStoneGolem(c,opts);c.restore();return;}
   if(opts.back&&type!=='bat'&&type!=='cannon'){drawBackHumanoid(c,type,opts);c.restore();return;}
   if(type==='bat'){
     const flap=Math.sin(t*13+walk)*.55;
@@ -936,7 +1036,7 @@ function drawArena(canvas,snapshot,options={}){
     const u=item.entity,p=orient(u,seat),owner=u.owner===seat?0:1,facing=visualFacing(u,seat);
     c.strokeStyle=TEAM_COLORS[owner]+'b0';c.lineWidth=2;c.beginPath();c.ellipse(p.x,p.y+4,u.radius+4,(u.radius+4)*.34,0,0,TAU);c.stroke();
     drawUnit(c,u.type,p.x,p.y,u.type==='bat'?.93:.95,{time,walk:u.walk,moving:u.moving,owner,anim:u.anim,hit:u.hit,alpha:u.spawn>0?.5:1,back:facing.back,mirror:u.building?false:facing.mirror,facing:facing.angle});
-    const hp=u.hp/u.maxHp,w=u.type==='knight'?38:28;
+    const hp=u.hp/u.maxHp,w=u.type==='golem'?50:u.type==='knight'?38:28;
     if(hp<.999){rr(c,p.x-w/2,p.y-(u.air?48:82),w,5,2,'#25363eaa');rr(c,p.x-w/2+1,p.y-(u.air?47:81),(w-2)*hp,3,1,TEAM_COLORS[owner]);}
     if(owner===0&&!u.air&&!u.building&&g.towers.some(t=>{const q=orient(t,seat);return t.hp>0&&q.y>p.y&&q.y-p.y<90&&Math.abs(q.x-p.x)<t.radius+8;}))markerUnits.push(p);
   }
@@ -986,8 +1086,8 @@ function drawPortrait(canvas,type,time=0,owner=0,selected=false,back=false){
   const g=c.createRadialGradient(60,48,10,60,64,70);g.addColorStop(0,col+'99');g.addColorStop(1,col+'00');
   c.fillStyle=g;c.fillRect(0,0,120,120);
   ellipse(c,60,105,40,8,'#1f39451b');
-  const scale=type==='bat'?1.6:type==='cannon'?1.5:type==='mage'?1.12:1.32;
-  drawUnit(c,type,60,type==='bat'?83:type==='cannon'?(back?94:80):104,scale,{time,owner,idle:true,noShadow:true,anim:0,back,facing:back?-Math.PI/2:Math.PI/2});
+  const scale=type==='golem'?.92:type==='bat'?1.6:type==='cannon'?1.5:type==='mage'?1.12:1.32;
+  drawUnit(c,type,60,type==='golem'?112:type==='bat'?83:type==='cannon'?(back?94:80):104,scale,{time,owner,idle:true,noShadow:true,anim:0,back,facing:back?-Math.PI/2:Math.PI/2});
   c.restore();
 }
 
@@ -1003,7 +1103,7 @@ let localGame=null,localTimer=null,lastLocal=0,localPaused=false,gameMode=null,d
 let demoGame=createMatch({seed:48164,bot:true}),demoLast=0,demoAutoAt=0,animationLast=0;
 let handSignature='',memberSignature='',lobbyCode='',previousPhase='',soundOn=false,audio=null,toastTimer;
 let serverAvailable=false,apiChecked=false,onlineBusy=false;
-let physicsOverlay=false,rosterBack=false,incompatibleVersion=false;
+let physicsOverlay=false,rosterBack=false,incompatibleVersion=false,editingDeck=[];
 const standalone=!!window.TINY_OFFLINE||location.protocol==='file:';
 function safeStorage(store,key,value){
   try{const storage=store==='session'?window.sessionStorage:window.localStorage;
@@ -1012,6 +1112,12 @@ function safeStorage(store,key,value){
 }
 const remembered=safeStorage('local','tiny-name');if(remembered)el('nickname').value=remembered;
 soundOn=safeStorage('local','tiny-sound')==='true';
+function loadDeck(){
+  try{const raw=JSON.parse(safeStorage('local','tiny-deck-v3')||'null');return normalizeDeck(raw);}catch{return [...DEFAULT_DECK];}
+}
+let playerDeck=loadDeck();
+function persistDeck(){safeStorage('local','tiny-deck-v3',JSON.stringify(playerDeck));renderDeckSummaries();}
+function deckReady(deck=playerDeck){return Array.isArray(deck)&&deck.length===MAX_DECK&&new Set(deck).size===MAX_DECK&&deck.every(id=>Object.hasOwn(UNITS,id));}
 function sound(kind='place'){
   if(!soundOn)return;
   try{
@@ -1138,7 +1244,7 @@ function renderLobby(){
       const avatar=document.createElement('span');avatar.className='member-avatar';avatar.textContent=p?[...p.name][0]:'+';
       const text=document.createElement('div'),name=document.createElement('strong'),sub=document.createElement('small');
       name.textContent=p?(p.name+(p.seat===seat?' · あなた':'')):'対戦相手を待っています';
-      sub.textContent=p?(p.connected?(p.seat===room.host?'ホスト':'メンバー'):'接続を待っています'):'同じPASSで参加';
+      sub.textContent=p?(p.connected?`${p.seat===room.host?'ホスト':'メンバー'} · デッキ ${p.seat===seat?playerDeck.length:(p.deckCount||0)}/${MAX_DECK}`:'接続を待っています'):'同じPASSで参加';
       text.append(name,sub);box.append(avatar,text);
       if(p?.ready){const b=document.createElement('em');b.textContent='✓ OK';box.append(b);}
       el('members').append(box);
@@ -1150,8 +1256,10 @@ function renderLobby(){
   if(lobbyCode!==room.code){
     lobbyCode=room.code;el('inviteCode').textContent=room.code;el('inviteURL').value=location.origin+'/';
   }
+  renderDeckSummaries();
+  el('lobbyDeckBtn').disabled=!!mine?.ready;
 }
-el('readyBtn').addEventListener('click',()=>send({type:'ready',ready:!room?.members[seat]?.ready}));
+el('readyBtn').addEventListener('click',()=>{const next=!room?.members[seat]?.ready;if(next&&!deckReady()){openDeckEditor();toast('対戦には6体のデッキが必要です。');return;}send({type:'ready',ready:next,deck:next?[...playerDeck]:undefined});});
 el('startBtn').addEventListener('click',()=>send({type:'start'}));
 el('leaveLobby').addEventListener('click',leaveOnline);
 async function copyText(text){
@@ -1168,14 +1276,15 @@ function startPractice(){
   let name;try{name=inputName();}catch(e){entryError(e.message);return;}
   if(session)leaveOnline();
   clearInterval(localTimer);gameMode='cpu';seat=0;room=null;previous=null;previousPhase='';handSignature='';
-  localGame=createMatch({seed:crypto.getRandomValues(new Uint32Array(1))[0],bot:true,difficulty});
+  if(!deckReady()){openDeckEditor();entryError('対戦には6体のデッキが必要です。');return;}
+  localGame=createMatch({seed:crypto.getRandomValues(new Uint32Array(1))[0],bot:true,difficulty,decks:[playerDeck,DEFAULT_DECK]});
   snapshot=viewMatch(localGame,0);selected=null;hover=null;localPaused=false;
   el('matchType').textContent='CPU PRACTICE · '+({easy:'EASY',normal:'NORMAL',hard:'HARD'}[difficulty]);
   el('ownName').textContent=name;el('enemyName').textContent='CPU · '+({easy:'やさしい',normal:'ふつう',hard:'手ごわい'}[difficulty]);
   showView('battle');status('CPU練習中');lastLocal=performance.now();
   localTimer=setInterval(()=>{
     const now=performance.now();
-    localPaused=document.hidden||el('helpModal').open||el('libraryModal').open;
+    localPaused=document.hidden||el('helpModal').open||el('libraryModal').open||el('deckModal').open;
     if(!localPaused&&localGame&&localGame.phase!=='ended'){
       tick(localGame,.1);acceptSnapshot(viewMatch(localGame,0));
     }
@@ -1299,7 +1408,7 @@ function place(p){
   }else send({type:'deploy',card:selected,x:pos.x,y:pos.y});
 }
 document.addEventListener('keydown',e=>{
-  if(currentView!=='battle'||['INPUT','TEXTAREA'].includes(document.activeElement.tagName)||el('helpModal').open||el('libraryModal').open)return;
+  if(currentView!=='battle'||['INPUT','TEXTAREA'].includes(document.activeElement.tagName)||el('helpModal').open||el('libraryModal').open||el('deckModal').open)return;
   if(/^[1-4]$/.test(e.key)){e.preventDefault();choose(snapshot.hand[Number(e.key)-1]);}
   if(e.key==='Escape'){selected=null;hover=null;updateHand();}
 });
@@ -1327,11 +1436,51 @@ el('soundBtn').onclick=()=>{
 el('soundBtn').textContent='♪';el('soundBtn').classList.toggle('sound-muted',!soundOn);el('soundBtn').title=soundOn?'効果音 ON':'効果音 OFF';
 el('physicsBtn').onclick=()=>{physicsOverlay=!physicsOverlay;el('physicsBtn').setAttribute('aria-pressed',String(physicsOverlay));el('physicsBtn').textContent=physicsOverlay?'当たり判定を隠す':'当たり判定を表示';el('physicsLegend').textContent=physicsOverlay?'緑: 地上 / 紫: 空中 / 黄: 建物':'地上と空中は別レイヤー';};
 el('libraryFacingBtn').onclick=()=>{rosterBack=!rosterBack;el('libraryFacingBtn').setAttribute('aria-pressed',String(rosterBack));el('libraryFacingBtn').textContent=rosterBack?'正面を見る ↻':'後ろ姿を見る ↻';};
+function makeMiniRoster(container,ids,interactive=false){
+  container.replaceChildren();
+  for(const id of ids){
+    const d=UNITS[id],mini=document.createElement('button');mini.type='button';mini.title=d.name;
+    const mc=document.createElement('canvas');mc.width=120;mc.height=120;mc.dataset.portrait=id;
+    const mn=document.createElement('span');mn.textContent=d.short;mini.append(mc,mn);
+    if(interactive)mini.onclick=openDeckEditor;container.append(mini);
+  }
+}
+function renderDeckSummaries(){
+  makeMiniRoster(el('homeDeck'),playerDeck,true);makeMiniRoster(el('lobbyRoster'),playerDeck,true);
+}
+function renderDeckEditor(){
+  el('deckCount').textContent=`${editingDeck.length} / ${MAX_DECK}`;el('deckError').hidden=true;
+  el('deckSaveBtn').disabled=editingDeck.length!==MAX_DECK;
+  el('deckSlots').replaceChildren();
+  for(let i=0;i<MAX_DECK;i++){
+    const id=editingDeck[i],slot=document.createElement('button');slot.type='button';slot.className='deck-slot '+(id?'filled':'empty');
+    const n=document.createElement('em');n.textContent=String(i+1);slot.append(n);
+    if(id){const can=document.createElement('canvas');can.width=120;can.height=120;can.dataset.portrait=id;const name=document.createElement('strong');name.textContent=UNITS[id].short;slot.append(can,name);slot.onclick=()=>{editingDeck.splice(i,1);renderDeckEditor();};}
+    el('deckSlots').append(slot);
+  }
+  el('deckPool').replaceChildren();
+  for(const id of DECK){
+    const d=UNITS[id],selected=editingDeck.includes(id),b=document.createElement('button');b.type='button';b.className='deck-choice'+(selected?' selected':'');
+    const can=document.createElement('canvas');can.width=120;can.height=120;can.dataset.portrait=id;
+    const cost=document.createElement('span');cost.className='deck-cost';cost.textContent=d.cost;
+    const copy=document.createElement('div');copy.className='deck-copy';const h=document.createElement('h3');h.textContent=d.name;const sm=document.createElement('small');sm.textContent=d.role;const desc=document.createElement('p');desc.textContent=d.desc;copy.append(h,sm,desc);b.append(can,cost,copy);
+    if(selected){const chk=document.createElement('span');chk.className='deck-check';chk.textContent='選択中';b.append(chk);}
+    b.onclick=()=>{const at=editingDeck.indexOf(id);if(at>=0)editingDeck.splice(at,1);else if(editingDeck.length<MAX_DECK)editingDeck.push(id);else{el('deckError').textContent='デッキは最大6体です。1体外してから追加してください。';el('deckError').hidden=false;return;}renderDeckEditor();};
+    el('deckPool').append(b);
+  }
+}
+function openDeckEditor(){
+  if(currentView==='battle'&&snapshot?.phase!=='ended'){toast('対戦中はデッキを変更できません。');return;}
+  editingDeck=[...playerDeck];renderDeckEditor();el('deckModal').showModal();
+}
+el('deckBtn').onclick=openDeckEditor;el('homeDeckBtn').onclick=openDeckEditor;el('lobbyDeckBtn').onclick=()=>{if(room?.members[seat]?.ready){toast('準備OKを取り消してから編集してください。');return;}openDeckEditor();};
+el('deckDefaultBtn').onclick=()=>{editingDeck=[...DEFAULT_DECK];renderDeckEditor();};
+el('deckSaveBtn').onclick=()=>{if(!deckReady(editingDeck)){el('deckError').textContent='対戦に使う6体を選んでください。';el('deckError').hidden=false;return;}playerDeck=[...editingDeck];persistDeck();el('deckModal').close();toast('デッキを保存しました。');};
 el('libraryBtn').onclick=()=>{el('libraryModal').showModal();};
 el('helpBtn').onclick=()=>{el('helpModal').showModal();};
 for(const b of document.querySelectorAll('.close-modal'))b.onclick=()=>b.closest('dialog').close();
 for(const dlg of document.querySelectorAll('dialog'))dlg.addEventListener('close',()=>{
-  if(gameMode==='cpu'){localPaused=document.hidden||el('helpModal').open||el('libraryModal').open;updateHUD();}
+  if(gameMode==='cpu'){localPaused=document.hidden||el('helpModal').open||el('libraryModal').open||el('deckModal').open;updateHUD();}
 });
 for(const dlg of document.querySelectorAll('dialog'))dlg.addEventListener('click',e=>{const r=dlg.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dlg.close();});
 for(const id of DECK){
@@ -1343,9 +1492,6 @@ for(const id of DECK){
   const p=document.createElement('p');p.textContent=d.desc;
   const stat=document.createElement('div');stat.className='library-stat';stat.textContent=`HP ${d.hp}${d.count>1?' ×3':''}　攻撃 ${d.damage}`;
   card.append(badge,can,role,h,p,stat);el('libraryGrid').append(card);
-  const mini=document.createElement('button');mini.title=d.name;
-  const mc=document.createElement('canvas');mc.width=120;mc.height=120;mc.dataset.portrait=id;
-  const mn=document.createElement('span');mn.textContent=d.short;mini.append(mc,mn);mini.onclick=()=>el('libraryModal').showModal();el('lobbyRoster').append(mini);
 }
 function interpolate(g,now){
   if(!previous||g.phase==='ended'||previous.units.length===0)return g;
@@ -1376,13 +1522,14 @@ function animation(now){
   }
 }
 requestAnimationFrame(animation);
-updateInspector('blade');
+updateInspector('blade');renderDeckSummaries();
 async function boot(){
   if(standalone){status('CPU練習・オフライン版');el('onlineBtn').disabled=true;entryError('このファイルはCPU練習用です。オンライン対戦は同梱のプロジェクトをCloudflareに公開してください。');return;}
   try{
     const config=await api('/api/config');
     if(config.version!==VERSION){incompatibleVersion=true;setOnlineBusy(false);entryError('ゲームが更新されています。Ctrl + F5で再読み込みしてください。');throw new Error('Version mismatch');}
     if(config.game!=='tiny-siege')throw new Error('別のゲームのAPIが応答しています。');
+    if(config.maxDeck!==MAX_DECK)throw new Error('デッキ仕様が更新されています。');
     serverAvailable=true;status('オンライン対応');
     const saved=safeStorage('session','tiny-session');
     if(saved){

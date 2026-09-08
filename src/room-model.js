@@ -1,5 +1,5 @@
 import {PHYSICS_VERSION} from '../public/game/physics.js';
-import {createMatch, deploy, tick, viewMatch, finish} from '../public/game/engine.js';
+import {createMatch, deploy, tick, viewMatch, finish, validateDeck} from '../public/game/engine.js';
 
 export const ROOM_TTL = 2*60*60*1000;
 export const RECONNECT_MS = 45_000;
@@ -11,7 +11,7 @@ export function cleanName(value){
 }
 export function makeToken(){return crypto.randomUUID().replaceAll('-','')+crypto.randomUUID().replaceAll('-','');}
 export function newRoom(code,name,now=Date.now()){
-  return {code,created:now,expires:now+ROOM_TTL,host:0,players:[{name:cleanName(name),token:makeToken(),ready:false,connected:false,disconnectedAt:now},null],game:null,savedAt:now};
+  return {code,created:now,expires:now+ROOM_TTL,host:0,players:[{name:cleanName(name),token:makeToken(),ready:false,deck:null,connected:false,disconnectedAt:now},null],game:null,savedAt:now};
 }
 export class RoomModel {
   constructor(data,{now=()=>Date.now(),persist=()=>{},activity=()=>{}}={}){
@@ -29,7 +29,7 @@ export class RoomModel {
     if(old&&!old.connected&&this.now()-old.disconnectedAt>120_000)this.data.players[1-this.data.host]=null;
     const seat=this.data.players.findIndex(p=>!p);
     if(seat<0)return {ok:false,error:'このルームは2人で満員です。'};
-    this.data.players[seat]={name:cleanName(name),token:makeToken(),ready:false,connected:false,disconnectedAt:this.now()};
+    this.data.players[seat]={name:cleanName(name),token:makeToken(),ready:false,deck:null,connected:false,disconnectedAt:this.now()};
     if(!this.data.players[this.data.host])this.data.host=seat;
     if(this.data.game?.phase==='ended')this.data.game=null;
     for(const p of this.data.players)if(p)p.ready=false;
@@ -70,14 +70,15 @@ export class RoomModel {
     if(m.type==='ready'){
       if(this.data.game){this.error(c,'待機ルームで準備してください。');return;}
       if(typeof m.ready!=='boolean'){this.error(c,'準備状態が正しくありません。');return;}
+      if(m.ready){const deck=validateDeck(m.deck);if(!deck){this.error(c,'デッキは重複なしの6体を選んでください。');return;}p.deck=deck;}
       p.ready=m.ready;this.changed();return;
     }
     if(m.type==='start'){
       if(seat!==this.data.host){this.error(c,'開始できるのはホストです。');return;}
       if(this.data.game){this.error(c,'対戦はすでに開始しています。');return;}
-      if(!this.data.players.every(v=>v?.connected&&v.ready)){this.error(c,'2人とも接続して準備OKにしてください。');return;}
+      if(!this.data.players.every(v=>v?.connected&&v.ready&&validateDeck(v.deck))){this.error(c,'2人とも6体のデッキを決めて準備OKにしてください。');return;}
       const seed=crypto.getRandomValues(new Uint32Array(1))[0];
-      this.data.game=createMatch({seed});this.lastTick=now;this.accumulator=0;this.changed();return;
+      this.data.game=createMatch({seed,decks:this.data.players.map(v=>v.deck)});this.lastTick=now;this.accumulator=0;this.changed();return;
     }
     if(m.type==='deploy'){
       if(!this.data.game){this.error(c,'ゲームが始まっていません。');return;}
@@ -125,7 +126,7 @@ export class RoomModel {
   snapshot(seat){
     const d=this.data;
     return {type:'state',code:d.code,host:d.host,seat,expires:d.expires,
-      members:d.players.map((p,i)=>p?{seat:i,name:p.name,ready:p.ready,connected:p.connected}:null),
+      members:d.players.map((p,i)=>p?{seat:i,name:p.name,ready:p.ready,connected:p.connected,deckCount:Array.isArray(p.deck)?p.deck.length:0}:null),
       paused:this.paused(),game:d.game?viewMatch(d.game,seat):null,serverNow:this.now()};
   }
   broadcast(){for(const c of [...this.peers.values()])if(c.seat!==null)this.send(c,this.snapshot(c.seat));}

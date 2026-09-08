@@ -1,6 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {RoomModel,newRoom,cleanName,ROOM_TTL} from '../src/room-model.js';
+import {DEFAULT_DECK} from '../public/game/units.js';
 function setup(){
  let now=10000;const d=newRoom('123456','Rin',now);const model=new RoomModel(d,{now:()=>now});
  const out=[[],[]],closed=[];const res=model.join('Taro');
@@ -33,13 +34,19 @@ test('wrong token is rejected',()=>{
 test('snapshots expose no member authentication tokens',()=>{
  const s=setup();const text=JSON.stringify(s.model.snapshot(0));assert.ok(!text.includes(s.d.players[0].token));assert.ok(!text.includes('"token"'));
 });
+test('ready requires a valid six-card deck and snapshot hides deck contents',()=>{
+ const s=setup();s.msg('a',{type:'ready',ready:true,deck:['blade']});assert.equal(s.d.players[0].ready,false);
+ s.msg('a',{type:'ready',ready:true,deck:[...DEFAULT_DECK]});assert.equal(s.d.players[0].ready,true);
+ const snap=s.model.snapshot(1);assert.equal(snap.members[0].deckCount,6);assert.equal(JSON.stringify(snap).includes('golem'),false);
+});
+
 test('only ready connected players and host may start',()=>{
  const s=setup();s.msg('a',{type:'start'});assert.equal(s.d.game,null);
- s.msg('a',{type:'ready',ready:true});s.msg('b',{type:'ready',ready:true});s.msg('b',{type:'start'});assert.equal(s.d.game,null);
+ s.msg('a',{type:'ready',ready:true,deck:[...DEFAULT_DECK]});s.msg('b',{type:'ready',ready:true,deck:[...DEFAULT_DECK]});s.msg('b',{type:'start'});assert.equal(s.d.game,null);
  s.msg('a',{type:'start'});assert.equal(s.d.game.phase,'countdown');
 });
 test('server owns player seat and ignores forged owner in commands',()=>{
- const s=setup();s.msg('a',{type:'ready',ready:true});s.msg('b',{type:'ready',ready:true});s.msg('a',{type:'start'});
+ const s=setup();s.msg('a',{type:'ready',ready:true,deck:[...DEFAULT_DECK]});s.msg('b',{type:'ready',ready:true,deck:[...DEFAULT_DECK]});s.msg('a',{type:'start'});
  for(let i=0;i<31;i++)s.step(100);
  const g=s.d.game;assert.equal(g.phase,'battle');
  const card=g.players[0].hand.find(id=>['bat','blade','archer','spear','bomber'].includes(id));
@@ -48,7 +55,7 @@ test('server owns player seat and ignores forged owner in commands',()=>{
  s.msg('a',{type:'deploy',owner:1,card,x:100,y:650});assert.ok(g.units.every(u=>u.owner===0));
 });
 test('disconnect pauses game and reconnect restores without resetting time',()=>{
- const s=setup();s.msg('a',{type:'ready',ready:true});s.msg('b',{type:'ready',ready:true});s.msg('a',{type:'start'});
+ const s=setup();s.msg('a',{type:'ready',ready:true,deck:[...DEFAULT_DECK]});s.msg('b',{type:'ready',ready:true,deck:[...DEFAULT_DECK]});s.msg('a',{type:'start'});
  for(let i=0;i<35;i++)s.step(100);
  const before=s.d.game.time,token=s.d.players[1].token;s.model.drop('b');
  assert.ok(s.model.paused());s.step(1000);assert.equal(s.d.game.time,before);
@@ -59,13 +66,13 @@ test('old socket close cannot disconnect replacement socket',()=>{
 });
 test('45 second disconnect forfeits; both disconnect draw',()=>{
  for(const both of [false,true]){
- const s=setup();s.msg('a',{type:'ready',ready:true});s.msg('b',{type:'ready',ready:true});s.msg('a',{type:'start'});
+ const s=setup();s.msg('a',{type:'ready',ready:true,deck:[...DEFAULT_DECK]});s.msg('b',{type:'ready',ready:true,deck:[...DEFAULT_DECK]});s.msg('a',{type:'start'});
  s.model.drop('b');if(both)s.model.drop('a');s.step(45001);
  assert.equal(s.d.game.phase,'ended');assert.equal(s.d.game.winner,both?null:0);
  }
 });
 test('surrender ends a game and host can reset to same lobby',()=>{
- const s=setup();s.msg('a',{type:'ready',ready:true});s.msg('b',{type:'ready',ready:true});s.msg('a',{type:'start'});
+ const s=setup();s.msg('a',{type:'ready',ready:true,deck:[...DEFAULT_DECK]});s.msg('b',{type:'ready',ready:true,deck:[...DEFAULT_DECK]});s.msg('a',{type:'start'});
  s.msg('b',{type:'surrender'});assert.equal(s.d.game.winner,0);
  s.msg('b',{type:'reset'});assert.ok(s.d.game);s.msg('a',{type:'reset'});assert.equal(s.d.game,null);assert.equal(s.d.code,'123456');assert.ok(s.d.players.every(p=>!p.ready));
 });
@@ -80,10 +87,10 @@ test('expired rooms reject new joins and close participants',()=>{
  const s=setup();s.advance(ROOM_TTL+1);assert.equal(s.model.join('Guest').ok,false);s.model.update();assert.equal(s.model.peers.size,0);
 });
 test('join during live game rejected',()=>{
- const s=setup();s.msg('a',{type:'ready',ready:true});s.msg('b',{type:'ready',ready:true});s.msg('a',{type:'start'});
+ const s=setup();s.msg('a',{type:'ready',ready:true,deck:[...DEFAULT_DECK]});s.msg('b',{type:'ready',ready:true,deck:[...DEFAULT_DECK]});s.msg('a',{type:'start'});
  assert.equal(s.model.join('late').ok,false);
 });
 test('repeated state snapshots never leak the other hand',()=>{
- const s=setup();s.msg('a',{type:'ready',ready:true});s.msg('b',{type:'ready',ready:true});s.msg('a',{type:'start'});
+ const s=setup();s.msg('a',{type:'ready',ready:true,deck:[...DEFAULT_DECK]});s.msg('b',{type:'ready',ready:true,deck:[...DEFAULT_DECK]});s.msg('a',{type:'start'});
  assert.equal(s.model.snapshot(0).game.players,undefined);assert.equal(s.model.snapshot(1).game.rng,undefined);
 });
