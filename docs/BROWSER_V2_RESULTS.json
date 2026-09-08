@@ -1,0 +1,19 @@
+{
+  "passed": 12,
+  "checks": [
+    "standalone loads v2 without external assets",
+    "roster button shows rear variants and maintains eight cards",
+    "all eight front/back or turret-orientation renders produce distinct pixels",
+    "front portrait toggle is reversible",
+    "CPU scene carries physics version and advancing rear-facing friendlies",
+    "collision overlay control renders both altitude layers and building footprints",
+    "collision overlay can be disabled without changing the simulation",
+    "placement preview rejects an occupied tower footprint",
+    "air placement preview allows the ground tower footprint",
+    "rotated seat reuses authoritative world-facing data without flipping the artwork upside down",
+    "390px viewport keeps v2 controls within the page width",
+    "no uncaught JavaScript errors in v2-specific controls and rendering"
+  ],
+  "errors": [],
+  "note": "Actual bundled UI and renderer, Chromium set_content with test-only state fixtures. Not a Cloudflare deployment or physical-device test."
+}

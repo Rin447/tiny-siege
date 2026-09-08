@@ -1,0 +1,37 @@
+
+> tiny-siege@2.0.0 test:network
+> node tests/network.mjs
+
+PASS 1: health and game config identify the correct game
+PASS 2: HTML, style and module assets load
+PASS 3: missing APIs return JSON 404, not a home page
+PASS 4: create room returns a code and private token
+PASS 5: join same code and reject a third participant
+PASS 6: two native WebSocket clients receive the same roster
+PASS 7: non-host cannot start; both ready and host starts
+PASS 8: validated deployment is synchronized to both players
+PASS 9: server sends v2 facing and collision metadata identically to both seats
+PASS 10: opponent territory is rejected without spawning
+PASS 11: disconnect pauses and token reconnect resumes
+PASS 12: surrender result reaches both clients and rematch keeps code
+PASS 13: explicit host leave promotes opponent
+PASS 14: cross-origin mutation rejected
+{
+  "passed": 14,
+  "checks": [
+    "health and game config identify the correct game",
+    "HTML, style and module assets load",
+    "missing APIs return JSON 404, not a home page",
+    "create room returns a code and private token",
+    "join same code and reject a third participant",
+    "two native WebSocket clients receive the same roster",
+    "non-host cannot start; both ready and host starts",
+    "validated deployment is synchronized to both players",
+    "server sends v2 facing and collision metadata identically to both seats",
+    "opponent territory is rejected without spawning",
+    "disconnect pauses and token reconnect resumes",
+    "surrender result reaches both clients and rematch keeps code",
+    "explicit host leave promotes opponent",
+    "cross-origin mutation rejected"
+  ]
+}

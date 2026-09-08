@@ -1,0 +1,37 @@
+PASS 1 standalone home renders with all eight roster cards
+PASS 2 name validation and offline online-button restriction
+PASS 3 CPU countdown reaches battle with four hand cards
+PASS 4 keyboard selection and escape deselection
+PASS 5 tap-card and field placement spawns player-owned units
+PASS 6 dragging a card from hand onto the arena deploys a unit
+PASS 7 CPU game pauses while instructions are open
+PASS 8 battle and all eight animated portraits render without errors
+PASS 9 CPU timeout result and rematch loop
+PASS 10 390px mobile layout has no horizontal overflow and touch selection works
+PASS 11 two browser UIs create/join one room through real HTTP and WebSocket bridge
+PASS 12 ready/start and player-relative opponent names synchronize
+PASS 13 seat 1 bottom-side placement rotates to authoritative enemy-side coordinates
+PASS 14 online surrender, winner display and same-PASS rematch via real server
+PASS 15 no uncaught JavaScript errors across desktop, mobile and online UI runs
+{
+  "passed": 15,
+  "checks": [
+    "standalone home renders with all eight roster cards",
+    "name validation and offline online-button restriction",
+    "CPU countdown reaches battle with four hand cards",
+    "keyboard selection and escape deselection",
+    "tap-card and field placement spawns player-owned units",
+    "dragging a card from hand onto the arena deploys a unit",
+    "CPU game pauses while instructions are open",
+    "battle and all eight animated portraits render without errors",
+    "CPU timeout result and rematch loop",
+    "390px mobile layout has no horizontal overflow and touch selection works",
+    "two browser UIs create/join one room through real HTTP and WebSocket bridge",
+    "ready/start and player-relative opponent names synchronize",
+    "seat 1 bottom-side placement rotates to authoritative enemy-side coordinates",
+    "online surrender, winner display and same-PASS rematch via real server",
+    "no uncaught JavaScript errors across desktop, mobile and online UI runs"
+  ],
+  "errors": [],
+  "note": "Chromium set_content. Online browser transport bridged to real local Node server; not a native browser-network or Cloudflare deployment test."
+}

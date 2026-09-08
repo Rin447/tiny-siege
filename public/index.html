@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#182f39">
+<title>TINY SIEGE — 8人の小さな攻城戦</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<header class="topbar">
+  <button id="brand" class="brand" aria-label="ホームへ">
+    <span class="brand-mark"><i></i><i></i><i></i></span>
+    <span>TINY SIEGE<small>小さな部隊、大きな一手。</small></span>
+  </button>
+  <nav>
+    <span id="connection" class="status"><i></i>接続確認中</span>
+    <button id="libraryBtn" class="navbtn">部隊図鑑 <span>08</span></button>
+    <button id="helpBtn" class="navbtn">遊び方</button>
+    <button id="soundBtn" class="iconbtn" aria-label="効果音を切り替え" title="効果音">♪</button>
+  </nav>
+</header>
+
+<main id="home" class="home view">
+  <section class="hero-copy">
+    <div class="eyebrow"><span></span> PRIVATE 1V1 · REALTIME TACTICS</div>
+    <h1>その一枚で、<br>戦況を<span>変えよう。</span></h1>
+    <p class="hero-desc">前衛で守る。後衛で射抜く。<br>8種類の仲間を組み合わせる、<br>小さな2Dリアルタイム攻城戦。</p>
+    <div class="hero-stats"><div><strong>8</strong><small>個性的なユニット</small></div><div><strong>3<span> min</span></strong><small>一手が変える攻防</small></div><div><strong>1v1</strong><small>友だちとオンライン</small></div></div>
+    <div class="hero-note"><span class="note-dot"></span><p>通話はいつものVCで。<br>ここでは、戦いに集中しよう。</p></div>
+    <div class="version-stamp">BACK VIEWS + TWO-LAYER PHYSICS <span>02 / FORMATION & FACING</span></div>
+  </section>
+  <section class="demo-area" aria-label="ゲームの自動デモ">
+    <div class="demo-label"><span class="live-dot"></span> LIVE ARENA PREVIEW <span>AUTOPLAY</span></div>
+    <div class="demo-frame"><canvas id="demoCanvas" width="720" height="1040"></canvas></div>
+    <div class="demo-caption">2つの橋。3つのタワー。無数の組み合わせ。</div>
+  </section>
+  <section class="entry-panel">
+    <div class="eyebrow">LET'S PLAY</div><h2>まずは、ひと勝負。</h2>
+    <label class="field-label" for="nickname">あなたの名前 <span>1〜16文字</span></label>
+    <input id="nickname" maxlength="32" placeholder="例：りん" autocomplete="nickname">
+    <div class="practice-block">
+      <div class="block-title"><span>01</span><h3>ひとりで練習</h3><small>CPU BATTLE</small></div>
+      <div id="difficulty" class="segmented"><button data-level="easy">やさしい</button><button data-level="normal" class="active">ふつう</button><button data-level="hard">手ごわい</button></div>
+      <button id="practiceBtn" class="btn primary">CPUと対戦する <span>↗</span></button>
+      <p class="field-help">登録不要。操作と8枚のカードを試そう。</p>
+    </div>
+    <div class="divider"></div>
+    <div class="block-title"><span>02</span><h3>友だちと対戦</h3><small>ONLINE 1V1</small></div>
+    <div class="segmented" id="entryTabs"><button data-tab="create" class="active">ルーム作成</button><button data-tab="join">PASSで参加</button></div>
+    <div id="passField" hidden><label for="roomPass" class="field-label">6桁のPASS</label><input id="roomPass" placeholder="123456" inputmode="numeric" maxlength="6" autocomplete="off"></div>
+    <p id="createHint" class="field-help">共通URLと、発行された6桁PASSを共有。</p>
+    <p id="entryError" class="error" role="alert" hidden></p>
+    <button id="onlineBtn" class="btn dark">対戦ルームを作る <span>＋</span></button>
+    <p class="panel-footer"><span>プライベート対戦</span><span>最大2人 / 2時間</span></p>
+  </section>
+</main>
+
+<main id="lobby" class="view lobby" hidden>
+  <section class="lobby-main">
+    <div class="eyebrow">PRIVATE DUEL LOBBY</div><h1>次の一戦を、待とう。</h1>
+    <p class="muted">2人とも「準備OK」にしたら、ホストが対戦を開始できます。</p>
+    <div id="members" class="members"></div>
+    <div class="lobby-actions"><button id="readyBtn" class="btn primary">準備OK</button><button id="startBtn" class="btn dark" disabled>対戦を開始</button></div>
+    <div class="lobby-rules"><div><small>バトル</small><strong>3分 ＋ 延長1分</strong></div><div><small>デッキ</small><strong>8枚 / 手札4枚</strong></div><div><small>勝利条件</small><strong>相手の本拠地を破壊</strong></div></div>
+    <h3 class="section-label">YOUR SQUAD <span>8種類すべてを使えます</span></h3><div id="lobbyRoster" class="mini-roster"></div>
+  </section>
+  <aside class="invite-panel">
+    <div class="eyebrow">INVITE YOUR RIVAL</div><h2>友だちを招待</h2><p class="muted">同じURLを開き、このPASSで参加。</p>
+    <span class="field-label">ルームPASS</span><strong id="inviteCode" class="room-code">------</strong>
+    <button id="copyPass" class="btn outline">PASSをコピー</button>
+    <label class="field-label" for="inviteURL">共通の参加URL</label><input id="inviteURL" readonly>
+    <button id="copyInvite" class="btn dark">URLとPASSをコピー <span>↗</span></button>
+    <p class="field-help">PASSを知っている人が参加できます。<br>信頼する相手にだけ共有してください。</p>
+    <button id="leaveLobby" class="textbtn">ルームを退出</button>
+  </aside>
+</main>
+
+<main id="battle" class="view battle" hidden>
+  <aside class="battle-sidebar">
+    <div class="eyebrow">THE CROSSING / ARENA 01</div><h2>橋を越えて、<br>本拠地へ。</h2>
+    <div id="matchType" class="battle-tag">CPU PRACTICE</div>
+    <div class="field-instructions"><span>1</span><p>下のカードを選ぶ</p><span>2</span><p>自分の陣地をタップ</p><span>3</span><p>仲間が自動で攻撃！</p></div>
+    <div class="tip-panel"><small>TACTICAL NOTE</small><p id="tacticalTip">衛士の後ろに弓兵。前衛と後衛を組み合わせよう。</p></div>
+    <button id="surrenderBtn" class="textbtn">この対戦を終了 / 降参</button>
+    <p class="muted keyboard-note">1〜4：カード選択<br>Esc：選択解除<br>ドラッグ配置にも対応</p>
+  </aside>
+  <section class="play-column">
+    <div class="scorebar"><div><span class="team-dot enemy"></span><strong id="enemyName">CPU</strong><span id="enemyScore">0</span></div><div id="clock" class="clock">3:00</div><span id="energyMode" class="energy-mode">×1</span></div>
+    <div class="arena-wrap">
+      <canvas id="arenaCanvas" width="720" height="1040" aria-label="対戦フィールド。カードを選び、自分の陣地をタップして配置" tabindex="0"></canvas>
+      <div id="countdownOverlay" class="arena-overlay countdown" hidden><small>GET READY</small><strong id="countdownNum">3</strong><span>カードを選んで、陣地に配置</span></div>
+      <div id="pausedOverlay" class="arena-overlay paused" hidden><span class="spinner"></span><h3 id="pausedTitle">再接続を待っています</h3><p id="pausedText"></p></div>
+      <div id="resultOverlay" class="arena-overlay result" hidden><small id="resultLabel">VICTORY</small><strong id="resultTitle">勝利！</strong><p id="resultReason"></p><div id="resultStats"></div><button id="rematchBtn" class="btn primary">もう一度対戦</button><button id="backHomeBtn" class="textbtn">ホームへ戻る</button></div>
+    </div>
+    <div class="own-bar"><div><span class="team-dot"></span><strong id="ownName">YOU</strong><span id="ownScore">0</span></div><span id="battleConnection">CPU練習</span><button id="mobileExit" class="textbtn">終了</button></div>
+    <div id="hand" class="hand"></div>
+    <div class="energy-row"><span class="energy-icon">◆</span><strong id="energyValue">5</strong><div id="energyTrack" class="energy-track"></div><span id="nextCard">NEXT</span></div>
+    <div class="battle-tools"><button id="physicsBtn" class="textbtn" aria-pressed="false">当たり判定を表示</button><span id="physicsLegend">地上と空中は別レイヤー</span></div>
+    <div id="battleHint" class="battle-hint">カードを選んで、自分の陣地に配置してください。</div>
+  </section>
+  <aside class="unit-inspector">
+    <div class="section-label">SELECTED UNIT</div>
+    <canvas id="inspectorCanvas" width="240" height="240"></canvas>
+    <div id="inspectorRole" class="unit-role">近接アタッカー</div><h2 id="inspectorName">アッシュ剣士</h2><p id="inspectorDesc"></p>
+    <div id="inspectorStats" class="inspector-stats"></div>
+    <div class="match-rules"><h4>この一戦のルール</h4><p>本拠地を壊せば即勝利。3分で同数なら延長戦。延長後も同数なら残りタワーHPで決着。</p><p>残り1分からエナジー回復が2倍。切り札を重ねて攻めよう。</p></div>
+  </aside>
+</main>
+<footer id="footer"><span>ひとつのURLから、小さな戦場へ。</span><span>TINY SIEGE <i>/</i> v2.0.0 · ORIGINAL PROTOTYPE</span></footer>
+
+<div id="toast" class="toast" role="status" hidden></div>
+<dialog id="libraryModal"><div class="modal-head"><div><span class="eyebrow">MEET YOUR EIGHT</span><h2>小さな部隊図鑑</h2></div><button class="close-modal iconbtn" aria-label="閉じる">×</button></div><p class="muted">全員が同じ8枚のデッキ。役割を組み合わせて、自分の戦術を作ろう。</p><div class="roster-tools"><button id="libraryFacingBtn" class="btn outline" aria-pressed="false">後ろ姿を見る ↻</button><small>戦場では進行・攻撃方向で自動切り替え。</small></div><div id="libraryGrid" class="library-grid"></div></dialog>
+<dialog id="helpModal"><div class="modal-head"><div><span class="eyebrow">HOW TO PLAY</span><h2>3分でわかる、攻城戦。</h2></div><button class="close-modal iconbtn" aria-label="閉じる">×</button></div>
+  <div class="help-steps">
+    <section><b>01</b><div><h3>まずはCPU戦から</h3><p>名前を入れて「CPUと対戦する」。オンラインはルームを作り、URLと6桁PASSを友だちへ共有します。</p></div></section>
+    <section><b>02</b><div><h3>カード → 自分の陣地</h3><p>手札4枚から1枚を選び、画面下側の自陣にタップで配置。カードをフィールドへドラッグしてもOK。ユニットは自動で移動・攻撃します。</p></div></section>
+    <section><b>03</b><div><h3>エナジーを使い分ける</h3><p>カード左上の数字が必要コスト。エナジーは最大10まで回復します。使ったカードは待機列へ入り、次の1枚が手札に補充されます。</p></div></section>
+    <section><b>04</b><div><h3>8枚の役割を組み合わせる</h3><p>衛士で攻撃を受けて弓兵で援護。敵が密集したら術師や爆弾兵。バットは川を飛び越えますが、対空攻撃が弱点。砲台は動かず32秒間守ります。</p></div></section>
+    <section><b>05</b><div><h3>本拠地を破壊したら勝利</h3><p>後方中央の本拠地を壊すと3ポイントで即勝利。3分終了時はタワー破壊数を比較。同数なら最大1分の延長で先にタワーを壊した側が勝ち。延長終了後は残りタワーHPの合計、同じなら引き分けです。</p></div></section>
+    <section><b>06</b><div><h3>通話はいつものVCで</h3><p>オンラインで切断したら最大45秒間一時停止して再接続を待ちます。戻れなければ切断側の敗北、両方切断は引き分け。CPU戦ではタブを離れると一時停止します。</p></div></section>
+    <section><b>07</b><div><h3>タワーを回り込む配置</h3><p>地上の部隊はタワー・砲台をすり抜けません。後ろに置くと回り道の時間が生まれます。破壊した建物の土台は通行可能。木や石は飾りです。</p></div></section>
+    <section><b>08</b><div><h3>大きさと地上／空中</h3><p>味方は同じ高度で軽く押し合い、敵とはすり抜けず接触します。大きな衛士は押されにくく、細い道で場所を取ります。飛行は地上の部隊・建物を無視。対空攻撃ができることと、飛んでいることは別です。</p></div></section>
+    <section><b>09</b><div><h3>向きと判定を確認</h3><p>敵陣へ進む自分の部隊は背中が見え、後ろの敵を狙えば正面を向きます。図鑑で正面／背面を切り替え。「当たり判定を表示」で足元の円を確認できます。矢・魔法は味方や建物で遮られません。</p></div></section>
+  </div>
+  <p class="help-note">オリジナルの試作ルールです。外部ゲームのキャラクター・画像・音源は使用していません。オンライン対戦はCloudflareへのサーバー込みの公開が必要です。</p>
+</dialog>
+<script type="module" src="/app.js"></script>
+</body>
+</html>
