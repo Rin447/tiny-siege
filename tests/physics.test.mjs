@@ -12,10 +12,10 @@ function advance(g,n){for(let i=0;i<n;i++)tick(g,.1);}
 function body(g,type,owner,x,y){const u={...UNITS[type],id:`u${g.nextId++}`,type,owner,x,y,maxHp:UNITS[type].hp,spawn:0,cd:999,walk:0,age:0,anim:0,hit:0,lane:x<360?190:530,face:owner===0?-1:1};g.units.push(u);return u;}
 function checkStatics(g){for(const u of g.units)if(!u.building)assert.ok(staticFree(g,u,u),`${u.id} ${u.type} in static at ${u.x},${u.y}`);}
 
-test('v3 physics version and mass/radius data are explicit',()=>{
- assert.equal(VERSION,'5.0.0');assert.equal(PHYSICS_VERSION,3);
+test('v9 physics version and mass/radius data are explicit',()=>{
+ assert.equal(VERSION,'9.0.0');assert.equal(PHYSICS_VERSION,7);
  assert.ok(UNITS.knight.mass>UNITS.archer.mass);assert.ok(UNITS.knight.radius>UNITS.archer.radius);
- assert.equal(createMatch().physicsVersion,3);
+ assert.equal(createMatch().physicsVersion,7);
 });
 test('body may not put its edge across the river even if its centre is on land',()=>{
  const u=UNITS.knight;assert.equal(terrainFree(u,{x:350,y:480}),false);
@@ -109,8 +109,8 @@ test('defeated tower immediately loses collision and invalidates the route cache
  g.towers.find(t=>t.owner===0&&t.x===190).hp=0;
  assert.equal(staticLineFree(g,u,u,target),true);const after=navigationWaypoint(g,u,target,5);assert.equal(after.x,190);
 });
-test('expired cannon is removed from the solid obstacle set',()=>{
- const g=game(),c=unit(g,'cannon',0,300,700);c.age=31.95;c.spawn=0;tick(g,.1);
+test('fully decayed cannon is removed from the solid obstacle set',()=>{
+ const g=game(),c=unit(g,'cannon',0,300,700);c.hp=UNITS.cannon.decayPerSecond*.1;c.spawn=0;tick(g,.1);
  assert.ok(!solidStructures(g).some(x=>x.id===c.id));
 });
 test('navigation around a cannon produces real extra travel, not a spawn delay',()=>{
@@ -145,7 +145,7 @@ test('rendering depth mixes towers and ground troops; air is always after ground
  assert.deepEqual(renderOrder(g,1).map(x=>x.entity.id),['front','tower','rear','air']);
 });
 test('server snapshots expose facing/mass/layer but not pathfinding internals',()=>{
- const g=game(),u=unit(g,'knight',0,190,930);advance(g,15);const snap=viewMatch(g,0);assert.equal(snap.physicsVersion,3);
+ const g=game(),u=unit(g,'knight',0,190,930);advance(g,15);const snap=viewMatch(g,0);assert.equal(snap.physicsVersion,7);
  assert.equal(snap.units[0].mass,6);assert.equal(typeof snap.units[0].facing,'number');assert.ok(!('_nav' in snap.units[0]));
 });
 test('legacy active matches terminate safely instead of resuming inside new obstacles',()=>{

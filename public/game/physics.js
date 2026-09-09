@@ -4,7 +4,7 @@ import {ARENA} from './units.js';
  * Ground bodies live on the lawn/bridges. Air bodies share a separate layer.
  * Buildings are static circles; tree/grass artwork is decorative only.
  */
-export const PHYSICS_VERSION=3;
+export const PHYSICS_VERSION=7;
 export const FIELD={left:34,right:686,top:28,bottom:1012};
 const EPS=0.001,GRID=20,COLS=33,ROWS=49;
 const worldCaches=new WeakMap();
@@ -14,6 +14,20 @@ export const isStructure=u=>!!(u.kind||u.building);
 export const bodyRadius=u=>u.radius||12;
 export const sameLayer=(a,b)=>!!a.air===!!b.air;
 export const solidStructures=g=>[...g.towers,...g.units.filter(u=>u.building)].filter(u=>u.hp>0);
+
+export function deploymentAllowed(g,owner,x,y){
+  if(owner!==0&&owner!==1)return false;
+  if(owner===0&&y>=ARENA.deployBottom)return true;
+  if(owner===1&&y<=ARENA.deployTop)return true;
+  const enemy=1-owner;
+  const laneX=x<=320?190:x>=400?530:null;
+  if(laneX===null)return false;
+  const fallen=g.towers?.find(t=>t.owner===enemy&&t.kind==='tower'&&t.x===laneX&&t.hp<=0);
+  if(!fallen)return false;
+  const inset=ARENA.advancedDeployInset||120;
+  // The attacker gains ground, but cannot deploy directly on the destroyed tower ruin.
+  return owner===0?y>=fallen.y+inset:y<=fallen.y-inset;
+}
 export function pairDistance(a,b,soft=false){
   const sum=bodyRadius(a)+bodyRadius(b);
   if(a.air&&b.air)return sum*(a.owner===b.owner?.9:1);
@@ -239,7 +253,7 @@ export function spawnPositions(g,owner,data,x,y){
       const n=rr?16:1;
       for(let k=0;k<n;k++){
         const a=k*Math.PI*2/n+(owner===1?Math.PI:0),p={x:wanted.x+Math.cos(a)*rr,y:wanted.y+Math.sin(a)*rr};
-        if(p.x<48||p.x>672||p.y<58||p.y>982||(owner===0?p.y<ARENA.deployBottom:p.y>ARENA.deployTop))continue;
+        if(p.x<48||p.x>672||p.y<58||p.y>982||!deploymentAllowed(g,owner,p.x,p.y))continue;
         if(!staticFree(g,data,p,1))continue;
         if(g.units.some(u=>u.hp>0&&sameLayer(data,u)&&dist(p,u)<bodyRadius(data)+bodyRadius(u)+.5))continue;
         if(points.some(q=>dist(p,q)<data.radius*2+.5))continue;

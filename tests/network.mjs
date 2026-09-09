@@ -24,7 +24,7 @@ async function wait(fn,message){
 let a,b,c,room,other;
 try{
  await check('health and game config identify the correct game',async()=>{
-  const r=await fetch(base+'/api/config'),j=await r.json();assert.equal(j.version,'5.0.0');assert.equal(j.physicsVersion,3);assert.equal(j.units,15);assert.equal(j.maxDeck,6);assert.equal(j.game,'tiny-siege');
+  const r=await fetch(base+'/api/config'),j=await r.json();assert.equal(j.version,'9.0.0');assert.equal(j.physicsVersion,7);assert.equal(j.cards,17);assert.equal(j.units,16);assert.equal(j.spells,1);assert.equal(j.maxDeck,6);assert.equal(j.game,'tiny-siege');
  });
  await check('HTML, style and module assets load',async()=>{
   for(const url of ['/','/app.js','/styles.css','/game/engine.js','/game/art.js','/game/physics.js']){
@@ -54,13 +54,13 @@ try{
   a.send({type:'start'});await wait(()=>a.last()?.game?.phase==='battle'&&b.last()?.game?.phase==='battle','countdown');
  });
  await check('validated deployment is synchronized to both players',async()=>{
-  const g=a.last().game,id=g.hand.find(k=>UNITS[k].cost<=g.energy&&k!=='cannon')||g.hand.find(k=>UNITS[k].cost<=g.energy);
+  const g=a.last().game,id=g.hand.find(k=>UNITS[k].cost<=g.energy&&k!=='cannon'&&!UNITS[k].spell)||g.hand.find(k=>UNITS[k].cost<=g.energy&&!UNITS[k].spell);
   a.send({type:'deploy',card:id,x:105,y:665});
   await wait(()=>a.last().game.units.some(u=>u.owner===0)&&b.last().game.units.some(u=>u.owner===0),'deployment synchronization');
   const ua=a.last().game.units.find(u=>u.owner===0),ub=b.last().game.units.find(u=>u.id===ua.id);assert.ok(ub);assert.equal(ua.type,ub.type);
  });
- await check('server sends v5 facing and collision metadata identically to both seats',async()=>{
-  const ga=a.last().game,u=ga.units[0];assert.equal(ga.physicsVersion,3);assert.equal(typeof u.facing,'number');assert.equal(typeof u.mass,'number');
+ await check('server sends v9 facing, dash, tower-awake and collision metadata identically to both seats',async()=>{
+  const ga=a.last().game,u=ga.units[0];assert.equal(ga.physicsVersion,7);assert.equal(typeof u.facing,'number');assert.equal(typeof u.mass,'number');
   assert.equal(Object.hasOwn(u,'_nav'),false);assert.equal(Object.hasOwn(u,'_stuck'),false);
   const matching=[...b.messages].reverse().find(m=>m.type==='state'&&m.game?.time===ga.time&&m.game.units.some(v=>v.id===u.id));
   assert.ok(matching);assert.deepEqual(matching.game.units.find(v=>v.id===u.id),u);

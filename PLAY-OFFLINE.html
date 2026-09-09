@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#182f39">
-<title>TINY SIEGE — 15体から6体を選ぶ小さな攻城戦</title>
+<title>TINY SIEGE — 17枚から6枚を選ぶ小さな攻城戦</title>
 
 <style>:root{--paper:#f6f5ef;--ink:#203843;--muted:#7b8c8d;--line:#dce1d7;--green:#47796d;--mint:#dce9c8;--coral:#d6896c;--card:#fffef8;--board: min(420px,calc((100dvh - 282px)*.6923));font-family:"Segoe UI","Noto Sans JP","Hiragino Kaku Gothic ProN","Meiryo",sans-serif;color:var(--ink);background:var(--paper)}
 *{box-sizing:border-box}body{margin:0}button,input{font:inherit}button{cursor:pointer;transition:background .16s,transform .16s,border-color .16s}button:disabled{cursor:not-allowed;opacity:.44}button:focus-visible,input:focus-visible,canvas:focus-visible{outline:3px solid #d89e5c;outline-offset:3px}
@@ -63,7 +63,7 @@ dialog{border:1px solid #d7dfcf;background:#f9faf3;color:var(--ink);border-radiu
   <nav>
     <span id="connection" class="status"><i></i>接続確認中</span>
     <button id="deckBtn" class="navbtn">デッキ <span>6</span></button>
-    <button id="libraryBtn" class="navbtn">部隊図鑑 <span>12</span></button>
+    <button id="libraryBtn" class="navbtn">カード図鑑 <span>17</span></button>
     <button id="helpBtn" class="navbtn">遊び方</button>
     <button id="soundBtn" class="iconbtn" aria-label="効果音を切り替え" title="効果音">♪</button>
   </nav>
@@ -73,10 +73,10 @@ dialog{border:1px solid #d7dfcf;background:#f9faf3;color:var(--ink);border-radiu
   <section class="hero-copy">
     <div class="eyebrow"><span></span> PRIVATE 1V1 · REALTIME TACTICS</div>
     <h1>その一枚で、<br>戦況を<span>変えよう。</span></h1>
-    <p class="hero-desc">前衛で守る。後衛で射抜く。<br>12種類の仲間から6体を選び、<br>自分の編成で挑む2Dリアルタイム攻城戦。</p>
-    <div class="hero-stats"><div><strong>12</strong><small>個性的なユニット</small></div><div><strong>3<span> min</span></strong><small>一手が変える攻防</small></div><div><strong>1v1</strong><small>友だちとオンライン</small></div></div>
+    <p class="hero-desc">前衛で守る。後衛で射抜く。<br>16体＋1呪文から6枚を選び、<br>自分の編成で挑む2Dリアルタイム攻城戦。</p>
+    <div class="hero-stats"><div><strong>17</strong><small>16体＋1呪文</small></div><div><strong>3<span> min</span></strong><small>一手が変える攻防</small></div><div><strong>1v1</strong><small>友だちとオンライン</small></div></div>
     <div class="hero-note"><span class="note-dot"></span><p>通話はいつものVCで。<br>ここでは、戦いに集中しよう。</p></div>
-    <div class="version-stamp">CHARGE · ASSASSIN · SWARM <span>04 / TWELVE UNIT ROSTER</span></div>
+    <div class="version-stamp">KRAGG BERSERKER · FIREBALL · SPLIT GOLEM <span>09 / SEVENTEEN CARD POOL</span></div>
   </section>
   <section class="demo-area" aria-label="ゲームの自動デモ">
     <div class="demo-label"><span class="live-dot"></span> LIVE ARENA PREVIEW <span>AUTOPLAY</span></div>
@@ -88,15 +88,15 @@ dialog{border:1px solid #d7dfcf;background:#f9faf3;color:var(--ink);border-radiu
     <label class="field-label" for="nickname">あなたの名前 <span>1〜16文字</span></label>
     <input id="nickname" maxlength="32" placeholder="例：りん" autocomplete="nickname">
     <div class="deck-summary">
-      <div class="block-title"><span>DECK</span><h3>今回使う6体</h3><button id="homeDeckBtn" class="textbtn" type="button">編集する</button></div>
+      <div class="block-title"><span>DECK</span><h3>今回使う6枚</h3><button id="homeDeckBtn" class="textbtn" type="button">編集する</button></div>
       <div id="homeDeck" class="mini-roster deck-mini"></div>
-      <p class="field-help">15体の中から6体を選択。対戦開始前なら何度でも変更できます。</p>
+      <p class="field-help">17枚（16体＋1呪文）から6枚を選択。対戦開始前なら何度でも変更できます。</p>
     </div>
     <div class="practice-block">
       <div class="block-title"><span>01</span><h3>ひとりで練習</h3><small>CPU BATTLE</small></div>
       <div id="difficulty" class="segmented"><button data-level="easy">やさしい</button><button data-level="normal" class="active">ふつう</button><button data-level="hard">手ごわい</button></div>
       <button id="practiceBtn" class="btn primary">CPUと対戦する <span>↗</span></button>
-      <p class="field-help">登録不要。編集した6体デッキでCPU戦を試せます。</p>
+      <p class="field-help">登録不要。編集した6枚デッキでCPU戦を試せます。</p>
     </div>
     <div class="divider"></div>
     <div class="block-title"><span>02</span><h3>友だちと対戦</h3><small>ONLINE 1V1</small></div>
@@ -115,8 +115,8 @@ dialog{border:1px solid #d7dfcf;background:#f9faf3;color:var(--ink);border-radiu
     <p class="muted">2人とも「準備OK」にしたら、ホストが対戦を開始できます。</p>
     <div id="members" class="members"></div>
     <div class="lobby-actions"><button id="readyBtn" class="btn primary">準備OK</button><button id="startBtn" class="btn dark" disabled>対戦を開始</button></div>
-    <div class="lobby-rules"><div><small>バトル</small><strong>3分 ＋ 延長1分</strong></div><div><small>デッキ</small><strong>6体 / 手札4枚</strong></div><div><small>勝利条件</small><strong>相手の本拠地を破壊</strong></div></div>
-    <h3 class="section-label">YOUR DECK <span>選んだ6体で出撃</span></h3><div id="lobbyRoster" class="mini-roster deck-mini"></div><button id="lobbyDeckBtn" class="btn outline lobby-deck-btn">デッキを編集</button>
+    <div class="lobby-rules"><div><small>バトル</small><strong>3分 ＋ 延長1分</strong></div><div><small>デッキ</small><strong>6枚 / 手札4枚</strong></div><div><small>勝利条件</small><strong>相手の本拠地を破壊</strong></div></div>
+    <h3 class="section-label">YOUR DECK <span>選んだ6枚で出撃</span></h3><div id="lobbyRoster" class="mini-roster deck-mini"></div><button id="lobbyDeckBtn" class="btn outline lobby-deck-btn">デッキを編集</button>
   </section>
   <aside class="invite-panel">
     <div class="eyebrow">INVITE YOUR RIVAL</div><h2>友だちを招待</h2><p class="muted">同じURLを開き、このPASSで参加。</p>
@@ -150,76 +150,82 @@ dialog{border:1px solid #d7dfcf;background:#f9faf3;color:var(--ink);border-radiu
     <div id="hand" class="hand"></div>
     <div class="energy-row"><span class="energy-icon">◆</span><strong id="energyValue">5</strong><div id="energyTrack" class="energy-track"></div><span id="nextCard">NEXT</span></div>
     <div class="battle-tools"><button id="physicsBtn" class="textbtn" aria-pressed="false">当たり判定を表示</button><span id="physicsLegend">地上と空中は別レイヤー</span></div>
-    <div id="battleHint" class="battle-hint">カードを選んで、自分の陣地に配置してください。</div>
+    <div id="battleHint" class="battle-hint">カードを選択。ユニットは配置、ファイヤーボールは着弾地点を指定します。</div>
   </section>
   <aside class="unit-inspector">
-    <div class="section-label">SELECTED UNIT</div>
+    <div class="section-label">SELECTED CARD</div>
     <canvas id="inspectorCanvas" width="240" height="240"></canvas>
     <div id="inspectorRole" class="unit-role">近接アタッカー</div><h2 id="inspectorName">アッシュ剣士</h2><p id="inspectorDesc"></p>
     <div id="inspectorStats" class="inspector-stats"></div>
     <div class="match-rules"><h4>この一戦のルール</h4><p>本拠地を壊せば即勝利。3分で同数なら延長戦。延長後も同数なら残りタワーHPで決着。</p><p>残り1分からエナジー回復が2倍。切り札を重ねて攻めよう。</p></div>
   </aside>
 </main>
-<footer id="footer"><span>ひとつのURLから、小さな戦場へ。</span><span>TINY SIEGE <i>/</i> v5.0.0 · 15 UNIT ROSTER</span></footer>
+<footer id="footer"><span>ひとつのURLから、小さな戦場へ。</span><span>TINY SIEGE <i>/</i> v9.0.0 · 17 CARD POOL</span></footer>
 
 <div id="toast" class="toast" role="status" hidden></div>
 <dialog id="deckModal" class="deck-modal">
   <div class="modal-head"><div><span class="eyebrow">BUILD YOUR SIX</span><h2>デッキ編集</h2></div><button class="close-modal iconbtn" aria-label="閉じる">×</button></div>
-  <div class="deck-editor-head"><div><strong id="deckCount">6 / 6</strong><span>選択中</span></div><p>15体から6体を選択。カードをクリックすると入れ替えできます。</p></div>
+  <div class="deck-editor-head"><div><strong id="deckCount">6 / 6</strong><span>選択中</span></div><p>17枚から6枚を選択。ユニットと呪文を同じデッキ枠で入れ替えできます。</p></div>
   <div id="deckSlots" class="deck-slots"></div>
   <div id="deckPool" class="deck-pool"></div>
-  <div class="deck-actions"><button id="deckDefaultBtn" class="btn outline">おすすめに戻す</button><button id="deckSaveBtn" class="btn dark">この6体で保存</button></div>
+  <div class="deck-actions"><button id="deckDefaultBtn" class="btn outline">おすすめに戻す</button><button id="deckSaveBtn" class="btn dark">この6枚で保存</button></div>
   <p id="deckError" class="error" hidden></p>
 </dialog>
-<dialog id="libraryModal"><div class="modal-head"><div><span class="eyebrow">MEET YOUR FIFTEEN</span><h2>小さな部隊図鑑</h2></div><button class="close-modal iconbtn" aria-label="閉じる">×</button></div><p class="muted">全15体の性能を確認できます。実戦に持ち込めるのはデッキで選んだ6体です。</p><div class="roster-tools"><button id="libraryFacingBtn" class="btn outline" aria-pressed="false">後ろ姿を見る ↻</button><small>戦場では進行・攻撃方向で自動切り替え。</small></div><div id="libraryGrid" class="library-grid"></div></dialog>
+<dialog id="libraryModal"><div class="modal-head"><div><span class="eyebrow">MEET YOUR SEVENTEEN</span><h2>カード図鑑</h2></div><button class="close-modal iconbtn" aria-label="閉じる">×</button></div><p class="muted">16体のユニットと1枚の呪文を確認できます。実戦に持ち込めるのはデッキで選んだ6枚です。</p><div class="roster-tools"><button id="libraryFacingBtn" class="btn outline" aria-pressed="false">後ろ姿を見る ↻</button><small>戦場では進行・攻撃方向で自動切り替え。</small></div><div id="libraryGrid" class="library-grid"></div></dialog>
 <dialog id="helpModal"><div class="modal-head"><div><span class="eyebrow">HOW TO PLAY</span><h2>3分でわかる、攻城戦。</h2></div><button class="close-modal iconbtn" aria-label="閉じる">×</button></div>
   <div class="help-steps">
     <section><b>01</b><div><h3>まずはCPU戦から</h3><p>名前を入れて「CPUと対戦する」。オンラインはルームを作り、URLと6桁PASSを友だちへ共有します。</p></div></section>
     <section><b>02</b><div><h3>カード → 自分の陣地</h3><p>手札4枚から1枚を選び、画面下側の自陣にタップで配置。カードをフィールドへドラッグしてもOK。ユニットは自動で移動・攻撃します。</p></div></section>
     <section><b>03</b><div><h3>エナジーを使い分ける</h3><p>カード左上の数字が必要コスト。エナジーは最大10まで回復します。使ったカードは待機列へ入り、次の1枚が手札に補充されます。</p></div></section>
-    <section><b>04</b><div><h3>15体から6体を選ぶ</h3><p>「デッキ」から出撃メンバー6体を編集。回復のルミナ司祭、減速のフロストシャーマン、連鎖雷のストームハーピー、押しのけ強化されたアイアンボアも選べます。</p></div></section>
-    <section><b>05</b><div><h3>本拠地を破壊したら勝利</h3><p>後方中央の本拠地を壊すと3ポイントで即勝利。3分終了時はタワー破壊数を比較。同数なら最大1分の延長で先にタワーを壊した側が勝ち。延長終了後は残りタワーHPの合計、同じなら引き分けです。</p></div></section>
+    <section><b>04</b><div><h3>17枚から6枚を選ぶ</h3><p>「デッキ」から6枚を編集。ユニット16体に加え、戦場全域へ飛ばせるファイヤーボールも1枠として選べます。</p></div></section>
+    <section><b>05</b><div><h3>本拠地は最初は休眠</h3><p>中央本拠地は3240HP、左右タワーは1980HP。中央は試合開始時は攻撃せず、左右どちらかのサイドタワーが壊れるか、中央自身が1度でもダメージを受けると起動して試合終了まで反撃します。本拠地を壊せば即勝利です。</p></div></section>
     <section><b>06</b><div><h3>通話はいつものVCで</h3><p>オンラインで切断したら最大45秒間一時停止して再接続を待ちます。戻れなければ切断側の敗北、両方切断は引き分け。CPU戦ではタブを離れると一時停止します。</p></div></section>
-    <section><b>07</b><div><h3>タワーを回り込む配置</h3><p>地上の部隊はタワー・砲台をすり抜けません。後ろに置くと回り道の時間が生まれます。破壊した建物の土台は通行可能。木や石は飾りです。</p></div></section>
+    <section><b>07</b><div><h3>タワー破壊で前線が進む</h3><p>地上の部隊はタワー・砲台をすり抜けません。敵サイドタワーを破壊すると、そのレーンだけ配置可能エリアが前進します。ただし破壊跡から約120px手前で止まり、防衛側が立て直せる距離を残します。反対レーンと中央帯は広がりません。</p></div></section>
     <section><b>08</b><div><h3>大きさと地上／空中</h3><p>味方は同じ高度で軽く押し合い、敵とはすり抜けず接触します。大きな衛士は押されにくく、細い道で場所を取ります。飛行は地上の部隊・建物を無視。対空攻撃ができることと、飛んでいることは別です。</p></div></section>
     <section><b>09</b><div><h3>向きと判定を確認</h3><p>敵陣へ進む自分の部隊は背中が見え、後ろの敵を狙えば正面を向きます。図鑑で正面／背面を切り替え。「当たり判定を表示」で足元の円を確認できます。矢・魔法は味方や建物で遮られません。</p></div></section>
-    <section><b>10</b><div><h3>建物特攻と新しい相性</h3><p>ゴーレムとアイアンボアは敵兵を攻撃せず建物へ。ナイトシェイドは後衛を優先、モスリング隊は5体で大型を囲みます。単体・群体・範囲・暗殺の相性を見て6体を組みましょう。</p></div></section>
+    <section><b>10</b><div><h3>建物特攻と新しい相性</h3><p>ゴーレムとアイアンボアは敵兵を攻撃せず建物へ。ゴーレムは2850HP・288攻撃に調整され、倒されるとちびゴーレム2体へ分裂。親子とも死亡時に周囲へダメージを与えます。ナイトシェイドの無敵突進、砲台のHP減衰に加え、6コスト高火力のクラッグバーサーカーも参戦します。</p></div></section>
+    <section><b>11</b><div><h3>ファイヤーボールは偏差撃ち</h3><p>4コストの呪文。好きな地点を指定し、自軍中央本拠地から火球を発射します。半径90の敵兵へ560、タワー・砲台など建物へ140ダメージ。地上・空中の両方に命中し、遠い地点ほど約0.6〜2秒の着弾時間が必要です。追尾しないので移動先を読んで狙いましょう。</p></div></section>
   </div>
   <p class="help-note">オリジナルの試作ルールです。外部ゲームのキャラクター・画像・音源は使用していません。オンライン対戦はCloudflareへのサーバー込みの公開が必要です。</p>
 </dialog>
 <script type="module">window.TINY_OFFLINE=true;
 /** Balance data: original prototype values. Both browser and server import this file. */
-const VERSION = '5.0.0';
+const VERSION = '9.0.0';
 const MAX_DECK = 6;
 const ARENA = Object.freeze({
   width:720, height:1040, riverTop:482, riverBottom:558, bridges:[190,530],
-  bridgeHalf:42, deployBottom:600, deployTop:440, maxUnits:100,
+  bridgeHalf:42, deployBottom:600, deployTop:440, advancedDeployInset:120, maxUnits:100,
   duration:180, overtime:60, maxEnergy:10, tick:0.1
 });
 const UNITS = Object.freeze({
   blade: {id:'blade',mass:2,name:'アッシュ剣士',short:'剣士',role:'近接アタッカー',cost:3,hp:780,damage:112,speed:56,range:34,cooldown:1.05,radius:16,count:1,air:false,targetsAir:false,color:'#efc577',desc:'攻守の基準になる剣士。盾役の後ろで前線を押し上げる。'},
-  knight:{id:'knight',mass:6,name:'アイアン衛士',short:'衛士',role:'近接タンク',cost:5,hp:1850,damage:98,speed:35,range:36,cooldown:1.35,radius:23,count:1,air:false,targetsAir:false,color:'#a7b9c3',desc:'高い体力で攻撃を受け止める。後ろに弓兵や術師を重ねよう。'},
+  knight:{id:'knight',mass:6,name:'アイアン衛士',short:'衛士',role:'近接タンク',cost:4,hp:1850,damage:98,speed:35,range:36,cooldown:1.35,radius:23,count:1,air:false,targetsAir:false,color:'#a7b9c3',desc:'高い体力で攻撃を受け止める。後ろに弓兵や術師を重ねよう。'},
   archer:{id:'archer',mass:1.2,name:'リーフ弓兵',short:'弓兵',role:'遠距離・対空',cost:3,hp:430,damage:86,speed:50,range:185,cooldown:1.15,radius:14,count:1,air:false,targetsAir:true,projectile:'arrow',color:'#a6ca8b',desc:'離れた敵と飛行ユニットを狙える。前衛で守ると長く働く。'},
   mage:{id:'mage',mass:1.6,name:'ルーン術師',short:'術師',role:'範囲攻撃・対空',cost:4,hp:480,damage:105,speed:44,range:158,cooldown:1.5,radius:15,count:1,air:false,targetsAir:true,projectile:'orb',splash:54,color:'#b9a0ef',desc:'魔力弾が周囲にもダメージ。密集した敵やコウモリに有効。'},
   spear:{id:'spear',mass:1.2,name:'スパーク槍兵',short:'槍兵',role:'中距離・低コスト',cost:2,hp:410,damage:82,speed:64,range:68,cooldown:0.9,radius:14,count:1,air:false,targetsAir:false,color:'#f6a98d',desc:'長い槍で剣士より少し離れて攻撃。素早い援軍や防衛に。'},
   bat:{id:'bat',mass:0.6,name:'ムーンバット',short:'バット',role:'飛行・3体編成',cost:2,hp:145,damage:46,speed:82,range:28,cooldown:0.85,radius:11,count:3,air:true,targetsAir:true,color:'#b7a7dc',desc:'3体で出撃し、川を飛び越える。対空できない敵に強い。'},
   bomber:{id:'bomber',mass:2,name:'ポット爆弾兵',short:'爆弾兵',role:'地上範囲攻撃',cost:3,hp:470,damage:174,speed:42,range:145,cooldown:1.8,radius:16,count:1,air:false,targetsAir:false,projectile:'bomb',splash:66,color:'#edaa66',desc:'爆弾で地上の密集を崩す。空中の敵には攻撃できない。'},
-  cannon:{id:'cannon',mass:1000000,name:'ボルト砲台',short:'砲台',role:'防衛建物',cost:4,hp:1080,damage:140,speed:0,range:218,cooldown:1.4,radius:24,count:1,air:false,targetsAir:false,projectile:'shell',building:true,lifetime:32,color:'#8dbfb3',desc:'動かない防衛建物。地上の敵を迎撃し、32秒で消える。'},
-  golem:{id:'golem',mass:16,name:'ストーンゴーレム',short:'ゴーレム',role:'建物特攻・超重量',cost:6,hp:3350,damage:295,speed:21,range:42,cooldown:1.85,radius:30,count:1,air:false,targetsAir:false,buildingOnly:true,color:'#8ea37d',desc:'敵ユニットを無視し、建物だけを目指す超重量タンク。非常に硬く一撃も重いが、歩みは遅い。'},
+  cannon:{id:'cannon',mass:1000000,name:'ボルト砲台',short:'砲台',role:'防衛建物・耐久減衰',cost:4,hp:1080,damage:140,speed:0,range:218,cooldown:1.4,radius:24,count:1,air:false,targetsAir:false,projectile:'shell',building:true,decayPerSecond:30,color:'#8dbfb3',desc:'動かない防衛建物。最大HPは1080のまま、設置後は毎秒30ずつ耐久が減り、攻撃を受けなくても約36秒で崩れる。'},
+  golem:{id:'golem',mass:16,name:'ストーンゴーレム',short:'ゴーレム',role:'建物特攻・分裂',cost:8,hp:2850,damage:288,speed:21,range:42,cooldown:1.85,radius:30,count:1,air:false,targetsAir:false,buildingOnly:true,deathDamage:180,deathRadius:75,splitType:'mini_golem',splitCount:2,color:'#8ea37d',desc:'建物だけを狙う大型兵。本体HPは2850へ調整。倒されるとちびゴーレム2体へ分裂し、死亡時に周囲へ180ダメージ。'},
+  berserker:{id:'berserker',mass:8.2,name:'クラッグバーサーカー',short:'クラッグ',role:'重量アタッカー・高火力',cost:6,hp:1950,damage:360,speed:32,range:40,cooldown:1.6,radius:24,count:1,air:false,targetsAir:false,color:'#b96550',desc:'巨大な戦槌を振るう重量級アタッカー。ゴーレムほど硬くない代わりに、地上の大型兵を真正面から削る高火力を持つ。'},
+  mini_golem:{id:'mini_golem',hidden:true,mass:5.3,name:'ちびゴーレム',short:'ちび',role:'建物特攻・分裂後',cost:0,hp:1050,damage:96,speed:28,range:32,cooldown:1.55,radius:18,count:1,air:false,targetsAir:false,buildingOnly:true,deathDamage:60,deathRadius:45,color:'#9aa88a',desc:'ストーンゴーレムが倒れた後に2体現れる小型体。HP1050・攻撃96を持ち、死亡時に周囲へ60ダメージ。'},
   boar:{id:'boar',mass:9.5,name:'アイアンボア',short:'ボア',role:'建物突撃・チャージ',cost:4,hp:980,damage:178,speed:78,range:28,cooldown:1.05,radius:18,count:1,air:false,targetsAir:false,buildingOnly:true,chargeDistance:105,chargeMultiplier:2.25,shovePower:14,shoveMassLimit:2.2,shoveCompression:.62,color:'#b4785f',desc:'敵兵を無視して建物へ突進。軽量な地上兵を押しのけながら進み、105px走ると最初の体当たりが2.25倍になる。'},
-  nightshade:{id:'nightshade',mass:1.05,name:'ナイトシェイド',short:'シェイド',role:'暗殺・後衛優先',cost:4,hp:520,damage:228,speed:88,range:30,cooldown:.82,radius:13,count:1,air:false,targetsAir:false,targetPriority:'backline',priorityRange:325,color:'#6f668f',desc:'弓兵・術師・爆弾兵などの後衛を優先して追う高速暗殺者。高火力だが耐久は低い。'},
+  nightshade:{id:'nightshade',mass:1.05,name:'ナイトシェイド',short:'シェイド',role:'暗殺・無敵突進',cost:3,hp:520,damage:228,speed:88,range:30,cooldown:.82,radius:13,count:1,air:false,targetsAir:false,aggroRange:105,dashAggroRange:105,dashWindup:.6,dashMinRange:80,dashMaxRange:205,dashSpeed:650,dashMultiplier:2,dashCooldown:4,color:'#6f668f',desc:'近づいた敵や建物を捉えると0.6秒溜め、影の突進を行う。突進中は無敵で、到達時に通常の2倍ダメージ。その後は通常攻撃し、突進は4秒で再使用できる。'},
   mossling:{id:'mossling',mass:.45,name:'モスリング隊',short:'モス隊',role:'群体・5体編成',cost:3,hp:155,damage:45,speed:72,range:21,cooldown:.8,radius:9,count:5,air:false,targetsAir:false,color:'#8fb56b',desc:'小さな森の精霊5体で取り囲む群体。単体攻撃の大型に強いが、爆弾や範囲魔法にはとても弱い。'},
   lumina:{id:'lumina',mass:1.4,name:'ルミナ司祭',short:'司祭',role:'回復支援・後衛',cost:4,hp:590,damage:38,speed:44,range:145,cooldown:1.55,radius:15,count:1,air:false,targetsAir:false,projectile:'light',healPower:115,healRange:128,healCooldown:1.25,color:'#e7dba8',desc:'弱い光弾を放ちながら、周囲で最も傷ついた味方ユニットを回復する。タンクと好相性だが暗殺者に狙われやすい。'},
   frost:{id:'frost',mass:1.5,name:'フロストシャーマン',short:'シャーマン',role:'妨害・減速',cost:4,hp:535,damage:74,speed:42,range:170,cooldown:1.4,radius:15,count:1,air:false,targetsAir:false,projectile:'frost',slowMove:.62,slowAttack:.72,slowDuration:3,color:'#9ccfe2',desc:'氷弾で地上の敵を減速。移動と攻撃のテンポを奪い、ボアのチャージも削るため大型・突進系への時間稼ぎに強い。'},
-  harpy:{id:'harpy',mass:1.05,name:'ストームハーピー',short:'ハーピー',role:'空中遠距離・連鎖雷',cost:4,hp:505,damage:94,speed:64,range:175,cooldown:1.25,radius:16,count:1,air:true,targetsAir:true,projectile:'lightning',chainCount:3,chainRange:105,chainFalloff:.78,color:'#8fa9d8',desc:'空から雷を放ち、近くの敵へ最大3体まで連鎖する。群体に強いが、弓兵などの対空遠距離に弱い。'}
+  harpy:{id:'harpy',mass:1.05,name:'ストームハーピー',short:'ハーピー',role:'空中遠距離・連鎖雷',cost:4,hp:505,damage:94,speed:64,range:175,cooldown:1.25,radius:16,count:1,air:true,targetsAir:true,projectile:'lightning',chainCount:3,chainRange:105,chainFalloff:.78,color:'#8fa9d8',desc:'空から雷を放ち、近くの敵へ最大3体まで連鎖する。群体に強いが、弓兵などの対空遠距離に弱い。'},
+  fireball:{id:'fireball',cardType:'spell',spell:'fireball',name:'ファイヤーボール',short:'火球',role:'呪文・範囲爆撃',cost:4,damage:560,buildingDamage:140,radius:90,count:0,targetsAir:true,color:'#ed7a47',desc:'戦場の好きな場所へ本拠地から火球を放つ。半径90に560ダメージ、建物には140。遠いほど着弾が遅く、追尾しないため偏差撃ちが必要。'}
 });
-const DECK = Object.freeze(Object.keys(UNITS));
-const DEFAULT_DECK = Object.freeze(['knight','archer','lumina','frost','harpy','boar']);
+const DECK = Object.freeze(Object.keys(UNITS).filter(id=>!UNITS[id].hidden));
+const UNIT_IDS = Object.freeze(DECK.filter(id=>!UNITS[id].spell));
+const SPELL_IDS = Object.freeze(DECK.filter(id=>!!UNITS[id].spell));
+const DEFAULT_DECK = Object.freeze(['knight','berserker','archer','fireball','frost','lumina']);
 const ROLE_ORDER = DECK;
 const TEAM_COLORS = ['#58b9ae','#ee9b81'];
 function normalizeDeck(value,{fallback=true}={}){
   const out=[];
-  if(Array.isArray(value))for(const id of value){if(typeof id==='string'&&Object.hasOwn(UNITS,id)&&!out.includes(id))out.push(id);if(out.length===MAX_DECK)break;}
+  if(Array.isArray(value))for(const id of value){if(typeof id==='string'&&DECK.includes(id)&&!out.includes(id))out.push(id);if(out.length===MAX_DECK)break;}
   if(out.length===MAX_DECK)return out;
   return fallback?[...DEFAULT_DECK]:null;
 }
@@ -229,7 +235,7 @@ function normalizeDeck(value,{fallback=true}={}){
  * Ground bodies live on the lawn/bridges. Air bodies share a separate layer.
  * Buildings are static circles; tree/grass artwork is decorative only.
  */
-const PHYSICS_VERSION=3;
+const PHYSICS_VERSION=7;
 const FIELD={left:34,right:686,top:28,bottom:1012};
 const EPS=0.001,GRID=20,COLS=33,ROWS=49;
 const worldCaches=new WeakMap();
@@ -239,6 +245,20 @@ const isStructure=u=>!!(u.kind||u.building);
 const bodyRadius=u=>u.radius||12;
 const sameLayer=(a,b)=>!!a.air===!!b.air;
 const solidStructures=g=>[...g.towers,...g.units.filter(u=>u.building)].filter(u=>u.hp>0);
+
+function deploymentAllowed(g,owner,x,y){
+  if(owner!==0&&owner!==1)return false;
+  if(owner===0&&y>=ARENA.deployBottom)return true;
+  if(owner===1&&y<=ARENA.deployTop)return true;
+  const enemy=1-owner;
+  const laneX=x<=320?190:x>=400?530:null;
+  if(laneX===null)return false;
+  const fallen=g.towers?.find(t=>t.owner===enemy&&t.kind==='tower'&&t.x===laneX&&t.hp<=0);
+  if(!fallen)return false;
+  const inset=ARENA.advancedDeployInset||120;
+  // The attacker gains ground, but cannot deploy directly on the destroyed tower ruin.
+  return owner===0?y>=fallen.y+inset:y<=fallen.y-inset;
+}
 function pairDistance(a,b,soft=false){
   const sum=bodyRadius(a)+bodyRadius(b);
   if(a.air&&b.air)return sum*(a.owner===b.owner?.9:1);
@@ -464,7 +484,7 @@ function spawnPositions(g,owner,data,x,y){
       const n=rr?16:1;
       for(let k=0;k<n;k++){
         const a=k*Math.PI*2/n+(owner===1?Math.PI:0),p={x:wanted.x+Math.cos(a)*rr,y:wanted.y+Math.sin(a)*rr};
-        if(p.x<48||p.x>672||p.y<58||p.y>982||(owner===0?p.y<ARENA.deployBottom:p.y>ARENA.deployTop))continue;
+        if(p.x<48||p.x>672||p.y<58||p.y>982||!deploymentAllowed(g,owner,p.x,p.y))continue;
         if(!staticFree(g,data,p,1))continue;
         if(g.units.some(u=>u.hp>0&&sameLayer(data,u)&&dist(p,u)<bodyRadius(data)+bodyRadius(u)+.5))continue;
         if(points.some(q=>dist(p,q)<data.radius*2+.5))continue;
@@ -497,8 +517,8 @@ function createMatch({seed=12345,bot=false,difficulty='normal',decks=[DEFAULT_DE
     for(let i=0;i<3;i++){
       const core=i===2,x=core?360:(i===0?190:530);
       g.towers.push({id:`t${owner}${i}`,kind:core?'core':'tower',owner,x,y:owner===0?(core?905:805):(core?135:235),
-      hp:core?2700:1650,maxHp:core?2700:1650,radius:core?40:32,range:core?226:226,damage:core?92:83,cd:0,
-      cooldown:core?0.9:1.0,targetsAir:true,projectile:'tower',hit:0,anim:0});
+      hp:core?3240:1980,maxHp:core?3240:1980,radius:core?40:32,range:core?226:226,damage:core?92:83,cd:0,
+      cooldown:core?0.9:1.0,targetsAir:true,projectile:'tower',hit:0,anim:0,awake:!core});
     }
   }
   return g;
@@ -507,27 +527,49 @@ function inRiver(x,y){return y>ARENA.riverTop && y<ARENA.riverBottom && !ARENA.b
 function canPlace(g,owner,id,x,y){
   if(g.phase!=='battle')return 'まだ出撃できません。';
   if(owner!==0 && owner!==1)return '参加者ではありません。';
-  if(typeof id!=='string'||!Object.hasOwn(UNITS,id))return '不明なユニットです。';
+  if(typeof id!=='string'||!DECK.includes(id))return '不明なカードです。';
   const d=UNITS[id];
-  if(!Number.isFinite(x)||!Number.isFinite(y))return '配置位置が正しくありません。';
-  if(x<48||x>672||y<58||y>982)return 'フィールドの内側に配置してください。';
-  if(owner===0?y<ARENA.deployBottom:y>ARENA.deployTop)return '自分の陣地に配置してください。';
+  if(!Number.isFinite(x)||!Number.isFinite(y))return '指定位置が正しくありません。';
+  if(x<30||x>690||y<30||y>1010)return 'フィールドの内側を指定してください。';
   if(!g.players[owner].hand.includes(id))return 'そのカードは手札にありません。';
   if(g.players[owner].energy+0.00001<d.cost)return 'エナジーが足りません。';
+  if(d.spell){
+    const core=g.towers.find(t=>t.owner===owner&&t.kind==='core'&&t.hp>0);
+    if(!core)return '本拠地が破壊されているため呪文を使えません。';
+    return null;
+  }
+  if(!deploymentAllowed(g,owner,x,y))return '自分の陣地、または破壊した敵サイドタワー側の前線に配置してください。';
   if(g.units.filter(u=>u.hp>0).length+d.count>ARENA.maxUnits)return 'フィールドのユニット上限です。';
-  if(!staticFree(g,d,{x,y},1))return '\u5efa\u7269\u3084\u5cb8\u304b\u3089\u5c11\u3057\u96e2\u3057\u3066\u914d\u7f6e\u3057\u3066\u304f\u3060\u3055\u3044\u3002';
-  if(!spawnPositions(g,owner,d,x,y))return '\u914d\u7f6e\u3059\u308b\u7a7a\u9593\u304c\u3042\u308a\u307e\u305b\u3093\u3002\u5c11\u3057\u96e2\u3057\u3066\u304f\u3060\u3055\u3044\u3002';
+  if(!staticFree(g,d,{x,y},1))return '建物や岸から少し離して配置してください。';
+  if(!spawnPositions(g,owner,d,x,y))return '配置する空間がありません。少し離してください。';
   return null;
 }
 function event(g,type,data){g.events.push({id:g.nextId++,type,life:type==='death'?0.9:0.5,...data});}
+function spendCard(g,owner,id){
+  const p=g.players[owner],d=UNITS[id],index=p.hand.indexOf(id);
+  p.energy=Math.max(0,p.energy-d.cost);p.hand[index]=p.queue.shift();p.queue.push(id);
+}
+function makeUnit(g,owner,type,x,y){
+  const d=UNITS[type];
+  return {...d,id:`u${g.nextId++}`,type,owner,x,y,hp:d.hp,maxHp:d.hp,cd:0,spawn:0.5,anim:0,hit:0,walk:0,target:null,face:owner===0?-1:1,
+    lane:x<360?190:530,age:0,facing:owner===0?-Math.PI/2:Math.PI/2,moving:false};
+}
+function fireballTravelTime(core,target){return clamp(.45+distance(core,target)/620,.6,2);}
+function castSpell(g,owner,id,x,y){
+  const err=canPlace(g,owner,id,x,y);if(err)return {ok:false,error:err};
+  const d=UNITS[id],core=g.towers.find(t=>t.owner===owner&&t.kind==='core'&&t.hp>0),travel=fireballTravelTime(core,{x,y});
+  spendCard(g,owner,id);
+  g.projectiles.push({id:`p${g.nextId++}`,owner,kind:'fireball',spell:'fireball',x:core.x,y:core.y,sx:core.x,sy:core.y,tx:x,ty:y,
+    total:travel,remaining:travel,progress:0,damage:d.damage,buildingDamage:d.buildingDamage,splash:d.radius,targetsAir:true,life:travel+.2});
+  event(g,'fireball-launch',{x:core.x,y:core.y,tx:x,ty:y,owner,travel});
+  return {ok:true,spell:true,travelTime:travel};
+}
 function deploy(g,owner,id,x,y){
   const err=canPlace(g,owner,id,x,y);if(err)return {ok:false,error:err};
-  const d=UNITS[id],p=g.players[owner],index=p.hand.indexOf(id),positions=spawnPositions(g,owner,d,x,y);
-  p.energy=Math.max(0,p.energy-d.cost);p.hand[index]=p.queue.shift();p.queue.push(id);
+  const d=UNITS[id];if(d.spell)return castSpell(g,owner,id,x,y);
+  const positions=spawnPositions(g,owner,d,x,y);spendCard(g,owner,id);
   for(let i=0;i<d.count;i++){
-    const u={...d,id:`u${g.nextId++}`,type:id,owner,x:positions[i].x,y:positions[i].y,
-      hp:d.hp,maxHp:d.hp,cd:0,spawn:0.5,anim:0,hit:0,walk:0,target:null,face:owner===0?-1:1,
-      lane:x<360?190:530,age:0,facing:owner===0?-Math.PI/2:Math.PI/2,moving:false};
+    const u=makeUnit(g,owner,id,positions[i].x,positions[i].y);
     g.units.push(u);event(g,'spawn',{x:u.x,y:u.y,owner});
   }
   return {ok:true};
@@ -538,9 +580,6 @@ function preferredTower(g,u){
   const enemy=1-u.owner;
   const out=g.towers.find(t=>t.owner===enemy&&t.kind==='tower'&&t.x===u.lane&&t.hp>0);
   return out||g.towers.find(t=>t.owner===enemy&&t.kind==='core'&&t.hp>0);
-}
-function isBacklineTarget(t){
-  return !t.kind&&!t.building&&(!!t.projectile||t.range>=110);
 }
 function getTarget(g,u,entities){
   // Building-only units ignore troops completely and march toward the nearest enemy structure.
@@ -553,26 +592,71 @@ function getTarget(g,u,entities){
     }
     return best;
   }
-  // Nightshade looks past the frontline when a ranged/backline target is close enough.
-  if(u.targetPriority==='backline'){
-    let best=null,bestD=Infinity;
-    for(const t of entities){
-      if(!targetable(u,t)||!isBacklineTarget(t))continue;
-      const d=distance(u,t)-t.radius;
-      if(d<=(u.priorityRange||300)&&d<bestD){best=t;bestD=d;}
-    }
-    if(best)return best;
-  }
   // Nearest combatant in the aggro radius; buildings never chase.
-  const reach=u.kind||u.building?u.range+30:Math.max(205,u.range+35);
+  const reach=u.kind||u.building?u.range+30:(u.aggroRange??Math.max(205,u.range+35));
   let best=null,bestD=Infinity;
   for(const t of entities){
     if(!targetable(u,t))continue;
-    const d=distance(u,t)-t.radius;
+    const d=distance(u,t)-t.radius-(u.aggroRange?u.range:0);
     if(d<=reach&&(d<bestD)){best=t;bestD=d;}
   }
   if(!best && !u.kind && !u.building)best=preferredTower(g,u);
   return best;
+}
+function dashEndpoint(u,t){
+  const dx=u.x-t.x,dy=u.y-t.y,len=Math.hypot(dx,dy)||1;
+  const stop=Math.max(1,u.range+t.radius-1);
+  return {x:t.x+dx/len*stop,y:t.y+dy/len*stop};
+}
+function canShadowRush(g,u,t){
+  if(!u.dashWindup||g.time<(u.dashReadyAt||0)||u.dashState)return false;
+  const gap=Math.max(0,distance(u,t)-(u.range+t.radius));
+  if(gap<(u.dashMinRange||0)||gap>(u.dashAggroRange??u.dashMaxRange??Infinity))return false;
+  const end=dashEndpoint(u,t);
+  return staticLineFree(g,u,u,end,1);
+}
+function beginShadowWindup(g,u,t){
+  u.dashState='windup';u.dashTarget=t.id;u.dashWindupUntil=g.time+u.dashWindup;u.moving=false;
+  faceToward(u,t.x,t.y);event(g,'shadow-windup',{x:u.x,y:u.y,owner:u.owner});
+}
+function beginShadowRush(g,u,t){
+  const end=dashEndpoint(u,t);
+  if(!staticLineFree(g,u,u,end,1)){u.dashState=null;u.dashTarget=null;return false;}
+  u.dashState='rush';u.dashEnd=end;u.invulnerableUntil=g.time+Math.max(.12,distance(u,end)/(u.dashSpeed||650)+.12);
+  faceToward(u,t.x,t.y);event(g,'shadow-rush',{x:u.x,y:u.y,tx:end.x,ty:end.y,owner:u.owner});return true;
+}
+function finishShadowRush(g,u,t){
+  u.dashState=null;u.invulnerableUntil=0;u.dashReadyAt=g.time+(u.dashCooldown||4);u.dashTarget=null;u.dashEnd=null;
+  u.cd=Math.max(u.cd,u.cooldown);u.anim=.35;
+  if(t&&t.hp>0&&targetable(u,t)&&distance(u,t)<=u.range+t.radius+14){
+    const amount=Math.round(u.damage*(u.dashMultiplier||2));damage(g,t,amount,u.owner);
+    event(g,'shadow-hit',{x:t.x,y:t.y,owner:u.owner,amount});
+  }
+}
+function updateShadowRush(g,u,entities,dt){
+  if(!u.dashState)return false;
+  const t=entities.find(e=>e.id===u.dashTarget&&e.hp>0);
+  if(u.dashState==='windup'){
+    u.moving=false;if(t)faceToward(u,t.x,t.y);
+    if(g.time+1e-8>=u.dashWindupUntil){
+      if(!t||!targetable(u,t)||!canRushAfterWindup(g,u,t)){u.dashState=null;u.dashTarget=null;u.dashReadyAt=g.time+.35;}
+      else beginShadowRush(g,u,t);
+    }
+    return true;
+  }
+  if(u.dashState==='rush'){
+    if(!t){finishShadowRush(g,u,null);return true;}
+    const end=dashEndpoint(u,t),dx=end.x-u.x,dy=end.y-u.y,len=Math.hypot(dx,dy),step=Math.min((u.dashSpeed||650)*dt,len);
+    if(len>.001){u.x+=dx/len*step;u.y+=dy/len*step;faceToward(u,t.x,t.y);u.walk+=step/Math.max(1,u.speed)*7;u.moving=true;}
+    if(len<=step+.5||g.time+dt>=(u.invulnerableUntil||0)){u.x=end.x;u.y=end.y;finishShadowRush(g,u,t);}
+    return true;
+  }
+  return false;
+}
+function canRushAfterWindup(g,u,t){
+  const gap=Math.max(0,distance(u,t)-(u.range+t.radius));
+  if(gap>(u.dashMaxRange||Infinity)+35)return false;
+  const end=dashEndpoint(u,t);return staticLineFree(g,u,u,end,1);
 }
 function move(g,u,t,dt){
   if(!u.speed)return;
@@ -591,10 +675,57 @@ function move(g,u,t,dt){
     if(u.chargeRun<u.chargeDistance*.55)u.charged=false;
   }
 }
+function wakeCore(g,owner,reason='wake'){
+  const core=g.towers.find(t=>t.owner===owner&&t.kind==='core'&&t.hp>0);
+  if(!core||core.awake)return false;
+  core.awake=true;event(g,'core-awake',{x:core.x,y:core.y,owner,reason});return true;
+}
+function refreshCoreWake(g){
+  for(const owner of [0,1]){
+    const core=g.towers.find(t=>t.owner===owner&&t.kind==='core'&&t.hp>0);
+    if(!core||core.awake)continue;
+    if(core.hp<core.maxHp||g.towers.some(t=>t.owner===owner&&t.kind==='tower'&&t.hp<=0))wakeCore(g,owner,core.hp<core.maxHp?'core-hit':'side-down');
+  }
+}
+function summonMiniGolems(g,parent){
+  const d=UNITS[parent.splitType||'mini_golem'];if(!d)return;
+  const count=Math.min(parent.splitCount||2,Math.max(0,ARENA.maxUnits-g.units.filter(u=>u.hp>0).length));
+  const f=parent.owner===0?1:-1,candidates=[[-22,4],[22,4],[-18,20],[18,20],[-32,-8],[32,-8],[0,28],[0,-28]];
+  let made=0;
+  for(const [ox,oy] of candidates){
+    if(made>=count)break;const p={x:clamp(parent.x+ox,50,670),y:clamp(parent.y+oy*f,60,980)};
+    if(!staticFree(g,d,p,0))continue;
+    if(g.units.some(u=>u.hp>0&&!!u.air===!!d.air&&distance(p,u)<d.radius+(u.radius||12)*.72))continue;
+    const u=makeUnit(g,parent.owner,d.id,p.x,p.y);u.spawn=.35;u.lane=parent.lane;g.units.push(u);event(g,'split-spawn',{x:u.x,y:u.y,owner:u.owner});made++;
+  }
+  // Crowded bridge/tower fights can leave no perfect free point. ResolveBodies will safely separate this fallback.
+  while(made<count){const side=made?1:-1,u=makeUnit(g,parent.owner,d.id,clamp(parent.x+side*18,50,670),clamp(parent.y+10*f,60,980));u.spawn=.35;u.lane=parent.lane;g.units.push(u);event(g,'split-spawn',{x:u.x,y:u.y,owner:u.owner});made++;}
+}
+function handleUnitDeath(g,t){
+  if(t._deathHandled)return;t._deathHandled=true;
+  event(g,'death',{x:t.x,y:t.y,owner:t.owner,large:t.type==='golem'});
+  if(t.deathDamage&&t.deathRadius){
+    event(g,'death-blast',{x:t.x,y:t.y,owner:t.owner,radius:t.deathRadius,damage:t.deathDamage,unitType:t.type});
+    const victims=[...alive(g)];
+    for(const v of victims)if(v.id!==t.id&&v.owner!==t.owner&&v.hp>0&&distance(t,v)<=t.deathRadius+(v.radius||12)*.35)damage(g,v,t.deathDamage,t.owner);
+  }
+  if(t.splitType&&t.splitCount)summonMiniGolems(g,t);
+}
 function damage(g,t,amount,owner){
-  if(t.hp<=0)return;
-  t.hp=Math.max(0,t.hp-amount);t.hit=.18;
-  if(t.hp===0)event(g,'death',{x:t.x,y:t.y,owner:t.owner,large:!!t.kind});
+  if(t.hp<=0)return 0;
+  if((t.invulnerableUntil||0)>g.time){if(t.type==='nightshade')event(g,'shadow-evade',{x:t.x,y:t.y,owner:t.owner});return 0;}
+  const before=t.hp;t.hp=Math.max(0,t.hp-amount);t.hit=.18;
+  if(t.kind==='core'&&t.hp<before)wakeCore(g,t.owner,'core-hit');
+  if(t.hp===0){
+    if(t.kind){event(g,'death',{x:t.x,y:t.y,owner:t.owner,large:true});if(t.kind==='tower')wakeCore(g,t.owner,'side-down');}
+    else handleUnitDeath(g,t);
+  }
+  return before-t.hp;
+}
+function decayStructure(g,t,amount){
+  if(t.hp<=0||amount<=0)return;
+  t.hp=Math.max(0,t.hp-amount);
+  if(t.hp===0)handleUnitDeath(g,t);
 }
 function heal(g,t,amount,owner){
   if(t.hp<=0||t.hp>=t.maxHp||t.kind||t.building)return 0;
@@ -612,6 +743,15 @@ function applySlow(g,t,p){
     if(t.chargeRun<t.chargeDistance*.8)t.charged=false;
   }
   event(g,'slow',{x:t.x,y:t.y,owner:p.owner});
+}
+function fireballImpact(g,p){
+  event(g,'fireball-impact',{x:p.tx,y:p.ty,owner:p.owner,radius:p.splash,damage:p.damage});
+  const centre={x:p.tx,y:p.ty};
+  for(const t of [...alive(g)]){
+    if(t.owner===p.owner||t.hp<=0)continue;
+    if(distance(centre,t)>p.splash+(t.radius||12)*.35)continue;
+    damage(g,t,(t.kind||t.building)?p.buildingDamage:p.damage,p.owner);
+  }
 }
 function impact(g,p,entities){
   const target=entities.find(t=>t.id===p.target);
@@ -678,14 +818,22 @@ function winCheck(g){
 function runBot(g,owner=1){
   const p=g.players[owner],aff=p.hand.filter(id=>UNITS[id].cost<=p.energy);
   if(!aff.length)return;
-  const threat=g.units.filter(u=>u.owner!==owner&&u.hp>0&&(owner===1?u.y<450:u.y>590)).sort((a,b)=>distance(a,{x:360,y:owner===1?150:890})-distance(b,{x:360,y:owner===1?150:890}))[0];
-  let choices=aff;
-  if(threat?.air&&aff.some(id=>UNITS[id].targetsAir))choices=aff.filter(id=>UNITS[id].targetsAir);
+  const enemies=g.units.filter(u=>u.owner!==owner&&u.hp>0),threat=enemies.filter(u=>(owner===1?u.y<450:u.y>590)).sort((a,b)=>distance(a,{x:360,y:owner===1?150:890})-distance(b,{x:360,y:owner===1?150:890}))[0];
+  if(aff.includes('fireball')&&threat){
+    const clustered=enemies.filter(u=>distance(u,threat)<=UNITS.fireball.radius+u.radius).length;
+    if(clustered>=2||threat.type==='frost'||threat.type==='lumina'){
+      deploy(g,owner,'fireball',threat.x,threat.y);return;
+    }
+  }
+  let choices=aff.filter(id=>!UNITS[id].spell);if(!choices.length){
+    const target=threat||g.towers.find(t=>t.owner!==owner&&t.kind==='tower'&&t.hp>0)||g.towers.find(t=>t.owner!==owner&&t.kind==='core'&&t.hp>0);
+    if(target)deploy(g,owner,'fireball',target.x,target.y);return;
+  }
+  if(threat?.air&&choices.some(id=>UNITS[id].targetsAir))choices=choices.filter(id=>UNITS[id].targetsAir);
   else if(!threat&&p.energy<7&&g.difficulty!=='hard'&&random(g)<.5)return;
   let id=choices[Math.floor(random(g)*choices.length)];
-  if(!threat&&id==='cannon'&&aff.length>1)id=aff.find(k=>k!=='cannon');
-  const lane=threat?(threat.x<360?190:530):(random(g)<.5?190:530);
-  const baseY=owner===1?(threat?360:145):(threat?680:895);
+  if(!threat&&id==='cannon'&&choices.length>1)id=choices.find(k=>k!=='cannon')||id;
+  const lane=threat?(threat.x<360?190:530):(random(g)<.5?190:530),baseY=owner===1?(threat?360:145):(threat?680:895);
   for(let i=0;i<8;i++){
     const x=clamp(lane+(random(g)-.5)*110,65,655),y=clamp(baseY+(random(g)-.5)*100,65,975);
     if(deploy(g,owner,id,x,y).ok)break;
@@ -703,6 +851,7 @@ function tick(g,dt=ARENA.tick){
   g.time+=dt;g.step++;
   for(const p of g.players)p.energy=Math.min(10,p.energy+dt*(g.time>=120?1.25:.625));
   g.events=g.events.map(e=>({...e,life:e.life-dt})).filter(e=>e.life>0);
+  refreshCoreWake(g);
   if(g.bot&&g.time>=g.botNext){
     runBot(g,1);g.botNext=g.time+(g.difficulty==='easy'?2.6:g.difficulty==='hard'?.65:1.3)+random(g)*.7;
   }
@@ -712,24 +861,33 @@ function tick(g,dt=ARENA.tick){
     if(u.hp<=0)continue;
     u.moving=false;
     u.hit=Math.max(0,(u.hit||0)-dt);u.anim=Math.max(0,(u.anim||0)-dt);u.cd=Math.max(0,u.cd-dt);u.healCd=Math.max(0,(u.healCd||0)-dt);
+    if(u.kind==='core'&&!u.awake){u.target=null;continue;}
     if(!u.kind){
       u.age+=dt;
-      if(u.lifetime&&u.age>=u.lifetime){damage(g,u,u.hp,1-u.owner);continue;}
       if(u.spawn>0){u.spawn=Math.max(0,u.spawn-dt);continue;}
+      if(u.decayPerSecond){decayStructure(g,u,u.decayPerSecond*dt);if(u.hp<=0)continue;}
     }
+    if(updateShadowRush(g,u,entities,dt))continue;
     healingPulse(g,u,entities);
     const target=getTarget(g,u,entities);
     if(!target){u.target=null;continue;}
     u.target=target.id;
     const reach=u.range+target.radius;
+    if(canShadowRush(g,u,target)){beginShadowWindup(g,u,target);continue;}
     if(distance(u,target)<=reach){
       faceToward(u,target.x,target.y);
       if(u.cd<=0)attack(g,u,target);
     }else if(!u.kind)move(g,u,target,dt);
   }
   for(const p of g.projectiles){
-    p.life-=dt;const t=entities.find(e=>e.id===p.target&&e.hp>0);
-    if(t){p.tx=t.x;p.ty=t.y;}
+    p.life-=dt;
+    if(p.spell==='fireball'){
+      p.remaining=Math.max(0,p.remaining-dt);p.progress=clamp(1-p.remaining/p.total,0,1);
+      p.x=p.sx+(p.tx-p.sx)*p.progress;p.y=p.sy+(p.ty-p.sy)*p.progress;
+      if(p.remaining<=1e-8){p.x=p.tx;p.y=p.ty;fireballImpact(g,p);p.life=0;}
+      continue;
+    }
+    const t=entities.find(e=>e.id===p.target&&e.hp>0);if(t){p.tx=t.x;p.ty=t.y;}
     const d=Math.hypot(p.tx-p.x,p.ty-p.y),step=p.speed*dt;
     if(d<=step+5){p.x=p.tx;p.y=p.ty;impact(g,p,entities);p.life=0;}
     else {p.x+=(p.tx-p.x)/d*step;p.y+=(p.ty-p.y)/d*step;}
@@ -743,9 +901,9 @@ function viewMatch(g,seat=0){
   const p=g.players[seat];
   return {physicsVersion:PHYSICS_VERSION,phase:g.phase,countdown:g.countdown,time:rnd(g.time),overtime:g.overtime,winner:g.winner,reason:g.reason,
     scores:[towerScore(g,0),towerScore(g,1)],energy:rnd(p.energy),hand:[...p.hand],next:p.queue[0],deck:[...p.deck],
-    units:g.units.map(u=>({id:u.id,type:u.type,owner:u.owner,x:rnd(u.x),y:rnd(u.y),hp:u.hp,maxHp:u.maxHp,radius:u.radius,air:u.air,building:!!u.building,anim:u.anim,hit:u.hit,walk:u.walk,spawn:u.spawn,face:u.face,facing:u.facing,moving:!!u.moving,mass:u.mass,age:u.age,charged:!!u.charged,chargeRun:rnd(u.chargeRun||0),slowed:(u.slowUntil||0)>g.time,slowRemaining:rnd(Math.max(0,(u.slowUntil||0)-g.time))})),
-    towers:g.towers.map(t=>({id:t.id,kind:t.kind,owner:t.owner,x:t.x,y:t.y,hp:t.hp,maxHp:t.maxHp,radius:t.radius,anim:t.anim,hit:t.hit,facing:t.facing})),
-    projectiles:g.projectiles.map(p=>({id:p.id,owner:p.owner,x:p.x,y:p.y,tx:p.tx,ty:p.ty,kind:p.kind})),
+    units:g.units.map(u=>({id:u.id,type:u.type,owner:u.owner,x:rnd(u.x),y:rnd(u.y),hp:u.hp,maxHp:u.maxHp,radius:u.radius,air:u.air,building:!!u.building,anim:u.anim,hit:u.hit,walk:u.walk,spawn:u.spawn,face:u.face,facing:u.facing,moving:!!u.moving,mass:u.mass,age:u.age,charged:!!u.charged,chargeRun:rnd(u.chargeRun||0),slowed:(u.slowUntil||0)>g.time,slowRemaining:rnd(Math.max(0,(u.slowUntil||0)-g.time)),dashState:u.dashState||null,dashWindupRemaining:rnd(Math.max(0,(u.dashWindupUntil||0)-g.time)),dashCooldownRemaining:rnd(Math.max(0,(u.dashReadyAt||0)-g.time)),invulnerable:(u.invulnerableUntil||0)>g.time})),
+    towers:g.towers.map(t=>({id:t.id,kind:t.kind,owner:t.owner,x:t.x,y:t.y,hp:t.hp,maxHp:t.maxHp,radius:t.radius,anim:t.anim,hit:t.hit,facing:t.facing,awake:t.kind==='core'?!!t.awake:true})),
+    projectiles:g.projectiles.map(p=>({id:p.id,owner:p.owner,x:rnd(p.x),y:rnd(p.y),tx:rnd(p.tx),ty:rnd(p.ty),kind:p.kind,spell:p.spell||null,progress:rnd(p.progress||0),radius:p.splash||0})),
     events:g.events.map(e=>({...e})),bot:g.bot,difficulty:g.difficulty};
 }
 
@@ -892,6 +1050,8 @@ function drawNightshade(c,opts={}){
   const ink='#1e2932',cloth='#343247',cloth2='#5b5276',accent='#8fe0b5',skin='#c49a82',team=TEAM_COLORS[opts.owner||0];
   const bob=Math.sin(walk)*1.1+(opts.idle?Math.sin(t*2.7)*.45:0),slash=attack?Math.sin((1-attack/.35)*Math.PI):0;
   c.save();c.translate(0,bob);
+  if(opts.dashWindup){c.save();c.globalAlpha=.7;c.strokeStyle='#9cf0c5';c.lineWidth=2;c.setLineDash([3,4]);c.beginPath();c.ellipse(0,-26,23+Math.sin(t*18)*3,34+Math.sin(t*18)*3,0,0,TAU);c.stroke();c.restore();}
+  if(opts.dashing){c.save();c.globalAlpha=.26;for(const dx of [16,28,40]){path(c,[[-12+dx,-55],[7+dx,-55],[14+dx,-9],[-2+dx,0],[-14+dx,-12]],cloth2,null);}c.restore();}
   for(const side of [-1,1]){c.save();c.translate(side*6,-9);c.rotate(Math.sin(walk+(side>0?Math.PI:0))*(moving?.48:0));line(c,0,0,0,15,'#2e3039',7);rr(c,-5,11,10,6,2,ink);c.restore();}
   // Short split cloak makes the rear silhouette immediately distinct.
   path(c,[[-14,-36],[14,-36],[18,-4],[4,-13],[0,1],[-5,-12],[-18,-4]],back?'#29293b':cloth2,ink,1.4);
@@ -907,6 +1067,7 @@ function drawNightshade(c,opts={}){
   path(c,[[-14,-49],[-8,-65],[0,-72],[9,-65],[14,-49],[9,-39],[-9,-39]],back?'#28283a':cloth2,ink,1.6);
   if(back){line(c,0,-65,0,-43,'#5c5674',1.5);path(c,[[-5,-45],[0,-39],[5,-45]],accent,null);}
   else{rr(c,-11,-53,22,12,4,'#252d35',ink);ellipse(c,-4,-48,1.8,1.8,accent);ellipse(c,4,-48,1.8,1.8,accent);path(c,[[-8,-41],[0,-37],[8,-41],[5,-31],[-5,-31]],'#292838',ink,1);}
+  if(opts.invulnerable){c.save();c.globalAlpha=.75;c.strokeStyle='#bdf8dc';c.lineWidth=2;c.beginPath();c.ellipse(0,-31,21,31,0,0,TAU);c.stroke();c.restore();}
   if(opts.hit){c.globalAlpha*=.5;ellipse(c,0,-31,19,28,'#eee5ff');}c.restore();
 }
 
@@ -924,6 +1085,54 @@ function drawMossling(c,opts={}){
   if(opts.hit){c.globalAlpha*=.55;ellipse(c,0,-14,13,17,'#f7f1c1');}c.restore();
 }
 
+
+function drawKraggBerserker(c,opts={}){
+  const t=opts.time||0,walk=opts.walk||0,attack=opts.anim||0,moving=opts.moving??walk!==0,back=!!opts.back;
+  const ink='#26383a',skin='#b8876d',armor='#6d6964',armor2='#9a9184',leather='#704738',cloth='#9f4e42',stone='#5b5c57',edge='#c2b59d',team=TEAM_COLORS[opts.owner||0];
+  const bob=(moving?Math.sin(walk*.8)*1.1:Math.sin(t*1.4)*.25),smash=attack?Math.sin((1-attack/.35)*Math.PI):0;
+  c.save();c.translate(0,bob);
+  // Broad heavy gait and reinforced boots.
+  for(const side of [-1,1]){
+    const step=Math.sin(walk+(side>0?Math.PI:0))*(moving?.16:0);
+    c.save();c.translate(side*10,-8);c.rotate(step);
+    rr(c,-7,0,14,18,5,leather,ink);rr(c,-9,14,18,8,3,stone,ink);line(c,-6,17,6,17,edge,1.4);c.restore();
+  }
+  // Torso, layered plates and team sash.
+  path(c,[[-25,-47],[-17,-61],[0,-66],[18,-60],[26,-46],[23,-10],[10,-3],[-10,-3],[-24,-11]],armor,ink,2);
+  path(c,[[-20,-49],[-11,-59],[10,-58],[21,-47],[13,-38],[-14,-38]],armor2,ink,1.2);
+  rr(c,-22,-42,44,8,3,team,ink);
+  if(back){
+    line(c,-16,-38,15,-12,'#9a6a50',5);line(c,15,-38,-14,-12,'#5e4033',3);
+    path(c,[[-12,-31],[0,-38],[12,-31],[9,-17],[0,-11],[-9,-17]],'#7c7770',ink,1.2);
+  }else{
+    path(c,[[-11,-34],[0,-40],[11,-34],[8,-20],[0,-15],[-8,-20]],cloth,ink,1.3);
+    for(const x of [-13,13])ellipse(c,x,-43,2,2,'#dac89c');
+  }
+  // Huge two-handed stone hammer. It rises and drops during the attack frame.
+  const hammerA=-.35-smash*1.15;
+  c.save();c.translate(16,-34);c.rotate(hammerA);
+  line(c,0,0,3,37,'#76513b',6);
+  c.save();c.translate(3,37);
+  rr(c,-15,-7,30,15,4,stone,ink);rr(c,-11,-11,22,5,2,armor2,ink);line(c,-9,4,9,4,edge,1.5);
+  c.restore();c.restore();
+  // Left arm braces the hammer shaft; right shoulder is oversized.
+  c.save();c.translate(-20,-38);c.rotate(.25+smash*.35);line(c,0,0,-1,19,armor2,13);ellipse(c,-1,18,5,5,skin);c.restore();
+  c.save();c.translate(21,-40);c.rotate(-.16-smash*.22);line(c,0,0,1,16,armor2,14);ellipse(c,1,16,5,5,skin);c.restore();
+  rr(c,-30,-50,15,14,5,armor2,ink);rr(c,15,-50,15,14,5,armor2,ink);
+  // Horned helmet and face/back plate.
+  if(back){
+    rr(c,-17,-78,34,27,8,'#66645f',ink);line(c,0,-75,0,-54,'#aaa08f',2);
+    path(c,[[-13,-75],[-25,-87],[-18,-69]],edge,ink,1.2);path(c,[[13,-75],[25,-87],[18,-69]],edge,ink,1.2);
+    rr(c,-10,-66,20,7,2,cloth,ink);
+  }else{
+    rr(c,-18,-79,36,29,8,armor2,ink);
+    path(c,[[-14,-75],[-27,-89],[-20,-68]],edge,ink,1.3);path(c,[[14,-75],[27,-89],[20,-68]],edge,ink,1.3);
+    rr(c,-14,-68,28,10,3,'#403b39',ink);ellipse(c,-6,-63,2.6,2.5,'#f1b16f');ellipse(c,6,-63,2.6,2.5,'#f1b16f');
+    path(c,[[-9,-55],[0,-50],[9,-55],[6,-45],[-6,-45]],skin,ink,1);line(c,-5,-50,5,-50,'#5d3731',1.5);
+  }
+  if(opts.hit){c.globalAlpha*=.42;ellipse(c,0,-39,30,42,'#ffe6bc');}
+  c.restore();
+}
 
 function drawLumina(c,opts={}){
   const t=opts.time||0,walk=opts.walk||0,attack=opts.anim||0,moving=opts.moving??walk!==0,back=!!opts.back;
@@ -1049,12 +1258,14 @@ function drawUnit(c,type,x,y,scale=1,opts={}){
   const moving=opts.moving??walk!==0,bob=Math.sin(walk)*1.5+(opts.idle?Math.sin(t*2)*.65:0);
   c.save();c.translate(x,y);c.scale(scale,scale);
   if(opts.alpha!=null)c.globalAlpha=opts.alpha;
-  if(!opts.noShadow){const sr=type==='golem'?32:type==='boar'?25:type==='knight'?23:type==='mossling'?12:type==='harpy'?20:18;ellipse(c,0,5,sr,type==='golem'?9:type==='boar'?8:6,'#172f3435');}
+  if(!opts.noShadow){const sr=type==='golem'?32:type==='mini_golem'?20:type==='berserker'?27:type==='boar'?25:type==='knight'?23:type==='mossling'?12:type==='harpy'?20:18;ellipse(c,0,5,sr,type==='golem'?9:type==='mini_golem'?6:type==='boar'?8:6,'#172f3435');}
   if(opts.mirror)c.scale(-1,1);
   if(type==='golem'){drawStoneGolem(c,opts);c.restore();return;}
+  if(type==='mini_golem'){c.scale(.62,.62);drawStoneGolem(c,opts);c.restore();return;}
   if(type==='boar'){drawIronBoar(c,opts);c.restore();return;}
   if(type==='nightshade'){drawNightshade(c,opts);c.restore();return;}
   if(type==='mossling'){drawMossling(c,opts);c.restore();return;}
+  if(type==='berserker'){drawKraggBerserker(c,opts);c.restore();return;}
   if(type==='lumina'){drawLumina(c,opts);c.restore();return;}
   if(type==='frost'){drawFrostShaman(c,opts);c.restore();return;}
   if(type==='harpy'){drawStormHarpy(c,opts);c.restore();return;}
@@ -1230,6 +1441,10 @@ function drawTower(c,t,seat,time){
     c.save();c.translate(0,-44);c.rotate((t.facing??(t.owner===0?-Math.PI/2:Math.PI/2))+(seat===1?Math.PI:0)+Math.PI/2);
     rr(c,-7,-22,14,24,3,'#364f56','#243d44');ellipse(c,0,-22,7,4,'#acc1b3');ellipse(c,0,-22,4,2,'#233b43');c.restore();
   }
+  if(core&&t.awake===false){
+    c.save();c.globalAlpha=.72;ellipse(c,0,-55,31,20,'#223b4655');
+    c.fillStyle='#e8edcf';c.font='bold 13px sans-serif';c.textAlign='center';c.fillText('Z z z',0,-53);c.restore();
+  }
   if(t.hit){c.globalAlpha=.32;ellipse(c,0,-26,34,36,'#fff7cd');c.globalAlpha=1;}
   // Health bars stay legible after arena flip.
   rr(c,-33,-96,66,7,3,'#253d4566');rr(c,-32,-95,64*clamp(t.hp/t.maxHp,0,1),5,2,col);
@@ -1243,19 +1458,26 @@ function drawArena(canvas,snapshot,options={}){
   c.clearRect(0,0,canvas.width,canvas.height);
   c.save();c.scale(canvas.width/720,canvas.height/1040);c.drawImage(terrainCache,0,0);
   const g=snapshot;if(!g){c.restore();return;}
-  if(options.selected&&g.phase==='battle'){
+  if(options.selected&&g.phase==='battle'&&!UNITS[options.selected].spell){
     c.fillStyle='#4abdaf18';c.fillRect(46,600,628,382);
     c.setLineDash([9,10]);line(c,46,600,674,600,'#d3eed788',2);c.setLineDash([]);
     c.fillStyle='#e3f2d5';c.font='bold 13px sans-serif';c.textAlign='center';c.fillText('ここに配置',360,628);
+    const fallen=g.towers.filter(t=>t.owner!==seat&&t.kind==='tower'&&t.hp<=0).map(t=>orient(t,seat));
+    for(const t of fallen){
+      const left=t.x<360,x=left?46:400,w=274,top=Math.max(58,t.y+(ARENA.advancedDeployInset||120));
+      c.fillStyle='#d2ef9d20';c.fillRect(x,top,w,600-top);
+      c.setLineDash([6,7]);line(c,x,top,x+w,top,'#e8f5b8aa',1.5);c.setLineDash([]);
+      c.fillStyle='#edf7c7';c.font='bold 10px sans-serif';c.fillText('前線配置',left?183:537,Math.min(590,top+22));
+    }
   }
   const markerUnits=[];
   for(const item of renderOrder(g,seat)){
     if(item.tower){drawTower(c,item.entity,seat,time);continue;}
     const u=item.entity,p=orient(u,seat),owner=u.owner===seat?0:1,facing=visualFacing(u,seat);
     c.strokeStyle=TEAM_COLORS[owner]+'b0';c.lineWidth=2;c.beginPath();c.ellipse(p.x,p.y+4,u.radius+4,(u.radius+4)*.34,0,0,TAU);c.stroke();
-    drawUnit(c,u.type,p.x,p.y,u.type==='mossling'?.9:u.type==='bat'?.93:u.type==='golem'?.92:u.type==='harpy'?.9:.95,{time,walk:u.walk,moving:u.moving,owner,anim:u.anim,hit:u.hit,charged:u.charged,alpha:u.spawn>0?.5:1,back:facing.back,mirror:u.building?false:facing.mirror,facing:facing.angle});
+    drawUnit(c,u.type,p.x,p.y,u.type==='mossling'?.9:u.type==='bat'?.93:u.type==='golem'?.92:u.type==='mini_golem'?.72:u.type==='berserker'?.94:u.type==='harpy'?.9:.95,{time,walk:u.walk,moving:u.moving,owner,anim:u.anim,hit:u.hit,charged:u.charged,dashWindup:u.dashState==='windup',dashing:u.dashState==='rush',invulnerable:!!u.invulnerable,alpha:u.spawn>0?.5:1,back:facing.back,mirror:u.building?false:facing.mirror,facing:facing.angle});
     if(u.slowed){c.save();c.strokeStyle='#a9ebffcc';c.lineWidth=2;c.setLineDash([3,4]);c.beginPath();c.ellipse(p.x,p.y+3,u.radius+8,(u.radius+8)*.42,0,0,TAU);c.stroke();c.restore();}
-    const hp=u.hp/u.maxHp,w=u.type==='golem'?50:u.type==='boar'?38:u.type==='knight'?38:u.type==='mossling'?20:28;
+    const hp=u.hp/u.maxHp,w=u.type==='golem'?50:u.type==='mini_golem'?32:u.type==='berserker'?42:u.type==='boar'?38:u.type==='knight'?38:u.type==='mossling'?20:28;
     if(hp<.999){rr(c,p.x-w/2,p.y-(u.air?48:82),w,5,2,'#25363eaa');rr(c,p.x-w/2+1,p.y-(u.air?47:81),(w-2)*hp,3,1,TEAM_COLORS[owner]);}
     if(owner===0&&!u.air&&!u.building&&g.towers.some(t=>{const q=orient(t,seat);return t.hp>0&&q.y>p.y&&q.y-p.y<90&&Math.abs(q.x-p.x)<t.radius+8;}))markerUnits.push(p);
   }
@@ -1268,6 +1490,13 @@ function drawArena(canvas,snapshot,options={}){
   }
   for(const p of g.projectiles){
     const pos=orient(p,seat),target=orient({x:p.tx,y:p.ty},seat),angle=Math.atan2(target.y-pos.y,target.x-pos.x);
+    if(p.kind==='fireball'){
+      const progress=clamp(p.progress||0,0,1),arc=Math.sin(Math.PI*progress)*72;
+      if(progress>.72){c.save();c.globalAlpha=.16+(progress-.72)*1.5;c.fillStyle='#f36f4d';c.beginPath();c.arc(target.x,target.y,p.radius||90,0,TAU);c.fill();c.strokeStyle='#ffd39a';c.lineWidth=2;c.setLineDash([7,6]);c.stroke();c.restore();}
+      c.save();c.translate(pos.x,pos.y-18-arc);c.rotate(angle);
+      for(let i=0;i<4;i++)ellipse(c,-13-i*7,0,10-i*1.6,7-i,'#f08a4f'+(i===0?'dd':'77'));
+      ellipse(c,0,0,12,12,'#f15e3d');ellipse(c,2,-2,7,7,'#ffbf63');ellipse(c,4,-4,3,3,'#fff0a5');c.restore();continue;
+    }
     c.save();c.translate(pos.x,pos.y-10);c.rotate(angle);
     if(p.kind==='arrow'){line(c,-10,0,7,0,'#f2dfb8',2);path(c,[[6,-3],[13,0],[6,3]],'#edf5df');}
     else if(p.kind==='bomb'){ellipse(c,0,0,8,8,'#2a3941');line(c,0,-7,4,-11,'#fbd078',2);}
@@ -1281,10 +1510,21 @@ function drawArena(canvas,snapshot,options={}){
     const p=orient(e,seat),fade=clamp(e.life/(e.type==='death'?.9:.5),0,1);c.save();c.globalAlpha=fade;
     if(e.type==='spawn'){
       c.strokeStyle=TEAM_COLORS[e.owner===seat?0:1];c.lineWidth=3;c.beginPath();c.ellipse(p.x,p.y,30*(1-fade)+15,10*(1-fade)+5,0,0,TAU);c.stroke();
+    }else if(e.type==='core-awake'){
+      c.strokeStyle='#ffe277';c.lineWidth=4;c.beginPath();c.arc(p.x,p.y-45,28+(1-fade)*48,0,TAU);c.stroke();
+      c.fillStyle='#fff1a8';c.font='bold 13px sans-serif';c.textAlign='center';c.fillText('AWAKE!',p.x,p.y-88-(1-fade)*10);
     }else if(e.type==='charge'){
       c.strokeStyle='#ffd46b';c.lineWidth=3;c.beginPath();c.arc(p.x,p.y-18,16+(1-fade)*24,0,TAU);c.stroke();
     }else if(e.type==='charge-hit'){
       for(let i=0;i<10;i++){const a=i*TAU/10,len=(1-fade)*42;ellipse(c,p.x+Math.cos(a)*len,p.y-10+Math.sin(a)*len*.6,3+fade*6,3+fade*4,i%2?'#d1a873':'#f4d177');}
+    }else if(e.type==='shadow-windup'){
+      c.strokeStyle='#9bf0c5';c.lineWidth=2.5;c.setLineDash([4,4]);c.beginPath();c.arc(p.x,p.y-24,16+(1-fade)*22,0,TAU);c.stroke();c.setLineDash([]);
+    }else if(e.type==='shadow-rush'){
+      const q=orient({x:e.tx,y:e.ty},seat);c.strokeStyle='#7b6d9fcc';c.lineWidth=8*fade+2;c.beginPath();c.moveTo(p.x,p.y-18);c.lineTo(q.x,q.y-18);c.stroke();c.strokeStyle='#b9f6d5';c.lineWidth=2;c.beginPath();c.moveTo(p.x,p.y-18);c.lineTo(q.x,q.y-18);c.stroke();
+    }else if(e.type==='shadow-hit'){
+      for(let i=0;i<8;i++){const a=i*TAU/8,len=(1-fade)*34;path(c,[[p.x+Math.cos(a)*len,p.y-12+Math.sin(a)*len],[p.x+Math.cos(a+.18)*(len+12),p.y-12+Math.sin(a+.18)*(len+12)]],null,i%2?'#9cf0c5':'#8175a5',2.4);}
+    }else if(e.type==='shadow-evade'){
+      c.strokeStyle='#d8fff0';c.lineWidth=2;c.beginPath();c.arc(p.x,p.y-22,9+(1-fade)*18,-2.5,.5);c.stroke();
     }else if(e.type==='slash'){
       c.strokeStyle='#fff1c0';c.lineWidth=4;c.beginPath();c.arc(p.x,p.y-18,20+(1-fade)*13,-2.5,-.3);c.stroke();
     }else if(e.type==='heal'){
@@ -1293,6 +1533,15 @@ function drawArena(canvas,snapshot,options={}){
       c.strokeStyle='#a7ebff';c.lineWidth=2;c.beginPath();c.arc(p.x,p.y-15,12+(1-fade)*18,0,TAU);c.stroke();for(let i=0;i<6;i++){const a=i*TAU/6;line(c,p.x+Math.cos(a)*12,p.y-15+Math.sin(a)*12,p.x+Math.cos(a)*18,p.y-15+Math.sin(a)*18,'#dffaff',1.5);}
     }else if(e.type==='chain'){
       if(e.points?.length){let a=orient({x:e.x,y:e.y},seat);for(const q0 of e.points){const q=orient(q0,seat),mx=(a.x+q.x)/2+((String(e.id).length%2)?5:-5);line(c,a.x,a.y-10,mx,(a.y+q.y)/2-16,'#ffe16e',3);line(c,mx,(a.y+q.y)/2-16,q.x,q.y-10,'#fff3b1',2);a=q;}}
+    }else if(e.type==='fireball-impact'){
+      c.fillStyle='#f45f3f44';c.beginPath();c.arc(p.x,p.y,(e.radius||90)*(1-fade*.18),0,TAU);c.fill();
+      c.strokeStyle='#ffd48c';c.lineWidth=5*fade+1;c.beginPath();c.arc(p.x,p.y,(e.radius||90)*(1-fade*.35),0,TAU);c.stroke();
+      for(let i=0;i<14;i++){const a=i*TAU/14+e.id,len=(1-fade)*(e.radius||90);ellipse(c,p.x+Math.cos(a)*len,p.y+Math.sin(a)*len*.65,5+fade*8,4+fade*7,i%2?'#ffb457':'#ef6742');}
+    }else if(e.type==='death-blast'){
+      c.strokeStyle=e.unitType==='mini_golem'?'#d8d7aa':'#ecd39b';c.lineWidth=3;c.beginPath();c.arc(p.x,p.y-8,(e.radius||55)*(1-fade*.25),0,TAU);c.stroke();
+      for(let i=0;i<9;i++){const a=i*TAU/9+e.id,len=(1-fade)*(e.radius||55);ellipse(c,p.x+Math.cos(a)*len,p.y-8+Math.sin(a)*len*.6,3+fade*6,3+fade*5,'#b8ad89');}
+    }else if(e.type==='split-spawn'){
+      c.strokeStyle='#cfe5aa';c.lineWidth=2;c.beginPath();c.arc(p.x,p.y-9,10+(1-fade)*18,0,TAU);c.stroke();
     }else if(e.type==='death'||e.type==='blast'){
       for(let i=0;i<8;i++){
         const a=i*TAU/8+e.id,len=(1-fade)*(e.type==='blast'?e.radius:35);
@@ -1303,25 +1552,34 @@ function drawArena(canvas,snapshot,options={}){
   }
   const ghost=options.ghost;
   if(options.selected&&ghost&&g.phase==='battle'){
-    c.globalAlpha=.35;ellipse(c,ghost.x,ghost.y,UNITS[options.selected].radius+10,10,ghost.valid?'#d9f3bb':'#fa9b80');c.globalAlpha=1;
-    drawUnit(c,options.selected,ghost.x,ghost.y,.9,{time,owner:0,alpha:.65,idle:true,back:true,facing:-Math.PI/2});
-    c.strokeStyle=ghost.valid?'#eaf9c8':'#ff987f';c.lineWidth=2;c.beginPath();c.arc(ghost.x,ghost.y,28,0,TAU);c.stroke();
+    const d=UNITS[options.selected];
+    if(d.spell){
+      c.save();c.globalAlpha=.22;c.fillStyle=ghost.valid?'#ef754d':'#fa9b80';c.beginPath();c.arc(ghost.x,ghost.y,d.radius,0,TAU);c.fill();c.globalAlpha=.8;c.strokeStyle=ghost.valid?'#ffd79a':'#ff987f';c.lineWidth=2;c.setLineDash([7,6]);c.stroke();c.setLineDash([]);
+      ellipse(c,ghost.x,ghost.y,14,14,'#ef633e');ellipse(c,ghost.x+3,ghost.y-3,7,7,'#ffd36f');c.restore();
+    }else{
+      c.globalAlpha=.35;ellipse(c,ghost.x,ghost.y,d.radius+10,10,ghost.valid?'#d9f3bb':'#fa9b80');c.globalAlpha=1;
+      drawUnit(c,options.selected,ghost.x,ghost.y,.9,{time,owner:0,alpha:.65,idle:true,back:true,facing:-Math.PI/2});
+      c.strokeStyle=ghost.valid?'#eaf9c8':'#ff987f';c.lineWidth=2;c.beginPath();c.arc(ghost.x,ghost.y,28,0,TAU);c.stroke();
+    }
   }
   // Foreground rim.
   c.strokeStyle='#d6d6ad55';c.lineWidth=2;c.beginPath();c.roundRect(22,14,676,1008,30);c.stroke();
   c.restore();
 }
 function drawPortrait(canvas,type,time=0,owner=0,selected=false,back=false){
-  const c=canvas.getContext('2d'),w=canvas.width,h=canvas.height;
+  const c=canvas.getContext('2d'),w=canvas.width,h=canvas.height,d=UNITS[type];
   c.clearRect(0,0,w,h);c.save();c.scale(w/120,h/120);
-  const col=UNITS[type].color;
-  const g=c.createRadialGradient(60,48,10,60,64,70);g.addColorStop(0,col+'99');g.addColorStop(1,col+'00');
-  c.fillStyle=g;c.fillRect(0,0,120,120);
+  const col=d.color,g=c.createRadialGradient(60,48,10,60,64,70);g.addColorStop(0,col+'99');g.addColorStop(1,col+'00');c.fillStyle=g;c.fillRect(0,0,120,120);
+  if(d.spell){
+    ellipse(c,60,100,37,8,'#1f39451b');
+    for(let i=0;i<5;i++){const a=-2.65+i*.34;path(c,[[60,70],[60+Math.cos(a)*31,70+Math.sin(a)*31],[60+Math.cos(a+.18)*18,70+Math.sin(a+.18)*18]],i%2?'#f18b4d':'#d94f39');}
+    ellipse(c,60,69,25,25,'#e95339','#7d382f',2);ellipse(c,66,62,14,14,'#ffad50');ellipse(c,70,57,6,6,'#fff0a5');
+    c.fillStyle='#fff6db';c.font='bold 10px sans-serif';c.textAlign='center';c.fillText('SPELL',60,111);c.restore();return;
+  }
   ellipse(c,60,105,40,8,'#1f39451b');
-  const scale=type==='golem'?.92:type==='boar'?1.28:type==='mossling'?2.05:type==='harpy'?1.45:type==='bat'?1.6:type==='cannon'?1.5:type==='mage'?1.12:type==='nightshade'?1.28:type==='lumina'?1.22:type==='frost'?1.2:1.32;
-  const py=type==='golem'?112:type==='boar'?96:type==='mossling'?91:type==='harpy'?91:type==='bat'?83:type==='cannon'?(back?94:80):104;
-  drawUnit(c,type,60,py,scale,{time,owner,idle:true,noShadow:true,anim:0,back,facing:back?-Math.PI/2:Math.PI/2});
-  c.restore();
+  const scale=type==='golem'?.92:type==='mini_golem'?1.15:type==='berserker'?1.18:type==='boar'?1.28:type==='mossling'?2.05:type==='harpy'?1.45:type==='bat'?1.6:type==='cannon'?1.5:type==='mage'?1.12:type==='nightshade'?1.28:type==='lumina'?1.22:type==='frost'?1.2:1.32;
+  const py=type==='golem'?112:type==='mini_golem'?104:type==='berserker'?108:type==='boar'?96:type==='mossling'?91:type==='harpy'?91:type==='bat'?83:type==='cannon'?(back?94:80):104;
+  drawUnit(c,type,60,py,scale,{time,owner,idle:true,noShadow:true,anim:0,back,facing:back?-Math.PI/2:Math.PI/2});c.restore();
 }
 
 
@@ -1346,11 +1604,11 @@ function safeStorage(store,key,value){
 const remembered=safeStorage('local','tiny-name');if(remembered)el('nickname').value=remembered;
 soundOn=safeStorage('local','tiny-sound')==='true';
 function loadDeck(){
-  try{const raw=JSON.parse(safeStorage('local','tiny-deck-v5')||safeStorage('local','tiny-deck-v4')||safeStorage('local','tiny-deck-v3')||'null');return normalizeDeck(raw);}catch{return [...DEFAULT_DECK];}
+  try{const raw=JSON.parse(safeStorage('local','tiny-deck-v9')||safeStorage('local','tiny-deck-v8')||safeStorage('local','tiny-deck-v7')||safeStorage('local','tiny-deck-v6')||safeStorage('local','tiny-deck-v5')||safeStorage('local','tiny-deck-v4')||safeStorage('local','tiny-deck-v3')||'null');return normalizeDeck(raw);}catch{return [...DEFAULT_DECK];}
 }
 let playerDeck=loadDeck();
-function persistDeck(){safeStorage('local','tiny-deck-v5',JSON.stringify(playerDeck));renderDeckSummaries();}
-function deckReady(deck=playerDeck){return Array.isArray(deck)&&deck.length===MAX_DECK&&new Set(deck).size===MAX_DECK&&deck.every(id=>Object.hasOwn(UNITS,id));}
+function persistDeck(){safeStorage('local','tiny-deck-v9',JSON.stringify(playerDeck));renderDeckSummaries();}
+function deckReady(deck=playerDeck){return Array.isArray(deck)&&deck.length===MAX_DECK&&new Set(deck).size===MAX_DECK&&deck.every(id=>DECK.includes(id));}
 function sound(kind='place'){
   if(!soundOn)return;
   try{
@@ -1492,7 +1750,7 @@ function renderLobby(){
   renderDeckSummaries();
   el('lobbyDeckBtn').disabled=!!mine?.ready;
 }
-el('readyBtn').addEventListener('click',()=>{const next=!room?.members[seat]?.ready;if(next&&!deckReady()){openDeckEditor();toast('対戦には6体のデッキが必要です。');return;}send({type:'ready',ready:next,deck:next?[...playerDeck]:undefined});});
+el('readyBtn').addEventListener('click',()=>{const next=!room?.members[seat]?.ready;if(next&&!deckReady()){openDeckEditor();toast('対戦には6枚のデッキが必要です。');return;}send({type:'ready',ready:next,deck:next?[...playerDeck]:undefined});});
 el('startBtn').addEventListener('click',()=>send({type:'start'}));
 el('leaveLobby').addEventListener('click',leaveOnline);
 async function copyText(text){
@@ -1509,7 +1767,7 @@ function startPractice(){
   let name;try{name=inputName();}catch(e){entryError(e.message);return;}
   if(session)leaveOnline();
   clearInterval(localTimer);gameMode='cpu';seat=0;room=null;previous=null;previousPhase='';handSignature='';
-  if(!deckReady()){openDeckEditor();entryError('対戦には6体のデッキが必要です。');return;}
+  if(!deckReady()){openDeckEditor();entryError('対戦には6枚のデッキが必要です。');return;}
   localGame=createMatch({seed:crypto.getRandomValues(new Uint32Array(1))[0],bot:true,difficulty,decks:[playerDeck,DEFAULT_DECK]});
   snapshot=viewMatch(localGame,0);selected=null;hover=null;localPaused=false;
   el('matchType').textContent='CPU PRACTICE · '+({easy:'EASY',normal:'NORMAL',hard:'HARD'}[difficulty]);
@@ -1568,7 +1826,7 @@ function updateHUD(){
     el('rematchBtn').textContent=gameMode==='cpu'?'もう一度対戦':seat===room?.host?'再戦の待機ルームへ':'ホストの再戦操作を待っています';
     el('rematchBtn').disabled=gameMode==='online'&&seat!==room?.host;
   }
-  el('battleHint').textContent=selected?`${UNITS[selected].name}を配置 / 必要エナジー ${UNITS[selected].cost}`:'カードを選んで、自分の陣地に配置してください。';
+  el('battleHint').textContent=selected?(UNITS[selected].spell?`${UNITS[selected].name}：着弾地点を指定 / コスト ${UNITS[selected].cost}。遠いほど着弾が遅れます。`:`${UNITS[selected].name}を配置 / 必要エナジー ${UNITS[selected].cost}`):'カードを選択。サイドタワー破壊後も前線配置は破壊跡より手前までです。';
 }
 for(let i=0;i<10;i++){const seg=document.createElement('i'),fill=document.createElement('b');seg.append(fill);el('energyTrack').append(seg);}
 function choose(id){
@@ -1615,9 +1873,8 @@ function updateInspector(id){
   inspectId=id;const d=UNITS[id];
   el('inspectorRole').textContent=d.role;el('inspectorName').textContent=d.name;el('inspectorDesc').textContent=d.desc;
   el('inspectorStats').replaceChildren();
-  for(const [label,value] of [['COST',d.cost],['HP',d.hp+(d.count>1?` ×${d.count}`:'')],['DMG',d.damage]]){
-    const div=document.createElement('div'),s=document.createElement('small'),strong=document.createElement('strong');s.textContent=label;strong.textContent=value;div.append(s,strong);el('inspectorStats').append(div);
-  }
+  const stats=d.spell?[['COST',d.cost],['AREA',`R${d.radius}`],['DMG',`${d.damage}/${d.buildingDamage}`]]:[['COST',d.cost],['HP',d.hp+(d.count>1?` ×${d.count}`:'')],['DMG',d.damage]];
+  for(const [label,value] of stats){const div=document.createElement('div'),s=document.createElement('small'),strong=document.createElement('strong');s.textContent=label;strong.textContent=value;div.append(s,strong);el('inspectorStats').append(div);}
   el('tacticalTip').textContent=d.desc;
 }
 function pointFromEvent(e,inside=false){
@@ -1698,7 +1955,7 @@ function renderDeckEditor(){
     const cost=document.createElement('span');cost.className='deck-cost';cost.textContent=d.cost;
     const copy=document.createElement('div');copy.className='deck-copy';const h=document.createElement('h3');h.textContent=d.name;const sm=document.createElement('small');sm.textContent=d.role;const desc=document.createElement('p');desc.textContent=d.desc;copy.append(h,sm,desc);b.append(can,cost,copy);
     if(selected){const chk=document.createElement('span');chk.className='deck-check';chk.textContent='選択中';b.append(chk);}
-    b.onclick=()=>{const at=editingDeck.indexOf(id);if(at>=0)editingDeck.splice(at,1);else if(editingDeck.length<MAX_DECK)editingDeck.push(id);else{el('deckError').textContent='デッキは最大6体です。1体外してから追加してください。';el('deckError').hidden=false;return;}renderDeckEditor();};
+    b.onclick=()=>{const at=editingDeck.indexOf(id);if(at>=0)editingDeck.splice(at,1);else if(editingDeck.length<MAX_DECK)editingDeck.push(id);else{el('deckError').textContent='デッキは最大6枚です。1枚外してから追加してください。';el('deckError').hidden=false;return;}renderDeckEditor();};
     el('deckPool').append(b);
   }
 }
@@ -1708,7 +1965,7 @@ function openDeckEditor(){
 }
 el('deckBtn').onclick=openDeckEditor;el('homeDeckBtn').onclick=openDeckEditor;el('lobbyDeckBtn').onclick=()=>{if(room?.members[seat]?.ready){toast('準備OKを取り消してから編集してください。');return;}openDeckEditor();};
 el('deckDefaultBtn').onclick=()=>{editingDeck=[...DEFAULT_DECK];renderDeckEditor();};
-el('deckSaveBtn').onclick=()=>{if(!deckReady(editingDeck)){el('deckError').textContent='対戦に使う6体を選んでください。';el('deckError').hidden=false;return;}playerDeck=[...editingDeck];persistDeck();el('deckModal').close();toast('デッキを保存しました。');};
+el('deckSaveBtn').onclick=()=>{if(!deckReady(editingDeck)){el('deckError').textContent='対戦に使う6枚を選んでください。';el('deckError').hidden=false;return;}playerDeck=[...editingDeck];persistDeck();el('deckModal').close();toast('デッキを保存しました。');};
 el('libraryBtn').onclick=()=>{el('libraryModal').showModal();};
 el('helpBtn').onclick=()=>{el('helpModal').showModal();};
 for(const b of document.querySelectorAll('.close-modal'))b.onclick=()=>b.closest('dialog').close();
@@ -1723,7 +1980,7 @@ for(const id of DECK){
   const role=document.createElement('small');role.textContent=d.role;
   const h=document.createElement('h3');h.textContent=d.name;
   const p=document.createElement('p');p.textContent=d.desc;
-  const stat=document.createElement('div');stat.className='library-stat';stat.textContent=`HP ${d.hp}${d.count>1?` ×${d.count}`:''}　攻撃 ${d.damage}`;
+  const stat=document.createElement('div');stat.className='library-stat';stat.textContent=d.spell?`範囲 R${d.radius}　兵 ${d.damage} / 建物 ${d.buildingDamage}`:`HP ${d.hp}${d.count>1?` ×${d.count}`:''}　攻撃 ${d.damage}`;
   card.append(badge,can,role,h,p,stat);el('libraryGrid').append(card);
 }
 function interpolate(g,now){

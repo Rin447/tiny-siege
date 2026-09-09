@@ -70,13 +70,13 @@ export class RoomModel {
     if(m.type==='ready'){
       if(this.data.game){this.error(c,'待機ルームで準備してください。');return;}
       if(typeof m.ready!=='boolean'){this.error(c,'準備状態が正しくありません。');return;}
-      if(m.ready){const deck=validateDeck(m.deck);if(!deck){this.error(c,'デッキは重複なしの6体を選んでください。');return;}p.deck=deck;}
+      if(m.ready){const deck=validateDeck(m.deck);if(!deck){this.error(c,'デッキは重複なしの6枚を選んでください。');return;}p.deck=deck;}
       p.ready=m.ready;this.changed();return;
     }
     if(m.type==='start'){
       if(seat!==this.data.host){this.error(c,'開始できるのはホストです。');return;}
       if(this.data.game){this.error(c,'対戦はすでに開始しています。');return;}
-      if(!this.data.players.every(v=>v?.connected&&v.ready&&validateDeck(v.deck))){this.error(c,'2人とも6体のデッキを決めて準備OKにしてください。');return;}
+      if(!this.data.players.every(v=>v?.connected&&v.ready&&validateDeck(v.deck))){this.error(c,'2人とも6枚のデッキを決めて準備OKにしてください。');return;}
       const seed=crypto.getRandomValues(new Uint32Array(1))[0];
       this.data.game=createMatch({seed,decks:this.data.players.map(v=>v.deck)});this.lastTick=now;this.accumulator=0;this.changed();return;
     }

@@ -1,11 +1,11 @@
 {
-  "units": 40,
+  "units": 35,
   "steps": 300,
   "simulatedSeconds": 30,
-  "meanMs": 9.996357669999993,
-  "p95Ms": 16.09868000000006,
-  "maxFrameMs": 148.31158200000002,
-  "maxEnemyOverlap": 0.015495487925704765,
+  "meanMs": 2.7680521733333374,
+  "p95Ms": 4.122927000000004,
+  "maxFrameMs": 48.517554,
+  "maxEnemyOverlap": 0.03875626084139583,
   "runtime": "v22.16.0",
-  "note": "Synthetic zero-damage congestion test on local Node. Not a Cloudflare CPU/quota benchmark."
+  "note": "Synthetic zero-damage congestion test on local Node. Shove-enabled lightweight compression is treated as intentional. Not a Cloudflare CPU/quota benchmark."
 }

@@ -10,7 +10,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {RoomModel,newRoom,cleanName} from '../src/room-model.js';
-import {VERSION,DECK,MAX_DECK} from '../public/game/units.js';
+import {VERSION,DECK,UNIT_IDS,SPELL_IDS,MAX_DECK} from '../public/game/units.js';
 const here=path.dirname(fileURLToPath(import.meta.url)),publicDir=path.resolve(here,'../public');
 const port=Number(process.env.PORT||3000),host=process.env.HOST||'0.0.0.0';
 const rooms=new Map(),limits=new Map(),sockets=new Set();
@@ -36,7 +36,7 @@ const server=http.createServer(async(req,res)=>{
   try{
     const u=new URL(req.url,`http://${req.headers.host}`);
     if(u.pathname==='/health')return sendJSON(res,{ok:true});
-    if(u.pathname==='/api/config')return sendJSON(res,{ok:true,game:'tiny-siege',version:VERSION,units:DECK.length,physicsVersion:PHYSICS_VERSION,features:['back-views','ground-air-layers','solid-buildings','body-size-mass','depth-sorting','custom-deck','building-only-golem','charging-boar','boar-shove','backline-assassin','five-unit-swarm','healing-priest','frost-slow','chain-lightning'],online:'local-node-websocket',maxPlayers:2,maxDeck:MAX_DECK});
+    if(u.pathname==='/api/config')return sendJSON(res,{ok:true,game:'tiny-siege',version:VERSION,cards:DECK.length,units:UNIT_IDS.length,spells:SPELL_IDS.length,physicsVersion:PHYSICS_VERSION,features:['back-views','ground-air-layers','solid-buildings','body-size-mass','depth-sorting','custom-deck','building-only-golem','charging-boar','shadow-rush-assassin','five-unit-swarm','healing-priest','frost-slow','chain-lightning','boar-shove','cannon-hp-decay','nightshade-half-aggro','frontline-inset','tower-hp-1.2','dormant-core-wake','golem-split','golem-death-blast','fireball-spell','golem-hp-2850','knight-cost-4','kragg-berserker'],online:'local-node-websocket',maxPlayers:2,maxDeck:MAX_DECK});
     if(u.pathname.startsWith('/api/')){
       if(!allowed(req))return sendJSON(res,{ok:false,error:'異なるサイトからの操作は拒否しました。'},403);
       if(!limit(req))return sendJSON(res,{ok:false,error:'リクエストが多すぎます。'},429);

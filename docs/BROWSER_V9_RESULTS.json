@@ -1,0 +1,12 @@
+{
+  "passed": 5,
+  "checks": [
+    "home shows a six-card saved deck",
+    "v9 deck editor exposes seventeen cards and six-card selection",
+    "library exposes v9 balance and Kragg Berserker",
+    "CPU battle starts from the v9 six-card deck with Kragg Berserker",
+    "no uncaught JavaScript errors in v9 browser flow"
+  ],
+  "errors": [],
+  "note": "Self-contained offline HTML loaded with Playwright set_content; not Cloudflare production or native browser networking."
+}

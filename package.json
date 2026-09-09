@@ -1,9 +1,9 @@
 {
   "name": "tiny-siege",
-  "version": "5.0.0",
+  "version": "9.0.0",
   "private": true,
   "type": "module",
-  "description": "Original fifteen-unit 2D lane battler with six-card decks, healing, slowing, chain lightning, charge/shove physics, CPU practice and private 1v1 on Cloudflare Workers.",
+  "description": "Original 2D lane battler with sixteen units plus a Fireball spell, six-card decks, a new six-cost Kragg Berserker, tuned Stone Golem and Iron Guard, CPU practice and private 1v1 on Cloudflare Workers.",
   "engines": {
     "node": ">=22"
   },

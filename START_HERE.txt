@@ -1,24 +1,15 @@
-TINY SIEGE v5.0.0
-==================
+TINY SIEGE v9.0.0
 
-今回の内容
-- 全15体 / 対戦デッキは6体
-- ルミナ司祭: 味方ユニット回復
-- フロストシャーマン: 地上敵を減速・ボアのチャージ妨害
-- ストームハーピー: 空中遠距離・最大3体へ連鎖雷
-- アイアンボア: 軽量地上兵を押しのける能力を追加
-- 物理バージョン3
+今回の主な変更
+- ストーンゴーレム HP 2850 / 攻撃288 / コスト8
+- アイアン衛士 コスト4（他ステータス維持）
+- 新キャラ クラッグバーサーカー: 6コスト / HP1950 / 攻撃360 / 低速 / 高重量
+- カード17枚（16ユニット＋1呪文）からデッキ6枚
 
-CPUで確認
-1. PLAY-OFFLINE.html を開く
-2. デッキを開く
-3. 「おすすめに戻す」で新3体+ボアを確認
-4. CPU戦を開始
-
-Cloudflare更新
-1. tiny-siege-cloudflare-v5.zip を展開
-2. GitHub Rin447/tiny-siege に「中身全部」を上書きUpload
-3. mainへCommit (例: Upgrade Tiny Siege to v5.0.0)
-4. CloudflareのDeploymentsが成功するまで待つ
-5. /api/config で version 5.0.0 / units 15 / physicsVersion 3 を確認
-6. Ctrl+F5して新規ルームで確認
+更新
+1. tiny-siege-cloudflare-v9.zip を展開
+2. Rin447/tiny-siege に中身全部を上書きアップロード
+3. mainへCommit（例: Upgrade Tiny Siege to v9.0.0）
+4. Cloudflare Deploymentsが成功するまで待つ
+5. /api/config で version 9.0.0 / cards 17 / units 16 / spells 1 / physicsVersion 7 / maxDeck 6 を確認
+6. Ctrl+F5して新しいPASSでテスト

@@ -21,11 +21,11 @@ function safeStorage(store,key,value){
 const remembered=safeStorage('local','tiny-name');if(remembered)el('nickname').value=remembered;
 soundOn=safeStorage('local','tiny-sound')==='true';
 function loadDeck(){
-  try{const raw=JSON.parse(safeStorage('local','tiny-deck-v5')||safeStorage('local','tiny-deck-v4')||safeStorage('local','tiny-deck-v3')||'null');return normalizeDeck(raw);}catch{return [...DEFAULT_DECK];}
+  try{const raw=JSON.parse(safeStorage('local','tiny-deck-v9')||safeStorage('local','tiny-deck-v8')||safeStorage('local','tiny-deck-v7')||safeStorage('local','tiny-deck-v6')||safeStorage('local','tiny-deck-v5')||safeStorage('local','tiny-deck-v4')||safeStorage('local','tiny-deck-v3')||'null');return normalizeDeck(raw);}catch{return [...DEFAULT_DECK];}
 }
 let playerDeck=loadDeck();
-function persistDeck(){safeStorage('local','tiny-deck-v5',JSON.stringify(playerDeck));renderDeckSummaries();}
-function deckReady(deck=playerDeck){return Array.isArray(deck)&&deck.length===MAX_DECK&&new Set(deck).size===MAX_DECK&&deck.every(id=>Object.hasOwn(UNITS,id));}
+function persistDeck(){safeStorage('local','tiny-deck-v9',JSON.stringify(playerDeck));renderDeckSummaries();}
+function deckReady(deck=playerDeck){return Array.isArray(deck)&&deck.length===MAX_DECK&&new Set(deck).size===MAX_DECK&&deck.every(id=>DECK.includes(id));}
 function sound(kind='place'){
   if(!soundOn)return;
   try{
@@ -167,7 +167,7 @@ function renderLobby(){
   renderDeckSummaries();
   el('lobbyDeckBtn').disabled=!!mine?.ready;
 }
-el('readyBtn').addEventListener('click',()=>{const next=!room?.members[seat]?.ready;if(next&&!deckReady()){openDeckEditor();toast('対戦には6体のデッキが必要です。');return;}send({type:'ready',ready:next,deck:next?[...playerDeck]:undefined});});
+el('readyBtn').addEventListener('click',()=>{const next=!room?.members[seat]?.ready;if(next&&!deckReady()){openDeckEditor();toast('対戦には6枚のデッキが必要です。');return;}send({type:'ready',ready:next,deck:next?[...playerDeck]:undefined});});
 el('startBtn').addEventListener('click',()=>send({type:'start'}));
 el('leaveLobby').addEventListener('click',leaveOnline);
 async function copyText(text){
@@ -184,7 +184,7 @@ function startPractice(){
   let name;try{name=inputName();}catch(e){entryError(e.message);return;}
   if(session)leaveOnline();
   clearInterval(localTimer);gameMode='cpu';seat=0;room=null;previous=null;previousPhase='';handSignature='';
-  if(!deckReady()){openDeckEditor();entryError('対戦には6体のデッキが必要です。');return;}
+  if(!deckReady()){openDeckEditor();entryError('対戦には6枚のデッキが必要です。');return;}
   localGame=createMatch({seed:crypto.getRandomValues(new Uint32Array(1))[0],bot:true,difficulty,decks:[playerDeck,DEFAULT_DECK]});
   snapshot=viewMatch(localGame,0);selected=null;hover=null;localPaused=false;
   el('matchType').textContent='CPU PRACTICE · '+({easy:'EASY',normal:'NORMAL',hard:'HARD'}[difficulty]);
@@ -243,7 +243,7 @@ function updateHUD(){
     el('rematchBtn').textContent=gameMode==='cpu'?'もう一度対戦':seat===room?.host?'再戦の待機ルームへ':'ホストの再戦操作を待っています';
     el('rematchBtn').disabled=gameMode==='online'&&seat!==room?.host;
   }
-  el('battleHint').textContent=selected?`${UNITS[selected].name}を配置 / 必要エナジー ${UNITS[selected].cost}`:'カードを選んで、自分の陣地に配置してください。';
+  el('battleHint').textContent=selected?(UNITS[selected].spell?`${UNITS[selected].name}：着弾地点を指定 / コスト ${UNITS[selected].cost}。遠いほど着弾が遅れます。`:`${UNITS[selected].name}を配置 / 必要エナジー ${UNITS[selected].cost}`):'カードを選択。サイドタワー破壊後も前線配置は破壊跡より手前までです。';
 }
 for(let i=0;i<10;i++){const seg=document.createElement('i'),fill=document.createElement('b');seg.append(fill);el('energyTrack').append(seg);}
 function choose(id){
@@ -290,9 +290,8 @@ function updateInspector(id){
   inspectId=id;const d=UNITS[id];
   el('inspectorRole').textContent=d.role;el('inspectorName').textContent=d.name;el('inspectorDesc').textContent=d.desc;
   el('inspectorStats').replaceChildren();
-  for(const [label,value] of [['COST',d.cost],['HP',d.hp+(d.count>1?` ×${d.count}`:'')],['DMG',d.damage]]){
-    const div=document.createElement('div'),s=document.createElement('small'),strong=document.createElement('strong');s.textContent=label;strong.textContent=value;div.append(s,strong);el('inspectorStats').append(div);
-  }
+  const stats=d.spell?[['COST',d.cost],['AREA',`R${d.radius}`],['DMG',`${d.damage}/${d.buildingDamage}`]]:[['COST',d.cost],['HP',d.hp+(d.count>1?` ×${d.count}`:'')],['DMG',d.damage]];
+  for(const [label,value] of stats){const div=document.createElement('div'),s=document.createElement('small'),strong=document.createElement('strong');s.textContent=label;strong.textContent=value;div.append(s,strong);el('inspectorStats').append(div);}
   el('tacticalTip').textContent=d.desc;
 }
 function pointFromEvent(e,inside=false){
@@ -373,7 +372,7 @@ function renderDeckEditor(){
     const cost=document.createElement('span');cost.className='deck-cost';cost.textContent=d.cost;
     const copy=document.createElement('div');copy.className='deck-copy';const h=document.createElement('h3');h.textContent=d.name;const sm=document.createElement('small');sm.textContent=d.role;const desc=document.createElement('p');desc.textContent=d.desc;copy.append(h,sm,desc);b.append(can,cost,copy);
     if(selected){const chk=document.createElement('span');chk.className='deck-check';chk.textContent='選択中';b.append(chk);}
-    b.onclick=()=>{const at=editingDeck.indexOf(id);if(at>=0)editingDeck.splice(at,1);else if(editingDeck.length<MAX_DECK)editingDeck.push(id);else{el('deckError').textContent='デッキは最大6体です。1体外してから追加してください。';el('deckError').hidden=false;return;}renderDeckEditor();};
+    b.onclick=()=>{const at=editingDeck.indexOf(id);if(at>=0)editingDeck.splice(at,1);else if(editingDeck.length<MAX_DECK)editingDeck.push(id);else{el('deckError').textContent='デッキは最大6枚です。1枚外してから追加してください。';el('deckError').hidden=false;return;}renderDeckEditor();};
     el('deckPool').append(b);
   }
 }
@@ -383,7 +382,7 @@ function openDeckEditor(){
 }
 el('deckBtn').onclick=openDeckEditor;el('homeDeckBtn').onclick=openDeckEditor;el('lobbyDeckBtn').onclick=()=>{if(room?.members[seat]?.ready){toast('準備OKを取り消してから編集してください。');return;}openDeckEditor();};
 el('deckDefaultBtn').onclick=()=>{editingDeck=[...DEFAULT_DECK];renderDeckEditor();};
-el('deckSaveBtn').onclick=()=>{if(!deckReady(editingDeck)){el('deckError').textContent='対戦に使う6体を選んでください。';el('deckError').hidden=false;return;}playerDeck=[...editingDeck];persistDeck();el('deckModal').close();toast('デッキを保存しました。');};
+el('deckSaveBtn').onclick=()=>{if(!deckReady(editingDeck)){el('deckError').textContent='対戦に使う6枚を選んでください。';el('deckError').hidden=false;return;}playerDeck=[...editingDeck];persistDeck();el('deckModal').close();toast('デッキを保存しました。');};
 el('libraryBtn').onclick=()=>{el('libraryModal').showModal();};
 el('helpBtn').onclick=()=>{el('helpModal').showModal();};
 for(const b of document.querySelectorAll('.close-modal'))b.onclick=()=>b.closest('dialog').close();
@@ -398,7 +397,7 @@ for(const id of DECK){
   const role=document.createElement('small');role.textContent=d.role;
   const h=document.createElement('h3');h.textContent=d.name;
   const p=document.createElement('p');p.textContent=d.desc;
-  const stat=document.createElement('div');stat.className='library-stat';stat.textContent=`HP ${d.hp}${d.count>1?` ×${d.count}`:''}　攻撃 ${d.damage}`;
+  const stat=document.createElement('div');stat.className='library-stat';stat.textContent=d.spell?`範囲 R${d.radius}　兵 ${d.damage} / 建物 ${d.buildingDamage}`:`HP ${d.hp}${d.count>1?` ×${d.count}`:''}　攻撃 ${d.damage}`;
   card.append(badge,can,role,h,p,stat);el('libraryGrid').append(card);
 }
 function interpolate(g,now){
