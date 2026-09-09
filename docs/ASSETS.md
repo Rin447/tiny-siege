@@ -1,7 +1,9 @@
-# Original procedural art, v9
+# Original procedural art, v15
 
-All unit art is drawn from original Canvas vector primitives; no external character artwork is bundled.
+外部キャラクター素材は使用せず、`public/game/art.js` のCanvas図形で描画します。
 
-v9 adds the **Kragg Berserker**: a horned, plate-armoured heavy fighter with a two-handed stone hammer, including front/back views and attack animation. Existing art remains procedural.
-
-`docs/previews-v9/` contains local Chromium render checks, not Cloudflare production screenshots.
+- 穴掘りティガー：鉱夫ヘルメット、ランプ、掘削クロー。地下中は土盛りだけ表示。
+- マッドドラゴン：泥色の大型飛行竜、広い翼、角、泥弾。
+- 吹き矢ゴブリン：小型の緑肌射手、長い吹き筒、軽装。前後姿あり。
+- レーザー塔：紫系の増幅結晶を備えた固定塔。ロック中は対象へ連続ビームを描画し、段階上昇でビームが太くなります。
+- 泥沼：茶系の半透明円と斑点。

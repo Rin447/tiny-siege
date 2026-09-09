@@ -10,7 +10,7 @@ export function random(g){
 function shuffled(g,source=DEFAULT_DECK){const a=[...source];for(let i=a.length-1;i>0;i--){const j=Math.floor(random(g)*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 export function validateDeck(value){return normalizeDeck(value,{fallback:false});}
 export function createMatch({seed=12345,bot=false,difficulty='normal',decks=[DEFAULT_DECK,DEFAULT_DECK]}={}){
-  const g={physicsVersion:PHYSICS_VERSION,phase:'countdown',countdown:3,time:0,overtime:false,rng:seed||1,units:[],projectiles:[],events:[],nextId:1,step:0,
+  const g={physicsVersion:PHYSICS_VERSION,phase:'countdown',countdown:3,time:0,overtime:false,rng:seed||1,units:[],projectiles:[],zones:[],events:[],nextId:1,step:0,
     winner:null,reason:'',bot,difficulty,botNext:1.5,
     players:[{energy:5,hand:[],queue:[],deck:[]},{energy:5,hand:[],queue:[],deck:[]}],towers:[]};
   const safeDecks=[normalizeDeck(decks?.[0]),normalizeDeck(decks?.[1])];
@@ -40,6 +40,13 @@ export function canPlace(g,owner,id,x,y){
     if(!core)return '本拠地が破壊されているため呪文を使えません。';
     return null;
   }
+  if(d.tunnelAnywhere){
+    const core=g.towers.find(t=>t.owner===owner&&t.kind==='core'&&t.hp>0);
+    if(!core)return '本拠地が破壊されているため地下移動できません。';
+    if(g.units.filter(u=>u.hp>0).length+1>ARENA.maxUnits)return 'フィールドのユニット上限です。';
+    if(!staticFree(g,d,{x,y},1))return '水上や建物の中には出現できません。少し離してください。';
+    return null;
+  }
   if(!deploymentAllowed(g,owner,x,y))return '自分の陣地、または破壊した敵サイドタワー側の前線に配置してください。';
   if(g.units.filter(u=>u.hp>0).length+d.count>ARENA.maxUnits)return 'フィールドのユニット上限です。';
   if(!staticFree(g,d,{x,y},1))return '建物や岸から少し離して配置してください。';
@@ -57,18 +64,35 @@ function makeUnit(g,owner,type,x,y){
     lane:x<360?190:530,age:0,facing:owner===0?-Math.PI/2:Math.PI/2,moving:false};
 }
 function fireballTravelTime(core,target){return clamp(.45+distance(core,target)/620,.6,2);}
+function arrowRainTravelTime(core,target){return clamp(.2+distance(core,target)/1150,.35,1);}
+function burrowTravelTime(d,core,target){return clamp((d.burrowBase??.45)+distance(core,target)/(d.burrowSpeedDivisor||500),d.burrowMin??.7,d.burrowMax??2.2);}
 function castSpell(g,owner,id,x,y){
   const err=canPlace(g,owner,id,x,y);if(err)return {ok:false,error:err};
-  const d=UNITS[id],core=g.towers.find(t=>t.owner===owner&&t.kind==='core'&&t.hp>0),travel=fireballTravelTime(core,{x,y});
+  const d=UNITS[id],core=g.towers.find(t=>t.owner===owner&&t.kind==='core'&&t.hp>0);
   spendCard(g,owner,id);
-  g.projectiles.push({id:`p${g.nextId++}`,owner,kind:'fireball',spell:'fireball',x:core.x,y:core.y,sx:core.x,sy:core.y,tx:x,ty:y,
+  if(d.spell==='poison'){
+    g.zones??=[];
+    g.zones.push({id:`z${g.nextId++}`,owner,kind:'poison',spell:'poison',x,y,radius:d.radius,remaining:d.zoneDuration,total:d.zoneDuration,
+      tickEvery:d.tickEvery,nextTick:g.time,damage:d.damage,buildingDamage:d.buildingDamage,lingerDuration:d.lingerDuration,lingerDamage:d.lingerDamage});
+    event(g,'poison-deploy',{x,y,owner,radius:d.radius});
+    return {ok:true,spell:true,travelTime:0};
+  }
+  const arrow=d.spell==='arrowrain',travel=arrow?arrowRainTravelTime(core,{x,y}):fireballTravelTime(core,{x,y});
+  g.projectiles.push({id:`p${g.nextId++}`,owner,kind:arrow?'arrowrain':'fireball',spell:d.spell,x:core.x,y:core.y,sx:core.x,sy:core.y,tx:x,ty:y,
     total:travel,remaining:travel,progress:0,damage:d.damage,buildingDamage:d.buildingDamage,splash:d.radius,targetsAir:true,life:travel+.2});
-  event(g,'fireball-launch',{x:core.x,y:core.y,tx:x,ty:y,owner,travel});
+  event(g,arrow?'arrowrain-launch':'fireball-launch',{x:core.x,y:core.y,tx:x,ty:y,owner,travel});
   return {ok:true,spell:true,travelTime:travel};
 }
 export function deploy(g,owner,id,x,y){
   const err=canPlace(g,owner,id,x,y);if(err)return {ok:false,error:err};
   const d=UNITS[id];if(d.spell)return castSpell(g,owner,id,x,y);
+  if(d.tunnelAnywhere){
+    const core=g.towers.find(t=>t.owner===owner&&t.kind==='core'&&t.hp>0),travel=burrowTravelTime(d,core,{x,y});
+    spendCard(g,owner,id);
+    const u=makeUnit(g,owner,id,core.x,core.y);u.spawn=0;u.targetable=false;u.burrowState='burrow';u.burrowFrom={x:core.x,y:core.y};u.burrowTo={x,y};u.burrowTotal=travel;u.burrowRemaining=travel;u.burrowProgress=0;
+    g.units.push(u);event(g,'burrow-start',{x:core.x,y:core.y,tx:x,ty:y,owner,travel});
+    return {ok:true,burrow:true,travelTime:travel};
+  }
   const positions=spawnPositions(g,owner,d,x,y);spendCard(g,owner,id);
   for(let i=0;i<d.count;i++){
     const u=makeUnit(g,owner,id,positions[i].x,positions[i].y);
@@ -77,14 +101,36 @@ export function deploy(g,owner,id,x,y){
   return {ok:true};
 }
 function alive(g){return [...g.units,...g.towers].filter(v=>v.hp>0);}
-function targetable(source,target){return target.owner!==source.owner&&target.hp>0&&(!target.air||source.targetsAir);}
+function targetable(source,target){return target.owner!==source.owner&&target.hp>0&&target.targetable!==false&&(!target.air||source.targetsAir);}
+function lockedStructureTarget(u,entities){
+  if(!(u.kind||u.building)||!u.target)return null;
+  const t=entities.find(e=>e.id===u.target);
+  if(!t||!targetable(u,t))return null;
+  return distance(u,t)<=u.range+t.radius?t:null;
+}
+function nearestStructureTarget(u,entities){
+  let best=null,bestD=Infinity;
+  for(const t of entities){
+    if(!targetable(u,t))continue;
+    const d=distance(u,t);
+    if(d<=u.range+t.radius&&d<bestD){best=t;bestD=d;}
+  }
+  return best;
+}
 function preferredTower(g,u){
   const enemy=1-u.owner;
   const out=g.towers.find(t=>t.owner===enemy&&t.kind==='tower'&&t.x===u.lane&&t.hp>0);
   return out||g.towers.find(t=>t.owner===enemy&&t.kind==='core'&&t.hp>0);
 }
 function getTarget(g,u,entities){
-  // Building-only units ignore troops completely and march toward the nearest enemy structure.
+  // Defensive structures lock their current target until it dies, leaves range, or becomes untargetable.
+  // A closer enemy entering range does not steal aggro mid-lock.
+  if(u.kind||u.building){
+    const locked=lockedStructureTarget(u,entities);
+    if(locked)return locked;
+    return nearestStructureTarget(u,entities);
+  }
+  // Building-only mobile units ignore troops completely and march toward the nearest enemy structure.
   if(u.buildingOnly){
     let best=null,bestD=Infinity;
     for(const t of entities){
@@ -155,6 +201,14 @@ function updateShadowRush(g,u,entities,dt){
   }
   return false;
 }
+function updateBurrow(g,u,dt){
+  if(u.burrowState!=='burrow')return false;
+  u.moving=false;u.target=null;u.targetable=false;u.burrowRemaining=Math.max(0,(u.burrowRemaining||0)-dt);
+  const total=Math.max(.001,u.burrowTotal||1),progress=clamp(1-u.burrowRemaining/total,0,1);u.burrowProgress=progress;
+  const a=u.burrowFrom||u,b=u.burrowTo||u;u.x=a.x+(b.x-a.x)*progress;u.y=a.y+(b.y-a.y)*progress;
+  if(u.burrowRemaining<=1e-8){u.x=b.x;u.y=b.y;u.burrowState=null;u.targetable=true;u.spawn=.25;event(g,'burrow-arrive',{x:u.x,y:u.y,owner:u.owner});}
+  return true;
+}
 function canRushAfterWindup(g,u,t){
   const gap=Math.max(0,distance(u,t)-(u.range+t.radius));
   if(gap>(u.dashMaxRange||Infinity)+35)return false;
@@ -164,8 +218,9 @@ function move(g,u,t,dt){
   if(!u.speed)return;
   const dest=navigationWaypoint(g,u,t,u.range+t.radius);
   const start={x:u.x,y:u.y};
-  const moveFactor=(u.slowUntil||0)>g.time?(u.slowMoveFactor||1):1;
-  const moved=moveBody(g,u,dest,dt*moveFactor);
+  const frostFactor=(u.slowUntil||0)>g.time?(u.slowMoveFactor||1):1;
+  const mudFactor=(u.mudUntil||0)>g.time?(u.mudSlowFactor||1):1;
+  const moved=moveBody(g,u,dest,dt*frostFactor*mudFactor);
   if(moved>.025){
     faceToward(u,u.x+(u.x-start.x),u.y+(u.y-start.y));u.walk+=moved/Math.max(1,u.speed)*7;u.moving=true;
     if(u.chargeDistance&&u.buildingOnly){
@@ -214,7 +269,7 @@ function handleUnitDeath(g,t){
   if(t.splitType&&t.splitCount)summonMiniGolems(g,t);
 }
 function damage(g,t,amount,owner){
-  if(t.hp<=0)return 0;
+  if(t.hp<=0||t.burrowState==='burrow')return 0;
   if((t.invulnerableUntil||0)>g.time){if(t.type==='nightshade')event(g,'shadow-evade',{x:t.x,y:t.y,owner:t.owner});return 0;}
   const before=t.hp;t.hp=Math.max(0,t.hp-amount);t.hit=.18;
   if(t.kind==='core'&&t.hp<before)wakeCore(g,t.owner,'core-hit');
@@ -246,13 +301,61 @@ function applySlow(g,t,p){
   }
   event(g,'slow',{x:t.x,y:t.y,owner:p.owner});
 }
-function fireballImpact(g,p){
-  event(g,'fireball-impact',{x:p.tx,y:p.ty,owner:p.owner,radius:p.splash,damage:p.damage});
+function spellAreaImpact(g,p,type){
+  event(g,type==='arrowrain'?'arrowrain-impact':'fireball-impact',{x:p.tx,y:p.ty,owner:p.owner,radius:p.splash,damage:p.damage});
   const centre={x:p.tx,y:p.ty};
   for(const t of [...alive(g)]){
     if(t.owner===p.owner||t.hp<=0)continue;
     if(distance(centre,t)>p.splash+(t.radius||12)*.35)continue;
     damage(g,t,(t.kind||t.building)?p.buildingDamage:p.damage,p.owner);
+  }
+}
+function insideEnemyPoison(g,t,owner){
+  return (g.zones||[]).some(z=>z.kind==='poison'&&z.owner===owner&&z.remaining>0&&distance(z,t)<=z.radius+(t.radius||12)*.25);
+}
+function updatePoisonZones(g,dt){
+  g.zones??=[];
+  const entities=alive(g);
+  for(const z of g.zones){
+    if(z.kind!=='poison')continue;
+    z.remaining=Math.max(0,z.remaining-dt);
+    while(z.remaining>0&&z.nextTick<=g.time+1e-8){
+      for(const t of entities){
+        if(t.owner===z.owner||t.hp<=0||distance(z,t)>z.radius+(t.radius||12)*.25)continue;
+        damage(g,t,(t.kind||t.building)?z.buildingDamage:z.damage,z.owner);
+        if(!t.kind&&!t.building&&t.hp>0){
+          t.poisonOwner=z.owner;t.poisonUntil=Math.max(t.poisonUntil||0,g.time+z.lingerDuration);
+          t.poisonDamage=Math.max(t.poisonDamage||0,z.lingerDamage);t.poisonTickEvery=z.tickEvery;
+          t.poisonNextAt=Math.max(t.poisonNextAt||0,g.time+z.tickEvery);
+        }
+      }
+      z.nextTick+=z.tickEvery;
+    }
+  }
+  g.zones=g.zones.filter(z=>z.remaining>1e-8);
+}
+function decayMudZones(g,dt){for(const z of g.zones||[])if(z.kind==='mud')z.remaining=Math.max(0,z.remaining-dt);g.zones=(g.zones||[]).filter(z=>z.remaining>1e-8);}
+function updateLingeringPoison(g,t){
+  if(t.hp<=0||t.kind||t.building||!(t.poisonUntil>g.time)||!Number.isFinite(t.poisonOwner))return;
+  if(insideEnemyPoison(g,t,t.poisonOwner))return;
+  const every=t.poisonTickEvery||.5;
+  while((t.poisonNextAt||0)<=g.time+1e-8&&t.poisonUntil>=(t.poisonNextAt||0)-1e-8){
+    damage(g,t,t.poisonDamage||18,t.poisonOwner);t.poisonNextAt=(t.poisonNextAt||g.time)+every;
+    if(t.hp<=0)break;
+  }
+}
+function createMudZone(g,p){
+  if(!p.mudRadius||!p.mudDuration)return;
+  g.zones??=[];g.zones.push({id:`z${g.nextId++}`,owner:p.owner,kind:'mud',x:p.x,y:p.y,radius:p.mudRadius,remaining:p.mudDuration,total:p.mudDuration,tickEvery:p.mudTickEvery||.5,damage:p.mudDamage||30,slow:p.mudSlow||.7});
+  event(g,'mud-deploy',{x:p.x,y:p.y,owner:p.owner,radius:p.mudRadius});
+}
+function updateMudZones(g){
+  const zones=(g.zones||[]).filter(z=>z.kind==='mud'&&z.remaining>0);if(!zones.length)return;
+  for(const t of alive(g)){
+    if(t.hp<=0||t.kind||t.building||t.air||t.burrowState==='burrow')continue;
+    const z=zones.find(q=>q.owner!==t.owner&&distance(q,t)<=q.radius+(t.radius||12)*.25);if(!z)continue;
+    t.mudUntil=Math.max(t.mudUntil||0,g.time+Math.min(.55,z.remaining));t.mudSlowFactor=Math.min(t.mudSlowFactor||1,z.slow||.7);
+    if((t.mudNextAt??-Infinity)<=g.time+1e-8){damage(g,t,z.damage||30,z.owner);t.mudNextAt=g.time+(z.tickEvery||.5);}
   }
 }
 function impact(g,p,entities){
@@ -270,6 +373,7 @@ function impact(g,p,entities){
   }else if(p.splash){
     event(g,'blast',{x:p.x,y:p.y,owner:p.owner,radius:p.splash,color:p.kind});
     for(const t of entities)if(targetable(p,t)&&distance(t,p)<=p.splash+t.radius*.35)damage(g,t,p.damage,p.owner);
+    createMudZone(g,p);
   }else if(target&&targetable(p,target)){damage(g,target,p.damage,p.owner);applySlow(g,target,p);}
 }
 function attack(g,u,t){
@@ -282,12 +386,28 @@ function attack(g,u,t){
   }
   if(u.projectile){
     g.projectiles.push({id:`p${g.nextId++}`,owner:u.owner,x:u.x,y:u.y-6,sx:u.x,sy:u.y,tx:t.x,ty:t.y,target:t.id,
-    kind:u.projectile,speed:u.projectile==='bomb'?220:(u.projectile==='lightning'?520:390),damage:amount,splash:u.splash||0,
+    kind:u.projectile,speed:u.projectile==='bomb'?220:(u.projectile==='lightning'?520:(u.projectile==='dart'?560:(u.projectile==='mud'?300:390))),damage:amount,splash:u.splash||0,
     targetsAir:u.targetsAir,life:3,slowMove:u.slowMove,slowAttack:u.slowAttack,slowDuration:u.slowDuration,
-    chainCount:u.chainCount,chainRange:u.chainRange,chainFalloff:u.chainFalloff});
+    chainCount:u.chainCount,chainRange:u.chainRange,chainFalloff:u.chainFalloff,mudRadius:u.mudRadius,mudDuration:u.mudDuration,mudTickEvery:u.mudTickEvery,mudDamage:u.mudDamage,mudSlow:u.mudSlow});
   }else{
     damage(g,t,amount,u.owner);event(g,'slash',{x:t.x,y:t.y,owner:u.owner,angle:Math.atan2(t.y-u.y,t.x-u.x),kind:u.type});
   }
+}
+function resetLaserTower(u){
+  u.laserTarget=null;u.laserLockTime=0;u.laserStage=0;u.laserDps=u.laserBaseDps||20;
+}
+function updateLaserTower(g,u,t,dt){
+  if(!u.laserTower)return false;
+  if(!t){resetLaserTower(u);u.target=null;return true;}
+  if(u.laserTarget!==t.id){
+    u.laserTarget=t.id;u.laserLockTime=0;u.laserStage=0;u.laserDps=u.laserBaseDps||20;
+    event(g,'laser-lock',{x:u.x,y:u.y,tx:t.x,ty:t.y,owner:u.owner});
+  }else u.laserLockTime=(u.laserLockTime||0)+dt;
+  const every=u.laserRampEvery||1.5,mult=u.laserMultiplier||2,stage=Math.max(0,Math.floor((u.laserLockTime+1e-9)/every));
+  if(stage!==(u.laserStage||0))event(g,'laser-ramp',{x:u.x,y:u.y,tx:t.x,ty:t.y,owner:u.owner,stage});
+  u.laserStage=stage;u.laserDps=(u.laserBaseDps||20)*Math.pow(mult,stage);u.target=t.id;u.anim=.12;faceToward(u,t.x,t.y);
+  damage(g,t,u.laserDps*dt,u.owner);
+  return true;
 }
 function healingPulse(g,u,entities){
   if(!u.healPower||u.healCd>0)return;
@@ -321,20 +441,26 @@ export function runBot(g,owner=1){
   const p=g.players[owner],aff=p.hand.filter(id=>UNITS[id].cost<=p.energy);
   if(!aff.length)return;
   const enemies=g.units.filter(u=>u.owner!==owner&&u.hp>0),threat=enemies.filter(u=>(owner===1?u.y<450:u.y>590)).sort((a,b)=>distance(a,{x:360,y:owner===1?150:890})-distance(b,{x:360,y:owner===1?150:890}))[0];
-  if(aff.includes('fireball')&&threat){
-    const clustered=enemies.filter(u=>distance(u,threat)<=UNITS.fireball.radius+u.radius).length;
-    if(clustered>=2||threat.type==='frost'||threat.type==='lumina'){
-      deploy(g,owner,'fireball',threat.x,threat.y);return;
-    }
+  if(threat){
+    const fireCluster=enemies.filter(u=>distance(u,threat)<=UNITS.fireball.radius+u.radius).length;
+    const arrowCluster=enemies.filter(u=>distance(u,threat)<=UNITS.arrowrain.radius+u.radius).length;
+    if(aff.includes('poison')&&(threat.type==='boneswarm'||fireCluster>=4)){deploy(g,owner,'poison',threat.x,threat.y);return;}
+    if(aff.includes('arrowrain')&&arrowCluster>=3){deploy(g,owner,'arrowrain',threat.x,threat.y);return;}
+    if(aff.includes('fireball')&&(fireCluster>=2||threat.type==='frost'||threat.type==='lumina')){deploy(g,owner,'fireball',threat.x,threat.y);return;}
   }
   let choices=aff.filter(id=>!UNITS[id].spell);if(!choices.length){
     const target=threat||g.towers.find(t=>t.owner!==owner&&t.kind==='tower'&&t.hp>0)||g.towers.find(t=>t.owner!==owner&&t.kind==='core'&&t.hp>0);
-    if(target)deploy(g,owner,'fireball',target.x,target.y);return;
+    const spell=aff.includes('arrowrain')?'arrowrain':aff.includes('fireball')?'fireball':aff.includes('poison')?'poison':null;
+    if(target&&spell)deploy(g,owner,spell,target.x,target.y);return;
   }
   if(threat?.air&&choices.some(id=>UNITS[id].targetsAir))choices=choices.filter(id=>UNITS[id].targetsAir);
   else if(!threat&&p.energy<7&&g.difficulty!=='hard'&&random(g)<.5)return;
   let id=choices[Math.floor(random(g)*choices.length)];
   if(!threat&&id==='cannon'&&choices.length>1)id=choices.find(k=>k!=='cannon')||id;
+  if(id==='tigger'){
+    const target=g.towers.filter(t=>t.owner!==owner&&t.hp>0).sort((a,b)=>(a.kind==='core')-(b.kind==='core')||a.hp-b.hp)[0];
+    if(target){const y=clamp(target.y+(owner===1?-1:1)*(target.radius+34),60,980),x=clamp(target.x+(random(g)-.5)*70,55,665);if(deploy(g,owner,id,x,y).ok)return;}
+  }
   const lane=threat?(threat.x<360?190:530):(random(g)<.5?190:530),baseY=owner===1?(threat?360:145):(threat?680:895);
   for(let i=0;i<8;i++){
     const x=clamp(lane+(random(g)-.5)*110,65,655),y=clamp(baseY+(random(g)-.5)*100,65,975);
@@ -353,6 +479,7 @@ export function tick(g,dt=ARENA.tick){
   g.time+=dt;g.step++;
   for(const p of g.players)p.energy=Math.min(10,p.energy+dt*(g.time>=120?1.25:.625));
   g.events=g.events.map(e=>({...e,life:e.life-dt})).filter(e=>e.life>0);
+  g.zones??=[];updatePoisonZones(g,dt);decayMudZones(g,dt);updateMudZones(g);
   refreshCoreWake(g);
   if(g.bot&&g.time>=g.botNext){
     runBot(g,1);g.botNext=g.time+(g.difficulty==='easy'?2.6:g.difficulty==='hard'?.65:1.3)+random(g)*.7;
@@ -363,18 +490,24 @@ export function tick(g,dt=ARENA.tick){
     if(u.hp<=0)continue;
     u.moving=false;
     u.hit=Math.max(0,(u.hit||0)-dt);u.anim=Math.max(0,(u.anim||0)-dt);u.cd=Math.max(0,u.cd-dt);u.healCd=Math.max(0,(u.healCd||0)-dt);
+    updateLingeringPoison(g,u);if(u.hp<=0)continue;
     if(u.kind==='core'&&!u.awake){u.target=null;continue;}
     if(!u.kind){
       u.age+=dt;
+      if(updateBurrow(g,u,dt))continue;
       if(u.spawn>0){u.spawn=Math.max(0,u.spawn-dt);continue;}
       if(u.decayPerSecond){decayStructure(g,u,u.decayPerSecond*dt);if(u.hp<=0)continue;}
     }
     if(updateShadowRush(g,u,entities,dt))continue;
     healingPulse(g,u,entities);
     const target=getTarget(g,u,entities);
-    if(!target){u.target=null;continue;}
+    if(!target){if(u.laserTower)resetLaserTower(u);u.target=null;continue;}
     u.target=target.id;
     const reach=u.range+target.radius;
+    if(u.laserTower){
+      if(distance(u,target)<=reach)updateLaserTower(g,u,target,dt);else resetLaserTower(u);
+      continue;
+    }
     if(canShadowRush(g,u,target)){beginShadowWindup(g,u,target);continue;}
     if(distance(u,target)<=reach){
       faceToward(u,target.x,target.y);
@@ -383,10 +516,10 @@ export function tick(g,dt=ARENA.tick){
   }
   for(const p of g.projectiles){
     p.life-=dt;
-    if(p.spell==='fireball'){
+    if(p.spell==='fireball'||p.spell==='arrowrain'){
       p.remaining=Math.max(0,p.remaining-dt);p.progress=clamp(1-p.remaining/p.total,0,1);
       p.x=p.sx+(p.tx-p.sx)*p.progress;p.y=p.sy+(p.ty-p.sy)*p.progress;
-      if(p.remaining<=1e-8){p.x=p.tx;p.y=p.ty;fireballImpact(g,p);p.life=0;}
+      if(p.remaining<=1e-8){p.x=p.tx;p.y=p.ty;spellAreaImpact(g,p,p.spell);p.life=0;}
       continue;
     }
     const t=entities.find(e=>e.id===p.target&&e.hp>0);if(t){p.tx=t.x;p.ty=t.y;}
@@ -403,8 +536,9 @@ export function viewMatch(g,seat=0){
   const p=g.players[seat];
   return {physicsVersion:PHYSICS_VERSION,phase:g.phase,countdown:g.countdown,time:rnd(g.time),overtime:g.overtime,winner:g.winner,reason:g.reason,
     scores:[towerScore(g,0),towerScore(g,1)],energy:rnd(p.energy),hand:[...p.hand],next:p.queue[0],deck:[...p.deck],
-    units:g.units.map(u=>({id:u.id,type:u.type,owner:u.owner,x:rnd(u.x),y:rnd(u.y),hp:u.hp,maxHp:u.maxHp,radius:u.radius,air:u.air,building:!!u.building,anim:u.anim,hit:u.hit,walk:u.walk,spawn:u.spawn,face:u.face,facing:u.facing,moving:!!u.moving,mass:u.mass,age:u.age,charged:!!u.charged,chargeRun:rnd(u.chargeRun||0),slowed:(u.slowUntil||0)>g.time,slowRemaining:rnd(Math.max(0,(u.slowUntil||0)-g.time)),dashState:u.dashState||null,dashWindupRemaining:rnd(Math.max(0,(u.dashWindupUntil||0)-g.time)),dashCooldownRemaining:rnd(Math.max(0,(u.dashReadyAt||0)-g.time)),invulnerable:(u.invulnerableUntil||0)>g.time})),
+    units:g.units.map(u=>({id:u.id,type:u.type,owner:u.owner,x:rnd(u.x),y:rnd(u.y),hp:u.hp,maxHp:u.maxHp,radius:u.radius,air:u.air,building:!!u.building,anim:u.anim,hit:u.hit,walk:u.walk,spawn:u.spawn,face:u.face,facing:u.facing,moving:!!u.moving,mass:u.mass,age:u.age,target:u.target||null,laserStage:u.laserStage||0,laserDps:rnd(u.laserDps||0),laserLockTime:rnd(u.laserLockTime||0),charged:!!u.charged,chargeRun:rnd(u.chargeRun||0),slowed:(u.slowUntil||0)>g.time,slowRemaining:rnd(Math.max(0,(u.slowUntil||0)-g.time)),poisoned:(u.poisonUntil||0)>g.time,poisonRemaining:rnd(Math.max(0,(u.poisonUntil||0)-g.time)),mudded:(u.mudUntil||0)>g.time,mudRemaining:rnd(Math.max(0,(u.mudUntil||0)-g.time)),burrowState:u.burrowState||null,burrowProgress:rnd(u.burrowProgress||0),dashState:u.dashState||null,dashWindupRemaining:rnd(Math.max(0,(u.dashWindupUntil||0)-g.time)),dashCooldownRemaining:rnd(Math.max(0,(u.dashReadyAt||0)-g.time)),invulnerable:(u.invulnerableUntil||0)>g.time})),
     towers:g.towers.map(t=>({id:t.id,kind:t.kind,owner:t.owner,x:t.x,y:t.y,hp:t.hp,maxHp:t.maxHp,radius:t.radius,anim:t.anim,hit:t.hit,facing:t.facing,awake:t.kind==='core'?!!t.awake:true})),
     projectiles:g.projectiles.map(p=>({id:p.id,owner:p.owner,x:rnd(p.x),y:rnd(p.y),tx:rnd(p.tx),ty:rnd(p.ty),kind:p.kind,spell:p.spell||null,progress:rnd(p.progress||0),radius:p.splash||0})),
+    zones:(g.zones||[]).map(z=>({id:z.id,owner:z.owner,kind:z.kind,spell:z.spell,x:rnd(z.x),y:rnd(z.y),radius:z.radius,remaining:rnd(z.remaining),total:z.total})),
     events:g.events.map(e=>({...e})),bot:g.bot,difficulty:g.difficulty};
 }

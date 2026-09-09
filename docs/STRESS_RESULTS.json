@@ -1,11 +1,11 @@
 {
-  "units": 35,
+  "units": 45,
   "steps": 300,
   "simulatedSeconds": 30,
-  "meanMs": 2.7680521733333374,
-  "p95Ms": 4.122927000000004,
-  "maxFrameMs": 48.517554,
-  "maxEnemyOverlap": 0.03875626084139583,
+  "meanMs": 4.136545480000004,
+  "p95Ms": 6.031279999999981,
+  "maxFrameMs": 51.09426799999999,
+  "maxEnemyOverlap": 0,
   "runtime": "v22.16.0",
   "note": "Synthetic zero-damage congestion test on local Node. Shove-enabled lightweight compression is treated as intentional. Not a Cloudflare CPU/quota benchmark."
 }

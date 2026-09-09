@@ -1,0 +1,13 @@
+{
+  "passed": 6,
+  "checks": [
+    "home shows an eight-card saved deck",
+    "seven-day patch notes open from the top navigation",
+    "v13 deck editor exposes twenty cards, eight-card selection, and average cost",
+    "library exposes twelve-body bone swarm and three-spell card pool",
+    "CPU battle keeps four-card hand; cannon range preview is available when the card is drawn",
+    "no uncaught JavaScript errors in v13 browser flow"
+  ],
+  "errors": [],
+  "note": "Self-contained offline HTML loaded with Playwright set_content; not Cloudflare production or native browser networking."
+}

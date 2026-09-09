@@ -1,0 +1,19 @@
+PASS 1 home shows an eight-card saved deck
+PASS 2 seven-day patch notes open from the top navigation
+PASS 3 v14 deck editor exposes twenty-two cards, eight-card selection, and average cost
+PASS 4 library exposes nineteen units including Tigger and Mud Dragon plus three spells
+PASS 5 CPU battle keeps four-card hand; cannon range preview is available when the card is drawn
+PASS 6 no uncaught JavaScript errors in v14 browser flow
+{
+  "passed": 6,
+  "checks": [
+    "home shows an eight-card saved deck",
+    "seven-day patch notes open from the top navigation",
+    "v14 deck editor exposes twenty-two cards, eight-card selection, and average cost",
+    "library exposes nineteen units including Tigger and Mud Dragon plus three spells",
+    "CPU battle keeps four-card hand; cannon range preview is available when the card is drawn",
+    "no uncaught JavaScript errors in v14 browser flow"
+  ],
+  "errors": [],
+  "note": "Self-contained offline HTML loaded with Playwright set_content; not Cloudflare production or native browser networking."
+}

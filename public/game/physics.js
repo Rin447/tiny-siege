@@ -4,7 +4,7 @@ import {ARENA} from './units.js';
  * Ground bodies live on the lawn/bridges. Air bodies share a separate layer.
  * Buildings are static circles; tree/grass artwork is decorative only.
  */
-export const PHYSICS_VERSION=7;
+export const PHYSICS_VERSION=13;
 export const FIELD={left:34,right:686,top:28,bottom:1012};
 const EPS=0.001,GRID=20,COLS=33,ROWS=49;
 const worldCaches=new WeakMap();
@@ -19,14 +19,19 @@ export function deploymentAllowed(g,owner,x,y){
   if(owner!==0&&owner!==1)return false;
   if(owner===0&&y>=ARENA.deployBottom)return true;
   if(owner===1&&y<=ARENA.deployTop)return true;
-  const enemy=1-owner;
-  const laneX=x<=320?190:x>=400?530:null;
-  if(laneX===null)return false;
-  const fallen=g.towers?.find(t=>t.owner===enemy&&t.kind==='tower'&&t.x===laneX&&t.hp<=0);
-  if(!fallen)return false;
-  const inset=ARENA.advancedDeployInset||120;
-  // The attacker gains ground, but cannot deploy directly on the destroyed tower ruin.
-  return owner===0?y>=fallen.y+inset:y<=fallen.y-inset;
+  const enemy=1-owner,inset=ARENA.advancedDeployInset||120,centreHalf=ARENA.advancedCenterHalf||52;
+  const sides=(g.towers||[]).filter(t=>t.owner===enemy&&t.kind==='tower');
+  const fallen=sides.filter(t=>t.hp<=0);
+  if(!fallen.length)return false;
+  // Once both side towers are down, the enemy front half becomes one continuous deployment zone.
+  if(fallen.length>=2){
+    const line=owner===0?Math.max(...fallen.map(t=>t.y))+inset:Math.min(...fallen.map(t=>t.y))-inset;
+    return owner===0?y>=line:y<=line;
+  }
+  // One tower down: only that lane plus a narrow centre connector gains ground.
+  const t=fallen[0],left=t.x<360,laneOK=left?x<=320:x>=400,centreOK=Math.abs(x-360)<=centreHalf;
+  if(!laneOK&&!centreOK)return false;
+  return owner===0?y>=t.y+inset:y<=t.y-inset;
 }
 export function pairDistance(a,b,soft=false){
   const sum=bodyRadius(a)+bodyRadius(b);
@@ -212,7 +217,7 @@ function projectStatic(g,u){
   }
 }
 export function resolveBodies(g,dt=.1){
-  const units=g.units.filter(u=>u.hp>0);
+  const units=g.units.filter(u=>u.hp>0&&u.burrowState!=='burrow');
   for(const u of units)projectStatic(g,u);
   for(let pass=0;pass<4;pass++)for(let i=0;i<units.length;i++)for(let j=i+1;j<units.length;j++){
     const a=units[i],b=units[j];if(!sameLayer(a,b)||isStructure(a)||isStructure(b))continue;

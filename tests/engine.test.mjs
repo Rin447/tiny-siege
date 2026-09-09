@@ -7,18 +7,26 @@ function deckWith(id){return [id,...DECK.filter(k=>k!==id)].slice(0,MAX_DECK);}
 function ready(g,o,id){const p=g.players[o],deck=deckWith(id);p.energy=10;p.deck=[...deck];p.hand=deck.slice(0,4);p.queue=deck.slice(4);}
 function spawn(g,o,id,x=190,y=o===0?650:390){ready(g,o,id);const r=deploy(g,o,id,x,y);assert.ok(r.ok,r.error);return g.units.at(-1);}
 function advance(g,seconds){for(let i=0;i<Math.round(seconds*10);i++)tick(g,.1);}
-test('seventeen selectable cards, sixteen units plus one spell, and six-card deck rule',()=>{
- assert.equal(DECK.length,17);assert.equal(new Set(DECK).size,17);assert.equal(UNIT_IDS.length,16);assert.deepEqual(SPELL_IDS,['fireball']);
- assert.equal(MAX_DECK,6);assert.equal(DEFAULT_DECK.length,6);assert.deepEqual(normalizeDeck(DEFAULT_DECK),[...DEFAULT_DECK]);
+test('twenty-four selectable cards, twenty-one units plus three spells, and eight-card deck rule',()=>{
+ assert.equal(DECK.length,24);assert.equal(new Set(DECK).size,24);assert.equal(UNIT_IDS.length,21);assert.deepEqual(SPELL_IDS,['fireball','poison','arrowrain']);
+ assert.equal(MAX_DECK,8);assert.equal(DEFAULT_DECK.length,8);assert.deepEqual(normalizeDeck(DEFAULT_DECK),[...DEFAULT_DECK]);
  for(const id of DECK){const d=UNITS[id];assert.ok(d.cost>=1&&d.damage>0);if(!d.spell)assert.ok(d.hp>0);assert.notEqual(d.hidden,true);}
  assert.equal(DECK.includes('mini_golem'),false);assert.equal(UNITS.mini_golem.hidden,true);
  assert.equal(UNITS.golem.cost,8);assert.equal(UNITS.golem.hp,2850);assert.equal(UNITS.golem.damage,288);assert.equal(UNITS.golem.deathDamage,180);assert.equal(UNITS.golem.splitCount,2);
  assert.equal(UNITS.mini_golem.hp,1050);assert.equal(UNITS.mini_golem.damage,96);assert.equal(UNITS.mini_golem.deathDamage,60);
  assert.equal(UNITS.fireball.cost,4);assert.equal(UNITS.fireball.damage,560);assert.equal(UNITS.fireball.buildingDamage,140);assert.equal(UNITS.fireball.radius,90);
+ assert.equal(UNITS.poison.cost,3);assert.equal(UNITS.poison.radius,90);assert.equal(UNITS.poison.zoneDuration,6);assert.equal(UNITS.poison.lingerDuration,3);
+ assert.equal(UNITS.arrowrain.cost,3);assert.equal(UNITS.arrowrain.damage,330);assert.equal(UNITS.arrowrain.buildingDamage,80);assert.equal(UNITS.arrowrain.radius,130);
+ assert.equal(UNITS.boneswarm.cost,4);assert.equal(UNITS.boneswarm.count,12);assert.equal(UNITS.boneswarm.hp,45);assert.equal(UNITS.boneswarm.damage,42);
  assert.equal(UNITS.nightshade.cost,3);assert.equal(UNITS.nightshade.hp,520);assert.equal(UNITS.nightshade.damage,228);assert.equal(UNITS.nightshade.dashMultiplier,2);assert.equal(UNITS.nightshade.aggroRange,105);assert.equal(UNITS.nightshade.dashAggroRange,105);
- assert.equal(UNITS.knight.cost,4);assert.equal(UNITS.knight.hp,1850);assert.equal(UNITS.knight.damage,98);
- assert.equal(UNITS.berserker.cost,6);assert.equal(UNITS.berserker.hp,1950);assert.equal(UNITS.berserker.damage,360);assert.equal(UNITS.berserker.targetsAir,false);assert.ok(UNITS.berserker.mass>UNITS.knight.mass);
- assert.equal(UNITS.cannon.hp,1080);assert.equal(UNITS.cannon.decayPerSecond,30);assert.equal('lifetime' in UNITS.cannon,false);
+ assert.equal(UNITS.blade.cost,2);assert.equal(UNITS.blade.hp,780);assert.equal(UNITS.blade.damage,112);
+ assert.equal(UNITS.knight.cost,3);assert.equal(UNITS.knight.hp,1850);assert.equal(UNITS.knight.damage,98);
+ assert.equal(UNITS.berserker.cost,7);assert.equal(UNITS.berserker.hp,2450);assert.equal(UNITS.berserker.damage,465);assert.equal(UNITS.berserker.targetsAir,false);assert.ok(UNITS.berserker.mass>UNITS.knight.mass);
+ assert.equal(UNITS.cannon.cost,3);assert.equal(UNITS.cannon.hp,1080);assert.equal(UNITS.cannon.decayPerSecond,30);assert.equal('lifetime' in UNITS.cannon,false);
+ assert.equal(UNITS.tigger.cost,3);assert.equal(UNITS.tigger.hp,1100);assert.equal(UNITS.tigger.damage,15);assert.equal(UNITS.tigger.tunnelAnywhere,true);assert.equal(UNITS.tigger.burrowMin,.9);assert.equal(UNITS.tigger.burrowMax,2.8);
+ assert.equal(UNITS.muddragon.cost,5);assert.equal(UNITS.muddragon.hp,2000);assert.equal(UNITS.muddragon.damage,200);assert.equal(UNITS.muddragon.range,78);assert.equal(UNITS.muddragon.splash,45);assert.equal(UNITS.muddragon.mudDuration,2);assert.equal(UNITS.muddragon.mudDamage,30);
+ assert.equal(UNITS.blowdart.cost,3);assert.equal(UNITS.blowdart.hp,240);assert.equal(UNITS.blowdart.damage,110);assert.equal(UNITS.blowdart.cooldown,.5);assert.equal(UNITS.blowdart.range,220);assert.equal(UNITS.blowdart.targetsAir,true);
+ assert.equal(UNITS.lasertower.cost,5);assert.equal(UNITS.lasertower.hp,2000);assert.equal(UNITS.lasertower.laserTower,true);assert.equal(UNITS.lasertower.laserBaseDps,20);assert.equal(UNITS.lasertower.laserRampEvery,1.5);assert.equal(UNITS.lasertower.targetsAir,true);
 });
 for(const id of DECK)test(`deploy ${id}: energy, count, card rotation`,()=>{
  const g=battle();ready(g,0,id);const next=g.players[0].queue[0],r=deploy(g,0,id,190,650);
@@ -29,23 +37,30 @@ for(const id of DECK)test(`deploy ${id}: energy, count, card rotation`,()=>{
 test('countdown blocks deployments and becomes battle after three seconds',()=>{
  const g=createMatch();assert.equal(deploy(g,0,g.players[0].hand[0],100,660).ok,false);advance(g,3);assert.equal(g.phase,'battle');
 });
-test('tower HP and dormant core rules remain unchanged in v9',()=>{
+test('tower HP and dormant core rules remain unchanged in v15',()=>{
  const g=battle();
  for(const t of g.towers){assert.equal(t.maxHp,t.kind==='core'?3240:1980);assert.equal(t.hp,t.maxHp);if(t.kind==='core')assert.equal(t.awake,false);}
 });
-test('destroying an enemy side tower advances only that lane but leaves a 120px recovery buffer',()=>{
+test('one destroyed side tower advances that lane plus a narrow centre connector',()=>{
  const g=battle();ready(g,0,'blade');
  assert.ok(canPlace(g,0,'blade',190,355));assert.ok(canPlace(g,0,'blade',530,355));
  g.towers.find(t=>t.owner===1&&t.kind==='tower'&&t.x===190).hp=0;
  assert.equal(canPlace(g,0,'blade',190,355),null);
  assert.equal(canPlace(g,0,'blade',250,370),null);
+ assert.equal(canPlace(g,0,'blade',360,370),null,'centre connector opens with the destroyed lane');
  assert.ok(canPlace(g,0,'blade',190,330),'cannot deploy inside the recovery buffer near the ruin');
  assert.ok(canPlace(g,0,'blade',530,370),'opposite lane stays locked');
- assert.ok(canPlace(g,0,'blade',360,370),'centre strip stays locked');
+ assert.ok(canPlace(g,0,'blade',450,370),'space between centre connector and opposite lane stays locked');
 });
-test('frontline recovery buffer is symmetric for player two',()=>{
+test('destroying both side towers unlocks the enemy front half across the full width',()=>{
+ const g=battle();ready(g,0,'blade');
+ g.towers.filter(t=>t.owner===1&&t.kind==='tower').forEach(t=>t.hp=0);
+ for(const x of [70,190,300,360,420,530,650])assert.equal(canPlace(g,0,'blade',x,370),null,`x=${x}`);
+ assert.ok(canPlace(g,0,'blade',360,330),'the recovery line still protects the enemy core side');
+});
+test('frontline lane and centre connector are symmetric for player two',()=>{
  const g=battle();ready(g,1,'blade');g.towers.find(t=>t.owner===0&&t.kind==='tower'&&t.x===530).hp=0;
- assert.equal(canPlace(g,1,'blade',530,685),null);assert.equal(canPlace(g,1,'blade',500,670),null);
+ assert.equal(canPlace(g,1,'blade',530,685),null);assert.equal(canPlace(g,1,'blade',500,670),null);assert.equal(canPlace(g,1,'blade',360,670),null);
  assert.ok(canPlace(g,1,'blade',530,710),'cannot deploy inside the recovery buffer near the ruin');
  assert.ok(canPlace(g,1,'blade',190,670),'opposite lane stays locked');
 });
@@ -61,7 +76,7 @@ test('unknown card and non-hand card rejected',()=>{
  assert.ok(canPlace(g,0,g.players[0].queue[0],100,650));
 });
 test('not enough energy never spawns or changes hand',()=>{
- const g=battle();ready(g,0,'knight');g.players[0].energy=3;const before=JSON.stringify(g);
+ const g=battle();ready(g,0,'knight');g.players[0].energy=2;const before=JSON.stringify(g);
  assert.equal(deploy(g,0,'knight',100,660).ok,false);assert.equal(JSON.stringify(g),before);
 });
 test('tower and building placement overlap rejected',()=>{
@@ -164,10 +179,42 @@ test('nightshade ignores damage while the rush state is invulnerable',()=>{
  attacker.x=190;attacker.y=610;attacker.speed=0;attacker.damage=9999;attacker.cd=0;shade.x=190;shade.y=630;shade.dashState='rush';shade.dashTarget=attacker.id;shade.invulnerableUntil=g.time+1;
  const hp=shade.hp;tick(g,.1);assert.equal(shade.hp,hp);
 });
+test('Tigger underground travel time increases with distance from its own core',()=>{
+ const near=battle();ready(near,0,'tigger');const a=deploy(near,0,'tigger',360,700);assert.ok(a.ok);
+ const far=battle();ready(far,0,'tigger');const b=deploy(far,0,'tigger',360,300);assert.ok(b.ok);
+ assert.ok(b.travelTime>a.travelTime,`${b.travelTime} should exceed ${a.travelTime}`);assert.ok(a.travelTime>=.9&&b.travelTime<=2.8);
+});
+
+test('hole-digger Tigger can target enemy territory, stays untargetable underground, and surfaces after distance-based travel',()=>{
+ const g=battle();ready(g,0,'tigger');
+ assert.equal(canPlace(g,0,'tigger',360,300),null,'Tigger ignores normal frontline placement limits');
+ ready(g,0,'blade');assert.ok(canPlace(g,0,'blade',360,300),'normal troop remains restricted');
+ ready(g,0,'tigger');const r=deploy(g,0,'tigger',360,300);assert.ok(r.ok);assert.ok(r.travelTime>=.9&&r.travelTime<=2.8);
+ const u=g.units.at(-1),enemyTower=g.towers.find(t=>t.owner===1&&t.kind==='tower');enemyTower.range=999;enemyTower.damage=999;
+ assert.equal(u.burrowState,'burrow');assert.equal(u.targetable,false);const hp=u.hp;advance(g,Math.max(.1,r.travelTime-.2));assert.equal(u.hp,hp);assert.notEqual(enemyTower.target,u.id,'burrowing Tigger must never be tower target');
+ advance(g,.4);assert.equal(u.burrowState,null);assert.equal(u.targetable,true);assert.ok(Math.hypot(u.x-360,u.y-300)<35);
+});
+
+test('mud dragon splash creates a two-second non-stacking ground mud zone with damage and movement slow',()=>{
+ const g=battle();g.towers.forEach(t=>{t.range=0;t.damage=0;});
+ const dragon=spawn(g,0,'muddragon',300,650),ground=spawn(g,1,'knight',300,390),air=spawn(g,1,'harpy',360,390);
+ dragon.spawn=ground.spawn=air.spawn=0;dragon.x=300;dragon.y=680;ground.x=300;ground.y=610;ground.speed=0;air.x=330;air.y=610;air.speed=0;
+ const gh=ground.hp,ah=air.hp;advance(g,.8);
+ assert.ok(ground.hp<=gh-UNITS.muddragon.damage,'ground takes splash hit');assert.ok(air.hp<ah,'nearby air also takes the base splash');
+ assert.ok(g.zones.some(z=>z.kind==='mud'&&z.remaining>0&&z.radius===45));
+ const snap=viewMatch(g,1),sg=snap.units.find(u=>u.id===ground.id),sa=snap.units.find(u=>u.id===air.id);assert.equal(sg.mudded,true);assert.equal(sa.mudded,false);assert.equal(ground.mudSlowFactor,.7);
+ const zone=g.zones.find(z=>z.kind==='mud');g.zones.push({...zone,id:'overlap-mud'});ground.mudNextAt=g.time;const beforeOverlap=ground.hp;tick(g,.1);assert.equal(beforeOverlap-ground.hp,30,'overlapping mud zones do not stack damage');
+ const after=ground.hp;advance(g,.55);assert.ok(ground.hp<=after-30,'mud applies one 30-damage tick');
+});
+
 test('mossling card spawns five legal individual bodies',()=>{
  const g=battle();ready(g,0,'mossling');const r=deploy(g,0,'mossling',300,680);assert.ok(r.ok,r.error);
  const pack=g.units.filter(u=>u.type==='mossling');assert.equal(pack.length,5);
  for(let i=0;i<pack.length;i++)for(let j=i+1;j<pack.length;j++)assert.ok(distance(pack[i],pack[j])>=pack[i].radius+pack[j].radius-.01);
+});
+test('bone swarm spawns twelve ultra-fragile individual ground attackers',()=>{
+ const g=battle();ready(g,0,'boneswarm');const r=deploy(g,0,'boneswarm',300,680);assert.ok(r.ok,r.error);
+ const pack=g.units.filter(u=>u.type==='boneswarm');assert.equal(pack.length,12);assert.ok(pack.every(u=>u.maxHp===45&&u.damage===42&&!u.air));
 });
 
 test('lumina priest heals a damaged nearby ally but never a building',()=>{
@@ -225,6 +272,27 @@ test('fireball damage wakes a dormant central core',()=>{
  const g=battle();g.towers.forEach(t=>{t.damage=0;});const core=g.towers.find(t=>t.owner===1&&t.kind==='core');assert.equal(core.awake,false);
  ready(g,0,'fireball');const r=deploy(g,0,'fireball',core.x,core.y);advance(g,r.travelTime+.2);assert.equal(core.hp,core.maxHp-140);assert.equal(core.awake,true);
 });
+test('poison trap deploys instantly, wipes bone swarm quickly and leaves lingering poison',()=>{
+ const g=battle();g.towers.forEach(t=>{t.damage=0;});ready(g,1,'boneswarm');assert.ok(deploy(g,1,'boneswarm',190,390).ok);
+ const pack=g.units.filter(u=>u.type==='boneswarm');pack.forEach(u=>{u.spawn=0;u.speed=0;u.damage=0;});
+ ready(g,0,'poison');const r=deploy(g,0,'poison',190,390);assert.ok(r.ok);assert.equal(r.travelTime,0);assert.equal(g.zones.length,1);
+ advance(g,.7);assert.equal(g.units.filter(u=>u.type==='boneswarm'&&u.owner===1).length,0);
+ const victim=spawn(g,1,'blade',190,390);victim.spawn=0;victim.speed=0;victim.damage=0;victim.x=190;victim.y=390;const before=victim.hp;
+ advance(g,.4);victim.x=500;victim.y=390;const afterContact=victim.hp;advance(g,1.2);assert.ok(afterContact<before);assert.ok(victim.hp<afterContact,'poison continues after leaving the area');
+});
+test('poison trap chips towers at reduced damage and wakes the central core',()=>{
+ const g=battle();g.towers.forEach(t=>{t.damage=0;});const core=g.towers.find(t=>t.owner===1&&t.kind==='core');ready(g,0,'poison');
+ assert.ok(deploy(g,0,'poison',core.x,core.y).ok);advance(g,.2);assert.ok(core.hp<core.maxHp);assert.equal(core.awake,true);
+});
+test('arrow rain is broader, lower damage and faster than fireball while still hitting air and towers',()=>{
+ const timing=battle();timing.towers.forEach(t=>{t.damage=0;});const core=timing.towers.find(t=>t.owner===0&&t.kind==='core');
+ ready(timing,0,'arrowrain');const ar=deploy(timing,0,'arrowrain',190,235);assert.ok(ar.ok);assert.ok(ar.travelTime>=.35&&ar.travelTime<=1);
+ const fbTime=Math.max(.6,Math.min(2,.45+distance(core,{x:190,y:235})/620));assert.ok(ar.travelTime<fbTime);
+ const g=battle();g.towers.forEach(t=>{t.damage=0;});const frost=spawn(g,1,'frost',190,390),bone=spawn(g,1,'boneswarm',190,390),harpy=spawn(g,1,'harpy',190,390);for(const u of [frost,bone,harpy]){u.spawn=0;u.x=190;u.y=235;u.speed=0;u.damage=0;}
+ const tower=g.towers.find(t=>t.owner===1&&t.kind==='tower'&&t.x===190),towerHp=tower.hp,frostHp=frost.hp;
+ ready(g,0,'arrowrain');const r=deploy(g,0,'arrowrain',190,235);advance(g,r.travelTime+.2);
+ assert.equal(frost.hp,frostHp-330);assert.equal(bone.hp,0);assert.equal(harpy.hp,Math.max(0,UNITS.harpy.hp-330));assert.equal(tower.hp,towerHp-80);
+});
 test('stone golem death blasts nearby enemies and still splits into two mini golems',()=>{
  const g=battle();g.towers.forEach(t=>{t.damage=0;});
  const golem=spawn(g,0,'golem',300,650),killer=spawn(g,1,'blade',300,390);golem.spawn=killer.spawn=0;golem.x=300;golem.y=600;killer.x=300;killer.y=555;
@@ -240,6 +308,55 @@ test('mini golem death blast is exactly one third of the parent blast',()=>{
  const killer=spawn(g,1,'blade',300,390),victim=spawn(g,1,'knight',340,390);killer.spawn=victim.spawn=0;killer.x=300;killer.y=565;victim.x=340;victim.y=600;killer.speed=victim.speed=0;killer.damage=9999;killer.cd=0;victim.damage=0;
  g.units.unshift(mini);const victimHp=victim.hp;tick(g,.1);
  assert.equal(g.units.some(u=>u.id===mini.id),false);assert.equal(victim.hp,victimHp-60);assert.equal(UNITS.golem.deathDamage/UNITS.mini_golem.deathDamage,3);
+});
+test('side tower locks its target even when a closer enemy enters range',()=>{
+ const g=battle();const tower=g.towers.find(t=>t.owner===0&&t.kind==='tower'&&t.x===190);
+ for(const t of g.towers)if(t.id!==tower.id)t.range=0;
+ const a=spawn(g,1,'knight',190,390),b=spawn(g,1,'blade',190,390);
+ for(const u of [a,b]){u.spawn=0;u.speed=0;u.damage=0;}
+ a.x=190;a.y=650;b.x=190;b.y=500;tick(g,.1);assert.equal(tower.target,a.id);
+ b.y=740;tick(g,.1);assert.equal(tower.target,a.id,'closer B must not steal a valid lock');
+ a.hp=0;tick(g,.1);assert.equal(tower.target,b.id,'target death should release and reacquire');
+});
+test('structure target lock releases on range exit or untargetable state',()=>{
+ for(const mode of ['range','untargetable']){
+  const g=battle(100+(mode==='range'?1:2)),tower=g.towers.find(t=>t.owner===0&&t.kind==='tower'&&t.x===190);
+  for(const t of g.towers)if(t.id!==tower.id)t.range=0;
+  const a=spawn(g,1,'knight',190,390),b=spawn(g,1,'blade',190,390);
+  for(const u of [a,b]){u.spawn=0;u.speed=0;u.damage=0;}
+  a.x=190;a.y=650;b.x=190;b.y=500;tick(g,.1);assert.equal(tower.target,a.id);
+  b.y=740;if(mode==='range')a.y=500;else a.targetable=false;
+  tick(g,.1);assert.equal(tower.target,b.id,`${mode} should release lock`);
+ }
+});
+test('bolt cannon uses the same target-lock contract',()=>{
+ const g=battle();for(const t of g.towers)t.range=0;
+ const cannon=spawn(g,0,'cannon',360,650),a=spawn(g,1,'knight',190,390),b=spawn(g,1,'blade',190,390);
+ cannon.spawn=0;cannon.x=360;cannon.y=650;cannon.damage=0;
+ for(const u of [a,b]){u.spawn=0;u.speed=0;u.damage=0;}
+ a.x=360;a.y=510;b.x=360;b.y=380;tick(g,.1);assert.equal(cannon.target,a.id);
+ b.y=600;tick(g,.1);assert.equal(cannon.target,a.id);
+ a.y=350;tick(g,.1);assert.equal(cannon.target,b.id);
+});
+test('blowdart goblin is a fragile long-range anti-air attacker',()=>{
+ const g=battle();g.towers.forEach(t=>{t.range=0;t.damage=0;});
+ const gob=spawn(g,0,'blowdart',190,650),air=spawn(g,1,'harpy',190,390);gob.spawn=air.spawn=0;gob.x=190;gob.y=620;air.x=190;air.y=440;gob.speed=air.speed=0;air.damage=0;
+ const hp=air.hp;advance(g,.7);assert.ok(air.hp<=hp-110,`expected anti-air damage, hp=${air.hp}`);assert.equal(gob.targetsAir,true);assert.equal(gob.range,220);
+});
+test('laser tower starts below bone-swarm kill speed, ramps every 1.5s, and resets after retarget',()=>{
+ const g=battle();g.towers.forEach(t=>{t.range=0;t.damage=0;});
+ const laser=spawn(g,0,'lasertower',360,650),a=spawn(g,1,'knight',190,390),b=spawn(g,1,'blade',190,390);
+ laser.spawn=0;laser.x=360;laser.y=650;for(const u of [a,b]){u.spawn=0;u.speed=0;u.damage=0;}a.x=360;a.y=520;b.x=360;b.y=400;
+ const hp=a.hp;advance(g,1.4);assert.ok(hp-a.hp<45,`base laser should not delete a bone-sized HP in first 1.4s: ${hp-a.hp}`);assert.equal(laser.laserStage,0);assert.equal(laser.laserDps,20);assert.equal(laser.target,a.id);
+ advance(g,.3);assert.ok(laser.laserStage>=1);assert.equal(laser.laserDps,40);
+ b.y=600;tick(g,.1);assert.equal(laser.target,a.id,'closer target does not steal laser lock');
+ a.hp=0;tick(g,.1);assert.equal(laser.target,b.id);assert.equal(laser.laserStage,0);assert.equal(laser.laserDps,20,'retarget resets power');
+});
+test('awake central core locks a target until a release condition occurs',()=>{
+ const g=battle();for(const t of g.towers)t.range=0;const core=g.towers.find(t=>t.owner===0&&t.kind==='core');core.range=226;core.awake=true;
+ const a=spawn(g,1,'knight',190,390),b=spawn(g,1,'blade',190,390);for(const u of [a,b]){u.spawn=0;u.speed=0;u.damage=0;}
+ a.x=360;a.y=735;b.x=360;b.y=650;tick(g,.1);assert.equal(core.target,a.id);
+ b.y=820;tick(g,.1);assert.equal(core.target,a.id);a.hp=0;tick(g,.1);assert.equal(core.target,b.id);
 });
 test('main tower destruction ends match immediately',()=>{
  const g=battle();g.towers.find(t=>t.id==='t12').hp=0;tick(g,.1);assert.equal(g.phase,'ended');assert.equal(g.winner,0);
@@ -283,3 +400,5 @@ test('maximum unit cap rejects a multi-unit card atomically',()=>{
  const g=battle();g.units=Array.from({length:ARENA.maxUnits-1},(_,i)=>({id:i,hp:1,x:60,y:660}));ready(g,0,'bat');
  const energy=g.players[0].energy;assert.equal(deploy(g,0,'bat',190,650).ok,false);assert.equal(g.players[0].energy,energy);
 });
+
+test('eight-card default deck keeps four-card hand and four-card queue',()=>{ const g=createMatch({seed:77});assert.equal(g.players[0].hand.length,4);assert.equal(g.players[0].queue.length,4);assert.equal(g.players[0].deck.length,8);});

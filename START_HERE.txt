@@ -1,15 +1,16 @@
-TINY SIEGE v9.0.0
+TINY SIEGE v15.0.0
 
-今回の主な変更
-- ストーンゴーレム HP 2850 / 攻撃288 / コスト8
-- アイアン衛士 コスト4（他ステータス維持）
-- 新キャラ クラッグバーサーカー: 6コスト / HP1950 / 攻撃360 / 低速 / 高重量
-- カード17枚（16ユニット＋1呪文）からデッキ6枚
+1. GitHub Rin447/tiny-siege に、このフォルダの中身全部を上書きします。
+2. main へ Commit します。例: Upgrade Tiny Siege to v15.0.0
+3. CloudflareのBuild/Deploy成功を待ちます。
+4. /api/config で version 15.0.0 / cards 24 / units 21 / spells 3 / physicsVersion 13 / maxDeck 8 を確認します。
+5. 両PC/スマホを再読み込みし、新しいPASSで対戦します。
 
-更新
-1. tiny-siege-cloudflare-v9.zip を展開
-2. Rin447/tiny-siege に中身全部を上書きアップロード
-3. mainへCommit（例: Upgrade Tiny Siege to v9.0.0）
-4. Cloudflare Deploymentsが成功するまで待つ
-5. /api/config で version 9.0.0 / cards 17 / units 16 / spells 1 / physicsVersion 7 / maxDeck 6 を確認
-6. Ctrl+F5して新しいPASSでテスト
+v15確認ポイント
+- マッドドラゴンの攻撃射程が155→78へ短縮されている
+- 穴掘りティガーの攻撃が15、地下移動が約0.9〜2.8秒になっている
+- 吹き矢ゴブリン：3コスト / HP240 / 攻撃110 / 0.5秒 / 射程220 / 地上＋空中
+- レーザー塔：5コスト / HP2000 / 射程220 / 同じ対象を1.5秒狙うごとにDPSが倍化
+- レーザー塔は対象変更・撃破・射程外・対象外で初期20 DPSへリセット
+- レーザー塔の配置前に射程円が表示される
+- 8枚デッキ・4枚手札・平均コスト・ターゲットロック・アプデ情報が維持されている

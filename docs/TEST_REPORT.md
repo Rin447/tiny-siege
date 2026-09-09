@@ -1,33 +1,64 @@
-# TINY SIEGE v9 test report
+# TINY SIEGE v15 Test Report
 
-Local development verification completed on the generated v9 package.
+This report summarizes local verification for v15.0.0. Cloudflare production deployment and two-device production play are not performed in this environment.
 
-## Automated unit/integration tests
+## Automated checks
 
-- **133 / 133 passed** with Node's test runner.
-- Dedicated v9 assertions cover:
-  - 17 selectable cards = 16 units + 1 spell, six-card decks.
-  - Stone Golem HP 2850 while cost 8, attack 288, split and death blast remain.
-  - Iron Guard cost 4 while HP 1850 and attack 98 remain.
-  - Kragg Berserker cost 6 / HP 1950 / attack 360 / speed 32 / ground-only targeting / heavier mass than Iron Guard.
-  - Existing Fireball, split Golem, Shadow Rush, healing, slow, chain lightning, building collision and frontline rules remain covered.
+- Unit / integration tests: **155 / 155 passed**
+- Static JavaScript/config check: **PASS**
+- Local HTTP / WebSocket integration: **14 / 14 passed**
+- Browser UI checks: **6 / 6 passed**
 
-## Real local HTTP + WebSocket flow
+## v15 feature verification
 
-- **14 / 14 passed** against a fresh local Node server on a dedicated port.
-- Verified config/static assets, room create/join, two native WebSocket clients, ready/start, authoritative placement synchronization, v9 metadata, invalid territory rejection, reconnect, surrender/rematch, host migration and cross-origin mutation rejection.
+### マッドドラゴン調整
+- Cost 5 / HP 2000 / damage 200 remain unchanged.
+- Attack acquisition range reduced from 155 to **78**.
+- Splash radius 45 and 2-second ground-only mud zone remain unchanged.
+- Mud still applies 30 damage every 0.5 seconds and 30% movement slow to ground non-building units only.
 
-## Browser UI flow
+### 穴掘りティガー調整
+- Cost 3 / HP 1100 remain unchanged.
+- Attack reduced from 30 to **15**.
+- Underground travel is slowed to roughly **0.9–2.8 seconds** based on distance from the player's central core.
+- Burrowing remains completely untargetable and immune until surfacing.
 
-- **5 / 5 passed** in local headless Chromium using the self-contained offline build.
-- Verified six-card deck summary, all 17 selectable cards, v9 balance text and Kragg Berserker, CPU battle startup, and no uncaught JavaScript errors.
+### 吹き矢ゴブリン
+- Cost **3** / HP **240** / damage **110**.
+- Attack interval **0.5 seconds** (about 220 single-target DPS while continuously firing).
+- Attack range **220**, intentionally near but below defensive tower range.
+- Targets both **ground and air** units.
+- No special ability; strength comes from long range and fast firing, balanced by very low HP.
 
-## Congestion stress simulation
+### レーザー塔
+- Cost **5** / HP **2000** / attack range **220**.
+- Building; targets both **ground and air**.
+- Uses the existing defensive-structure target-lock rule.
+- Initial continuous laser DPS: **20**.
+- While retaining the same target, DPS doubles every **1.5 seconds**: 20 → 40 → 80 → 160 → ... with no explicit cap.
+- Target death, leaving range, or becoming untargetable causes retargeting and resets laser DPS to 20.
+- Existing generic building-range preview exposes the Laser Tower's R220 placement range.
 
-- 35 active units, 300 steps / 30 simulated seconds.
-- Max enemy contact residual: about **0.039 px**, within the test's 0.05 px sub-pixel tolerance.
-- This is a synthetic local test, not a Cloudflare CPU/quota benchmark.
+## Regression verification
 
-## Environment limitation
+- **24 total cards: 21 units + 3 spells**.
+- 8-card decks and 4-card hands preserved.
+- Average energy-cost display preserved.
+- Tower/core/Bolt Cannon target-lock behavior preserved.
+- Tigger global destination placement, Fireball, Poison Trap, Arrow Rain, Stone Golem split/death blast, Nightshade Shadow Rush, frontline deployment and central-core wake rules preserved.
+- Recent 7-day patch notes / アプデ情報 include v15.
+- Compatibility contract advanced to **physicsVersion 13**.
 
-Cloudflare production, Wrangler's hosted build environment, and the user's actual Windows/mobile devices were not executed from this environment. After deployment, verify `/api/config`, force-refresh both clients, and create a new room because `physicsVersion` changed to 7.
+## Local transport fix verified
+
+The zero-dependency local Node WebSocket parser was corrected for an RFC6455 edge case where an extended-length payload whose decoded size was exactly 127 bytes could be mistaken for the 64-bit length marker. This surfaced because the new eight-card recommended deck made the ready message exactly 127 bytes. The local HTTP/WebSocket suite now passes all 14 checks. Cloudflare Workers uses the platform WebSocket implementation and was not dependent on this local parser.
+
+## Stress simulation
+
+- 45 active units
+- 300 simulation steps / roughly 30 seconds
+- Maximum unintended enemy-body overlap observed: **0 px**
+- Mean local simulation step: about **4.14 ms**
+- p95 local simulation step: about **6.03 ms**
+
+Local Node timing is environment-specific and is not a Cloudflare production benchmark.

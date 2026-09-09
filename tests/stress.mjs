@@ -14,9 +14,9 @@ for(const u of g.units){u.damage=0;u.hp=100000;u.maxHp=100000;}
 let worst=0,peak=g.units.length,maxFrame=0;const durations=[];
 for(let i=0;i<300;i++){
  const s=performance.now();tick(g,.1);const ms=performance.now()-s;durations.push(ms);maxFrame=Math.max(maxFrame,ms);
- for(const u of g.units){assert.ok(staticFree(g,u,u),`inside obstacle ${u.id}`);assert.ok(Number.isFinite(u.x+u.y));}
+ for(const u of g.units){if(u.burrowState!=='burrow')assert.ok(staticFree(g,u,u),`inside obstacle ${u.id}`);assert.ok(Number.isFinite(u.x+u.y));}
  for(let a=0;a<g.units.length;a++)for(let b=a+1;b<g.units.length;b++){
-  const u=g.units[a],v=g.units[b];if(u.owner===v.owner||!!u.air!==!!v.air)continue;
+  const u=g.units[a],v=g.units[b];if(u.burrowState==='burrow'||v.burrowState==='burrow'||u.owner===v.owner||!!u.air!==!!v.air)continue;
   let min=u.radius+v.radius;
   const uShoves=!u.air&&u.shovePower&&((v.mass||1)<=u.shoveMassLimit),vShoves=!v.air&&v.shovePower&&((u.mass||1)<=v.shoveMassLimit);
   if(uShoves&&!vShoves)min*=u.shoveCompression||.65;else if(vShoves&&!uShoves)min*=v.shoveCompression||.65;

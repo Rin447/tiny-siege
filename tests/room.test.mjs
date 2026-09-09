@@ -34,10 +34,10 @@ test('wrong token is rejected',()=>{
 test('snapshots expose no member authentication tokens',()=>{
  const s=setup();const text=JSON.stringify(s.model.snapshot(0));assert.ok(!text.includes(s.d.players[0].token));assert.ok(!text.includes('"token"'));
 });
-test('ready requires a valid six-card deck and snapshot hides deck contents',()=>{
+test('ready requires a valid eight-card deck and snapshot hides deck contents',()=>{
  const s=setup();s.msg('a',{type:'ready',ready:true,deck:['blade']});assert.equal(s.d.players[0].ready,false);
  s.msg('a',{type:'ready',ready:true,deck:[...DEFAULT_DECK]});assert.equal(s.d.players[0].ready,true);
- const snap=s.model.snapshot(1);assert.equal(snap.members[0].deckCount,6);assert.equal(JSON.stringify(snap).includes('golem'),false);
+ const snap=s.model.snapshot(1);assert.equal(snap.members[0].deckCount,8);assert.equal(JSON.stringify(snap).includes('golem'),false);
 });
 
 test('only ready connected players and host may start',()=>{

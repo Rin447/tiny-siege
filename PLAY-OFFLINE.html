@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#182f39">
-<title>TINY SIEGE — 17枚から6枚を選ぶ小さな攻城戦</title>
+<title>TINY SIEGE — 24枚から8枚を選ぶ小さな攻城戦</title>
 
 <style>:root{--paper:#f6f5ef;--ink:#203843;--muted:#7b8c8d;--line:#dce1d7;--green:#47796d;--mint:#dce9c8;--coral:#d6896c;--card:#fffef8;--board: min(420px,calc((100dvh - 282px)*.6923));font-family:"Segoe UI","Noto Sans JP","Hiragino Kaku Gothic ProN","Meiryo",sans-serif;color:var(--ink);background:var(--paper)}
 *{box-sizing:border-box}body{margin:0}button,input{font:inherit}button{cursor:pointer;transition:background .16s,transform .16s,border-color .16s}button:disabled{cursor:not-allowed;opacity:.44}button:focus-visible,input:focus-visible,canvas:focus-visible{outline:3px solid #d89e5c;outline-offset:3px}
@@ -48,10 +48,21 @@ dialog{border:1px solid #d7dfcf;background:#f9faf3;color:var(--ink);border-radiu
 @media(max-width:600px){.roster-tools{flex-wrap:wrap;gap:8px}.battle-tools{font-size:8px}.battle-hint{font-size:9px}.battle-tools .textbtn{font-size:9px}}
 
 /* v3 custom deck editor */
-.deck-summary{margin-top:20px;padding:15px 14px 13px;border:1px solid #dce3d5;border-radius:12px;background:#f8faf1}.deck-summary .block-title{margin-bottom:10px}.deck-summary .block-title .textbtn{margin-left:auto;padding:2px 0;font-size:10px;color:#54776c}.deck-mini{grid-template-columns:repeat(6,1fr)!important;gap:5px}.deck-mini button{pointer-events:none}.deck-mini canvas{max-height:58px;object-fit:contain}.deck-mini span{font-size:7px}.lobby-deck-btn{width:auto;min-width:150px;margin-top:12px;padding:9px 14px;min-height:36px}
-.deck-modal{width:min(1080px,95vw)}.deck-editor-head{display:flex;align-items:center;justify-content:space-between;gap:28px;padding:15px 17px;border:1px solid #dce3d5;border-radius:13px;background:#f1f5e7}.deck-editor-head>div{display:flex;align-items:baseline;gap:9px;white-space:nowrap}.deck-editor-head strong{font-size:28px}.deck-editor-head span{font-size:9px;color:#819185;letter-spacing:1px}.deck-editor-head p{font-size:10px;line-height:1.8;color:#71867c}.deck-slots{display:grid;grid-template-columns:repeat(6,1fr);gap:9px;margin:18px 0 22px}.deck-slot{min-height:98px;border:1px dashed #cbd7c7;border-radius:12px;background:#fbfcf5;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;padding:4px}.deck-slot.filled{border-style:solid;background:#fffef8}.deck-slot canvas{width:100%;max-width:105px;height:auto}.deck-slot strong{font-size:9px;margin-top:-4px}.deck-slot em{position:absolute;top:5px;left:6px;font-style:normal;font-size:8px;color:#8da08d}.deck-slot.empty:after{content:'＋';font-size:24px;color:#b4c0af}.deck-pool{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.deck-choice{position:relative;display:grid;grid-template-columns:88px 1fr;gap:10px;text-align:left;border:1px solid var(--line);background:#fffef8;border-radius:13px;padding:10px;min-height:112px;color:var(--ink)}.deck-choice:hover{background:#f7faee}.deck-choice.selected{border-color:#95b47f;background:#eef5df;box-shadow:inset 0 0 0 1px #b8cda4}.deck-choice canvas{width:88px;height:88px}.deck-choice .deck-copy{min-width:0;padding-top:5px}.deck-choice h3{font-size:12px;margin-bottom:5px}.deck-choice small{font-size:8px;color:#899b8e}.deck-choice p{font-size:9px;color:#7c8c84;line-height:1.55;margin-top:6px}.deck-choice .deck-cost{position:absolute;left:7px;top:7px;width:23px;height:25px;border-radius:8px;background:#9c86b3;color:#fff;border:2px solid #f7f2e7;display:grid;place-items:center;font-size:12px;font-weight:700}.deck-choice .deck-check{position:absolute;right:8px;top:8px;border-radius:20px;background:#7e9c68;color:#fff;font-size:8px;padding:4px 6px}.deck-actions{display:grid;grid-template-columns:1fr 1.4fr;gap:12px;margin-top:20px}.deck-actions .btn{margin:0}
-@media(max-width:800px){.deck-pool{grid-template-columns:repeat(2,1fr)}.deck-slots{grid-template-columns:repeat(3,1fr)}.deck-editor-head{align-items:flex-start;flex-direction:column;gap:5px}.deck-choice{grid-template-columns:70px 1fr}.deck-choice canvas{width:70px;height:70px}.deck-mini{grid-template-columns:repeat(6,1fr)!important}}
-@media(max-width:520px){.deck-pool{grid-template-columns:1fr}.deck-slots{grid-template-columns:repeat(3,1fr);gap:6px}.deck-slot{min-height:82px}.deck-actions{grid-template-columns:1fr}.deck-modal{padding:18px}.deck-choice{grid-template-columns:82px 1fr}.deck-choice canvas{width:82px;height:82px}.deck-summary{padding:12px 10px}.deck-mini{gap:3px}.deck-mini span{font-size:6px}}
+.deck-summary{margin-top:20px;padding:15px 14px 13px;border:1px solid #dce3d5;border-radius:12px;background:#f8faf1}.deck-summary .block-title{margin-bottom:10px}.deck-summary .block-title .textbtn{margin-left:auto;padding:2px 0;font-size:10px;color:#54776c}.deck-mini{grid-template-columns:repeat(8,1fr)!important;gap:5px}.deck-mini button{pointer-events:none}.deck-mini canvas{max-height:58px;object-fit:contain}.deck-mini span{font-size:7px}.lobby-deck-btn{width:auto;min-width:150px;margin-top:12px;padding:9px 14px;min-height:36px}
+.deck-modal{width:min(1080px,95vw)}.deck-editor-head{display:flex;align-items:center;justify-content:space-between;gap:28px;padding:15px 17px;border:1px solid #dce3d5;border-radius:13px;background:#f1f5e7}.deck-editor-head>div{display:flex;align-items:baseline;gap:9px;white-space:nowrap}.deck-editor-head strong{font-size:28px}.deck-editor-head span{font-size:9px;color:#819185;letter-spacing:1px}.deck-editor-head p{font-size:10px;line-height:1.8;color:#71867c}.deck-slots{display:grid;grid-template-columns:repeat(8,1fr);gap:9px;margin:18px 0 22px}.deck-slot{min-height:98px;border:1px dashed #cbd7c7;border-radius:12px;background:#fbfcf5;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;padding:4px}.deck-slot.filled{border-style:solid;background:#fffef8}.deck-slot canvas{width:100%;max-width:105px;height:auto}.deck-slot strong{font-size:9px;margin-top:-4px}.deck-slot em{position:absolute;top:5px;left:6px;font-style:normal;font-size:8px;color:#8da08d}.deck-slot.empty:after{content:'＋';font-size:24px;color:#b4c0af}.deck-pool{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.deck-choice{position:relative;display:grid;grid-template-columns:88px 1fr;gap:10px;text-align:left;border:1px solid var(--line);background:#fffef8;border-radius:13px;padding:10px;min-height:112px;color:var(--ink)}.deck-choice:hover{background:#f7faee}.deck-choice.selected{border-color:#95b47f;background:#eef5df;box-shadow:inset 0 0 0 1px #b8cda4}.deck-choice canvas{width:88px;height:88px}.deck-choice .deck-copy{min-width:0;padding-top:5px}.deck-choice h3{font-size:12px;margin-bottom:5px}.deck-choice small{font-size:8px;color:#899b8e}.deck-choice p{font-size:9px;color:#7c8c84;line-height:1.55;margin-top:6px}.deck-choice .deck-cost{position:absolute;left:7px;top:7px;width:23px;height:25px;border-radius:8px;background:#9c86b3;color:#fff;border:2px solid #f7f2e7;display:grid;place-items:center;font-size:12px;font-weight:700}.deck-choice .deck-check{position:absolute;right:8px;top:8px;border-radius:20px;background:#7e9c68;color:#fff;font-size:8px;padding:4px 6px}.deck-actions{display:grid;grid-template-columns:1fr 1.4fr;gap:12px;margin-top:20px}.deck-actions .btn{margin:0}
+@media(max-width:800px){.deck-pool{grid-template-columns:repeat(2,1fr)}.deck-slots{grid-template-columns:repeat(4,1fr)}.deck-editor-head{align-items:flex-start;flex-direction:column;gap:5px}.deck-choice{grid-template-columns:70px 1fr}.deck-choice canvas{width:70px;height:70px}.deck-mini{grid-template-columns:repeat(4,1fr)!important}}
+@media(max-width:520px){.deck-pool{grid-template-columns:1fr}.deck-slots{grid-template-columns:repeat(4,1fr);gap:6px}.deck-slot{min-height:82px}.deck-actions{grid-template-columns:1fr}.deck-modal{padding:18px}.deck-choice{grid-template-columns:82px 1fr}.deck-choice canvas{width:82px;height:82px}.deck-summary{padding:12px 10px}.deck-mini{gap:3px}.deck-mini span{font-size:6px}}
+
+/* v12 eight-card deck metrics and building-placement clarity */
+.deck-average{display:flex!important;flex-direction:column;align-items:flex-end!important;gap:2px!important;margin-left:auto}.deck-average strong{font-size:19px!important;color:#785f91}.deck-average span{font-size:7px!important;letter-spacing:1.2px}.deck-average-inline{margin-left:auto;font-size:8px;color:#7c728e;white-space:nowrap}.section-label b{font:inherit;color:#7c728e}@media(max-width:800px){.deck-average{align-items:flex-start!important;margin-left:0}.deck-average-inline{display:none}}
+
+/* v14 underground ambush + mud control + v13 target lock / patch notes */
+.update-nav{position:relative}.update-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#e98f68;margin-left:4px;vertical-align:middle;box-shadow:0 0 0 3px rgba(233,143,104,.13)}
+.updates-modal{width:min(820px,94vw)}.updates-intro{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:12px 14px;margin-bottom:14px;border:1px solid var(--line);border-radius:12px;background:#f5f7ed}.updates-intro p{font-size:10px;color:#71867c}.updates-intro span{font-size:8px;letter-spacing:1.3px;color:#8d9a8e;white-space:nowrap}.patch-notes{display:grid;gap:12px;max-height:min(62vh,650px);overflow:auto;padding-right:4px}.patch-note{border:1px solid #dce3d5;border-radius:14px;background:#fffef8;padding:15px 16px}.patch-head{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:11px;margin-bottom:9px}.patch-head strong{background:#203e43;color:#fff;padding:5px 8px;border-radius:8px;font-size:9px;letter-spacing:.5px}.patch-head h3{font-size:13px;color:#18393d}.patch-head time{font-size:8px;color:#91a092}.patch-note ul{margin:0;padding-left:18px;display:grid;gap:6px}.patch-note li{font-size:10px;line-height:1.65;color:#627970}.patch-note:first-child{border-color:#adc59d;background:#f5f8e9;box-shadow:inset 3px 0 0 #8eaa76}
+@media(max-width:800px){.topbar nav{gap:5px}.topbar .navbtn{font-size:9px;padding:7px 5px}.update-dot{width:5px;height:5px}.updates-intro{align-items:flex-start;flex-direction:column;gap:4px}.patch-head{grid-template-columns:auto 1fr}.patch-head time{grid-column:2}.patch-note{padding:13px}.patch-notes{max-height:68vh}}
+@media(max-width:520px){.topbar .navbtn{font-size:8px}.updates-modal{padding:16px}.patch-head h3{font-size:11px}.patch-note li{font-size:9px}}
+
+@media(max-width:550px){.topbar nav{gap:3px}.topbar .navbtn{padding:7px 3px}.update-nav{font-size:0!important}.update-nav::before{content:'アプデ';font-size:9px}.update-nav .update-dot{margin-left:2px}}
 </style>
 </head>
 <body>
@@ -62,9 +73,10 @@ dialog{border:1px solid #d7dfcf;background:#f9faf3;color:var(--ink);border-radiu
   </button>
   <nav>
     <span id="connection" class="status"><i></i>接続確認中</span>
-    <button id="deckBtn" class="navbtn">デッキ <span>6</span></button>
-    <button id="libraryBtn" class="navbtn">カード図鑑 <span>17</span></button>
+    <button id="deckBtn" class="navbtn">デッキ <span>8</span></button>
+    <button id="libraryBtn" class="navbtn">カード図鑑 <span>24</span></button>
     <button id="helpBtn" class="navbtn">遊び方</button>
+    <button id="updatesBtn" class="navbtn update-nav">アプデ情報 <span class="update-dot" aria-hidden="true"></span></button>
     <button id="soundBtn" class="iconbtn" aria-label="効果音を切り替え" title="効果音">♪</button>
   </nav>
 </header>
@@ -73,10 +85,10 @@ dialog{border:1px solid #d7dfcf;background:#f9faf3;color:var(--ink);border-radiu
   <section class="hero-copy">
     <div class="eyebrow"><span></span> PRIVATE 1V1 · REALTIME TACTICS</div>
     <h1>その一枚で、<br>戦況を<span>変えよう。</span></h1>
-    <p class="hero-desc">前衛で守る。後衛で射抜く。<br>16体＋1呪文から6枚を選び、<br>自分の編成で挑む2Dリアルタイム攻城戦。</p>
-    <div class="hero-stats"><div><strong>17</strong><small>16体＋1呪文</small></div><div><strong>3<span> min</span></strong><small>一手が変える攻防</small></div><div><strong>1v1</strong><small>友だちとオンライン</small></div></div>
+    <p class="hero-desc">前衛で守る。後衛で射抜く。<br>21体＋3呪文から8枚を選び、<br>自分の編成で挑む2Dリアルタイム攻城戦。</p>
+    <div class="hero-stats"><div><strong>24</strong><small>21体＋3呪文</small></div><div><strong>3<span> min</span></strong><small>一手が変える攻防</small></div><div><strong>1v1</strong><small>友だちとオンライン</small></div></div>
     <div class="hero-note"><span class="note-dot"></span><p>通話はいつものVCで。<br>ここでは、戦いに集中しよう。</p></div>
-    <div class="version-stamp">KRAGG BERSERKER · FIREBALL · SPLIT GOLEM <span>09 / SEVENTEEN CARD POOL</span></div>
+    <div class="version-stamp">LONG RANGE · RAMPING LASER <span>15 / LOCK & BURN</span></div>
   </section>
   <section class="demo-area" aria-label="ゲームの自動デモ">
     <div class="demo-label"><span class="live-dot"></span> LIVE ARENA PREVIEW <span>AUTOPLAY</span></div>
@@ -88,15 +100,15 @@ dialog{border:1px solid #d7dfcf;background:#f9faf3;color:var(--ink);border-radiu
     <label class="field-label" for="nickname">あなたの名前 <span>1〜16文字</span></label>
     <input id="nickname" maxlength="32" placeholder="例：りん" autocomplete="nickname">
     <div class="deck-summary">
-      <div class="block-title"><span>DECK</span><h3>今回使う6枚</h3><button id="homeDeckBtn" class="textbtn" type="button">編集する</button></div>
+      <div class="block-title"><span>DECK</span><h3>今回使う8枚</h3><small id="homeDeckAverage" class="deck-average-inline">平均コスト ◆ 0.0</small><button id="homeDeckBtn" class="textbtn" type="button">編集する</button></div>
       <div id="homeDeck" class="mini-roster deck-mini"></div>
-      <p class="field-help">17枚（16体＋1呪文）から6枚を選択。対戦開始前なら何度でも変更できます。</p>
+      <p class="field-help">24枚（21体＋3呪文）から8枚を選択。平均コストを見ながら編成できます。対戦開始前なら何度でも変更できます。</p>
     </div>
     <div class="practice-block">
       <div class="block-title"><span>01</span><h3>ひとりで練習</h3><small>CPU BATTLE</small></div>
       <div id="difficulty" class="segmented"><button data-level="easy">やさしい</button><button data-level="normal" class="active">ふつう</button><button data-level="hard">手ごわい</button></div>
       <button id="practiceBtn" class="btn primary">CPUと対戦する <span>↗</span></button>
-      <p class="field-help">登録不要。編集した6枚デッキでCPU戦を試せます。</p>
+      <p class="field-help">登録不要。編集した8枚デッキでCPU戦を試せます。</p>
     </div>
     <div class="divider"></div>
     <div class="block-title"><span>02</span><h3>友だちと対戦</h3><small>ONLINE 1V1</small></div>
@@ -115,8 +127,8 @@ dialog{border:1px solid #d7dfcf;background:#f9faf3;color:var(--ink);border-radiu
     <p class="muted">2人とも「準備OK」にしたら、ホストが対戦を開始できます。</p>
     <div id="members" class="members"></div>
     <div class="lobby-actions"><button id="readyBtn" class="btn primary">準備OK</button><button id="startBtn" class="btn dark" disabled>対戦を開始</button></div>
-    <div class="lobby-rules"><div><small>バトル</small><strong>3分 ＋ 延長1分</strong></div><div><small>デッキ</small><strong>6枚 / 手札4枚</strong></div><div><small>勝利条件</small><strong>相手の本拠地を破壊</strong></div></div>
-    <h3 class="section-label">YOUR DECK <span>選んだ6枚で出撃</span></h3><div id="lobbyRoster" class="mini-roster deck-mini"></div><button id="lobbyDeckBtn" class="btn outline lobby-deck-btn">デッキを編集</button>
+    <div class="lobby-rules"><div><small>バトル</small><strong>3分 ＋ 延長1分</strong></div><div><small>デッキ</small><strong>8枚 / 手札4枚</strong></div><div><small>勝利条件</small><strong>相手の本拠地を破壊</strong></div></div>
+    <h3 class="section-label">YOUR DECK <span>選んだ8枚で出撃 · <b id="lobbyDeckAverage">平均 ◆ 0.0</b></span></h3><div id="lobbyRoster" class="mini-roster deck-mini"></div><button id="lobbyDeckBtn" class="btn outline lobby-deck-btn">デッキを編集</button>
   </section>
   <aside class="invite-panel">
     <div class="eyebrow">INVITE YOUR RIVAL</div><h2>友だちを招待</h2><p class="muted">同じURLを開き、このPASSで参加。</p>
@@ -150,7 +162,7 @@ dialog{border:1px solid #d7dfcf;background:#f9faf3;color:var(--ink);border-radiu
     <div id="hand" class="hand"></div>
     <div class="energy-row"><span class="energy-icon">◆</span><strong id="energyValue">5</strong><div id="energyTrack" class="energy-track"></div><span id="nextCard">NEXT</span></div>
     <div class="battle-tools"><button id="physicsBtn" class="textbtn" aria-pressed="false">当たり判定を表示</button><span id="physicsLegend">地上と空中は別レイヤー</span></div>
-    <div id="battleHint" class="battle-hint">カードを選択。ユニットは配置、ファイヤーボールは着弾地点を指定します。</div>
+    <div id="battleHint" class="battle-hint">カードを選択。ユニットは配置、3種類の呪文は戦場の地点を指定します。</div>
   </section>
   <aside class="unit-inspector">
     <div class="section-label">SELECTED CARD</div>
@@ -160,67 +172,80 @@ dialog{border:1px solid #d7dfcf;background:#f9faf3;color:var(--ink);border-radiu
     <div class="match-rules"><h4>この一戦のルール</h4><p>本拠地を壊せば即勝利。3分で同数なら延長戦。延長後も同数なら残りタワーHPで決着。</p><p>残り1分からエナジー回復が2倍。切り札を重ねて攻めよう。</p></div>
   </aside>
 </main>
-<footer id="footer"><span>ひとつのURLから、小さな戦場へ。</span><span>TINY SIEGE <i>/</i> v9.0.0 · 17 CARD POOL</span></footer>
+<footer id="footer"><span>ひとつのURLから、小さな戦場へ。</span><span>TINY SIEGE <i>/</i> v15.0.0 · LONG RANGE & LASER</span></footer>
 
 <div id="toast" class="toast" role="status" hidden></div>
 <dialog id="deckModal" class="deck-modal">
-  <div class="modal-head"><div><span class="eyebrow">BUILD YOUR SIX</span><h2>デッキ編集</h2></div><button class="close-modal iconbtn" aria-label="閉じる">×</button></div>
-  <div class="deck-editor-head"><div><strong id="deckCount">6 / 6</strong><span>選択中</span></div><p>17枚から6枚を選択。ユニットと呪文を同じデッキ枠で入れ替えできます。</p></div>
+  <div class="modal-head"><div><span class="eyebrow">BUILD YOUR EIGHT</span><h2>デッキ編集</h2></div><button class="close-modal iconbtn" aria-label="閉じる">×</button></div>
+  <div class="deck-editor-head"><div><strong id="deckCount">8 / 8</strong><span>選択中</span></div><div class="deck-average"><span>AVERAGE ENERGY</span><strong id="deckAverage">◆ 0.0</strong></div><p>24枚から8枚を選択。手札は4枚のままなので、主力カードが戻るまでの読み合いが長くなります。</p></div>
   <div id="deckSlots" class="deck-slots"></div>
   <div id="deckPool" class="deck-pool"></div>
-  <div class="deck-actions"><button id="deckDefaultBtn" class="btn outline">おすすめに戻す</button><button id="deckSaveBtn" class="btn dark">この6枚で保存</button></div>
+  <div class="deck-actions"><button id="deckDefaultBtn" class="btn outline">おすすめに戻す</button><button id="deckSaveBtn" class="btn dark">この8枚で保存</button></div>
   <p id="deckError" class="error" hidden></p>
 </dialog>
-<dialog id="libraryModal"><div class="modal-head"><div><span class="eyebrow">MEET YOUR SEVENTEEN</span><h2>カード図鑑</h2></div><button class="close-modal iconbtn" aria-label="閉じる">×</button></div><p class="muted">16体のユニットと1枚の呪文を確認できます。実戦に持ち込めるのはデッキで選んだ6枚です。</p><div class="roster-tools"><button id="libraryFacingBtn" class="btn outline" aria-pressed="false">後ろ姿を見る ↻</button><small>戦場では進行・攻撃方向で自動切り替え。</small></div><div id="libraryGrid" class="library-grid"></div></dialog>
+<dialog id="libraryModal"><div class="modal-head"><div><span class="eyebrow">MEET YOUR TWENTY-FOUR</span><h2>カード図鑑</h2></div><button class="close-modal iconbtn" aria-label="閉じる">×</button></div><p class="muted">21体のユニットと3枚の呪文を確認できます。実戦に持ち込めるのはデッキで選んだ8枚です。</p><div class="roster-tools"><button id="libraryFacingBtn" class="btn outline" aria-pressed="false">後ろ姿を見る ↻</button><small>戦場では進行・攻撃方向で自動切り替え。</small></div><div id="libraryGrid" class="library-grid"></div></dialog>
+<dialog id="updatesModal" class="updates-modal"><div class="modal-head"><div><span class="eyebrow">LAST 7 DAYS</span><h2>アプデ情報</h2></div><button class="close-modal iconbtn" aria-label="閉じる">×</button></div>
+  <div class="updates-intro"><p>直近7日以内に追加された変更だけを表示します。</p><span id="updatesRange">PATCH WINDOW</span></div>
+  <div id="patchNotes" class="patch-notes"></div>
+  <p id="noPatchNotes" class="muted" hidden>直近7日以内のアップデートはありません。</p>
+</dialog>
 <dialog id="helpModal"><div class="modal-head"><div><span class="eyebrow">HOW TO PLAY</span><h2>3分でわかる、攻城戦。</h2></div><button class="close-modal iconbtn" aria-label="閉じる">×</button></div>
   <div class="help-steps">
     <section><b>01</b><div><h3>まずはCPU戦から</h3><p>名前を入れて「CPUと対戦する」。オンラインはルームを作り、URLと6桁PASSを友だちへ共有します。</p></div></section>
-    <section><b>02</b><div><h3>カード → 自分の陣地</h3><p>手札4枚から1枚を選び、画面下側の自陣にタップで配置。カードをフィールドへドラッグしてもOK。ユニットは自動で移動・攻撃します。</p></div></section>
+    <section><b>02</b><div><h3>カード → 自分の陣地</h3><p>手札4枚から1枚を選び、画面下側の自陣にタップで配置。カードをフィールドへドラッグしてもOK。ユニットは自動で移動・攻撃します。砲台などの設置物は配置前に攻撃範囲が表示されます。</p></div></section>
     <section><b>03</b><div><h3>エナジーを使い分ける</h3><p>カード左上の数字が必要コスト。エナジーは最大10まで回復します。使ったカードは待機列へ入り、次の1枚が手札に補充されます。</p></div></section>
-    <section><b>04</b><div><h3>17枚から6枚を選ぶ</h3><p>「デッキ」から6枚を編集。ユニット16体に加え、戦場全域へ飛ばせるファイヤーボールも1枠として選べます。</p></div></section>
+    <section><b>04</b><div><h3>24枚から8枚を選ぶ</h3><p>「デッキ」から8枚を編集。平均エネルギーコストも確認できます。手札は4枚のままなので、安いカードで回すか重い切り札を増やすかが重要です。</p></div></section>
     <section><b>05</b><div><h3>本拠地は最初は休眠</h3><p>中央本拠地は3240HP、左右タワーは1980HP。中央は試合開始時は攻撃せず、左右どちらかのサイドタワーが壊れるか、中央自身が1度でもダメージを受けると起動して試合終了まで反撃します。本拠地を壊せば即勝利です。</p></div></section>
     <section><b>06</b><div><h3>通話はいつものVCで</h3><p>オンラインで切断したら最大45秒間一時停止して再接続を待ちます。戻れなければ切断側の敗北、両方切断は引き分け。CPU戦ではタブを離れると一時停止します。</p></div></section>
-    <section><b>07</b><div><h3>タワー破壊で前線が進む</h3><p>地上の部隊はタワー・砲台をすり抜けません。敵サイドタワーを破壊すると、そのレーンだけ配置可能エリアが前進します。ただし破壊跡から約120px手前で止まり、防衛側が立て直せる距離を残します。反対レーンと中央帯は広がりません。</p></div></section>
+    <section><b>07</b><div><h3>タワー破壊で前線が進む</h3><p>敵サイドタワーを1本破壊すると、その側のレーンと中央の細い帯だけが白線まで前進します。左右2本とも破壊すると、白線より手前の敵陣前半が横幅いっぱい・中央の隙間なしで配置可能になります。</p></div></section>
     <section><b>08</b><div><h3>大きさと地上／空中</h3><p>味方は同じ高度で軽く押し合い、敵とはすり抜けず接触します。大きな衛士は押されにくく、細い道で場所を取ります。飛行は地上の部隊・建物を無視。対空攻撃ができることと、飛んでいることは別です。</p></div></section>
     <section><b>09</b><div><h3>向きと判定を確認</h3><p>敵陣へ進む自分の部隊は背中が見え、後ろの敵を狙えば正面を向きます。図鑑で正面／背面を切り替え。「当たり判定を表示」で足元の円を確認できます。矢・魔法は味方や建物で遮られません。</p></div></section>
     <section><b>10</b><div><h3>建物特攻と新しい相性</h3><p>ゴーレムとアイアンボアは敵兵を攻撃せず建物へ。ゴーレムは2850HP・288攻撃に調整され、倒されるとちびゴーレム2体へ分裂。親子とも死亡時に周囲へダメージを与えます。ナイトシェイドの無敵突進、砲台のHP減衰に加え、6コスト高火力のクラッグバーサーカーも参戦します。</p></div></section>
-    <section><b>11</b><div><h3>ファイヤーボールは偏差撃ち</h3><p>4コストの呪文。好きな地点を指定し、自軍中央本拠地から火球を発射します。半径90の敵兵へ560、タワー・砲台など建物へ140ダメージ。地上・空中の両方に命中し、遠い地点ほど約0.6〜2秒の着弾時間が必要です。追尾しないので移動先を読んで狙いましょう。</p></div></section>
+    <section><b>11</b><div><h3>3種類の範囲呪文</h3><p>ファイヤーボールは高威力の偏差撃ち。ポイズントラップは半径90へ即展開し、離脱後も3秒毒が残ります。矢の雨は半径130と広く、330ダメージでファイヤーボールより速く着弾します。</p></div></section>
   </div>
   <p class="help-note">オリジナルの試作ルールです。外部ゲームのキャラクター・画像・音源は使用していません。オンライン対戦はCloudflareへのサーバー込みの公開が必要です。</p>
 </dialog>
 <script type="module">window.TINY_OFFLINE=true;
 /** Balance data: original prototype values. Both browser and server import this file. */
-const VERSION = '9.0.0';
-const MAX_DECK = 6;
+const VERSION = '15.0.0';
+const MAX_DECK = 8;
 const ARENA = Object.freeze({
   width:720, height:1040, riverTop:482, riverBottom:558, bridges:[190,530],
-  bridgeHalf:42, deployBottom:600, deployTop:440, advancedDeployInset:120, maxUnits:100,
+  bridgeHalf:42, deployBottom:600, deployTop:440, advancedDeployInset:120, advancedCenterHalf:40, maxUnits:120,
   duration:180, overtime:60, maxEnergy:10, tick:0.1
 });
 const UNITS = Object.freeze({
-  blade: {id:'blade',mass:2,name:'アッシュ剣士',short:'剣士',role:'近接アタッカー',cost:3,hp:780,damage:112,speed:56,range:34,cooldown:1.05,radius:16,count:1,air:false,targetsAir:false,color:'#efc577',desc:'攻守の基準になる剣士。盾役の後ろで前線を押し上げる。'},
-  knight:{id:'knight',mass:6,name:'アイアン衛士',short:'衛士',role:'近接タンク',cost:4,hp:1850,damage:98,speed:35,range:36,cooldown:1.35,radius:23,count:1,air:false,targetsAir:false,color:'#a7b9c3',desc:'高い体力で攻撃を受け止める。後ろに弓兵や術師を重ねよう。'},
+  blade: {id:'blade',mass:2,name:'アッシュ剣士',short:'剣士',role:'近接アタッカー',cost:2,hp:780,damage:112,speed:56,range:34,cooldown:1.05,radius:16,count:1,air:false,targetsAir:false,color:'#efc577',desc:'攻守の基準になる剣士。盾役の後ろで前線を押し上げる。'},
+  knight:{id:'knight',mass:6,name:'アイアン衛士',short:'衛士',role:'近接タンク',cost:3,hp:1850,damage:98,speed:35,range:36,cooldown:1.35,radius:23,count:1,air:false,targetsAir:false,color:'#a7b9c3',desc:'高い体力で攻撃を受け止める。後ろに弓兵や術師を重ねよう。'},
   archer:{id:'archer',mass:1.2,name:'リーフ弓兵',short:'弓兵',role:'遠距離・対空',cost:3,hp:430,damage:86,speed:50,range:185,cooldown:1.15,radius:14,count:1,air:false,targetsAir:true,projectile:'arrow',color:'#a6ca8b',desc:'離れた敵と飛行ユニットを狙える。前衛で守ると長く働く。'},
   mage:{id:'mage',mass:1.6,name:'ルーン術師',short:'術師',role:'範囲攻撃・対空',cost:4,hp:480,damage:105,speed:44,range:158,cooldown:1.5,radius:15,count:1,air:false,targetsAir:true,projectile:'orb',splash:54,color:'#b9a0ef',desc:'魔力弾が周囲にもダメージ。密集した敵やコウモリに有効。'},
   spear:{id:'spear',mass:1.2,name:'スパーク槍兵',short:'槍兵',role:'中距離・低コスト',cost:2,hp:410,damage:82,speed:64,range:68,cooldown:0.9,radius:14,count:1,air:false,targetsAir:false,color:'#f6a98d',desc:'長い槍で剣士より少し離れて攻撃。素早い援軍や防衛に。'},
   bat:{id:'bat',mass:0.6,name:'ムーンバット',short:'バット',role:'飛行・3体編成',cost:2,hp:145,damage:46,speed:82,range:28,cooldown:0.85,radius:11,count:3,air:true,targetsAir:true,color:'#b7a7dc',desc:'3体で出撃し、川を飛び越える。対空できない敵に強い。'},
   bomber:{id:'bomber',mass:2,name:'ポット爆弾兵',short:'爆弾兵',role:'地上範囲攻撃',cost:3,hp:470,damage:174,speed:42,range:145,cooldown:1.8,radius:16,count:1,air:false,targetsAir:false,projectile:'bomb',splash:66,color:'#edaa66',desc:'爆弾で地上の密集を崩す。空中の敵には攻撃できない。'},
-  cannon:{id:'cannon',mass:1000000,name:'ボルト砲台',short:'砲台',role:'防衛建物・耐久減衰',cost:4,hp:1080,damage:140,speed:0,range:218,cooldown:1.4,radius:24,count:1,air:false,targetsAir:false,projectile:'shell',building:true,decayPerSecond:30,color:'#8dbfb3',desc:'動かない防衛建物。最大HPは1080のまま、設置後は毎秒30ずつ耐久が減り、攻撃を受けなくても約36秒で崩れる。'},
+  cannon:{id:'cannon',mass:1000000,name:'ボルト砲台',short:'砲台',role:'防衛建物・耐久減衰',cost:3,hp:1080,damage:140,speed:0,range:218,cooldown:1.4,radius:24,count:1,air:false,targetsAir:false,projectile:'shell',building:true,decayPerSecond:30,color:'#8dbfb3',desc:'動かない防衛建物。最大HPは1080のまま、設置後は毎秒30ずつ耐久が減り、攻撃を受けなくても約36秒で崩れる。'},
   golem:{id:'golem',mass:16,name:'ストーンゴーレム',short:'ゴーレム',role:'建物特攻・分裂',cost:8,hp:2850,damage:288,speed:21,range:42,cooldown:1.85,radius:30,count:1,air:false,targetsAir:false,buildingOnly:true,deathDamage:180,deathRadius:75,splitType:'mini_golem',splitCount:2,color:'#8ea37d',desc:'建物だけを狙う大型兵。本体HPは2850へ調整。倒されるとちびゴーレム2体へ分裂し、死亡時に周囲へ180ダメージ。'},
-  berserker:{id:'berserker',mass:8.2,name:'クラッグバーサーカー',short:'クラッグ',role:'重量アタッカー・高火力',cost:6,hp:1950,damage:360,speed:32,range:40,cooldown:1.6,radius:24,count:1,air:false,targetsAir:false,color:'#b96550',desc:'巨大な戦槌を振るう重量級アタッカー。ゴーレムほど硬くない代わりに、地上の大型兵を真正面から削る高火力を持つ。'},
+  berserker:{id:'berserker',mass:8.2,name:'クラッグバーサーカー',short:'クラッグ',role:'重量アタッカー・高火力',cost:7,hp:2450,damage:465,speed:32,range:40,cooldown:1.6,radius:24,count:1,air:false,targetsAir:false,color:'#b96550',desc:'巨大な戦槌を振るう7コスト重量級アタッカー。HP2450と攻撃465で、地上の大型兵を真正面から削る切り札。'},
   mini_golem:{id:'mini_golem',hidden:true,mass:5.3,name:'ちびゴーレム',short:'ちび',role:'建物特攻・分裂後',cost:0,hp:1050,damage:96,speed:28,range:32,cooldown:1.55,radius:18,count:1,air:false,targetsAir:false,buildingOnly:true,deathDamage:60,deathRadius:45,color:'#9aa88a',desc:'ストーンゴーレムが倒れた後に2体現れる小型体。HP1050・攻撃96を持ち、死亡時に周囲へ60ダメージ。'},
   boar:{id:'boar',mass:9.5,name:'アイアンボア',short:'ボア',role:'建物突撃・チャージ',cost:4,hp:980,damage:178,speed:78,range:28,cooldown:1.05,radius:18,count:1,air:false,targetsAir:false,buildingOnly:true,chargeDistance:105,chargeMultiplier:2.25,shovePower:14,shoveMassLimit:2.2,shoveCompression:.62,color:'#b4785f',desc:'敵兵を無視して建物へ突進。軽量な地上兵を押しのけながら進み、105px走ると最初の体当たりが2.25倍になる。'},
+  tigger:{id:'tigger',mass:1.8,name:'穴掘りティガー',short:'ティガー',role:'奇襲・地下移動',cost:3,hp:1100,damage:15,speed:56,range:30,cooldown:.82,radius:16,count:1,air:false,targetsAir:false,tunnelAnywhere:true,burrowMin:.9,burrowMax:2.8,burrowBase:.55,burrowSpeedDivisor:380,color:'#c08a52',desc:'戦場の好きな地上地点を指定し、自軍中央本拠地から地下を掘って移動する奇襲兵。攻撃は15と低いが、潜行中は完全に攻撃対象外。地下移動はv15でやや遅くなり、遠い地点ほど到着に時間がかかる。'},
+  muddragon:{id:'muddragon',mass:4.8,name:'マッドドラゴン',short:'泥竜',role:'空中範囲・泥沼制圧',cost:5,hp:2000,damage:200,speed:36,range:78,cooldown:1.6,radius:22,count:1,air:true,targetsAir:true,projectile:'mud',splash:45,mudRadius:45,mudDuration:2,mudTickEvery:.5,mudDamage:30,mudSlow:.70,color:'#8b7657',desc:'少し遅い飛行ドラゴン。v15で射程を約半分の78へ短縮。地上・空中へ半径45の範囲攻撃を行い、着弾地点に2秒間の泥沼を残す。泥沼は地上兵だけに30ダメージの継続攻撃と30%移動低下を与える。'},
   nightshade:{id:'nightshade',mass:1.05,name:'ナイトシェイド',short:'シェイド',role:'暗殺・無敵突進',cost:3,hp:520,damage:228,speed:88,range:30,cooldown:.82,radius:13,count:1,air:false,targetsAir:false,aggroRange:105,dashAggroRange:105,dashWindup:.6,dashMinRange:80,dashMaxRange:205,dashSpeed:650,dashMultiplier:2,dashCooldown:4,color:'#6f668f',desc:'近づいた敵や建物を捉えると0.6秒溜め、影の突進を行う。突進中は無敵で、到達時に通常の2倍ダメージ。その後は通常攻撃し、突進は4秒で再使用できる。'},
   mossling:{id:'mossling',mass:.45,name:'モスリング隊',short:'モス隊',role:'群体・5体編成',cost:3,hp:155,damage:45,speed:72,range:21,cooldown:.8,radius:9,count:5,air:false,targetsAir:false,color:'#8fb56b',desc:'小さな森の精霊5体で取り囲む群体。単体攻撃の大型に強いが、爆弾や範囲魔法にはとても弱い。'},
+  boneswarm:{id:'boneswarm',mass:.20,name:'ボーンスウォーム',short:'ボーン隊',role:'群体・12体編成',cost:4,hp:45,damage:42,speed:78,range:19,cooldown:.72,radius:7,count:12,air:false,targetsAir:false,color:'#d9d2b5',desc:'HP45の小さな骨兵12体で大型を包囲する超群体。1体ずつは紙のように脆いが、単体攻撃のゴーレムやクラッグにはめっぽう強い。範囲攻撃には極端に弱い。'},
   lumina:{id:'lumina',mass:1.4,name:'ルミナ司祭',short:'司祭',role:'回復支援・後衛',cost:4,hp:590,damage:38,speed:44,range:145,cooldown:1.55,radius:15,count:1,air:false,targetsAir:false,projectile:'light',healPower:115,healRange:128,healCooldown:1.25,color:'#e7dba8',desc:'弱い光弾を放ちながら、周囲で最も傷ついた味方ユニットを回復する。タンクと好相性だが暗殺者に狙われやすい。'},
   frost:{id:'frost',mass:1.5,name:'フロストシャーマン',short:'シャーマン',role:'妨害・減速',cost:4,hp:535,damage:74,speed:42,range:170,cooldown:1.4,radius:15,count:1,air:false,targetsAir:false,projectile:'frost',slowMove:.62,slowAttack:.72,slowDuration:3,color:'#9ccfe2',desc:'氷弾で地上の敵を減速。移動と攻撃のテンポを奪い、ボアのチャージも削るため大型・突進系への時間稼ぎに強い。'},
   harpy:{id:'harpy',mass:1.05,name:'ストームハーピー',short:'ハーピー',role:'空中遠距離・連鎖雷',cost:4,hp:505,damage:94,speed:64,range:175,cooldown:1.25,radius:16,count:1,air:true,targetsAir:true,projectile:'lightning',chainCount:3,chainRange:105,chainFalloff:.78,color:'#8fa9d8',desc:'空から雷を放ち、近くの敵へ最大3体まで連鎖する。群体に強いが、弓兵などの対空遠距離に弱い。'},
-  fireball:{id:'fireball',cardType:'spell',spell:'fireball',name:'ファイヤーボール',short:'火球',role:'呪文・範囲爆撃',cost:4,damage:560,buildingDamage:140,radius:90,count:0,targetsAir:true,color:'#ed7a47',desc:'戦場の好きな場所へ本拠地から火球を放つ。半径90に560ダメージ、建物には140。遠いほど着弾が遅く、追尾しないため偏差撃ちが必要。'}
+
+  blowdart:{id:'blowdart',mass:.9,name:'吹き矢ゴブリン',short:'吹き矢',role:'超長射程・高速対空',cost:3,hp:240,damage:110,speed:52,range:220,cooldown:.5,radius:12,count:1,air:false,targetsAir:true,projectile:'dart',color:'#8fbd63',desc:'HP240と非常に脆い代わりに、0.5秒ごとに110ダメージを放つ超長射程射手。橋を越えた直後からタワーを狙えるほど長い射程を持ち、地上・空中の両方に対応する。'},
+  lasertower:{id:'lasertower',mass:1000000,name:'レーザー塔',short:'レーザー塔',role:'防衛建物・単体増幅レーザー',cost:5,hp:2000,damage:20,speed:0,range:220,cooldown:.1,radius:26,count:1,air:false,targetsAir:true,building:true,laserTower:true,laserBaseDps:20,laserRampEvery:1.5,laserMultiplier:2,color:'#9c8ed0',desc:'同じ敵へ照射し続けるほど1.5秒ごとに威力が倍化する5コスト防衛建物。初期火力はボーン1体すらすぐ倒せないほど低いが、上限はない。対象が死亡・射程外・攻撃対象外になると次の対象へ切り替わり、火力は初期値へ戻る。'},
+  fireball:{id:'fireball',cardType:'spell',spell:'fireball',name:'ファイヤーボール',short:'火球',role:'呪文・範囲爆撃',cost:4,damage:560,buildingDamage:140,radius:90,count:0,targetsAir:true,color:'#ed7a47',desc:'戦場の好きな場所へ本拠地から火球を放つ。半径90に560ダメージ、建物には140。遠いほど着弾が遅く、追尾しないため偏差撃ちが必要。'},
+  poison:{id:'poison',cardType:'spell',spell:'poison',name:'ポイズントラップ',short:'ポイズン',role:'呪文・設置毒エリア',cost:3,damage:55,buildingDamage:10,radius:90,count:0,targetsAir:true,zoneDuration:6,tickEvery:.5,lingerDuration:3,lingerDamage:18,color:'#83a857',desc:'指定地点へ遅延なしで毒エリアを6秒設置。範囲内の敵へ継続ダメージを与え、離脱後も3秒毒が残る。建物にも低い継続ダメージが入る。'},
+  arrowrain:{id:'arrowrain',cardType:'spell',spell:'arrowrain',name:'矢の雨',short:'矢の雨',role:'呪文・広範囲一斉射撃',cost:3,damage:330,buildingDamage:80,radius:130,count:0,targetsAir:true,color:'#c89b68',desc:'ファイヤーボールより広い半径130へ矢を降らせる。威力は330と控えめだが着弾が速く、散らばった小型群体の緊急処理に向く。'}
 });
 const DECK = Object.freeze(Object.keys(UNITS).filter(id=>!UNITS[id].hidden));
 const UNIT_IDS = Object.freeze(DECK.filter(id=>!UNITS[id].spell));
 const SPELL_IDS = Object.freeze(DECK.filter(id=>!!UNITS[id].spell));
-const DEFAULT_DECK = Object.freeze(['knight','berserker','archer','fireball','frost','lumina']);
+const DEFAULT_DECK = Object.freeze(['knight','blowdart','archer','muddragon','lasertower','arrowrain','berserker','fireball']);
 const ROLE_ORDER = DECK;
 const TEAM_COLORS = ['#58b9ae','#ee9b81'];
 function normalizeDeck(value,{fallback=true}={}){
@@ -235,7 +260,7 @@ function normalizeDeck(value,{fallback=true}={}){
  * Ground bodies live on the lawn/bridges. Air bodies share a separate layer.
  * Buildings are static circles; tree/grass artwork is decorative only.
  */
-const PHYSICS_VERSION=7;
+const PHYSICS_VERSION=13;
 const FIELD={left:34,right:686,top:28,bottom:1012};
 const EPS=0.001,GRID=20,COLS=33,ROWS=49;
 const worldCaches=new WeakMap();
@@ -250,14 +275,19 @@ function deploymentAllowed(g,owner,x,y){
   if(owner!==0&&owner!==1)return false;
   if(owner===0&&y>=ARENA.deployBottom)return true;
   if(owner===1&&y<=ARENA.deployTop)return true;
-  const enemy=1-owner;
-  const laneX=x<=320?190:x>=400?530:null;
-  if(laneX===null)return false;
-  const fallen=g.towers?.find(t=>t.owner===enemy&&t.kind==='tower'&&t.x===laneX&&t.hp<=0);
-  if(!fallen)return false;
-  const inset=ARENA.advancedDeployInset||120;
-  // The attacker gains ground, but cannot deploy directly on the destroyed tower ruin.
-  return owner===0?y>=fallen.y+inset:y<=fallen.y-inset;
+  const enemy=1-owner,inset=ARENA.advancedDeployInset||120,centreHalf=ARENA.advancedCenterHalf||52;
+  const sides=(g.towers||[]).filter(t=>t.owner===enemy&&t.kind==='tower');
+  const fallen=sides.filter(t=>t.hp<=0);
+  if(!fallen.length)return false;
+  // Once both side towers are down, the enemy front half becomes one continuous deployment zone.
+  if(fallen.length>=2){
+    const line=owner===0?Math.max(...fallen.map(t=>t.y))+inset:Math.min(...fallen.map(t=>t.y))-inset;
+    return owner===0?y>=line:y<=line;
+  }
+  // One tower down: only that lane plus a narrow centre connector gains ground.
+  const t=fallen[0],left=t.x<360,laneOK=left?x<=320:x>=400,centreOK=Math.abs(x-360)<=centreHalf;
+  if(!laneOK&&!centreOK)return false;
+  return owner===0?y>=t.y+inset:y<=t.y-inset;
 }
 function pairDistance(a,b,soft=false){
   const sum=bodyRadius(a)+bodyRadius(b);
@@ -443,7 +473,7 @@ function projectStatic(g,u){
   }
 }
 function resolveBodies(g,dt=.1){
-  const units=g.units.filter(u=>u.hp>0);
+  const units=g.units.filter(u=>u.hp>0&&u.burrowState!=='burrow');
   for(const u of units)projectStatic(g,u);
   for(let pass=0;pass<4;pass++)for(let i=0;i<units.length;i++)for(let j=i+1;j<units.length;j++){
     const a=units[i],b=units[j];if(!sameLayer(a,b)||isStructure(a)||isStructure(b))continue;
@@ -508,7 +538,7 @@ function random(g){
 function shuffled(g,source=DEFAULT_DECK){const a=[...source];for(let i=a.length-1;i>0;i--){const j=Math.floor(random(g)*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function validateDeck(value){return normalizeDeck(value,{fallback:false});}
 function createMatch({seed=12345,bot=false,difficulty='normal',decks=[DEFAULT_DECK,DEFAULT_DECK]}={}){
-  const g={physicsVersion:PHYSICS_VERSION,phase:'countdown',countdown:3,time:0,overtime:false,rng:seed||1,units:[],projectiles:[],events:[],nextId:1,step:0,
+  const g={physicsVersion:PHYSICS_VERSION,phase:'countdown',countdown:3,time:0,overtime:false,rng:seed||1,units:[],projectiles:[],zones:[],events:[],nextId:1,step:0,
     winner:null,reason:'',bot,difficulty,botNext:1.5,
     players:[{energy:5,hand:[],queue:[],deck:[]},{energy:5,hand:[],queue:[],deck:[]}],towers:[]};
   const safeDecks=[normalizeDeck(decks?.[0]),normalizeDeck(decks?.[1])];
@@ -538,6 +568,13 @@ function canPlace(g,owner,id,x,y){
     if(!core)return '本拠地が破壊されているため呪文を使えません。';
     return null;
   }
+  if(d.tunnelAnywhere){
+    const core=g.towers.find(t=>t.owner===owner&&t.kind==='core'&&t.hp>0);
+    if(!core)return '本拠地が破壊されているため地下移動できません。';
+    if(g.units.filter(u=>u.hp>0).length+1>ARENA.maxUnits)return 'フィールドのユニット上限です。';
+    if(!staticFree(g,d,{x,y},1))return '水上や建物の中には出現できません。少し離してください。';
+    return null;
+  }
   if(!deploymentAllowed(g,owner,x,y))return '自分の陣地、または破壊した敵サイドタワー側の前線に配置してください。';
   if(g.units.filter(u=>u.hp>0).length+d.count>ARENA.maxUnits)return 'フィールドのユニット上限です。';
   if(!staticFree(g,d,{x,y},1))return '建物や岸から少し離して配置してください。';
@@ -555,18 +592,35 @@ function makeUnit(g,owner,type,x,y){
     lane:x<360?190:530,age:0,facing:owner===0?-Math.PI/2:Math.PI/2,moving:false};
 }
 function fireballTravelTime(core,target){return clamp(.45+distance(core,target)/620,.6,2);}
+function arrowRainTravelTime(core,target){return clamp(.2+distance(core,target)/1150,.35,1);}
+function burrowTravelTime(d,core,target){return clamp((d.burrowBase??.45)+distance(core,target)/(d.burrowSpeedDivisor||500),d.burrowMin??.7,d.burrowMax??2.2);}
 function castSpell(g,owner,id,x,y){
   const err=canPlace(g,owner,id,x,y);if(err)return {ok:false,error:err};
-  const d=UNITS[id],core=g.towers.find(t=>t.owner===owner&&t.kind==='core'&&t.hp>0),travel=fireballTravelTime(core,{x,y});
+  const d=UNITS[id],core=g.towers.find(t=>t.owner===owner&&t.kind==='core'&&t.hp>0);
   spendCard(g,owner,id);
-  g.projectiles.push({id:`p${g.nextId++}`,owner,kind:'fireball',spell:'fireball',x:core.x,y:core.y,sx:core.x,sy:core.y,tx:x,ty:y,
+  if(d.spell==='poison'){
+    g.zones??=[];
+    g.zones.push({id:`z${g.nextId++}`,owner,kind:'poison',spell:'poison',x,y,radius:d.radius,remaining:d.zoneDuration,total:d.zoneDuration,
+      tickEvery:d.tickEvery,nextTick:g.time,damage:d.damage,buildingDamage:d.buildingDamage,lingerDuration:d.lingerDuration,lingerDamage:d.lingerDamage});
+    event(g,'poison-deploy',{x,y,owner,radius:d.radius});
+    return {ok:true,spell:true,travelTime:0};
+  }
+  const arrow=d.spell==='arrowrain',travel=arrow?arrowRainTravelTime(core,{x,y}):fireballTravelTime(core,{x,y});
+  g.projectiles.push({id:`p${g.nextId++}`,owner,kind:arrow?'arrowrain':'fireball',spell:d.spell,x:core.x,y:core.y,sx:core.x,sy:core.y,tx:x,ty:y,
     total:travel,remaining:travel,progress:0,damage:d.damage,buildingDamage:d.buildingDamage,splash:d.radius,targetsAir:true,life:travel+.2});
-  event(g,'fireball-launch',{x:core.x,y:core.y,tx:x,ty:y,owner,travel});
+  event(g,arrow?'arrowrain-launch':'fireball-launch',{x:core.x,y:core.y,tx:x,ty:y,owner,travel});
   return {ok:true,spell:true,travelTime:travel};
 }
 function deploy(g,owner,id,x,y){
   const err=canPlace(g,owner,id,x,y);if(err)return {ok:false,error:err};
   const d=UNITS[id];if(d.spell)return castSpell(g,owner,id,x,y);
+  if(d.tunnelAnywhere){
+    const core=g.towers.find(t=>t.owner===owner&&t.kind==='core'&&t.hp>0),travel=burrowTravelTime(d,core,{x,y});
+    spendCard(g,owner,id);
+    const u=makeUnit(g,owner,id,core.x,core.y);u.spawn=0;u.targetable=false;u.burrowState='burrow';u.burrowFrom={x:core.x,y:core.y};u.burrowTo={x,y};u.burrowTotal=travel;u.burrowRemaining=travel;u.burrowProgress=0;
+    g.units.push(u);event(g,'burrow-start',{x:core.x,y:core.y,tx:x,ty:y,owner,travel});
+    return {ok:true,burrow:true,travelTime:travel};
+  }
   const positions=spawnPositions(g,owner,d,x,y);spendCard(g,owner,id);
   for(let i=0;i<d.count;i++){
     const u=makeUnit(g,owner,id,positions[i].x,positions[i].y);
@@ -575,14 +629,36 @@ function deploy(g,owner,id,x,y){
   return {ok:true};
 }
 function alive(g){return [...g.units,...g.towers].filter(v=>v.hp>0);}
-function targetable(source,target){return target.owner!==source.owner&&target.hp>0&&(!target.air||source.targetsAir);}
+function targetable(source,target){return target.owner!==source.owner&&target.hp>0&&target.targetable!==false&&(!target.air||source.targetsAir);}
+function lockedStructureTarget(u,entities){
+  if(!(u.kind||u.building)||!u.target)return null;
+  const t=entities.find(e=>e.id===u.target);
+  if(!t||!targetable(u,t))return null;
+  return distance(u,t)<=u.range+t.radius?t:null;
+}
+function nearestStructureTarget(u,entities){
+  let best=null,bestD=Infinity;
+  for(const t of entities){
+    if(!targetable(u,t))continue;
+    const d=distance(u,t);
+    if(d<=u.range+t.radius&&d<bestD){best=t;bestD=d;}
+  }
+  return best;
+}
 function preferredTower(g,u){
   const enemy=1-u.owner;
   const out=g.towers.find(t=>t.owner===enemy&&t.kind==='tower'&&t.x===u.lane&&t.hp>0);
   return out||g.towers.find(t=>t.owner===enemy&&t.kind==='core'&&t.hp>0);
 }
 function getTarget(g,u,entities){
-  // Building-only units ignore troops completely and march toward the nearest enemy structure.
+  // Defensive structures lock their current target until it dies, leaves range, or becomes untargetable.
+  // A closer enemy entering range does not steal aggro mid-lock.
+  if(u.kind||u.building){
+    const locked=lockedStructureTarget(u,entities);
+    if(locked)return locked;
+    return nearestStructureTarget(u,entities);
+  }
+  // Building-only mobile units ignore troops completely and march toward the nearest enemy structure.
   if(u.buildingOnly){
     let best=null,bestD=Infinity;
     for(const t of entities){
@@ -653,6 +729,14 @@ function updateShadowRush(g,u,entities,dt){
   }
   return false;
 }
+function updateBurrow(g,u,dt){
+  if(u.burrowState!=='burrow')return false;
+  u.moving=false;u.target=null;u.targetable=false;u.burrowRemaining=Math.max(0,(u.burrowRemaining||0)-dt);
+  const total=Math.max(.001,u.burrowTotal||1),progress=clamp(1-u.burrowRemaining/total,0,1);u.burrowProgress=progress;
+  const a=u.burrowFrom||u,b=u.burrowTo||u;u.x=a.x+(b.x-a.x)*progress;u.y=a.y+(b.y-a.y)*progress;
+  if(u.burrowRemaining<=1e-8){u.x=b.x;u.y=b.y;u.burrowState=null;u.targetable=true;u.spawn=.25;event(g,'burrow-arrive',{x:u.x,y:u.y,owner:u.owner});}
+  return true;
+}
 function canRushAfterWindup(g,u,t){
   const gap=Math.max(0,distance(u,t)-(u.range+t.radius));
   if(gap>(u.dashMaxRange||Infinity)+35)return false;
@@ -662,8 +746,9 @@ function move(g,u,t,dt){
   if(!u.speed)return;
   const dest=navigationWaypoint(g,u,t,u.range+t.radius);
   const start={x:u.x,y:u.y};
-  const moveFactor=(u.slowUntil||0)>g.time?(u.slowMoveFactor||1):1;
-  const moved=moveBody(g,u,dest,dt*moveFactor);
+  const frostFactor=(u.slowUntil||0)>g.time?(u.slowMoveFactor||1):1;
+  const mudFactor=(u.mudUntil||0)>g.time?(u.mudSlowFactor||1):1;
+  const moved=moveBody(g,u,dest,dt*frostFactor*mudFactor);
   if(moved>.025){
     faceToward(u,u.x+(u.x-start.x),u.y+(u.y-start.y));u.walk+=moved/Math.max(1,u.speed)*7;u.moving=true;
     if(u.chargeDistance&&u.buildingOnly){
@@ -712,7 +797,7 @@ function handleUnitDeath(g,t){
   if(t.splitType&&t.splitCount)summonMiniGolems(g,t);
 }
 function damage(g,t,amount,owner){
-  if(t.hp<=0)return 0;
+  if(t.hp<=0||t.burrowState==='burrow')return 0;
   if((t.invulnerableUntil||0)>g.time){if(t.type==='nightshade')event(g,'shadow-evade',{x:t.x,y:t.y,owner:t.owner});return 0;}
   const before=t.hp;t.hp=Math.max(0,t.hp-amount);t.hit=.18;
   if(t.kind==='core'&&t.hp<before)wakeCore(g,t.owner,'core-hit');
@@ -744,13 +829,61 @@ function applySlow(g,t,p){
   }
   event(g,'slow',{x:t.x,y:t.y,owner:p.owner});
 }
-function fireballImpact(g,p){
-  event(g,'fireball-impact',{x:p.tx,y:p.ty,owner:p.owner,radius:p.splash,damage:p.damage});
+function spellAreaImpact(g,p,type){
+  event(g,type==='arrowrain'?'arrowrain-impact':'fireball-impact',{x:p.tx,y:p.ty,owner:p.owner,radius:p.splash,damage:p.damage});
   const centre={x:p.tx,y:p.ty};
   for(const t of [...alive(g)]){
     if(t.owner===p.owner||t.hp<=0)continue;
     if(distance(centre,t)>p.splash+(t.radius||12)*.35)continue;
     damage(g,t,(t.kind||t.building)?p.buildingDamage:p.damage,p.owner);
+  }
+}
+function insideEnemyPoison(g,t,owner){
+  return (g.zones||[]).some(z=>z.kind==='poison'&&z.owner===owner&&z.remaining>0&&distance(z,t)<=z.radius+(t.radius||12)*.25);
+}
+function updatePoisonZones(g,dt){
+  g.zones??=[];
+  const entities=alive(g);
+  for(const z of g.zones){
+    if(z.kind!=='poison')continue;
+    z.remaining=Math.max(0,z.remaining-dt);
+    while(z.remaining>0&&z.nextTick<=g.time+1e-8){
+      for(const t of entities){
+        if(t.owner===z.owner||t.hp<=0||distance(z,t)>z.radius+(t.radius||12)*.25)continue;
+        damage(g,t,(t.kind||t.building)?z.buildingDamage:z.damage,z.owner);
+        if(!t.kind&&!t.building&&t.hp>0){
+          t.poisonOwner=z.owner;t.poisonUntil=Math.max(t.poisonUntil||0,g.time+z.lingerDuration);
+          t.poisonDamage=Math.max(t.poisonDamage||0,z.lingerDamage);t.poisonTickEvery=z.tickEvery;
+          t.poisonNextAt=Math.max(t.poisonNextAt||0,g.time+z.tickEvery);
+        }
+      }
+      z.nextTick+=z.tickEvery;
+    }
+  }
+  g.zones=g.zones.filter(z=>z.remaining>1e-8);
+}
+function decayMudZones(g,dt){for(const z of g.zones||[])if(z.kind==='mud')z.remaining=Math.max(0,z.remaining-dt);g.zones=(g.zones||[]).filter(z=>z.remaining>1e-8);}
+function updateLingeringPoison(g,t){
+  if(t.hp<=0||t.kind||t.building||!(t.poisonUntil>g.time)||!Number.isFinite(t.poisonOwner))return;
+  if(insideEnemyPoison(g,t,t.poisonOwner))return;
+  const every=t.poisonTickEvery||.5;
+  while((t.poisonNextAt||0)<=g.time+1e-8&&t.poisonUntil>=(t.poisonNextAt||0)-1e-8){
+    damage(g,t,t.poisonDamage||18,t.poisonOwner);t.poisonNextAt=(t.poisonNextAt||g.time)+every;
+    if(t.hp<=0)break;
+  }
+}
+function createMudZone(g,p){
+  if(!p.mudRadius||!p.mudDuration)return;
+  g.zones??=[];g.zones.push({id:`z${g.nextId++}`,owner:p.owner,kind:'mud',x:p.x,y:p.y,radius:p.mudRadius,remaining:p.mudDuration,total:p.mudDuration,tickEvery:p.mudTickEvery||.5,damage:p.mudDamage||30,slow:p.mudSlow||.7});
+  event(g,'mud-deploy',{x:p.x,y:p.y,owner:p.owner,radius:p.mudRadius});
+}
+function updateMudZones(g){
+  const zones=(g.zones||[]).filter(z=>z.kind==='mud'&&z.remaining>0);if(!zones.length)return;
+  for(const t of alive(g)){
+    if(t.hp<=0||t.kind||t.building||t.air||t.burrowState==='burrow')continue;
+    const z=zones.find(q=>q.owner!==t.owner&&distance(q,t)<=q.radius+(t.radius||12)*.25);if(!z)continue;
+    t.mudUntil=Math.max(t.mudUntil||0,g.time+Math.min(.55,z.remaining));t.mudSlowFactor=Math.min(t.mudSlowFactor||1,z.slow||.7);
+    if((t.mudNextAt??-Infinity)<=g.time+1e-8){damage(g,t,z.damage||30,z.owner);t.mudNextAt=g.time+(z.tickEvery||.5);}
   }
 }
 function impact(g,p,entities){
@@ -768,6 +901,7 @@ function impact(g,p,entities){
   }else if(p.splash){
     event(g,'blast',{x:p.x,y:p.y,owner:p.owner,radius:p.splash,color:p.kind});
     for(const t of entities)if(targetable(p,t)&&distance(t,p)<=p.splash+t.radius*.35)damage(g,t,p.damage,p.owner);
+    createMudZone(g,p);
   }else if(target&&targetable(p,target)){damage(g,target,p.damage,p.owner);applySlow(g,target,p);}
 }
 function attack(g,u,t){
@@ -780,12 +914,28 @@ function attack(g,u,t){
   }
   if(u.projectile){
     g.projectiles.push({id:`p${g.nextId++}`,owner:u.owner,x:u.x,y:u.y-6,sx:u.x,sy:u.y,tx:t.x,ty:t.y,target:t.id,
-    kind:u.projectile,speed:u.projectile==='bomb'?220:(u.projectile==='lightning'?520:390),damage:amount,splash:u.splash||0,
+    kind:u.projectile,speed:u.projectile==='bomb'?220:(u.projectile==='lightning'?520:(u.projectile==='dart'?560:(u.projectile==='mud'?300:390))),damage:amount,splash:u.splash||0,
     targetsAir:u.targetsAir,life:3,slowMove:u.slowMove,slowAttack:u.slowAttack,slowDuration:u.slowDuration,
-    chainCount:u.chainCount,chainRange:u.chainRange,chainFalloff:u.chainFalloff});
+    chainCount:u.chainCount,chainRange:u.chainRange,chainFalloff:u.chainFalloff,mudRadius:u.mudRadius,mudDuration:u.mudDuration,mudTickEvery:u.mudTickEvery,mudDamage:u.mudDamage,mudSlow:u.mudSlow});
   }else{
     damage(g,t,amount,u.owner);event(g,'slash',{x:t.x,y:t.y,owner:u.owner,angle:Math.atan2(t.y-u.y,t.x-u.x),kind:u.type});
   }
+}
+function resetLaserTower(u){
+  u.laserTarget=null;u.laserLockTime=0;u.laserStage=0;u.laserDps=u.laserBaseDps||20;
+}
+function updateLaserTower(g,u,t,dt){
+  if(!u.laserTower)return false;
+  if(!t){resetLaserTower(u);u.target=null;return true;}
+  if(u.laserTarget!==t.id){
+    u.laserTarget=t.id;u.laserLockTime=0;u.laserStage=0;u.laserDps=u.laserBaseDps||20;
+    event(g,'laser-lock',{x:u.x,y:u.y,tx:t.x,ty:t.y,owner:u.owner});
+  }else u.laserLockTime=(u.laserLockTime||0)+dt;
+  const every=u.laserRampEvery||1.5,mult=u.laserMultiplier||2,stage=Math.max(0,Math.floor((u.laserLockTime+1e-9)/every));
+  if(stage!==(u.laserStage||0))event(g,'laser-ramp',{x:u.x,y:u.y,tx:t.x,ty:t.y,owner:u.owner,stage});
+  u.laserStage=stage;u.laserDps=(u.laserBaseDps||20)*Math.pow(mult,stage);u.target=t.id;u.anim=.12;faceToward(u,t.x,t.y);
+  damage(g,t,u.laserDps*dt,u.owner);
+  return true;
 }
 function healingPulse(g,u,entities){
   if(!u.healPower||u.healCd>0)return;
@@ -819,20 +969,26 @@ function runBot(g,owner=1){
   const p=g.players[owner],aff=p.hand.filter(id=>UNITS[id].cost<=p.energy);
   if(!aff.length)return;
   const enemies=g.units.filter(u=>u.owner!==owner&&u.hp>0),threat=enemies.filter(u=>(owner===1?u.y<450:u.y>590)).sort((a,b)=>distance(a,{x:360,y:owner===1?150:890})-distance(b,{x:360,y:owner===1?150:890}))[0];
-  if(aff.includes('fireball')&&threat){
-    const clustered=enemies.filter(u=>distance(u,threat)<=UNITS.fireball.radius+u.radius).length;
-    if(clustered>=2||threat.type==='frost'||threat.type==='lumina'){
-      deploy(g,owner,'fireball',threat.x,threat.y);return;
-    }
+  if(threat){
+    const fireCluster=enemies.filter(u=>distance(u,threat)<=UNITS.fireball.radius+u.radius).length;
+    const arrowCluster=enemies.filter(u=>distance(u,threat)<=UNITS.arrowrain.radius+u.radius).length;
+    if(aff.includes('poison')&&(threat.type==='boneswarm'||fireCluster>=4)){deploy(g,owner,'poison',threat.x,threat.y);return;}
+    if(aff.includes('arrowrain')&&arrowCluster>=3){deploy(g,owner,'arrowrain',threat.x,threat.y);return;}
+    if(aff.includes('fireball')&&(fireCluster>=2||threat.type==='frost'||threat.type==='lumina')){deploy(g,owner,'fireball',threat.x,threat.y);return;}
   }
   let choices=aff.filter(id=>!UNITS[id].spell);if(!choices.length){
     const target=threat||g.towers.find(t=>t.owner!==owner&&t.kind==='tower'&&t.hp>0)||g.towers.find(t=>t.owner!==owner&&t.kind==='core'&&t.hp>0);
-    if(target)deploy(g,owner,'fireball',target.x,target.y);return;
+    const spell=aff.includes('arrowrain')?'arrowrain':aff.includes('fireball')?'fireball':aff.includes('poison')?'poison':null;
+    if(target&&spell)deploy(g,owner,spell,target.x,target.y);return;
   }
   if(threat?.air&&choices.some(id=>UNITS[id].targetsAir))choices=choices.filter(id=>UNITS[id].targetsAir);
   else if(!threat&&p.energy<7&&g.difficulty!=='hard'&&random(g)<.5)return;
   let id=choices[Math.floor(random(g)*choices.length)];
   if(!threat&&id==='cannon'&&choices.length>1)id=choices.find(k=>k!=='cannon')||id;
+  if(id==='tigger'){
+    const target=g.towers.filter(t=>t.owner!==owner&&t.hp>0).sort((a,b)=>(a.kind==='core')-(b.kind==='core')||a.hp-b.hp)[0];
+    if(target){const y=clamp(target.y+(owner===1?-1:1)*(target.radius+34),60,980),x=clamp(target.x+(random(g)-.5)*70,55,665);if(deploy(g,owner,id,x,y).ok)return;}
+  }
   const lane=threat?(threat.x<360?190:530):(random(g)<.5?190:530),baseY=owner===1?(threat?360:145):(threat?680:895);
   for(let i=0;i<8;i++){
     const x=clamp(lane+(random(g)-.5)*110,65,655),y=clamp(baseY+(random(g)-.5)*100,65,975);
@@ -851,6 +1007,7 @@ function tick(g,dt=ARENA.tick){
   g.time+=dt;g.step++;
   for(const p of g.players)p.energy=Math.min(10,p.energy+dt*(g.time>=120?1.25:.625));
   g.events=g.events.map(e=>({...e,life:e.life-dt})).filter(e=>e.life>0);
+  g.zones??=[];updatePoisonZones(g,dt);decayMudZones(g,dt);updateMudZones(g);
   refreshCoreWake(g);
   if(g.bot&&g.time>=g.botNext){
     runBot(g,1);g.botNext=g.time+(g.difficulty==='easy'?2.6:g.difficulty==='hard'?.65:1.3)+random(g)*.7;
@@ -861,18 +1018,24 @@ function tick(g,dt=ARENA.tick){
     if(u.hp<=0)continue;
     u.moving=false;
     u.hit=Math.max(0,(u.hit||0)-dt);u.anim=Math.max(0,(u.anim||0)-dt);u.cd=Math.max(0,u.cd-dt);u.healCd=Math.max(0,(u.healCd||0)-dt);
+    updateLingeringPoison(g,u);if(u.hp<=0)continue;
     if(u.kind==='core'&&!u.awake){u.target=null;continue;}
     if(!u.kind){
       u.age+=dt;
+      if(updateBurrow(g,u,dt))continue;
       if(u.spawn>0){u.spawn=Math.max(0,u.spawn-dt);continue;}
       if(u.decayPerSecond){decayStructure(g,u,u.decayPerSecond*dt);if(u.hp<=0)continue;}
     }
     if(updateShadowRush(g,u,entities,dt))continue;
     healingPulse(g,u,entities);
     const target=getTarget(g,u,entities);
-    if(!target){u.target=null;continue;}
+    if(!target){if(u.laserTower)resetLaserTower(u);u.target=null;continue;}
     u.target=target.id;
     const reach=u.range+target.radius;
+    if(u.laserTower){
+      if(distance(u,target)<=reach)updateLaserTower(g,u,target,dt);else resetLaserTower(u);
+      continue;
+    }
     if(canShadowRush(g,u,target)){beginShadowWindup(g,u,target);continue;}
     if(distance(u,target)<=reach){
       faceToward(u,target.x,target.y);
@@ -881,10 +1044,10 @@ function tick(g,dt=ARENA.tick){
   }
   for(const p of g.projectiles){
     p.life-=dt;
-    if(p.spell==='fireball'){
+    if(p.spell==='fireball'||p.spell==='arrowrain'){
       p.remaining=Math.max(0,p.remaining-dt);p.progress=clamp(1-p.remaining/p.total,0,1);
       p.x=p.sx+(p.tx-p.sx)*p.progress;p.y=p.sy+(p.ty-p.sy)*p.progress;
-      if(p.remaining<=1e-8){p.x=p.tx;p.y=p.ty;fireballImpact(g,p);p.life=0;}
+      if(p.remaining<=1e-8){p.x=p.tx;p.y=p.ty;spellAreaImpact(g,p,p.spell);p.life=0;}
       continue;
     }
     const t=entities.find(e=>e.id===p.target&&e.hp>0);if(t){p.tx=t.x;p.ty=t.y;}
@@ -901,9 +1064,10 @@ function viewMatch(g,seat=0){
   const p=g.players[seat];
   return {physicsVersion:PHYSICS_VERSION,phase:g.phase,countdown:g.countdown,time:rnd(g.time),overtime:g.overtime,winner:g.winner,reason:g.reason,
     scores:[towerScore(g,0),towerScore(g,1)],energy:rnd(p.energy),hand:[...p.hand],next:p.queue[0],deck:[...p.deck],
-    units:g.units.map(u=>({id:u.id,type:u.type,owner:u.owner,x:rnd(u.x),y:rnd(u.y),hp:u.hp,maxHp:u.maxHp,radius:u.radius,air:u.air,building:!!u.building,anim:u.anim,hit:u.hit,walk:u.walk,spawn:u.spawn,face:u.face,facing:u.facing,moving:!!u.moving,mass:u.mass,age:u.age,charged:!!u.charged,chargeRun:rnd(u.chargeRun||0),slowed:(u.slowUntil||0)>g.time,slowRemaining:rnd(Math.max(0,(u.slowUntil||0)-g.time)),dashState:u.dashState||null,dashWindupRemaining:rnd(Math.max(0,(u.dashWindupUntil||0)-g.time)),dashCooldownRemaining:rnd(Math.max(0,(u.dashReadyAt||0)-g.time)),invulnerable:(u.invulnerableUntil||0)>g.time})),
+    units:g.units.map(u=>({id:u.id,type:u.type,owner:u.owner,x:rnd(u.x),y:rnd(u.y),hp:u.hp,maxHp:u.maxHp,radius:u.radius,air:u.air,building:!!u.building,anim:u.anim,hit:u.hit,walk:u.walk,spawn:u.spawn,face:u.face,facing:u.facing,moving:!!u.moving,mass:u.mass,age:u.age,target:u.target||null,laserStage:u.laserStage||0,laserDps:rnd(u.laserDps||0),laserLockTime:rnd(u.laserLockTime||0),charged:!!u.charged,chargeRun:rnd(u.chargeRun||0),slowed:(u.slowUntil||0)>g.time,slowRemaining:rnd(Math.max(0,(u.slowUntil||0)-g.time)),poisoned:(u.poisonUntil||0)>g.time,poisonRemaining:rnd(Math.max(0,(u.poisonUntil||0)-g.time)),mudded:(u.mudUntil||0)>g.time,mudRemaining:rnd(Math.max(0,(u.mudUntil||0)-g.time)),burrowState:u.burrowState||null,burrowProgress:rnd(u.burrowProgress||0),dashState:u.dashState||null,dashWindupRemaining:rnd(Math.max(0,(u.dashWindupUntil||0)-g.time)),dashCooldownRemaining:rnd(Math.max(0,(u.dashReadyAt||0)-g.time)),invulnerable:(u.invulnerableUntil||0)>g.time})),
     towers:g.towers.map(t=>({id:t.id,kind:t.kind,owner:t.owner,x:t.x,y:t.y,hp:t.hp,maxHp:t.maxHp,radius:t.radius,anim:t.anim,hit:t.hit,facing:t.facing,awake:t.kind==='core'?!!t.awake:true})),
     projectiles:g.projectiles.map(p=>({id:p.id,owner:p.owner,x:rnd(p.x),y:rnd(p.y),tx:rnd(p.tx),ty:rnd(p.ty),kind:p.kind,spell:p.spell||null,progress:rnd(p.progress||0),radius:p.splash||0})),
+    zones:(g.zones||[]).map(z=>({id:z.id,owner:z.owner,kind:z.kind,spell:z.spell,x:rnd(z.x),y:rnd(z.y),radius:z.radius,remaining:rnd(z.remaining),total:z.total})),
     events:g.events.map(e=>({...e})),bot:g.bot,difficulty:g.difficulty};
 }
 
@@ -1045,6 +1209,69 @@ function drawIronBoar(c,opts={}){
   c.restore();
 }
 
+function drawTigger(c,opts={}){
+  const t=opts.time||0,walk=opts.walk||0,attack=opts.anim||0,moving=opts.moving??walk!==0,back=!!opts.back;
+  const ink='#26383a',fur='#a96f48',fur2='#d59a63',leather='#6f5946',metal='#7f9992',lamp='#f7db78',team=TEAM_COLORS[opts.owner||0];
+  const bob=(moving?Math.sin(walk*1.15)*1.4:Math.sin(t*2.4)*.4),sw=attack?Math.sin((1-attack/.35)*Math.PI):0;
+  c.save();c.translate(0,bob);
+  for(const side of [-1,1]){c.save();c.translate(side*7,-6);c.rotate(Math.sin(walk+(side>0?Math.PI:0))*(moving?.42:0));rr(c,-5,0,10,15,4,leather,ink);rr(c,-6,11,12,6,3,'#3b403a',ink);c.restore();}
+  // compact digging rig and backpack
+  rr(c,-15,-34,30,27,10,fur,ink);rr(c,-14,-31,28,7,3,team);
+  if(back){rr(c,-12,-31,24,20,6,'#705844',ink);rr(c,-7,-26,14,12,4,'#96704c',ink);line(c,-9,-26,9,-13,'#baa06f',2);}
+  else {path(c,[[-14,-34],[-6,-47],[7,-47],[15,-34],[12,-17],[-12,-17]],fur2,ink,1.5);ellipse(c,-5,-31,2.2,2.2,'#1d2928');ellipse(c,5,-31,2.2,2.2,'#1d2928');ellipse(c,0,-23,5,3,'#5b3d31');}
+  // miner helmet and head lamp
+  path(c,[[-14,-42],[-9,-55],[0,-61],[10,-55],[15,-42]],metal,ink,1.7);rr(c,-16,-44,32,6,3,'#536c69',ink);ellipse(c,0,-51,5,5,lamp);ellipse(c,0,-51,2,2,'#fff6c6');
+  // shovel/claw arms; swing downward on attack
+  for(const side of [-1,1]){c.save();c.translate(side*14,-29);c.rotate(side*(.35+sw*.55));line(c,0,0,side*3,14,fur2,8);ellipse(c,side*3,14,4,4,fur2);c.translate(side*5,15);c.rotate(side*.4);path(c,[[-2,-1],[8,-8],[12,-5],[5,3],[10,8],[6,11],[-2,4]],'#9fb0a5',ink,1.2);c.restore();}
+  if(opts.hit){c.globalAlpha*=.45;ellipse(c,0,-28,23,30,'#fff2c0');}
+  c.restore();
+}
+
+function drawMudDragon(c,opts={}){
+  const t=opts.time||0,walk=opts.walk||0,attack=opts.anim||0,back=!!opts.back,team=TEAM_COLORS[opts.owner||0];
+  const ink='#283735',mud='#7e684d',mud2='#a18a67',belly='#b9aa7d',wing='#596b58',horn='#d9cf9c';
+  const flap=Math.sin(t*6+walk)*.32,bob=Math.sin(t*3)*1.6,blast=attack?Math.sin((1-attack/.35)*Math.PI):0;
+  c.save();c.translate(0,-18+bob);
+  // broad wings make the air silhouette distinct from the harpy
+  for(const side of [-1,1]){c.save();c.scale(side,1);c.rotate(flap);path(c,[[5,-28],[25,-47],[40,-42],[31,-25],[43,-12],[25,-15],[18,1],[8,-8]],wing,ink,1.5);path(c,[[11,-28],[27,-38],[20,-19]],'#819076',null);c.restore();}
+  ellipse(c,0,-22,20,29,mud);path(c,[[-14,-29],[-8,-48],[0,-56],[9,-48],[15,-29],[10,1],[0,10],[-10,1]],mud2,ink,1.7);ellipse(c,0,-6,10,15,belly);
+  if(back){for(const y of [-42,-32,-22,-12])path(c,[[-4,y],[0,y-6],[4,y]],'#536253',ink,.7);path(c,[[-6,5],[0,23],[6,5]],mud,ink,1.2);}
+  else {
+    path(c,[[-11,-47],[-5,-61],[0,-52],[6,-61],[12,-46]],mud2,ink,1.2);path(c,[[-10,-49],[-18,-58],[-15,-44]],horn,ink,1);path(c,[[10,-49],[18,-58],[15,-44]],horn,ink,1);
+    ellipse(c,-5,-43,2.2,2.2,'#e8d76f');ellipse(c,5,-43,2.2,2.2,'#e8d76f');
+    if(blast){c.save();c.globalAlpha=.8;ellipse(c,0,-33-blast*7,8+blast*5,5+blast*3,'#8f7a4f');ellipse(c,0,-35-blast*10,4+blast*3,3+blast*2,'#c2b27b');c.restore();}
+  }
+  rr(c,-12,-24,24,6,3,team,ink);if(opts.hit){c.globalAlpha*=.4;ellipse(c,0,-24,25,34,'#fff0ba');}c.restore();
+}
+
+function drawBlowdartGoblin(c,opts={}){
+  const t=opts.time||0,walk=opts.walk||0,attack=opts.anim||0,moving=opts.moving??walk!==0,back=!!opts.back;
+  const ink='#263738',skin='#77a953',skin2='#a8cf70',cloth='#4c5f43',wood='#b78c5e',team=TEAM_COLORS[opts.owner||0];
+  const bob=(moving?Math.sin(walk)*1.2:Math.sin(t*2.8)*.35),shoot=attack?Math.sin((1-attack/.35)*Math.PI):0;
+  c.save();c.translate(0,bob);
+  for(const side of [-1,1]){c.save();c.translate(side*5,-5);c.rotate(Math.sin(walk+(side>0?Math.PI:0))*(moving?.48:0));line(c,0,0,0,13,skin,6);rr(c,-4,10,9,5,2,ink);c.restore();}
+  rr(c,-11,-34,22,28,6,cloth,ink);rr(c,-11,-31,22,5,2,team);rr(c,-9,-15,18,5,2,'#775c3e',ink);
+  path(c,[[-12,-39],[-8,-52],[0,-57],[9,-52],[13,-39],[8,-29],[-8,-29]],skin2,ink,1.3);
+  path(c,[[-11,-48],[-20,-56],[-17,-41]],skin2,ink,1);path(c,[[11,-48],[20,-56],[17,-41]],skin2,ink,1);
+  if(back){rr(c,-9,-47,18,13,4,skin,ink);line(c,-7,-32,7,-12,'#c0a26a',2);path(c,[[-5,-12],[0,-5],[5,-12]],'#41533a',ink,1);}
+  else{ellipse(c,-4,-43,2,2,'#f8eea6');ellipse(c,4,-43,2,2,'#f8eea6');path(c,[[-5,-36],[0,-33],[5,-36]],null,ink,1);}
+  c.save();c.translate(-9,-30);c.rotate(-.18-shoot*.08);line(c,0,0,6,12,skin,6);ellipse(c,6,12,3,3,skin2);c.restore();
+  c.save();c.translate(8,-30);c.rotate(.12-shoot*.15);line(c,0,0,-3,10,skin,6);ellipse(c,-3,10,3,3,skin2);c.translate(-3,9);c.rotate(-.12);
+  rr(c,-2,-4,40,5,2,wood,ink);rr(c,31,-3,10,3,1,'#e5d2a1',ink);if(shoot)line(c,42,-1,58,-1,'#f5dfaa',1.5);c.restore();
+  rr(c,-14,-52,28,5,2,'#3f553a',ink);path(c,[[-9,-54],[-4,-64],[0,-55],[5,-65],[10,-54]],'#658849',ink,1);
+  if(opts.hit){c.globalAlpha*=.48;ellipse(c,0,-31,18,27,'#fff1c4');}c.restore();
+}
+
+function drawLaserTower(c,opts={}){
+  const t=opts.time||0,attack=opts.anim||0,team=TEAM_COLORS[opts.owner||0],ink='#23363f',stone='#6f7b82',stone2='#9aa4a2',glow='#c9b5ff';
+  c.save();ellipse(c,0,4,28,12,'#1d3540');path(c,[[-27,-2],[0,-15],[27,-2],[20,11],[0,19],[-20,11]],stone,ink,2);
+  path(c,[[-20,-28],[20,-28],[17,4],[0,12],[-17,4]],stone2,ink,2);rr(c,-18,-24,36,7,3,team,ink);
+  for(const x of [-13,13])rr(c,x-5,-35,10,15,3,'#58676c',ink);
+  c.save();c.translate(0,-31);c.rotate((opts.facing??-Math.PI/2)+Math.PI/2);path(c,[[-12,-7],[0,-21],[12,-7],[8,7],[-8,7]],'#70649a',ink,1.5);ellipse(c,0,-8,7,11,glow,ink,1.3);ellipse(c,0,-10,3+Math.sin(t*6)*.5,5,'#f3ecff');c.restore();
+  if(attack){c.globalAlpha=.35+.25*Math.sin(t*20);ellipse(c,0,-39,18,18,'#c8b4ff66');}
+  if(opts.hit){c.globalAlpha*=.4;ellipse(c,0,-17,29,34,'#fff0cf');}c.restore();
+}
+
 function drawNightshade(c,opts={}){
   const t=opts.time||0,walk=opts.walk||0,attack=opts.anim||0,moving=opts.moving??walk!==0,back=!!opts.back;
   const ink='#1e2932',cloth='#343247',cloth2='#5b5276',accent='#8fe0b5',skin='#c49a82',team=TEAM_COLORS[opts.owner||0];
@@ -1085,6 +1312,28 @@ function drawMossling(c,opts={}){
   if(opts.hit){c.globalAlpha*=.55;ellipse(c,0,-14,13,17,'#f7f1c1');}c.restore();
 }
 
+
+function drawBoneSwarm(c,opts={}){
+  const t=opts.time||0,walk=opts.walk||0,attack=opts.anim||0,moving=opts.moving??walk!==0,back=!!opts.back;
+  const ink='#344047',bone='#e4ddc4',bone2='#b9b39e',dark='#61675f',team=TEAM_COLORS[opts.owner||0];
+  const bob=(moving?Math.sin(walk*1.4)*1.3:Math.sin(t*3)*.4),stab=attack?Math.sin((1-attack/.35)*Math.PI):0;
+  c.save();c.translate(0,bob);
+  // Thin articulated legs and pelvis make this read as a fragile bone construct, not a tiny humanoid skin.
+  for(const side of [-1,1]){c.save();c.translate(side*5,-5);c.rotate(Math.sin(walk+(side>0?Math.PI:0))*(moving?.45:0));line(c,0,0,side,12,bone2,3);rr(c,side>0?-1:-6,9,7,4,2,dark,ink);c.restore();}
+  path(c,[[-9,-22],[0,-27],[9,-22],[7,-11],[0,-7],[-7,-11]],bone2,ink,1.2);
+  line(c,0,-22,0,-38,bone,4);
+  for(const y of [-19,-15,-11]){line(c,-7,y,7,y,bone,2.5);line(c,-7,y,-10,y+3,bone2,1.5);line(c,7,y,10,y+3,bone2,1.5);}
+  rr(c,-8,-30,16,5,2,team,ink);
+  // Tiny chipped blade. Its short reach and low HP keep the swarm clearly disposable.
+  c.save();c.translate(10,-28);c.rotate(-.35-stab*.8);line(c,0,0,2,13,bone2,3);line(c,2,13,3,-7,'#9b9f91',2.5);path(c,[[3,-13],[-1,-5],[4,-6],[7,-4]],bone,ink,.8);c.restore();
+  c.save();c.translate(-9,-27);c.rotate(.2+stab*.3);line(c,0,0,-2,11,bone2,3);c.restore();
+  if(back){
+    ellipse(c,0,-46,10,9,bone2);rr(c,-8,-52,16,13,4,bone2,ink);line(c,0,-49,0,-39,dark,1.5);path(c,[[-5,-54],[0,-60],[5,-54]],team,ink,.8);
+  }else{
+    rr(c,-10,-55,20,18,6,bone,ink);ellipse(c,-4,-48,2.2,2.8,ink);ellipse(c,4,-48,2.2,2.8,ink);path(c,[[-4,-41],[0,-38],[4,-41]],null,dark,1.3);line(c,-7,-55,-2,-59,bone2,1.5);
+  }
+  if(opts.hit){c.globalAlpha*=.5;ellipse(c,0,-30,14,28,'#fff9df');}c.restore();
+}
 
 function drawKraggBerserker(c,opts={}){
   const t=opts.time||0,walk=opts.walk||0,attack=opts.anim||0,moving=opts.moving??walk!==0,back=!!opts.back;
@@ -1258,13 +1507,18 @@ function drawUnit(c,type,x,y,scale=1,opts={}){
   const moving=opts.moving??walk!==0,bob=Math.sin(walk)*1.5+(opts.idle?Math.sin(t*2)*.65:0);
   c.save();c.translate(x,y);c.scale(scale,scale);
   if(opts.alpha!=null)c.globalAlpha=opts.alpha;
-  if(!opts.noShadow){const sr=type==='golem'?32:type==='mini_golem'?20:type==='berserker'?27:type==='boar'?25:type==='knight'?23:type==='mossling'?12:type==='harpy'?20:18;ellipse(c,0,5,sr,type==='golem'?9:type==='mini_golem'?6:type==='boar'?8:6,'#172f3435');}
+  if(!opts.noShadow){const sr=type==='golem'?32:type==='mini_golem'?20:type==='berserker'?27:type==='boar'?25:type==='knight'?23:type==='mossling'?12:type==='boneswarm'?9:type==='tigger'?18:type==='muddragon'?26:type==='harpy'?20:18;ellipse(c,0,5,sr,type==='golem'?9:type==='mini_golem'?6:type==='boar'?8:6,'#172f3435');}
   if(opts.mirror)c.scale(-1,1);
   if(type==='golem'){drawStoneGolem(c,opts);c.restore();return;}
   if(type==='mini_golem'){c.scale(.62,.62);drawStoneGolem(c,opts);c.restore();return;}
   if(type==='boar'){drawIronBoar(c,opts);c.restore();return;}
+  if(type==='tigger'){drawTigger(c,opts);c.restore();return;}
+  if(type==='muddragon'){drawMudDragon(c,opts);c.restore();return;}
+  if(type==='blowdart'){drawBlowdartGoblin(c,opts);c.restore();return;}
+  if(type==='lasertower'){drawLaserTower(c,opts);c.restore();return;}
   if(type==='nightshade'){drawNightshade(c,opts);c.restore();return;}
   if(type==='mossling'){drawMossling(c,opts);c.restore();return;}
+  if(type==='boneswarm'){drawBoneSwarm(c,opts);c.restore();return;}
   if(type==='berserker'){drawKraggBerserker(c,opts);c.restore();return;}
   if(type==='lumina'){drawLumina(c,opts);c.restore();return;}
   if(type==='frost'){drawFrostShaman(c,opts);c.restore();return;}
@@ -1459,25 +1713,56 @@ function drawArena(canvas,snapshot,options={}){
   c.save();c.scale(canvas.width/720,canvas.height/1040);c.drawImage(terrainCache,0,0);
   const g=snapshot;if(!g){c.restore();return;}
   if(options.selected&&g.phase==='battle'&&!UNITS[options.selected].spell){
-    c.fillStyle='#4abdaf18';c.fillRect(46,600,628,382);
-    c.setLineDash([9,10]);line(c,46,600,674,600,'#d3eed788',2);c.setLineDash([]);
-    c.fillStyle='#e3f2d5';c.font='bold 13px sans-serif';c.textAlign='center';c.fillText('ここに配置',360,628);
-    const fallen=g.towers.filter(t=>t.owner!==seat&&t.kind==='tower'&&t.hp<=0).map(t=>orient(t,seat));
-    for(const t of fallen){
-      const left=t.x<360,x=left?46:400,w=274,top=Math.max(58,t.y+(ARENA.advancedDeployInset||120));
-      c.fillStyle='#d2ef9d20';c.fillRect(x,top,w,600-top);
-      c.setLineDash([6,7]);line(c,x,top,x+w,top,'#e8f5b8aa',1.5);c.setLineDash([]);
-      c.fillStyle='#edf7c7';c.font='bold 10px sans-serif';c.fillText('前線配置',left?183:537,Math.min(590,top+22));
+    const selectedData=UNITS[options.selected];
+    if(selectedData.tunnelAnywhere){
+      c.fillStyle='#a67f4a12';c.fillRect(46,46,628,936);c.setLineDash([7,8]);c.strokeStyle='#d9bd82aa';c.lineWidth=1.5;c.strokeRect(46,46,628,936);c.setLineDash([]);
+      c.fillStyle='#f2dfb9';c.font='bold 12px sans-serif';c.textAlign='center';c.fillText('地下出現地点を指定',360,74);
+    }else{
+      c.fillStyle='#4abdaf18';c.fillRect(46,600,628,382);
+      c.setLineDash([9,10]);line(c,46,600,674,600,'#d3eed788',2);c.setLineDash([]);
+      c.fillStyle='#e3f2d5';c.font='bold 13px sans-serif';c.textAlign='center';c.fillText('ここに配置',360,628);
+      const fallen=g.towers.filter(t=>t.owner!==seat&&t.kind==='tower'&&t.hp<=0).map(t=>orient(t,seat));
+      if(fallen.length>=2){
+        const top=Math.max(58,Math.max(...fallen.map(t=>t.y))+(ARENA.advancedDeployInset||120));
+        c.fillStyle='#d2ef9d24';c.fillRect(46,top,628,600-top);
+        c.setLineDash([6,7]);line(c,46,top,674,top,'#e8f5b8cc',1.8);c.setLineDash([]);
+        c.fillStyle='#edf7c7';c.font='bold 10px sans-serif';c.fillText('両塔破壊・前線全面解放',360,Math.min(590,top+22));
+      }else for(const t of fallen){
+        const left=t.x<360,x=left?46:400,w=274,top=Math.max(58,t.y+(ARENA.advancedDeployInset||120)),half=ARENA.advancedCenterHalf||52;
+        c.fillStyle='#d2ef9d20';c.fillRect(x,top,w,600-top);c.fillRect(360-half,top,half*2,600-top);
+        c.setLineDash([6,7]);line(c,x,top,x+w,top,'#e8f5b8aa',1.5);line(c,360-half,top,360+half,top,'#e8f5b8aa',1.5);c.setLineDash([]);
+        c.fillStyle='#edf7c7';c.font='bold 10px sans-serif';c.fillText('前線配置',left?183:537,Math.min(590,top+22));
+      }
     }
+  }
+  for(const z of g.zones||[]){
+    const p=orient(z,seat),life=z.total?clamp(z.remaining/z.total,0,1):1,pulse=.92+.05*Math.sin(time*6);
+    const mud=z.kind==='mud';c.save();c.globalAlpha=.16+.11*life;c.fillStyle=mud?'#786548':z.kind==='poison'?'#70984f':'#9aa36d';c.beginPath();c.arc(p.x,p.y,z.radius*pulse,0,TAU);c.fill();
+    c.globalAlpha=.55;c.strokeStyle=mud?'#b6a276':'#c9ec82';c.lineWidth=2;c.setLineDash([5,6]);c.beginPath();c.arc(p.x,p.y,z.radius,0,TAU);c.stroke();c.setLineDash([]);
+    for(let i=0;i<7;i++){const a=i*TAU/7+time*.25,r=z.radius*(.25+.55*((i*37)%10)/10);ellipse(c,p.x+Math.cos(a)*r,p.y+Math.sin(a)*r*.65,3,2,mud?'#9b875f88':'#c7e38488');}
+    c.restore();
+  }
+  // Continuous laser beams are drawn beneath units so the locked target remains readable.
+  for(const u of g.units||[]){
+    if(u.type!=='lasertower'||u.hp<=0||!u.target)continue;
+    const target=[...(g.units||[]),...(g.towers||[])].find(e=>e.id===u.target&&e.hp>0);if(!target)continue;
+    const p=orient(u,seat),q=orient(target,seat),stage=u.laserStage||0,pulse=.75+.2*Math.sin(time*18);
+    c.save();c.globalAlpha=.7+.18*pulse;c.strokeStyle=stage>=4?'#ff9bd5':stage>=2?'#e8b4ff':'#c8d5ff';c.lineWidth=Math.min(8,2+stage*.85);c.beginPath();c.moveTo(p.x,p.y-32);c.lineTo(q.x,q.y-(target.air?20:12));c.stroke();
+    c.globalAlpha=.9;c.strokeStyle='#fff3ff';c.lineWidth=1.2;c.beginPath();c.moveTo(p.x,p.y-32);c.lineTo(q.x,q.y-(target.air?20:12));c.stroke();c.restore();
   }
   const markerUnits=[];
   for(const item of renderOrder(g,seat)){
     if(item.tower){drawTower(c,item.entity,seat,time);continue;}
     const u=item.entity,p=orient(u,seat),owner=u.owner===seat?0:1,facing=visualFacing(u,seat);
+    if(u.burrowState==='burrow'){
+      c.save();c.globalAlpha=.7;ellipse(c,p.x,p.y+2,17,7,'#806548');ellipse(c,p.x-8,p.y-2,5,3,'#a58a62');ellipse(c,p.x+7,p.y-3,4,2,'#b19970');c.strokeStyle=TEAM_COLORS[owner]+'99';c.lineWidth=1.5;c.setLineDash([3,5]);c.beginPath();c.ellipse(p.x,p.y,20,9,0,0,TAU);c.stroke();c.setLineDash([]);c.restore();continue;
+    }
     c.strokeStyle=TEAM_COLORS[owner]+'b0';c.lineWidth=2;c.beginPath();c.ellipse(p.x,p.y+4,u.radius+4,(u.radius+4)*.34,0,0,TAU);c.stroke();
-    drawUnit(c,u.type,p.x,p.y,u.type==='mossling'?.9:u.type==='bat'?.93:u.type==='golem'?.92:u.type==='mini_golem'?.72:u.type==='berserker'?.94:u.type==='harpy'?.9:.95,{time,walk:u.walk,moving:u.moving,owner,anim:u.anim,hit:u.hit,charged:u.charged,dashWindup:u.dashState==='windup',dashing:u.dashState==='rush',invulnerable:!!u.invulnerable,alpha:u.spawn>0?.5:1,back:facing.back,mirror:u.building?false:facing.mirror,facing:facing.angle});
+    drawUnit(c,u.type,p.x,p.y,u.type==='mossling'?.9:u.type==='boneswarm'?.78:u.type==='tigger'?1.0:u.type==='muddragon'?.92:u.type==='blowdart'?.9:u.type==='lasertower'?.92:u.type==='bat'?.93:u.type==='golem'?.92:u.type==='mini_golem'?.72:u.type==='berserker'?.94:u.type==='harpy'?.9:.95,{time,walk:u.walk,moving:u.moving,owner,anim:u.anim,hit:u.hit,charged:u.charged,dashWindup:u.dashState==='windup',dashing:u.dashState==='rush',invulnerable:!!u.invulnerable,alpha:u.spawn>0?.5:1,back:facing.back,mirror:u.building?false:facing.mirror,facing:facing.angle});
     if(u.slowed){c.save();c.strokeStyle='#a9ebffcc';c.lineWidth=2;c.setLineDash([3,4]);c.beginPath();c.ellipse(p.x,p.y+3,u.radius+8,(u.radius+8)*.42,0,0,TAU);c.stroke();c.restore();}
-    const hp=u.hp/u.maxHp,w=u.type==='golem'?50:u.type==='mini_golem'?32:u.type==='berserker'?42:u.type==='boar'?38:u.type==='knight'?38:u.type==='mossling'?20:28;
+    if(u.poisoned){c.save();c.strokeStyle='#c9e77dcc';c.lineWidth=2;c.setLineDash([2,4]);c.beginPath();c.ellipse(p.x,p.y+3,u.radius+7,(u.radius+7)*.48,0,0,TAU);c.stroke();c.restore();}
+    if(u.mudded){c.save();c.strokeStyle='#b59c6dcc';c.lineWidth=2;c.setLineDash([5,3]);c.beginPath();c.ellipse(p.x,p.y+4,u.radius+9,(u.radius+9)*.42,0,0,TAU);c.stroke();c.restore();}
+    const hp=u.hp/u.maxHp,w=u.type==='golem'?50:u.type==='mini_golem'?32:u.type==='berserker'?42:u.type==='boar'?38:u.type==='knight'?38:u.type==='mossling'?20:u.type==='boneswarm'?16:28;
     if(hp<.999){rr(c,p.x-w/2,p.y-(u.air?48:82),w,5,2,'#25363eaa');rr(c,p.x-w/2+1,p.y-(u.air?47:81),(w-2)*hp,3,1,TEAM_COLORS[owner]);}
     if(owner===0&&!u.air&&!u.building&&g.towers.some(t=>{const q=orient(t,seat);return t.hp>0&&q.y>p.y&&q.y-p.y<90&&Math.abs(q.x-p.x)<t.radius+8;}))markerUnits.push(p);
   }
@@ -1490,6 +1775,13 @@ function drawArena(canvas,snapshot,options={}){
   }
   for(const p of g.projectiles){
     const pos=orient(p,seat),target=orient({x:p.tx,y:p.ty},seat),angle=Math.atan2(target.y-pos.y,target.x-pos.x);
+    if(p.kind==='arrowrain'){
+      const progress=clamp(p.progress||0,0,1),warn=progress>.35;
+      if(warn){c.save();c.globalAlpha=.1+progress*.18;c.fillStyle='#d9c295';c.beginPath();c.arc(target.x,target.y,p.radius||130,0,TAU);c.fill();c.strokeStyle='#f4dfaf';c.lineWidth=1.5;c.setLineDash([5,5]);c.stroke();c.restore();}
+      c.save();c.strokeStyle='#f0dfbb';c.lineWidth=1.6;
+      for(let i=0;i<11;i++){const a=i*2.39,rad=(p.radius||130)*(.18+.7*((i*37)%10)/10),ax=target.x+Math.cos(a)*rad,ay=target.y+Math.sin(a)*rad*.55-80*(1-progress);line(c,ax-6,ay-18,ax+2,ay+6,'#ead8b4',1.8);path(c,[[ax-1,ay+5],[ax+5,ay+10],[ax+1,ay+1]],'#d5a46f');}
+      c.restore();continue;
+    }
     if(p.kind==='fireball'){
       const progress=clamp(p.progress||0,0,1),arc=Math.sin(Math.PI*progress)*72;
       if(progress>.72){c.save();c.globalAlpha=.16+(progress-.72)*1.5;c.fillStyle='#f36f4d';c.beginPath();c.arc(target.x,target.y,p.radius||90,0,TAU);c.fill();c.strokeStyle='#ffd39a';c.lineWidth=2;c.setLineDash([7,6]);c.stroke();c.restore();}
@@ -1499,10 +1791,12 @@ function drawArena(canvas,snapshot,options={}){
     }
     c.save();c.translate(pos.x,pos.y-10);c.rotate(angle);
     if(p.kind==='arrow'){line(c,-10,0,7,0,'#f2dfb8',2);path(c,[[6,-3],[13,0],[6,3]],'#edf5df');}
+    else if(p.kind==='dart'){line(c,-12,0,8,0,'#e8d59d',1.6);path(c,[[7,-2],[14,0],[7,2]],'#8fd06d');}
     else if(p.kind==='bomb'){ellipse(c,0,0,8,8,'#2a3941');line(c,0,-7,4,-11,'#fbd078',2);}
     else if(p.kind==='frost'){path(c,[[-9,0],[0,-8],[10,0],[0,8]],'#a8edff','#4c8297',1);ellipse(c,0,0,3,3,'#effdff');}
     else if(p.kind==='lightning'){line(c,-10,0,-2,-5,'#ffe074',3);line(c,-2,-5,3,4,'#fff1a4',3);line(c,3,4,12,0,'#ffe074',3);}
     else if(p.kind==='light'){ellipse(c,0,0,7,7,'#ffe7a3');ellipse(c,0,0,3,3,'#e6ffff');}
+    else if(p.kind==='mud'){ellipse(c,0,0,9,7,'#806847');ellipse(c,-4,-2,4,3,'#b09a6e');ellipse(c,4,1,3,2,'#5f513b');}
     else{ellipse(c,0,0,p.kind==='orb'?8:5,p.kind==='orb'?8:5,p.kind==='orb'?'#c8b0f1':'#f9d494');ellipse(c,-4,0,3,3,'#fff3ca');}
     c.restore();
   }
@@ -1533,6 +1827,21 @@ function drawArena(canvas,snapshot,options={}){
       c.strokeStyle='#a7ebff';c.lineWidth=2;c.beginPath();c.arc(p.x,p.y-15,12+(1-fade)*18,0,TAU);c.stroke();for(let i=0;i<6;i++){const a=i*TAU/6;line(c,p.x+Math.cos(a)*12,p.y-15+Math.sin(a)*12,p.x+Math.cos(a)*18,p.y-15+Math.sin(a)*18,'#dffaff',1.5);}
     }else if(e.type==='chain'){
       if(e.points?.length){let a=orient({x:e.x,y:e.y},seat);for(const q0 of e.points){const q=orient(q0,seat),mx=(a.x+q.x)/2+((String(e.id).length%2)?5:-5);line(c,a.x,a.y-10,mx,(a.y+q.y)/2-16,'#ffe16e',3);line(c,mx,(a.y+q.y)/2-16,q.x,q.y-10,'#fff3b1',2);a=q;}}
+    }else if(e.type==='laser-lock'||e.type==='laser-ramp'){
+      const q=orient({x:e.tx,y:e.ty},seat);c.strokeStyle=e.type==='laser-ramp'?'#f0b5ff':'#cad8ff';c.lineWidth=e.type==='laser-ramp'?4:2;c.beginPath();c.moveTo(p.x,p.y-20);c.lineTo(q.x,q.y-10);c.stroke();
+      if(e.type==='laser-ramp'){c.fillStyle='#fff0ff';c.font='bold 10px sans-serif';c.textAlign='center';c.fillText(`POWER ×${Math.pow(2,e.stage||0)}`,p.x,p.y-50);}
+    }else if(e.type==='burrow-start'){
+      const q=orient({x:e.tx,y:e.ty},seat);c.strokeStyle='#a88a60aa';c.lineWidth=3;c.setLineDash([4,6]);c.beginPath();c.moveTo(p.x,p.y);c.quadraticCurveTo((p.x+q.x)/2,p.y-18,q.x,q.y);c.stroke();c.setLineDash([]);
+    }else if(e.type==='burrow-arrive'){
+      c.strokeStyle='#d2b47d';c.lineWidth=3;c.beginPath();c.ellipse(p.x,p.y,12+(1-fade)*26,6+(1-fade)*12,0,0,TAU);c.stroke();for(let i=0;i<7;i++){const a=i*TAU/7;ellipse(c,p.x+Math.cos(a)*(1-fade)*24,p.y+Math.sin(a)*(1-fade)*10,3,2,'#a8845e');}
+    }else if(e.type==='mud-deploy'){
+      c.strokeStyle='#b7a477';c.lineWidth=3;c.beginPath();c.arc(p.x,p.y,(e.radius||45)*(1-fade*.22),0,TAU);c.stroke();for(let i=0;i<8;i++){const a=i*TAU/8+e.id;ellipse(c,p.x+Math.cos(a)*(1-fade)*(e.radius||45)*.65,p.y+Math.sin(a)*(1-fade)*(e.radius||45)*.45,3,2,'#8e7452');}
+    }else if(e.type==='poison-deploy'){
+      c.strokeStyle='#c9eb83';c.lineWidth=3;c.beginPath();c.arc(p.x,p.y,(e.radius||90)*(1-fade*.35),0,TAU);c.stroke();
+      for(let i=0;i<10;i++){const a=i*TAU/10+e.id,len=(1-fade)*(e.radius||90)*.65;ellipse(c,p.x+Math.cos(a)*len,p.y+Math.sin(a)*len*.6,3+fade*4,2+fade*3,'#97bd63');}
+    }else if(e.type==='arrowrain-impact'){
+      c.strokeStyle='#f0d4a0';c.lineWidth=3;c.beginPath();c.arc(p.x,p.y,(e.radius||130)*(1-fade*.18),0,TAU);c.stroke();
+      for(let i=0;i<16;i++){const a=i*2.17,len=(1-fade)*(e.radius||130)*.85;line(c,p.x+Math.cos(a)*len-5,p.y+Math.sin(a)*len*.55-14,p.x+Math.cos(a)*len+2,p.y+Math.sin(a)*len*.55+7,'#e7d6b2',1.5);}
     }else if(e.type==='fireball-impact'){
       c.fillStyle='#f45f3f44';c.beginPath();c.arc(p.x,p.y,(e.radius||90)*(1-fade*.18),0,TAU);c.fill();
       c.strokeStyle='#ffd48c';c.lineWidth=5*fade+1;c.beginPath();c.arc(p.x,p.y,(e.radius||90)*(1-fade*.35),0,TAU);c.stroke();
@@ -1554,9 +1863,19 @@ function drawArena(canvas,snapshot,options={}){
   if(options.selected&&ghost&&g.phase==='battle'){
     const d=UNITS[options.selected];
     if(d.spell){
-      c.save();c.globalAlpha=.22;c.fillStyle=ghost.valid?'#ef754d':'#fa9b80';c.beginPath();c.arc(ghost.x,ghost.y,d.radius,0,TAU);c.fill();c.globalAlpha=.8;c.strokeStyle=ghost.valid?'#ffd79a':'#ff987f';c.lineWidth=2;c.setLineDash([7,6]);c.stroke();c.setLineDash([]);
-      ellipse(c,ghost.x,ghost.y,14,14,'#ef633e');ellipse(c,ghost.x+3,ghost.y-3,7,7,'#ffd36f');c.restore();
+      const poison=d.spell==='poison',arrows=d.spell==='arrowrain',fill=poison?'#7fa64d':arrows?'#d0af78':'#ef754d',stroke=poison?'#d9f49a':arrows?'#f5dfb0':'#ffd79a';
+      c.save();c.globalAlpha=.2;c.fillStyle=ghost.valid?fill:'#fa9b80';c.beginPath();c.arc(ghost.x,ghost.y,d.radius,0,TAU);c.fill();c.globalAlpha=.8;c.strokeStyle=ghost.valid?stroke:'#ff987f';c.lineWidth=2;c.setLineDash([7,6]);c.stroke();c.setLineDash([]);
+      if(poison){ellipse(c,ghost.x,ghost.y,13,9,'#789850');for(const a of [0,2.1,4.2])ellipse(c,ghost.x+Math.cos(a)*14,ghost.y+Math.sin(a)*9,4,3,'#bddd77');}
+      else if(arrows){for(let i=-2;i<=2;i++)line(c,ghost.x+i*6-3,ghost.y-15,ghost.x+i*6+2,ghost.y+10,'#ead8b5',2);}
+      else{ellipse(c,ghost.x,ghost.y,14,14,'#ef633e');ellipse(c,ghost.x+3,ghost.y-3,7,7,'#ffd36f');}c.restore();
     }else{
+      if(d.tunnelAnywhere){
+        const core=g.towers.find(t=>t.owner===seat&&t.kind==='core'&&t.hp>0);if(core){const q=orient(core,seat);c.save();c.globalAlpha=.65;c.strokeStyle=ghost.valid?'#d6b778':'#ff9d87';c.lineWidth=2;c.setLineDash([5,7]);c.beginPath();c.moveTo(q.x,q.y);c.quadraticCurveTo((q.x+ghost.x)/2,(q.y+ghost.y)/2-28,ghost.x,ghost.y);c.stroke();c.setLineDash([]);c.fillStyle='#f3dfb1';c.font='bold 10px sans-serif';c.textAlign='center';c.fillText('地下移動',ghost.x,Math.max(22,ghost.y-38));c.restore();}}
+      if(d.building&&d.range){
+        c.save();c.globalAlpha=ghost.valid?.11:.08;c.fillStyle=ghost.valid?'#bfe9cc':'#f5a08d';c.beginPath();c.arc(ghost.x,ghost.y,d.range,0,TAU);c.fill();
+        c.globalAlpha=.75;c.strokeStyle=ghost.valid?'#d9f6df':'#ff9d87';c.lineWidth=2;c.setLineDash([8,7]);c.beginPath();c.arc(ghost.x,ghost.y,d.range,0,TAU);c.stroke();c.setLineDash([]);
+        c.fillStyle=ghost.valid?'#e8f8df':'#ffd4ca';c.font='bold 11px sans-serif';c.textAlign='center';c.fillText(`攻撃範囲 R${d.range}`,ghost.x,Math.max(24,ghost.y-d.range-10));c.restore();
+      }
       c.globalAlpha=.35;ellipse(c,ghost.x,ghost.y,d.radius+10,10,ghost.valid?'#d9f3bb':'#fa9b80');c.globalAlpha=1;
       drawUnit(c,options.selected,ghost.x,ghost.y,.9,{time,owner:0,alpha:.65,idle:true,back:true,facing:-Math.PI/2});
       c.strokeStyle=ghost.valid?'#eaf9c8':'#ff987f';c.lineWidth=2;c.beginPath();c.arc(ghost.x,ghost.y,28,0,TAU);c.stroke();
@@ -1572,13 +1891,21 @@ function drawPortrait(canvas,type,time=0,owner=0,selected=false,back=false){
   const col=d.color,g=c.createRadialGradient(60,48,10,60,64,70);g.addColorStop(0,col+'99');g.addColorStop(1,col+'00');c.fillStyle=g;c.fillRect(0,0,120,120);
   if(d.spell){
     ellipse(c,60,100,37,8,'#1f39451b');
-    for(let i=0;i<5;i++){const a=-2.65+i*.34;path(c,[[60,70],[60+Math.cos(a)*31,70+Math.sin(a)*31],[60+Math.cos(a+.18)*18,70+Math.sin(a+.18)*18]],i%2?'#f18b4d':'#d94f39');}
-    ellipse(c,60,69,25,25,'#e95339','#7d382f',2);ellipse(c,66,62,14,14,'#ffad50');ellipse(c,70,57,6,6,'#fff0a5');
+    if(d.spell==='poison'){
+      ellipse(c,60,72,27,18,'#66834e','#3d563d',2);for(const [x,y,r] of [[49,64,9],[68,61,11],[75,75,8],[52,79,7]])ellipse(c,x,y,r,r*.75,'#9fca65');
+      rr(c,48,48,24,12,5,'#586f4d','#354c3e');ellipse(c,60,50,5,4,'#d8eb8b');
+    }else if(d.spell==='arrowrain'){
+      for(let i=0;i<7;i++){const x=39+i*7,y=49+(i%2)*8;line(c,x,y,x+9,y+37,'#e8d7b7',3);path(c,[[x+7,y+34],[x+14,y+42],[x+9,y+30]],'#b17b56','#5f5346',1);}
+      c.strokeStyle='#d4ad76';c.lineWidth=2;c.beginPath();c.arc(60,82,28,0,TAU);c.stroke();
+    }else{
+      for(let i=0;i<5;i++){const a=-2.65+i*.34;path(c,[[60,70],[60+Math.cos(a)*31,70+Math.sin(a)*31],[60+Math.cos(a+.18)*18,70+Math.sin(a+.18)*18]],i%2?'#f18b4d':'#d94f39');}
+      ellipse(c,60,69,25,25,'#e95339','#7d382f',2);ellipse(c,66,62,14,14,'#ffad50');ellipse(c,70,57,6,6,'#fff0a5');
+    }
     c.fillStyle='#fff6db';c.font='bold 10px sans-serif';c.textAlign='center';c.fillText('SPELL',60,111);c.restore();return;
   }
   ellipse(c,60,105,40,8,'#1f39451b');
-  const scale=type==='golem'?.92:type==='mini_golem'?1.15:type==='berserker'?1.18:type==='boar'?1.28:type==='mossling'?2.05:type==='harpy'?1.45:type==='bat'?1.6:type==='cannon'?1.5:type==='mage'?1.12:type==='nightshade'?1.28:type==='lumina'?1.22:type==='frost'?1.2:1.32;
-  const py=type==='golem'?112:type==='mini_golem'?104:type==='berserker'?108:type==='boar'?96:type==='mossling'?91:type==='harpy'?91:type==='bat'?83:type==='cannon'?(back?94:80):104;
+  const scale=type==='golem'?.92:type==='mini_golem'?1.15:type==='berserker'?1.18:type==='boar'?1.28:type==='tigger'?1.35:type==='muddragon'?1.34:type==='blowdart'?1.42:type==='lasertower'?1.35:type==='mossling'?2.05:type==='boneswarm'?1.8:type==='harpy'?1.45:type==='bat'?1.6:type==='cannon'?1.5:type==='mage'?1.12:type==='nightshade'?1.28:type==='lumina'?1.22:type==='frost'?1.2:1.32;
+  const py=type==='golem'?112:type==='mini_golem'?104:type==='berserker'?108:type==='boar'?96:type==='tigger'?101:type==='muddragon'?94:type==='blowdart'?102:type==='lasertower'?96:type==='mossling'?91:type==='boneswarm'?96:type==='harpy'?91:type==='bat'?83:type==='cannon'?(back?94:80):104;
   drawUnit(c,type,60,py,scale,{time,owner,idle:true,noShadow:true,anim:0,back,facing:back?-Math.PI/2:Math.PI/2});c.restore();
 }
 
@@ -1586,6 +1913,54 @@ function drawPortrait(canvas,type,time=0,owner=0,selected=false,back=false){
 
 
 const $=s=>document.querySelector(s);
+const PATCH_NOTES = Object.freeze([
+  {version:'15.0.0',date:'2026-09-09',title:'LONG RANGE & LASER',items:[
+    'マッドドラゴンの攻撃射程を155から78へ短縮。範囲攻撃・泥沼性能は維持。',
+    '穴掘りティガーの攻撃を30から15へ低下し、地下移動時間を約0.9〜2.8秒へ延長。',
+    '新ユニット「吹き矢ゴブリン」を追加。3コスト・HP240・攻撃110・0.5秒間隔の超長射程対空射手。',
+    '新設置物「レーザー塔」を追加。5コスト・HP2000。同じ敵を1.5秒ごとに照射し続けるほど火力が倍化し、対象変更時に初期火力へ戻ります。'
+  ]},
+  {version:'14.0.0',date:'2026-09-09',title:'UNDERGROUND & MUD',items:[
+    '新ユニット「穴掘りティガー」を追加。戦場の任意の地上地点へ地下移動し、潜行中は攻撃対象外になります。',
+    'ティガーは自軍中央本拠地から出発し、遠い場所ほど到着まで時間がかかります。',
+    '新ユニット「マッドドラゴン」を追加。地上・空中への範囲攻撃と、地上兵だけに効く2秒間の泥沼を生成します。',
+    '泥沼は30ダメージの継続攻撃と30%移動低下を与え、重複時はダメージ・減速を加算せず効果時間だけ更新します。'
+  ]},
+  {version:'13.0.0',date:'2026-09-09',title:'TARGET LOCK',items:[
+    '左右タワー・中央本拠地・ボルト砲台をターゲットロック式へ変更。',
+    'ロック解除は「対象撃破」「射程外」「攻撃対象ではなくなった」の3条件のみ。',
+    'より近い敵が途中で入ってきても、現在の対象が有効な間は攻撃先を変更しません。',
+    '上部メニューに「アプデ情報」を追加し、直近7日のパッチノートをゲーム内で確認可能にしました。'
+  ]},
+  {version:'12.0.0',date:'2026-09-09',title:'EIGHT CARD DECK',items:[
+    'デッキを6枚から8枚へ拡張。手札は4枚のまま、待機カードは4枚になりました。',
+    'デッキ編集・ホーム・待機室へ平均エネルギーコストを追加。',
+    'ボーンスウォームを12体・1体HP45へ再調整。',
+    '砲台など設置物の配置前に攻撃射程を表示するプレビューを追加。'
+  ]},
+  {version:'11.0.0',date:'2026-09-09',title:'SWARM & SPELLS',items:[
+    '大型単体に強い群体ユニット「ボーンスウォーム」を追加。',
+    '即時設置の継続毒「ポイズントラップ」と、広範囲の「矢の雨」を追加。',
+    'サイドタワー1本破壊時は破壊レーン＋中央細帯、2本破壊時は敵陣前半を横幅100%配置可能に変更。'
+  ]},
+  {version:'10.0.0',date:'2026-09-09',title:'BALANCE PASS',items:[
+    'ボルト砲台を3コスト、アイアン衛士を3コスト、アッシュ剣士を2コストへ調整。',
+    'クラッグバーサーカーを7コスト・HP2450・攻撃465へ強化。'
+  ]},
+  {version:'9.0.0',date:'2026-09-09',title:'KRAGG ARRIVES',items:[
+    '6コスト重量アタッカーとしてクラッグバーサーカーを追加（後にv10で再調整）。',
+    'ストーンゴーレムHPを2850へ低下、アイアン衛士のコストを引き下げ。'
+  ]},
+  {version:'8.0.0',date:'2026-09-09',title:'FIREBALL & GOLEM SPLIT',items:[
+    'ファイヤーボールを追加。距離で着弾時間が変わる偏差撃ち呪文として実装。',
+    'ストーンゴーレム死亡時にちびゴーレム2体へ分裂し、本体・ちび双方に死亡時範囲ダメージを追加。'
+  ]},
+  {version:'7.0.0',date:'2026-09-09',title:'FRONTLINE & DORMANT CORE',items:[
+    'タワーHPを1.2倍へ増加。中央本拠地は休眠し、被弾またはサイドタワー破壊で起動する仕様へ。',
+    'サイドタワー破壊後の前線配置を導入し、ナイトシェイドの索敵範囲を縮小。'
+  ]}
+]);
+
 const el=id=>document.getElementById(id);
 const views=['home','lobby','battle'];
 let currentView='home',selected=null,hover=null,inspectId='blade',snapshot=null,previous=null,receivedAt=0;
@@ -1603,11 +1978,19 @@ function safeStorage(store,key,value){
 }
 const remembered=safeStorage('local','tiny-name');if(remembered)el('nickname').value=remembered;
 soundOn=safeStorage('local','tiny-sound')==='true';
+function migrateDeck(raw){
+  const out=[];
+  if(Array.isArray(raw))for(const id of raw){if(typeof id==='string'&&DECK.includes(id)&&!out.includes(id))out.push(id);if(out.length===MAX_DECK)break;}
+  for(const source of [DEFAULT_DECK,DECK])for(const id of source){if(out.length>=MAX_DECK)break;if(!out.includes(id))out.push(id);}
+  return normalizeDeck(out);
+}
 function loadDeck(){
-  try{const raw=JSON.parse(safeStorage('local','tiny-deck-v9')||safeStorage('local','tiny-deck-v8')||safeStorage('local','tiny-deck-v7')||safeStorage('local','tiny-deck-v6')||safeStorage('local','tiny-deck-v5')||safeStorage('local','tiny-deck-v4')||safeStorage('local','tiny-deck-v3')||'null');return normalizeDeck(raw);}catch{return [...DEFAULT_DECK];}
+  try{const raw=JSON.parse(safeStorage('local','tiny-deck-v15')||safeStorage('local','tiny-deck-v14')||safeStorage('local','tiny-deck-v13')||safeStorage('local','tiny-deck-v12')||safeStorage('local','tiny-deck-v11')||safeStorage('local','tiny-deck-v10')||safeStorage('local','tiny-deck-v9')||safeStorage('local','tiny-deck-v8')||safeStorage('local','tiny-deck-v7')||safeStorage('local','tiny-deck-v6')||safeStorage('local','tiny-deck-v5')||safeStorage('local','tiny-deck-v4')||safeStorage('local','tiny-deck-v3')||'null');return migrateDeck(raw);}catch{return [...DEFAULT_DECK];}
 }
 let playerDeck=loadDeck();
-function persistDeck(){safeStorage('local','tiny-deck-v9',JSON.stringify(playerDeck));renderDeckSummaries();}
+function persistDeck(){safeStorage('local','tiny-deck-v15',JSON.stringify(playerDeck));renderDeckSummaries();}
+function averageDeckCost(deck){if(!Array.isArray(deck)||!deck.length)return 0;return deck.reduce((sum,id)=>sum+(UNITS[id]?.cost||0),0)/deck.length;}
+function formatAverage(deck){return `◆ ${averageDeckCost(deck).toFixed(1)}`;}
 function deckReady(deck=playerDeck){return Array.isArray(deck)&&deck.length===MAX_DECK&&new Set(deck).size===MAX_DECK&&deck.every(id=>DECK.includes(id));}
 function sound(kind='place'){
   if(!soundOn)return;
@@ -1750,7 +2133,7 @@ function renderLobby(){
   renderDeckSummaries();
   el('lobbyDeckBtn').disabled=!!mine?.ready;
 }
-el('readyBtn').addEventListener('click',()=>{const next=!room?.members[seat]?.ready;if(next&&!deckReady()){openDeckEditor();toast('対戦には6枚のデッキが必要です。');return;}send({type:'ready',ready:next,deck:next?[...playerDeck]:undefined});});
+el('readyBtn').addEventListener('click',()=>{const next=!room?.members[seat]?.ready;if(next&&!deckReady()){openDeckEditor();toast('対戦には8枚のデッキが必要です。');return;}send({type:'ready',ready:next,deck:next?[...playerDeck]:undefined});});
 el('startBtn').addEventListener('click',()=>send({type:'start'}));
 el('leaveLobby').addEventListener('click',leaveOnline);
 async function copyText(text){
@@ -1767,7 +2150,7 @@ function startPractice(){
   let name;try{name=inputName();}catch(e){entryError(e.message);return;}
   if(session)leaveOnline();
   clearInterval(localTimer);gameMode='cpu';seat=0;room=null;previous=null;previousPhase='';handSignature='';
-  if(!deckReady()){openDeckEditor();entryError('対戦には6枚のデッキが必要です。');return;}
+  if(!deckReady()){openDeckEditor();entryError('対戦には8枚のデッキが必要です。');return;}
   localGame=createMatch({seed:crypto.getRandomValues(new Uint32Array(1))[0],bot:true,difficulty,decks:[playerDeck,DEFAULT_DECK]});
   snapshot=viewMatch(localGame,0);selected=null;hover=null;localPaused=false;
   el('matchType').textContent='CPU PRACTICE · '+({easy:'EASY',normal:'NORMAL',hard:'HARD'}[difficulty]);
@@ -1775,7 +2158,7 @@ function startPractice(){
   showView('battle');status('CPU練習中');lastLocal=performance.now();
   localTimer=setInterval(()=>{
     const now=performance.now();
-    localPaused=document.hidden||el('helpModal').open||el('libraryModal').open||el('deckModal').open;
+    localPaused=document.hidden||el('helpModal').open||el('libraryModal').open||el('updatesModal').open||el('deckModal').open;
     if(!localPaused&&localGame&&localGame.phase!=='ended'){
       tick(localGame,.1);acceptSnapshot(viewMatch(localGame,0));
     }
@@ -1826,7 +2209,7 @@ function updateHUD(){
     el('rematchBtn').textContent=gameMode==='cpu'?'もう一度対戦':seat===room?.host?'再戦の待機ルームへ':'ホストの再戦操作を待っています';
     el('rematchBtn').disabled=gameMode==='online'&&seat!==room?.host;
   }
-  el('battleHint').textContent=selected?(UNITS[selected].spell?`${UNITS[selected].name}：着弾地点を指定 / コスト ${UNITS[selected].cost}。遠いほど着弾が遅れます。`:`${UNITS[selected].name}を配置 / 必要エナジー ${UNITS[selected].cost}`):'カードを選択。サイドタワー破壊後も前線配置は破壊跡より手前までです。';
+  el('battleHint').textContent=selected?(()=>{const d=UNITS[selected];if(!d.spell){if(d.tunnelAnywhere)return `${d.name}：戦場の好きな地上地点を指定 / コスト ${d.cost}。自軍本拠地から地下移動し、遠いほど到着が遅れます。`;if(d.building)return `${d.name}を配置 / 必要エナジー ${d.cost}。配置前に攻撃射程を表示します。スマホは1回目のタップで射程確認、2回目で設置。`;return `${d.name}を配置 / 必要エナジー ${d.cost}`;}if(d.spell==='poison')return `${d.name}：地点を指定すると即展開 / コスト ${d.cost}。範囲外へ出ても毒が残ります。`;if(d.spell==='arrowrain')return `${d.name}：広い着弾地点を指定 / コスト ${d.cost}。ファイヤーボールより速く届きます。`;return `${d.name}：着弾地点を指定 / コスト ${d.cost}。遠いほど着弾が遅れます。`;})():'カードを選択。片塔破壊はそのレーン＋中央細帯、両塔破壊後は敵陣前半を横いっぱい使えます。';
 }
 for(let i=0;i<10;i++){const seg=document.createElement('i'),fill=document.createElement('b');seg.append(fill);el('energyTrack').append(seg);}
 function choose(id){
@@ -1887,7 +2270,14 @@ function pointFromEvent(e,inside=false){
 }
 el('arenaCanvas').addEventListener('pointermove',e=>{if(selected)hover=pointFromEvent(e);});
 el('arenaCanvas').addEventListener('pointerleave',()=>hover=null);
-el('arenaCanvas').addEventListener('pointerdown',e=>{if(selected){e.preventDefault();place(pointFromEvent(e));}else toast('下のカードを1枚選んでください。');});
+el('arenaCanvas').addEventListener('pointerdown',e=>{
+  if(!selected){toast('下のカードを1枚選んでください。');return;}
+  e.preventDefault();const p=pointFromEvent(e),d=UNITS[selected];
+  if(e.pointerType==='touch'&&d?.building){
+    if(!hover||Math.hypot(hover.x-p.x,hover.y-p.y)>12){hover=p;toast('攻撃射程を確認できます。もう一度同じ場所をタップして設置。');return;}
+  }
+  place(p);
+});
 function place(p){
   if(!selected||!p||!snapshot||snapshot.phase!=='battle')return;
   const pos=orient(p,seat);
@@ -1898,7 +2288,7 @@ function place(p){
   }else send({type:'deploy',card:selected,x:pos.x,y:pos.y});
 }
 document.addEventListener('keydown',e=>{
-  if(currentView!=='battle'||['INPUT','TEXTAREA'].includes(document.activeElement.tagName)||el('helpModal').open||el('libraryModal').open||el('deckModal').open)return;
+  if(currentView!=='battle'||['INPUT','TEXTAREA'].includes(document.activeElement.tagName)||el('helpModal').open||el('libraryModal').open||el('updatesModal').open||el('deckModal').open)return;
   if(/^[1-4]$/.test(e.key)){e.preventDefault();choose(snapshot.hand[Number(e.key)-1]);}
   if(e.key==='Escape'){selected=null;hover=null;updateHand();}
 });
@@ -1937,9 +2327,11 @@ function makeMiniRoster(container,ids,interactive=false){
 }
 function renderDeckSummaries(){
   makeMiniRoster(el('homeDeck'),playerDeck,true);makeMiniRoster(el('lobbyRoster'),playerDeck,true);
+  if(el('homeDeckAverage'))el('homeDeckAverage').textContent=`平均コスト ${formatAverage(playerDeck)}`;
+  if(el('lobbyDeckAverage'))el('lobbyDeckAverage').textContent=`平均 ${formatAverage(playerDeck)}`;
 }
 function renderDeckEditor(){
-  el('deckCount').textContent=`${editingDeck.length} / ${MAX_DECK}`;el('deckError').hidden=true;
+  el('deckCount').textContent=`${editingDeck.length} / ${MAX_DECK}`;el('deckError').hidden=true;if(el('deckAverage'))el('deckAverage').textContent=formatAverage(editingDeck);
   el('deckSaveBtn').disabled=editingDeck.length!==MAX_DECK;
   el('deckSlots').replaceChildren();
   for(let i=0;i<MAX_DECK;i++){
@@ -1955,7 +2347,7 @@ function renderDeckEditor(){
     const cost=document.createElement('span');cost.className='deck-cost';cost.textContent=d.cost;
     const copy=document.createElement('div');copy.className='deck-copy';const h=document.createElement('h3');h.textContent=d.name;const sm=document.createElement('small');sm.textContent=d.role;const desc=document.createElement('p');desc.textContent=d.desc;copy.append(h,sm,desc);b.append(can,cost,copy);
     if(selected){const chk=document.createElement('span');chk.className='deck-check';chk.textContent='選択中';b.append(chk);}
-    b.onclick=()=>{const at=editingDeck.indexOf(id);if(at>=0)editingDeck.splice(at,1);else if(editingDeck.length<MAX_DECK)editingDeck.push(id);else{el('deckError').textContent='デッキは最大6枚です。1枚外してから追加してください。';el('deckError').hidden=false;return;}renderDeckEditor();};
+    b.onclick=()=>{const at=editingDeck.indexOf(id);if(at>=0)editingDeck.splice(at,1);else if(editingDeck.length<MAX_DECK)editingDeck.push(id);else{el('deckError').textContent='デッキは最大8枚です。1枚外してから追加してください。';el('deckError').hidden=false;return;}renderDeckEditor();};
     el('deckPool').append(b);
   }
 }
@@ -1965,12 +2357,33 @@ function openDeckEditor(){
 }
 el('deckBtn').onclick=openDeckEditor;el('homeDeckBtn').onclick=openDeckEditor;el('lobbyDeckBtn').onclick=()=>{if(room?.members[seat]?.ready){toast('準備OKを取り消してから編集してください。');return;}openDeckEditor();};
 el('deckDefaultBtn').onclick=()=>{editingDeck=[...DEFAULT_DECK];renderDeckEditor();};
-el('deckSaveBtn').onclick=()=>{if(!deckReady(editingDeck)){el('deckError').textContent='対戦に使う6枚を選んでください。';el('deckError').hidden=false;return;}playerDeck=[...editingDeck];persistDeck();el('deckModal').close();toast('デッキを保存しました。');};
+el('deckSaveBtn').onclick=()=>{if(!deckReady(editingDeck)){el('deckError').textContent='対戦に使う8枚を選んでください。';el('deckError').hidden=false;return;}playerDeck=[...editingDeck];persistDeck();el('deckModal').close();toast('デッキを保存しました。');};
+function renderPatchNotes(){
+  const host=el('patchNotes'),none=el('noPatchNotes'),range=el('updatesRange');
+  if(!host)return;
+  const now=new Date(),today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  const cutoff=new Date(today);cutoff.setDate(cutoff.getDate()-6);
+  const recent=PATCH_NOTES.filter(n=>{const d=new Date(`${n.date}T00:00:00`);return d>=cutoff&&d<=new Date(today.getTime()+86400000-1);});
+  host.replaceChildren();
+  range.textContent=`${cutoff.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric'})} — ${today.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric'})}`;
+  none.hidden=recent.length>0;
+  for(const note of recent){
+    const article=document.createElement('article');article.className='patch-note';
+    const head=document.createElement('div');head.className='patch-head';
+    const version=document.createElement('strong');version.textContent=`v${note.version}`;
+    const title=document.createElement('h3');title.textContent=note.title;
+    const date=document.createElement('time');date.dateTime=note.date;date.textContent=new Date(`${note.date}T00:00:00`).toLocaleDateString('ja-JP',{month:'short',day:'numeric'});
+    head.append(version,title,date);
+    const ul=document.createElement('ul');for(const item of note.items){const li=document.createElement('li');li.textContent=item;ul.append(li);}
+    article.append(head,ul);host.append(article);
+  }
+}
 el('libraryBtn').onclick=()=>{el('libraryModal').showModal();};
 el('helpBtn').onclick=()=>{el('helpModal').showModal();};
+el('updatesBtn').onclick=()=>{renderPatchNotes();el('updatesModal').showModal();};
 for(const b of document.querySelectorAll('.close-modal'))b.onclick=()=>b.closest('dialog').close();
 for(const dlg of document.querySelectorAll('dialog'))dlg.addEventListener('close',()=>{
-  if(gameMode==='cpu'){localPaused=document.hidden||el('helpModal').open||el('libraryModal').open||el('deckModal').open;updateHUD();}
+  if(gameMode==='cpu'){localPaused=document.hidden||el('helpModal').open||el('libraryModal').open||el('updatesModal').open||el('deckModal').open;updateHUD();}
 });
 for(const dlg of document.querySelectorAll('dialog'))dlg.addEventListener('click',e=>{const r=dlg.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dlg.close();});
 for(const id of DECK){

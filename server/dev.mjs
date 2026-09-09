@@ -36,7 +36,7 @@ const server=http.createServer(async(req,res)=>{
   try{
     const u=new URL(req.url,`http://${req.headers.host}`);
     if(u.pathname==='/health')return sendJSON(res,{ok:true});
-    if(u.pathname==='/api/config')return sendJSON(res,{ok:true,game:'tiny-siege',version:VERSION,cards:DECK.length,units:UNIT_IDS.length,spells:SPELL_IDS.length,physicsVersion:PHYSICS_VERSION,features:['back-views','ground-air-layers','solid-buildings','body-size-mass','depth-sorting','custom-deck','building-only-golem','charging-boar','shadow-rush-assassin','five-unit-swarm','healing-priest','frost-slow','chain-lightning','boar-shove','cannon-hp-decay','nightshade-half-aggro','frontline-inset','tower-hp-1.2','dormant-core-wake','golem-split','golem-death-blast','fireball-spell','golem-hp-2850','knight-cost-4','kragg-berserker'],online:'local-node-websocket',maxPlayers:2,maxDeck:MAX_DECK});
+    if(u.pathname==='/api/config')return sendJSON(res,{ok:true,game:'tiny-siege',version:VERSION,cards:DECK.length,units:UNIT_IDS.length,spells:SPELL_IDS.length,physicsVersion:PHYSICS_VERSION,features:['back-views','ground-air-layers','solid-buildings','body-size-mass','depth-sorting','custom-deck','building-only-golem','charging-boar','shadow-rush-assassin','five-unit-swarm','healing-priest','frost-slow','chain-lightning','boar-shove','cannon-hp-decay','nightshade-half-aggro','frontline-inset','tower-hp-1.2','dormant-core-wake','golem-split','golem-death-blast','fireball-spell','golem-hp-2850','cannon-cost-3','knight-cost-3','blade-cost-2','kragg-berserker-7-2450-465','bone-swarm-twelve-45hp','poison-trap','arrow-rain','single-tower-centre-connector','double-tower-full-frontline','eight-card-deck','average-deck-cost','building-range-preview','target-lock-towers','weekly-patch-notes','tigger-underground','mud-dragon','mud-dragon-range-halved','tigger-attack-15-slower-burrow','blowdart-goblin','laser-tower-ramping'],online:'local-node-websocket',maxPlayers:2,maxDeck:MAX_DECK});
     if(u.pathname.startsWith('/api/')){
       if(!allowed(req))return sendJSON(res,{ok:false,error:'異なるサイトからの操作は拒否しました。'},403);
       if(!limit(req))return sendJSON(res,{ok:false,error:'リクエストが多すぎます。'},429);
@@ -93,9 +93,9 @@ server.on('upgrade',(req,socket,head)=>{
     while(buffer.length>=2&&!done){
       const b0=buffer[0],b1=buffer[1],op=b0&15;
       if((b0&0x70)||!(b0&0x80)||!(b1&0x80)){close(1002,'Unsupported frame');return;}
-      let n=b1&127,off=2;
-      if(n===126){if(buffer.length<4)return;n=buffer.readUInt16BE(2);off=4;}
-      if(n===127){close(1009,'Too large');return;}
+      const lengthCode=b1&127;let n=lengthCode,off=2;
+      if(lengthCode===126){if(buffer.length<4)return;n=buffer.readUInt16BE(2);off=4;}
+      if(lengthCode===127){close(1009,'Too large');return;}
       if(n>8192||((op&8)&&n>125)){close(1009,'Too large');return;}
       if(buffer.length<off+4+n)return;
       const mask=buffer.subarray(off,off+4),p=Buffer.from(buffer.subarray(off+4,off+4+n));buffer=buffer.subarray(off+4+n);

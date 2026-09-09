@@ -3,6 +3,54 @@ import {createMatch,tick,runBot,deploy,viewMatch,clamp,canPlace} from './game/en
 import {drawArena,drawPortrait,orient} from './game/art.js';
 
 const $=s=>document.querySelector(s);
+const PATCH_NOTES = Object.freeze([
+  {version:'15.0.0',date:'2026-09-09',title:'LONG RANGE & LASER',items:[
+    'マッドドラゴンの攻撃射程を155から78へ短縮。範囲攻撃・泥沼性能は維持。',
+    '穴掘りティガーの攻撃を30から15へ低下し、地下移動時間を約0.9〜2.8秒へ延長。',
+    '新ユニット「吹き矢ゴブリン」を追加。3コスト・HP240・攻撃110・0.5秒間隔の超長射程対空射手。',
+    '新設置物「レーザー塔」を追加。5コスト・HP2000。同じ敵を1.5秒ごとに照射し続けるほど火力が倍化し、対象変更時に初期火力へ戻ります。'
+  ]},
+  {version:'14.0.0',date:'2026-09-09',title:'UNDERGROUND & MUD',items:[
+    '新ユニット「穴掘りティガー」を追加。戦場の任意の地上地点へ地下移動し、潜行中は攻撃対象外になります。',
+    'ティガーは自軍中央本拠地から出発し、遠い場所ほど到着まで時間がかかります。',
+    '新ユニット「マッドドラゴン」を追加。地上・空中への範囲攻撃と、地上兵だけに効く2秒間の泥沼を生成します。',
+    '泥沼は30ダメージの継続攻撃と30%移動低下を与え、重複時はダメージ・減速を加算せず効果時間だけ更新します。'
+  ]},
+  {version:'13.0.0',date:'2026-09-09',title:'TARGET LOCK',items:[
+    '左右タワー・中央本拠地・ボルト砲台をターゲットロック式へ変更。',
+    'ロック解除は「対象撃破」「射程外」「攻撃対象ではなくなった」の3条件のみ。',
+    'より近い敵が途中で入ってきても、現在の対象が有効な間は攻撃先を変更しません。',
+    '上部メニューに「アプデ情報」を追加し、直近7日のパッチノートをゲーム内で確認可能にしました。'
+  ]},
+  {version:'12.0.0',date:'2026-09-09',title:'EIGHT CARD DECK',items:[
+    'デッキを6枚から8枚へ拡張。手札は4枚のまま、待機カードは4枚になりました。',
+    'デッキ編集・ホーム・待機室へ平均エネルギーコストを追加。',
+    'ボーンスウォームを12体・1体HP45へ再調整。',
+    '砲台など設置物の配置前に攻撃射程を表示するプレビューを追加。'
+  ]},
+  {version:'11.0.0',date:'2026-09-09',title:'SWARM & SPELLS',items:[
+    '大型単体に強い群体ユニット「ボーンスウォーム」を追加。',
+    '即時設置の継続毒「ポイズントラップ」と、広範囲の「矢の雨」を追加。',
+    'サイドタワー1本破壊時は破壊レーン＋中央細帯、2本破壊時は敵陣前半を横幅100%配置可能に変更。'
+  ]},
+  {version:'10.0.0',date:'2026-09-09',title:'BALANCE PASS',items:[
+    'ボルト砲台を3コスト、アイアン衛士を3コスト、アッシュ剣士を2コストへ調整。',
+    'クラッグバーサーカーを7コスト・HP2450・攻撃465へ強化。'
+  ]},
+  {version:'9.0.0',date:'2026-09-09',title:'KRAGG ARRIVES',items:[
+    '6コスト重量アタッカーとしてクラッグバーサーカーを追加（後にv10で再調整）。',
+    'ストーンゴーレムHPを2850へ低下、アイアン衛士のコストを引き下げ。'
+  ]},
+  {version:'8.0.0',date:'2026-09-09',title:'FIREBALL & GOLEM SPLIT',items:[
+    'ファイヤーボールを追加。距離で着弾時間が変わる偏差撃ち呪文として実装。',
+    'ストーンゴーレム死亡時にちびゴーレム2体へ分裂し、本体・ちび双方に死亡時範囲ダメージを追加。'
+  ]},
+  {version:'7.0.0',date:'2026-09-09',title:'FRONTLINE & DORMANT CORE',items:[
+    'タワーHPを1.2倍へ増加。中央本拠地は休眠し、被弾またはサイドタワー破壊で起動する仕様へ。',
+    'サイドタワー破壊後の前線配置を導入し、ナイトシェイドの索敵範囲を縮小。'
+  ]}
+]);
+
 const el=id=>document.getElementById(id);
 const views=['home','lobby','battle'];
 let currentView='home',selected=null,hover=null,inspectId='blade',snapshot=null,previous=null,receivedAt=0;
@@ -20,11 +68,19 @@ function safeStorage(store,key,value){
 }
 const remembered=safeStorage('local','tiny-name');if(remembered)el('nickname').value=remembered;
 soundOn=safeStorage('local','tiny-sound')==='true';
+function migrateDeck(raw){
+  const out=[];
+  if(Array.isArray(raw))for(const id of raw){if(typeof id==='string'&&DECK.includes(id)&&!out.includes(id))out.push(id);if(out.length===MAX_DECK)break;}
+  for(const source of [DEFAULT_DECK,DECK])for(const id of source){if(out.length>=MAX_DECK)break;if(!out.includes(id))out.push(id);}
+  return normalizeDeck(out);
+}
 function loadDeck(){
-  try{const raw=JSON.parse(safeStorage('local','tiny-deck-v9')||safeStorage('local','tiny-deck-v8')||safeStorage('local','tiny-deck-v7')||safeStorage('local','tiny-deck-v6')||safeStorage('local','tiny-deck-v5')||safeStorage('local','tiny-deck-v4')||safeStorage('local','tiny-deck-v3')||'null');return normalizeDeck(raw);}catch{return [...DEFAULT_DECK];}
+  try{const raw=JSON.parse(safeStorage('local','tiny-deck-v15')||safeStorage('local','tiny-deck-v14')||safeStorage('local','tiny-deck-v13')||safeStorage('local','tiny-deck-v12')||safeStorage('local','tiny-deck-v11')||safeStorage('local','tiny-deck-v10')||safeStorage('local','tiny-deck-v9')||safeStorage('local','tiny-deck-v8')||safeStorage('local','tiny-deck-v7')||safeStorage('local','tiny-deck-v6')||safeStorage('local','tiny-deck-v5')||safeStorage('local','tiny-deck-v4')||safeStorage('local','tiny-deck-v3')||'null');return migrateDeck(raw);}catch{return [...DEFAULT_DECK];}
 }
 let playerDeck=loadDeck();
-function persistDeck(){safeStorage('local','tiny-deck-v9',JSON.stringify(playerDeck));renderDeckSummaries();}
+function persistDeck(){safeStorage('local','tiny-deck-v15',JSON.stringify(playerDeck));renderDeckSummaries();}
+function averageDeckCost(deck){if(!Array.isArray(deck)||!deck.length)return 0;return deck.reduce((sum,id)=>sum+(UNITS[id]?.cost||0),0)/deck.length;}
+function formatAverage(deck){return `◆ ${averageDeckCost(deck).toFixed(1)}`;}
 function deckReady(deck=playerDeck){return Array.isArray(deck)&&deck.length===MAX_DECK&&new Set(deck).size===MAX_DECK&&deck.every(id=>DECK.includes(id));}
 function sound(kind='place'){
   if(!soundOn)return;
@@ -167,7 +223,7 @@ function renderLobby(){
   renderDeckSummaries();
   el('lobbyDeckBtn').disabled=!!mine?.ready;
 }
-el('readyBtn').addEventListener('click',()=>{const next=!room?.members[seat]?.ready;if(next&&!deckReady()){openDeckEditor();toast('対戦には6枚のデッキが必要です。');return;}send({type:'ready',ready:next,deck:next?[...playerDeck]:undefined});});
+el('readyBtn').addEventListener('click',()=>{const next=!room?.members[seat]?.ready;if(next&&!deckReady()){openDeckEditor();toast('対戦には8枚のデッキが必要です。');return;}send({type:'ready',ready:next,deck:next?[...playerDeck]:undefined});});
 el('startBtn').addEventListener('click',()=>send({type:'start'}));
 el('leaveLobby').addEventListener('click',leaveOnline);
 async function copyText(text){
@@ -184,7 +240,7 @@ function startPractice(){
   let name;try{name=inputName();}catch(e){entryError(e.message);return;}
   if(session)leaveOnline();
   clearInterval(localTimer);gameMode='cpu';seat=0;room=null;previous=null;previousPhase='';handSignature='';
-  if(!deckReady()){openDeckEditor();entryError('対戦には6枚のデッキが必要です。');return;}
+  if(!deckReady()){openDeckEditor();entryError('対戦には8枚のデッキが必要です。');return;}
   localGame=createMatch({seed:crypto.getRandomValues(new Uint32Array(1))[0],bot:true,difficulty,decks:[playerDeck,DEFAULT_DECK]});
   snapshot=viewMatch(localGame,0);selected=null;hover=null;localPaused=false;
   el('matchType').textContent='CPU PRACTICE · '+({easy:'EASY',normal:'NORMAL',hard:'HARD'}[difficulty]);
@@ -192,7 +248,7 @@ function startPractice(){
   showView('battle');status('CPU練習中');lastLocal=performance.now();
   localTimer=setInterval(()=>{
     const now=performance.now();
-    localPaused=document.hidden||el('helpModal').open||el('libraryModal').open||el('deckModal').open;
+    localPaused=document.hidden||el('helpModal').open||el('libraryModal').open||el('updatesModal').open||el('deckModal').open;
     if(!localPaused&&localGame&&localGame.phase!=='ended'){
       tick(localGame,.1);acceptSnapshot(viewMatch(localGame,0));
     }
@@ -243,7 +299,7 @@ function updateHUD(){
     el('rematchBtn').textContent=gameMode==='cpu'?'もう一度対戦':seat===room?.host?'再戦の待機ルームへ':'ホストの再戦操作を待っています';
     el('rematchBtn').disabled=gameMode==='online'&&seat!==room?.host;
   }
-  el('battleHint').textContent=selected?(UNITS[selected].spell?`${UNITS[selected].name}：着弾地点を指定 / コスト ${UNITS[selected].cost}。遠いほど着弾が遅れます。`:`${UNITS[selected].name}を配置 / 必要エナジー ${UNITS[selected].cost}`):'カードを選択。サイドタワー破壊後も前線配置は破壊跡より手前までです。';
+  el('battleHint').textContent=selected?(()=>{const d=UNITS[selected];if(!d.spell){if(d.tunnelAnywhere)return `${d.name}：戦場の好きな地上地点を指定 / コスト ${d.cost}。自軍本拠地から地下移動し、遠いほど到着が遅れます。`;if(d.building)return `${d.name}を配置 / 必要エナジー ${d.cost}。配置前に攻撃射程を表示します。スマホは1回目のタップで射程確認、2回目で設置。`;return `${d.name}を配置 / 必要エナジー ${d.cost}`;}if(d.spell==='poison')return `${d.name}：地点を指定すると即展開 / コスト ${d.cost}。範囲外へ出ても毒が残ります。`;if(d.spell==='arrowrain')return `${d.name}：広い着弾地点を指定 / コスト ${d.cost}。ファイヤーボールより速く届きます。`;return `${d.name}：着弾地点を指定 / コスト ${d.cost}。遠いほど着弾が遅れます。`;})():'カードを選択。片塔破壊はそのレーン＋中央細帯、両塔破壊後は敵陣前半を横いっぱい使えます。';
 }
 for(let i=0;i<10;i++){const seg=document.createElement('i'),fill=document.createElement('b');seg.append(fill);el('energyTrack').append(seg);}
 function choose(id){
@@ -304,7 +360,14 @@ function pointFromEvent(e,inside=false){
 }
 el('arenaCanvas').addEventListener('pointermove',e=>{if(selected)hover=pointFromEvent(e);});
 el('arenaCanvas').addEventListener('pointerleave',()=>hover=null);
-el('arenaCanvas').addEventListener('pointerdown',e=>{if(selected){e.preventDefault();place(pointFromEvent(e));}else toast('下のカードを1枚選んでください。');});
+el('arenaCanvas').addEventListener('pointerdown',e=>{
+  if(!selected){toast('下のカードを1枚選んでください。');return;}
+  e.preventDefault();const p=pointFromEvent(e),d=UNITS[selected];
+  if(e.pointerType==='touch'&&d?.building){
+    if(!hover||Math.hypot(hover.x-p.x,hover.y-p.y)>12){hover=p;toast('攻撃射程を確認できます。もう一度同じ場所をタップして設置。');return;}
+  }
+  place(p);
+});
 function place(p){
   if(!selected||!p||!snapshot||snapshot.phase!=='battle')return;
   const pos=orient(p,seat);
@@ -315,7 +378,7 @@ function place(p){
   }else send({type:'deploy',card:selected,x:pos.x,y:pos.y});
 }
 document.addEventListener('keydown',e=>{
-  if(currentView!=='battle'||['INPUT','TEXTAREA'].includes(document.activeElement.tagName)||el('helpModal').open||el('libraryModal').open||el('deckModal').open)return;
+  if(currentView!=='battle'||['INPUT','TEXTAREA'].includes(document.activeElement.tagName)||el('helpModal').open||el('libraryModal').open||el('updatesModal').open||el('deckModal').open)return;
   if(/^[1-4]$/.test(e.key)){e.preventDefault();choose(snapshot.hand[Number(e.key)-1]);}
   if(e.key==='Escape'){selected=null;hover=null;updateHand();}
 });
@@ -354,9 +417,11 @@ function makeMiniRoster(container,ids,interactive=false){
 }
 function renderDeckSummaries(){
   makeMiniRoster(el('homeDeck'),playerDeck,true);makeMiniRoster(el('lobbyRoster'),playerDeck,true);
+  if(el('homeDeckAverage'))el('homeDeckAverage').textContent=`平均コスト ${formatAverage(playerDeck)}`;
+  if(el('lobbyDeckAverage'))el('lobbyDeckAverage').textContent=`平均 ${formatAverage(playerDeck)}`;
 }
 function renderDeckEditor(){
-  el('deckCount').textContent=`${editingDeck.length} / ${MAX_DECK}`;el('deckError').hidden=true;
+  el('deckCount').textContent=`${editingDeck.length} / ${MAX_DECK}`;el('deckError').hidden=true;if(el('deckAverage'))el('deckAverage').textContent=formatAverage(editingDeck);
   el('deckSaveBtn').disabled=editingDeck.length!==MAX_DECK;
   el('deckSlots').replaceChildren();
   for(let i=0;i<MAX_DECK;i++){
@@ -372,7 +437,7 @@ function renderDeckEditor(){
     const cost=document.createElement('span');cost.className='deck-cost';cost.textContent=d.cost;
     const copy=document.createElement('div');copy.className='deck-copy';const h=document.createElement('h3');h.textContent=d.name;const sm=document.createElement('small');sm.textContent=d.role;const desc=document.createElement('p');desc.textContent=d.desc;copy.append(h,sm,desc);b.append(can,cost,copy);
     if(selected){const chk=document.createElement('span');chk.className='deck-check';chk.textContent='選択中';b.append(chk);}
-    b.onclick=()=>{const at=editingDeck.indexOf(id);if(at>=0)editingDeck.splice(at,1);else if(editingDeck.length<MAX_DECK)editingDeck.push(id);else{el('deckError').textContent='デッキは最大6枚です。1枚外してから追加してください。';el('deckError').hidden=false;return;}renderDeckEditor();};
+    b.onclick=()=>{const at=editingDeck.indexOf(id);if(at>=0)editingDeck.splice(at,1);else if(editingDeck.length<MAX_DECK)editingDeck.push(id);else{el('deckError').textContent='デッキは最大8枚です。1枚外してから追加してください。';el('deckError').hidden=false;return;}renderDeckEditor();};
     el('deckPool').append(b);
   }
 }
@@ -382,12 +447,33 @@ function openDeckEditor(){
 }
 el('deckBtn').onclick=openDeckEditor;el('homeDeckBtn').onclick=openDeckEditor;el('lobbyDeckBtn').onclick=()=>{if(room?.members[seat]?.ready){toast('準備OKを取り消してから編集してください。');return;}openDeckEditor();};
 el('deckDefaultBtn').onclick=()=>{editingDeck=[...DEFAULT_DECK];renderDeckEditor();};
-el('deckSaveBtn').onclick=()=>{if(!deckReady(editingDeck)){el('deckError').textContent='対戦に使う6枚を選んでください。';el('deckError').hidden=false;return;}playerDeck=[...editingDeck];persistDeck();el('deckModal').close();toast('デッキを保存しました。');};
+el('deckSaveBtn').onclick=()=>{if(!deckReady(editingDeck)){el('deckError').textContent='対戦に使う8枚を選んでください。';el('deckError').hidden=false;return;}playerDeck=[...editingDeck];persistDeck();el('deckModal').close();toast('デッキを保存しました。');};
+function renderPatchNotes(){
+  const host=el('patchNotes'),none=el('noPatchNotes'),range=el('updatesRange');
+  if(!host)return;
+  const now=new Date(),today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  const cutoff=new Date(today);cutoff.setDate(cutoff.getDate()-6);
+  const recent=PATCH_NOTES.filter(n=>{const d=new Date(`${n.date}T00:00:00`);return d>=cutoff&&d<=new Date(today.getTime()+86400000-1);});
+  host.replaceChildren();
+  range.textContent=`${cutoff.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric'})} — ${today.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric'})}`;
+  none.hidden=recent.length>0;
+  for(const note of recent){
+    const article=document.createElement('article');article.className='patch-note';
+    const head=document.createElement('div');head.className='patch-head';
+    const version=document.createElement('strong');version.textContent=`v${note.version}`;
+    const title=document.createElement('h3');title.textContent=note.title;
+    const date=document.createElement('time');date.dateTime=note.date;date.textContent=new Date(`${note.date}T00:00:00`).toLocaleDateString('ja-JP',{month:'short',day:'numeric'});
+    head.append(version,title,date);
+    const ul=document.createElement('ul');for(const item of note.items){const li=document.createElement('li');li.textContent=item;ul.append(li);}
+    article.append(head,ul);host.append(article);
+  }
+}
 el('libraryBtn').onclick=()=>{el('libraryModal').showModal();};
 el('helpBtn').onclick=()=>{el('helpModal').showModal();};
+el('updatesBtn').onclick=()=>{renderPatchNotes();el('updatesModal').showModal();};
 for(const b of document.querySelectorAll('.close-modal'))b.onclick=()=>b.closest('dialog').close();
 for(const dlg of document.querySelectorAll('dialog'))dlg.addEventListener('close',()=>{
-  if(gameMode==='cpu'){localPaused=document.hidden||el('helpModal').open||el('libraryModal').open||el('deckModal').open;updateHUD();}
+  if(gameMode==='cpu'){localPaused=document.hidden||el('helpModal').open||el('libraryModal').open||el('updatesModal').open||el('deckModal').open;updateHUD();}
 });
 for(const dlg of document.querySelectorAll('dialog'))dlg.addEventListener('click',e=>{const r=dlg.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dlg.close();});
 for(const id of DECK){

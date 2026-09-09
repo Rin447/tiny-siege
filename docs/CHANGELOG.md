@@ -1,5 +1,54 @@
 # Changelog
 
+## 15.0.0
+
+- Mud Dragon attack range reduced from 155 to **78**; HP, splash and mud-zone effects unchanged.
+- Hole-digger Tigger attack reduced from 30 to **15**; underground travel slowed to roughly **0.9–2.8 seconds** depending on distance.
+- Added **Blowdart Goblin**: 3 cost / 240 HP / 110 damage / 0.5s attack interval / range 220 / ground + air targeting.
+- Added **Laser Tower**: 5 cost / 2000 HP / range 220 / ground + air target lock. Continuous DPS starts at 20 and doubles every 1.5 seconds on the same target with no cap; changing target resets DPS to 20.
+- Card pool expanded to **24 cards (21 units + 3 spells)**.
+- Deck storage advances to `tiny-deck-v15`; v14 and older keys remain migration fallbacks.
+- Compatibility contract advanced to **physicsVersion 13**.
+
+## 14.0.0
+
+- Added Hole-digger Tigger: 3 cost / 1100 HP / 30 damage / global ground destination tunnelling.
+- Burrowing units are completely untargetable and immune until surfacing; travel time scales with distance from own core.
+- Added Mud Dragon: 5 cost / 2000 HP / 200 splash damage / air unit attacking ground and air.
+- Mud Dragon attacks create a 2-second ground-only mud zone: 30 damage every 0.5 seconds and 30% movement slow, non-stacking.
+- Card pool expanded to 22 (19 units + 3 spells).
+- Deck storage advances to `tiny-deck-v14`; v13 and older keys remain migration fallbacks.
+- Compatibility contract advanced to **physicsVersion 12**.
+
+## 13.0.0
+
+- Defensive structures (side towers, awake central cores, and Bolt Cannon) now use **target lock**.
+- A locked target is retained even when a closer enemy enters range. Lock releases only when the target dies, leaves attack range, or becomes untargetable.
+- Nightshade rush invulnerability does not clear a structure lock.
+- Added **アプデ情報 / Patch Notes** to the top navigation. The client filters bundled patch-note entries to the last seven calendar days.
+- Deck storage advances to `tiny-deck-v13` with v12 and older fallback.
+- Compatibility contract advanced to **physicsVersion 11**.
+
+## 12.0.0
+
+- Expanded deck size from 6 to **8 cards** while keeping the battle hand at **4 cards**; the waiting queue is now 4 cards.
+- Added deck **average energy cost** to the editor, home summary and lobby summary.
+- Added saved-deck migration: existing 6-card v11/v10/... decks retain their valid picks and are automatically filled to 8 cards rather than being discarded.
+- Reworked Bone Swarm from 8 × 95 HP to **12 × 45 HP** while keeping 42 damage and 4 cost. It is now more polarized against single-target heavy attackers and area damage.
+- Added generic building placement range preview. Bolt Cannon shows its **R218** attack circle before placement; the implementation applies to future `building` cards with a range value.
+- On touch devices, building placement uses a two-tap flow: first tap previews the location/range, second tap at the same spot confirms placement. Drag placement remains available.
+- Existing v11 spell/frontline rules remain unchanged.
+- Compatibility contract advanced to **physicsVersion 10**.
+
+## 10.0.0
+
+- Bolt Cannon cost reduced from 4 to 3; HP, attack and passive HP decay are unchanged.
+- Kragg Berserker rebalanced from 6 to 7 cost, 1950 to 2450 HP, and 360 to 465 damage; movement and targeting unchanged.
+- Iron Guard cost reduced from 4 to 3 with combat stats unchanged.
+- Ash Swordsman cost reduced from 3 to 2 with combat stats unchanged.
+- Card pool remains 17 cards and deck size remains 6.
+- Compatibility version advanced to 8 so active v9 matches restart cleanly under one balance set.
+
 ## 9.0.0
 
 - Stone Golem HP reduced from 3150 to 2850; 8 cost, 288 building damage, split and death blast unchanged.

@@ -1,0 +1,13 @@
+{
+  "passed": 6,
+  "checks": [
+    "home shows an eight-card deck",
+    "v15 patch notes are visible from top navigation",
+    "deck editor exposes 24 cards and recommended v15 deck",
+    "library exposes twenty-one units plus three spells with v15 balance text",
+    "CPU battle starts with four-card hand under v15",
+    "no uncaught JavaScript errors in v15 browser flow"
+  ],
+  "errors": [],
+  "note": "Self-contained offline HTML loaded with Playwright set_content; not Cloudflare production or native browser networking."
+}
