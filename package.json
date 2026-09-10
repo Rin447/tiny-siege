@@ -1,9 +1,9 @@
 {
   "name": "tiny-siege",
-  "version": "17.0.0",
+  "version": "18.1.0",
   "private": true,
   "type": "module",
-  "description": "Original 2D lane battler with 27 selectable cards, eight-card decks, three-column responsive deck builder, verified up to ten local My List presets, ability-focused live engine-driven card-detail battle demos, viewer-relative spell colors, persistent touch building placement, CPU practice and private 1v1 on Cloudflare Workers.",
+  "description": "Original 2D lane battler with 30 selectable cards, eight-card decks, three-column responsive deck builder, verified up to ten local My List presets, ability-focused live engine-driven card-detail battle demos, viewer-relative spell colors, persistent touch building placement, CPU practice and private 1v1 on Cloudflare Workers.",
   "engines": {
     "node": ">=22"
   },

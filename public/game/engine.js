@@ -63,7 +63,8 @@ function makeUnit(g,owner,type,x,y){
   const d=UNITS[type];
   return {...d,id:`u${g.nextId++}`,type,owner,x,y,hp:d.hp,maxHp:d.hp,cd:0,spawn:0.5,anim:0,hit:0,walk:0,target:null,face:owner===0?-1:1,
     lane:x<360?190:530,age:0,facing:owner===0?-Math.PI/2:Math.PI/2,moving:false,
-    summonNextAt:d.summonInterval?g.time+d.summonInterval:null};
+    summonNextAt:d.summonInterval?g.time+d.summonInterval:null,
+    stunUntil:0,sparkCharged:false,sparkChargeStartAt:d.sparkChargeTime?g.time:null,sparkChargeProgress:0};
 }
 function fireballTravelTime(core,target){return clamp(.45+distance(core,target)/620,.6,2);}
 function arrowRainTravelTime(core,target){return clamp(.2+distance(core,target)/1150,.35,1);}
@@ -77,6 +78,16 @@ function castSpell(g,owner,id,x,y){
     g.zones.push({id:`z${g.nextId++}`,owner,kind:'poison',spell:'poison',x,y,radius:d.radius,remaining:d.zoneDuration,total:d.zoneDuration,
       tickEvery:d.tickEvery,nextTick:g.time,damage:d.damage,buildingDamage:d.buildingDamage,lingerDuration:d.lingerDuration,lingerDamage:d.lingerDamage});
     event(g,'poison-deploy',{x,y,owner,radius:d.radius});
+    return {ok:true,spell:true,travelTime:0};
+  }
+  if(d.spell==='zap'){
+    event(g,'zap-impact',{x,y,owner,radius:d.radius,damage:d.damage,stunDuration:d.stunDuration});
+    const centre={x,y};
+    for(const t of alive(g)){
+      if(t.owner===owner||t.hp<=0||t.burrowState==='burrow'||distance(centre,t)>d.radius+(t.radius||12)*.35)continue;
+      damage(g,t,(t.kind||t.building)?d.buildingDamage:d.damage,owner);
+      if(t.hp>0)applyStun(g,t,d.stunDuration,owner);
+    }
     return {ok:true,spell:true,travelTime:0};
   }
   const arrow=d.spell==='arrowrain',travel=arrow?arrowRainTravelTime(core,{x,y}):fireballTravelTime(core,{x,y});
@@ -328,6 +339,24 @@ function applySlow(g,t,p){
   }
   event(g,'slow',{x:t.x,y:t.y,owner:p.owner});
 }
+function resetSparkyCharge(g,u,delayUntil=g.time){
+  if(!u.sparkUnit)return;
+  u.sparkCharged=false;u.sparkChargeProgress=0;u.sparkChargeStartAt=delayUntil;
+}
+function applyStun(g,t,duration,owner){
+  const until=Math.max(t.stunUntil||0,g.time+(duration||0));t.stunUntil=until;t.target=null;
+  if(t.laserTower)resetLaserTower(t);
+  if(t.sparkUnit)resetSparkyCharge(g,t,until);
+  if(t.dashState){t.dashState=null;t.dashTarget=null;t.dashEnd=null;t.invulnerableUntil=0;t.dashReadyAt=Math.max(t.dashReadyAt||0,until+.35);}
+  event(g,'stun',{x:t.x,y:t.y,owner,targetOwner:t.owner,duration});
+}
+function updateSparkyCharge(g,u){
+  if(!u.sparkUnit||u.hp<=0)return;
+  if(u.sparkCharged){u.sparkChargeProgress=1;return;}
+  if(!Number.isFinite(u.sparkChargeStartAt))u.sparkChargeStartAt=g.time;
+  const total=Math.max(.1,u.sparkChargeTime||3.5),progress=clamp((g.time-u.sparkChargeStartAt)/total,0,1);u.sparkChargeProgress=progress;
+  if(progress>=1-1e-8){u.sparkCharged=true;u.sparkChargeProgress=1;event(g,'sparky-ready',{x:u.x,y:u.y,owner:u.owner});}
+}
 function spellAreaImpact(g,p,type){
   event(g,type==='arrowrain'?'arrowrain-impact':'fireball-impact',{x:p.tx,y:p.ty,owner:p.owner,radius:p.splash,damage:p.damage});
   const centre={x:p.tx,y:p.ty};
@@ -404,16 +433,18 @@ function impact(g,p,entities){
   }else if(target&&targetable(p,target)){damage(g,target,p.damage,p.owner);applySlow(g,target,p);}
 }
 function attack(g,u,t){
+  if(u.sparkUnit&&!u.sparkCharged)return;
   const attackFactor=(u.slowUntil||0)>g.time?(u.slowAttackFactor||1):1;
   u.cd=u.cooldown/Math.max(.15,attackFactor);u.anim=.35;faceToward(u,t.x,t.y);u.target=t.id;
   let amount=u.damage;
+  if(u.sparkUnit){u.sparkCharged=false;u.sparkChargeProgress=0;u.sparkChargeStartAt=g.time;event(g,'sparky-fire',{x:u.x,y:u.y,tx:t.x,ty:t.y,owner:u.owner,radius:u.splash||90});}
   if(u.chargeMultiplier&&u.charged&&(t.kind||t.building)){
     amount=Math.round(amount*u.chargeMultiplier);u.charged=false;u.chargeRun=0;
     event(g,'charge-hit',{x:t.x,y:t.y,owner:u.owner,radius:48});
   }
   if(u.projectile){
     g.projectiles.push({id:`p${g.nextId++}`,owner:u.owner,x:u.x,y:u.y-6,sx:u.x,sy:u.y,tx:t.x,ty:t.y,target:t.id,
-    kind:u.projectile,speed:u.projectile==='bomb'?220:(u.projectile==='lightning'?520:(u.projectile==='dart'?560:(u.projectile==='mud'?300:390))),damage:amount,splash:u.splash||0,
+    kind:u.projectile,speed:u.projectile==='bomb'?220:(u.projectile==='lightning'?520:(u.projectile==='dart'?560:(u.projectile==='mud'?300:(u.projectile==='royal_arrow'?470:(u.projectile==='sparkblast'?340:390))))),damage:amount,splash:u.splash||0,
     targetsAir:u.targetsAir,life:3,slowMove:u.slowMove,slowAttack:u.slowAttack,slowDuration:u.slowDuration,
     chainCount:u.chainCount,chainRange:u.chainRange,chainFalloff:u.chainFalloff,mudRadius:u.mudRadius,mudDuration:u.mudDuration,mudTickEvery:u.mudTickEvery,mudDamage:u.mudDamage,mudSlow:u.mudSlow});
   }else{
@@ -471,13 +502,14 @@ export function runBot(g,owner=1){
   if(threat){
     const fireCluster=enemies.filter(u=>distance(u,threat)<=UNITS.fireball.radius+u.radius).length;
     const arrowCluster=enemies.filter(u=>distance(u,threat)<=UNITS.arrowrain.radius+u.radius).length;
+    if(aff.includes('zap')&&(threat.type==='sparky'||threat.type==='lasertower'||fireCluster>=4)){deploy(g,owner,'zap',threat.x,threat.y);return;}
     if(aff.includes('poison')&&(threat.type==='boneswarm'||fireCluster>=4)){deploy(g,owner,'poison',threat.x,threat.y);return;}
     if(aff.includes('arrowrain')&&arrowCluster>=3){deploy(g,owner,'arrowrain',threat.x,threat.y);return;}
     if(aff.includes('fireball')&&(fireCluster>=2||threat.type==='frost'||threat.type==='lumina')){deploy(g,owner,'fireball',threat.x,threat.y);return;}
   }
   let choices=aff.filter(id=>!UNITS[id].spell);if(!choices.length){
     const target=threat||g.towers.find(t=>t.owner!==owner&&t.kind==='tower'&&t.hp>0)||g.towers.find(t=>t.owner!==owner&&t.kind==='core'&&t.hp>0);
-    const spell=aff.includes('arrowrain')?'arrowrain':aff.includes('fireball')?'fireball':aff.includes('poison')?'poison':null;
+    const spell=aff.includes('zap')?'zap':aff.includes('arrowrain')?'arrowrain':aff.includes('fireball')?'fireball':aff.includes('poison')?'poison':null;
     if(target&&spell)deploy(g,owner,spell,target.x,target.y);return;
   }
   if(threat?.air&&choices.some(id=>UNITS[id].targetsAir))choices=choices.filter(id=>UNITS[id].targetsAir);
@@ -521,11 +553,13 @@ export function tick(g,dt=ARENA.tick){
     if(u.kind==='core'&&!u.awake){u.target=null;continue;}
     if(!u.kind){
       u.age+=dt;
+      if(u.sparkUnit)updateSparkyCharge(g,u);
       if(updateBurrow(g,u,dt))continue;
       if(u.spawn>0){u.spawn=Math.max(0,u.spawn-dt);continue;}
-      updateSummoner(g,u);
       if(u.decayPerSecond){decayStructure(g,u,u.decayPerSecond*dt);if(u.hp<=0)continue;}
     }
+    if((u.stunUntil||0)>g.time){u.target=null;if(u.laserTower)resetLaserTower(u);continue;}
+    if(!u.kind)updateSummoner(g,u);
     if(updateShadowRush(g,u,entities,dt))continue;
     healingPulse(g,u,entities);
     const target=getTarget(g,u,entities);
@@ -564,8 +598,8 @@ export function viewMatch(g,seat=0){
   const p=g.players[seat];
   return {physicsVersion:PHYSICS_VERSION,phase:g.phase,countdown:g.countdown,time:rnd(g.time),overtime:g.overtime,winner:g.winner,reason:g.reason,
     scores:[towerScore(g,0),towerScore(g,1)],energy:rnd(p.energy),hand:[...p.hand],next:p.queue[0],deck:[...p.deck],
-    units:g.units.map(u=>({id:u.id,type:u.type,owner:u.owner,x:rnd(u.x),y:rnd(u.y),hp:u.hp,maxHp:u.maxHp,radius:u.radius,air:u.air,building:!!u.building,anim:u.anim,hit:u.hit,walk:u.walk,spawn:u.spawn,face:u.face,facing:u.facing,moving:!!u.moving,mass:u.mass,age:u.age,target:u.target||null,laserStage:u.laserStage||0,laserDps:rnd(u.laserDps||0),laserLockTime:rnd(u.laserLockTime||0),charged:!!u.charged,chargeRun:rnd(u.chargeRun||0),slowed:(u.slowUntil||0)>g.time,slowRemaining:rnd(Math.max(0,(u.slowUntil||0)-g.time)),poisoned:(u.poisonUntil||0)>g.time,poisonOwner:Number.isFinite(u.poisonOwner)?u.poisonOwner:null,poisonRemaining:rnd(Math.max(0,(u.poisonUntil||0)-g.time)),mudded:(u.mudUntil||0)>g.time,mudRemaining:rnd(Math.max(0,(u.mudUntil||0)-g.time)),burrowState:u.burrowState||null,burrowProgress:rnd(u.burrowProgress||0),summonType:u.summonType||null,summonCount:u.summonCount||0,summonRemaining:u.summonInterval?rnd(Math.max(0,(u.summonNextAt||g.time)-g.time)):0,dashState:u.dashState||null,dashWindupRemaining:rnd(Math.max(0,(u.dashWindupUntil||0)-g.time)),dashCooldownRemaining:rnd(Math.max(0,(u.dashReadyAt||0)-g.time)),invulnerable:(u.invulnerableUntil||0)>g.time})),
-    towers:g.towers.map(t=>({id:t.id,kind:t.kind,owner:t.owner,x:t.x,y:t.y,hp:t.hp,maxHp:t.maxHp,radius:t.radius,anim:t.anim,hit:t.hit,facing:t.facing,awake:t.kind==='core'?!!t.awake:true})),
+    units:g.units.map(u=>({id:u.id,type:u.type,owner:u.owner,x:rnd(u.x),y:rnd(u.y),hp:u.hp,maxHp:u.maxHp,radius:u.radius,air:u.air,building:!!u.building,anim:u.anim,hit:u.hit,walk:u.walk,spawn:u.spawn,face:u.face,facing:u.facing,moving:!!u.moving,mass:u.mass,age:u.age,target:u.target||null,laserStage:u.laserStage||0,laserDps:rnd(u.laserDps||0),laserLockTime:rnd(u.laserLockTime||0),charged:!!u.charged,chargeRun:rnd(u.chargeRun||0),sparkCharged:!!u.sparkCharged,sparkChargeProgress:rnd(u.sparkChargeProgress||0),stunned:(u.stunUntil||0)>g.time,stunRemaining:rnd(Math.max(0,(u.stunUntil||0)-g.time)),slowed:(u.slowUntil||0)>g.time,slowRemaining:rnd(Math.max(0,(u.slowUntil||0)-g.time)),poisoned:(u.poisonUntil||0)>g.time,poisonOwner:Number.isFinite(u.poisonOwner)?u.poisonOwner:null,poisonRemaining:rnd(Math.max(0,(u.poisonUntil||0)-g.time)),mudded:(u.mudUntil||0)>g.time,mudRemaining:rnd(Math.max(0,(u.mudUntil||0)-g.time)),burrowState:u.burrowState||null,burrowProgress:rnd(u.burrowProgress||0),summonType:u.summonType||null,summonCount:u.summonCount||0,summonRemaining:u.summonInterval?rnd(Math.max(0,(u.summonNextAt||g.time)-g.time)):0,dashState:u.dashState||null,dashWindupRemaining:rnd(Math.max(0,(u.dashWindupUntil||0)-g.time)),dashCooldownRemaining:rnd(Math.max(0,(u.dashReadyAt||0)-g.time)),invulnerable:(u.invulnerableUntil||0)>g.time})),
+    towers:g.towers.map(t=>({id:t.id,kind:t.kind,owner:t.owner,x:t.x,y:t.y,hp:t.hp,maxHp:t.maxHp,radius:t.radius,anim:t.anim,hit:t.hit,facing:t.facing,awake:t.kind==='core'?!!t.awake:true,stunned:(t.stunUntil||0)>g.time,stunRemaining:rnd(Math.max(0,(t.stunUntil||0)-g.time))})),
     projectiles:g.projectiles.map(p=>({id:p.id,owner:p.owner,x:rnd(p.x),y:rnd(p.y),tx:rnd(p.tx),ty:rnd(p.ty),kind:p.kind,spell:p.spell||null,progress:rnd(p.progress||0),radius:p.splash||0})),
     zones:(g.zones||[]).map(z=>({id:z.id,owner:z.owner,kind:z.kind,spell:z.spell,x:rnd(z.x),y:rnd(z.y),radius:z.radius,remaining:rnd(z.remaining),total:z.total})),
     events:g.events.map(e=>({...e})),bot:g.bot,difficulty:g.difficulty};

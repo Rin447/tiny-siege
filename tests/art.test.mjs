@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import {SPELL_TEAM_COLORS, spellTeamStyle} from '../public/game/art.js';
 import {createMatch, deploy, tick, viewMatch} from '../public/game/engine.js';
 
@@ -32,4 +33,13 @@ test('lingering poison snapshot retains caster owner for spell-side rendering',(
   const snap=viewMatch(g,0),poisoned=snap.units.find(x=>x.id==='u-poison-test');
   assert.equal(poisoned.poisoned,true);
   assert.equal(poisoned.poisonOwner,0);
+});
+
+
+test('sparkblast render uses drawArena time and frame rendering resets transforms',()=>{
+  const source=fs.readFileSync(new URL('../public/game/art.js',import.meta.url),'utf8');
+  assert.match(source,/sparkblast'[\s\S]{0,260}time\*6/);
+  assert.doesNotMatch(source,/sparkblast'[\s\S]{0,260}\+t\*6/);
+  assert.match(source,/drawArena\(canvas,snapshot,options=\{\}\)[\s\S]{0,420}setTransform\(1,0,0,1,0,0\)/);
+  assert.match(source,/c\.save\(\);[\s\S]{0,120}try\{[\s\S]{0,1600}finally\{c\.restore\(\);\}/);
 });

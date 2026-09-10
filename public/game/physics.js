@@ -4,7 +4,7 @@ import {ARENA} from './units.js';
  * Ground bodies live on the lawn/bridges. Air bodies share a separate layer.
  * Buildings are static circles; tree/grass artwork is decorative only.
  */
-export const PHYSICS_VERSION=16;
+export const PHYSICS_VERSION=17;
 export const FIELD={left:34,right:686,top:28,bottom:1012};
 const EPS=0.001,GRID=20,COLS=33,ROWS=49;
 const worldCaches=new WeakMap();

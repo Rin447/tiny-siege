@@ -7,8 +7,8 @@ function deckWith(id){return [id,...DECK.filter(k=>k!==id)].slice(0,MAX_DECK);}
 function ready(g,o,id){const p=g.players[o],deck=deckWith(id);p.energy=10;p.deck=[...deck];p.hand=deck.slice(0,4);p.queue=deck.slice(4);}
 function spawn(g,o,id,x=190,y=o===0?650:390){ready(g,o,id);const r=deploy(g,o,id,x,y);assert.ok(r.ok,r.error);return g.units.at(-1);}
 function advance(g,seconds){for(let i=0;i<Math.round(seconds*10);i++)tick(g,.1);}
-test('twenty-seven selectable cards, twenty-four unit cards plus three spells, and eight-card deck rule',()=>{
- assert.equal(DECK.length,27);assert.equal(new Set(DECK).size,27);assert.equal(UNIT_IDS.length,24);assert.deepEqual(SPELL_IDS,['fireball','poison','arrowrain']);
+test('thirty selectable cards, twenty-six unit cards plus four spells, and eight-card deck rule',()=>{
+ assert.equal(DECK.length,30);assert.equal(new Set(DECK).size,30);assert.equal(UNIT_IDS.length,26);assert.deepEqual(SPELL_IDS,['fireball','poison','arrowrain','zap']);
  assert.equal(MAX_DECK,8);assert.equal(DEFAULT_DECK.length,8);assert.deepEqual(normalizeDeck(DEFAULT_DECK),[...DEFAULT_DECK]);
  for(const id of DECK){const d=UNITS[id];assert.ok(d.cost>=1&&d.damage>0);if(!d.spell)assert.ok(d.hp>0);assert.notEqual(d.hidden,true);}
  assert.equal(DECK.includes('mini_golem'),false);assert.equal(UNITS.mini_golem.hidden,true);
@@ -28,9 +28,13 @@ test('twenty-seven selectable cards, twenty-four unit cards plus three spells, a
  assert.equal(UNITS.muddragon.cost,5);assert.equal(UNITS.muddragon.hp,1600);assert.equal(UNITS.muddragon.damage,200);assert.equal(UNITS.muddragon.range,78);assert.equal(UNITS.muddragon.splash,45);assert.equal(UNITS.muddragon.mudDuration,2);assert.equal(UNITS.muddragon.mudDamage,30);
  assert.equal(UNITS.blowdart.cost,3);assert.equal(UNITS.blowdart.hp,240);assert.equal(UNITS.blowdart.damage,110);assert.equal(UNITS.blowdart.cooldown,.5);assert.equal(UNITS.blowdart.range,195);assert.equal(UNITS.blowdart.targetsAir,true);
  assert.equal(UNITS.lasertower.cost,5);assert.equal(UNITS.lasertower.hp,2000);assert.equal(UNITS.lasertower.laserTower,true);assert.equal(UNITS.lasertower.laserBaseDps,20);assert.equal(UNITS.lasertower.laserRampEvery,1.5);assert.equal(UNITS.lasertower.targetsAir,true);
- assert.equal(UNITS.necromancer.cost,6);assert.equal(UNITS.necromancer.hp,1350);assert.equal(UNITS.necromancer.damage,125);assert.equal(UNITS.necromancer.targetsAir,true);assert.equal(UNITS.necromancer.splash,54);assert.equal(UNITS.necromancer.summonType,'boneswarm');assert.equal(UNITS.necromancer.summonCount,3);assert.equal(UNITS.necromancer.summonInterval,6);assert.equal(UNITS.necromancer.summonOnDeploy,true);
- assert.equal(UNITS.darknecro.cost,5);assert.equal(UNITS.darknecro.hp,1150);assert.equal(UNITS.darknecro.damage,165);assert.equal(UNITS.darknecro.targetsAir,false);assert.equal(UNITS.darknecro.summonType,'bat');assert.equal(UNITS.darknecro.summonCount,2);assert.equal(UNITS.darknecro.summonInterval,5);assert.equal(UNITS.darknecro.summonOnDeploy,true);
+ assert.equal(UNITS.necromancer.cost,6);assert.equal(UNITS.necromancer.hp,1350);assert.equal(UNITS.necromancer.damage,125);assert.equal(UNITS.necromancer.targetsAir,true);assert.equal(UNITS.necromancer.splash,54);assert.equal(UNITS.necromancer.summonType,'boneswarm');assert.equal(UNITS.necromancer.summonCount,3);assert.equal(UNITS.necromancer.summonInterval,7.5);assert.equal(UNITS.necromancer.summonOnDeploy,true);
+ assert.equal(UNITS.darknecro.cost,5);assert.equal(UNITS.darknecro.hp,1150);assert.equal(UNITS.darknecro.damage,165);assert.equal(UNITS.darknecro.targetsAir,false);assert.equal(UNITS.darknecro.summonType,'bat');assert.equal(UNITS.darknecro.summonCount,2);assert.equal(UNITS.darknecro.summonInterval,6.5);assert.equal(UNITS.darknecro.range,34);assert.equal(UNITS.darknecro.projectile,undefined);assert.equal(UNITS.darknecro.summonOnDeploy,true);
  assert.equal(UNITS.ashsquad.cost,5);assert.equal(UNITS.ashsquad.count,3);assert.equal(UNITS.ashsquad.spawnType,'blade');
+ assert.equal(UNITS.archer.cost,2);assert.equal(UNITS.mage.cost,3);assert.equal(UNITS.berserker.cooldown,1.8);
+ assert.equal(UNITS.princess.cost,3);assert.equal(UNITS.princess.hp,300);assert.equal(UNITS.princess.damage,275);assert.equal(UNITS.princess.cooldown,3);assert.equal(UNITS.princess.range,350);assert.equal(UNITS.princess.splash,70);assert.equal(UNITS.princess.targetsAir,true);
+ assert.equal(UNITS.zap.cost,2);assert.equal(UNITS.zap.damage,225);assert.equal(UNITS.zap.stunDuration,1.5);assert.equal(UNITS.zap.radius,78);
+ assert.equal(UNITS.sparky.cost,6);assert.equal(UNITS.sparky.hp,1500);assert.equal(UNITS.sparky.damage,1200);assert.equal(UNITS.sparky.range,145);assert.equal(UNITS.sparky.splash,90);assert.equal(UNITS.sparky.sparkChargeTime,3.5);assert.equal(UNITS.sparky.targetsAir,false);
 });
 for(const id of DECK)test(`deploy ${id}: energy, count, card rotation`,()=>{
  const g=battle();ready(g,0,id);const next=g.players[0].queue[0],r=deploy(g,0,id,190,650);
@@ -38,17 +42,17 @@ for(const id of DECK)test(`deploy ${id}: energy, count, card rotation`,()=>{
  assert.equal(g.players[0].hand[0],next);assert.equal(g.players[0].queue.at(-1),id);
  assert.equal(new Set([...g.players[0].hand,...g.players[0].queue]).size,MAX_DECK);
 });
-test('necromancer summons three bones immediately and three more every six seconds',()=>{
+test('necromancer summons three bones immediately and three more every 7.5 seconds',()=>{
  const g=battle();ready(g,0,'necromancer');const r=deploy(g,0,'necromancer',190,650);assert.ok(r.ok,r.error);
- const necro=g.units.find(u=>u.type==='necromancer');assert.ok(necro);assert.equal(g.units.filter(u=>u.type==='boneswarm'&&u.owner===0).length,3);assert.equal(necro.summonNextAt,6);g.towers.forEach(t=>t.range=0);
- advance(g,5.8);assert.equal(g.units.filter(u=>u.type==='boneswarm'&&u.owner===0).length,3);
+ const necro=g.units.find(u=>u.type==='necromancer');assert.ok(necro);assert.equal(g.units.filter(u=>u.type==='boneswarm'&&u.owner===0).length,3);assert.equal(necro.summonNextAt,7.5);g.towers.forEach(t=>t.range=0);
+ advance(g,7.3);assert.equal(g.units.filter(u=>u.type==='boneswarm'&&u.owner===0).length,3);
  // Keep the fixture alive and isolated so the timer itself is what is being tested.
  necro.hp=necro.maxHp;g.towers.forEach(t=>t.range=0);advance(g,.3);assert.equal(g.units.filter(u=>u.type==='boneswarm'&&u.owner===0).length,6);
 });
-test('dark necromancer summons two bats immediately and two more every five seconds',()=>{
+test('dark necromancer is melee and summons two bats immediately and two more every 6.5 seconds',()=>{
  const g=battle();ready(g,0,'darknecro');const r=deploy(g,0,'darknecro',190,650);assert.ok(r.ok,r.error);
- const dark=g.units.find(u=>u.type==='darknecro');assert.ok(dark);assert.equal(g.units.filter(u=>u.type==='bat'&&u.owner===0).length,2);assert.equal(dark.summonNextAt,5);
- g.towers.forEach(t=>t.range=0);advance(g,5.1);assert.equal(g.units.filter(u=>u.type==='bat'&&u.owner===0).length,4);
+ const dark=g.units.find(u=>u.type==='darknecro');assert.ok(dark);assert.equal(g.units.filter(u=>u.type==='bat'&&u.owner===0).length,2);assert.equal(dark.summonNextAt,6.5);
+ g.towers.forEach(t=>t.range=0);advance(g,6.3);assert.equal(g.units.filter(u=>u.type==='bat'&&u.owner===0).length,2);advance(g,.3);assert.equal(g.units.filter(u=>u.type==='bat'&&u.owner===0).length,4);
 });
 test('dead summoners never create another periodic wave',()=>{
  const g=battle();ready(g,0,'necromancer');deploy(g,0,'necromancer',190,650);g.towers.forEach(t=>t.range=0);const necro=g.units.find(u=>u.type==='necromancer');necro.hp=0;advance(g,7);
@@ -108,6 +112,23 @@ test('unknown card and non-hand card rejected',()=>{
  for(const id of ['unknown',null,{},[],{toString:null,valueOf:null},'__proto__','constructor'])assert.ok(canPlace(g,0,id,100,650));
  assert.ok(canPlace(g,0,g.players[0].queue[0],100,650));
 });
+test('princess archer can damage a side tower from own side of the river and Arrow Rain can one-shot her',()=>{
+ const g=battle();ready(g,0,'princess');g.towers.forEach(t=>t.damage=0);const tower=g.towers.find(t=>t.owner===1&&t.kind==='tower'&&t.x===530),before=tower.hp;
+ assert.ok(deploy(g,0,'princess',530,600).ok);advance(g,4.2);assert.ok(tower.hp<before,'princess should hit tower before crossing bridge');const princess=g.units.find(u=>u.type==='princess');assert.ok(princess&&princess.y>=ARENA.riverBottom,'princess should remain on own side when first tower damage lands');
+ const h=battle();ready(h,1,'princess');ready(h,0,'arrowrain');h.towers.forEach(t=>t.range=0);assert.ok(deploy(h,1,'princess',530,400).ok);advance(h,.6);const p=h.units.find(u=>u.owner===1&&u.type==='princess');assert.ok(p);assert.ok(deploy(h,0,'arrowrain',p.x,p.y).ok);advance(h,1.2);assert.equal(h.units.some(u=>u.owner===1&&u.type==='princess'),false);
+});
+
+test('sparky charges before anything enters attack range, fires only when full, then starts charging again',()=>{
+ const g=battle();ready(g,0,'sparky');g.towers.forEach(t=>t.range=0);assert.ok(deploy(g,0,'sparky',530,650).ok);const s=g.units.find(u=>u.type==='sparky');s.speed=0;advance(g,3.6);assert.ok(s.sparkCharged);assert.equal(s.sparkChargeProgress,1);assert.ok(s.target,'Sparky may know a distant tower but must charge without needing an attackable target in range');
+ const target=spawn(g,1,'knight',530,390);target.x=530;target.y=520;target.speed=0;target.damage=0;const hp=target.hp;advance(g,.5);assert.ok(target.hp<=hp-UNITS.sparky.damage,'full Sparky should release 1200 shot');assert.equal(s.sparkCharged,false);assert.ok(s.sparkChargeProgress<.25);
+});
+
+test('zap stuns and resets targets, laser ramp, and sparky charge',()=>{
+ const g=battle();g.towers.forEach(t=>t.range=0);ready(g,0,'zap');const laser=spawn(g,1,'lasertower',530,390),sparky=spawn(g,1,'sparky',440,390);laser.x=530;laser.y=520;sparky.x=490;sparky.y=520;laser.target='dummy';laser.laserTarget='dummy';laser.laserStage=5;laser.laserDps=640;laser.laserLockTime=8;sparky.sparkCharged=true;sparky.sparkChargeProgress=1;sparky.target='dummy';const hp=sparky.hp;
+ assert.ok(deploy(g,0,'zap',510,520).ok);assert.equal(sparky.hp,hp-UNITS.zap.damage);assert.ok(sparky.stunUntil>=1.5);assert.equal(sparky.target,null);assert.equal(sparky.sparkCharged,false);assert.equal(sparky.sparkChargeProgress,0);assert.equal(laser.target,null);assert.equal(laser.laserStage,0);assert.equal(laser.laserDps,UNITS.lasertower.laserBaseDps);
+ advance(g,1.4);assert.equal(sparky.sparkCharged,false);advance(g,3.6);assert.equal(sparky.sparkCharged,true);
+});
+
 test('not enough energy never spawns or changes hand',()=>{
  const g=battle();ready(g,0,'knight');g.players[0].energy=2;const before=JSON.stringify(g);
  assert.equal(deploy(g,0,'knight',100,660).ok,false);assert.equal(JSON.stringify(g),before);

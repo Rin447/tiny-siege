@@ -13,9 +13,9 @@ function body(g,type,owner,x,y){const u={...UNITS[type],id:`u${g.nextId++}`,type
 function checkStatics(g){for(const u of g.units)if(!u.building&&u.burrowState!=='burrow')assert.ok(staticFree(g,u,u),`${u.id} ${u.type} in static at ${u.x},${u.y}`);}
 
 test('v16 physics version and mass/radius data are explicit',()=>{
- assert.equal(VERSION,'17.0.0');assert.equal(PHYSICS_VERSION,16);
+ assert.equal(VERSION,'18.1.0');assert.equal(PHYSICS_VERSION,17);
  assert.ok(UNITS.knight.mass>UNITS.archer.mass);assert.ok(UNITS.knight.radius>UNITS.archer.radius);
- assert.equal(createMatch().physicsVersion,16);
+ assert.equal(createMatch().physicsVersion,17);
 });
 test('body may not put its edge across the river even if its centre is on land',()=>{
  const u=UNITS.knight;assert.equal(terrainFree(u,{x:350,y:480}),false);
@@ -145,7 +145,7 @@ test('rendering depth mixes towers and ground troops; air is always after ground
  assert.deepEqual(renderOrder(g,1).map(x=>x.entity.id),['front','tower','rear','air']);
 });
 test('server snapshots expose facing/mass/layer but not pathfinding internals',()=>{
- const g=game(),u=unit(g,'knight',0,190,930);advance(g,15);const snap=viewMatch(g,0);assert.equal(snap.physicsVersion,16);
+ const g=game(),u=unit(g,'knight',0,190,930);advance(g,15);const snap=viewMatch(g,0);assert.equal(snap.physicsVersion,17);
  assert.equal(snap.units[0].mass,6);assert.equal(typeof snap.units[0].facing,'number');assert.ok(!('_nav' in snap.units[0]));
 });
 test('legacy active matches terminate safely instead of resuming inside new obstacles',()=>{

@@ -1,5 +1,26 @@
 # Changelog
 
+## 18.1.0 - DETAIL DEMO RENDER FIX (2026-09-10)
+
+- Fixed the Sparky LIVE BATTLE DEMO throwing during sparkblast rendering after the first charged shot.
+- Replaced the undefined projectile animation variable with drawArena's `time` value.
+- Reset the canvas transform at the start of every frame and protect projectile save/restore with `try/finally`, preventing rotated/scaled frames from accumulating after a render error.
+- Gameplay stats and authoritative combat logic are unchanged; physicsVersion remains 17.
+
+## 18.0.0 - LONGSHOT & VOLTAGE (2026-09-10)
+
+- Added Princess Archer: cost 3, HP 300, damage 275 every 3 seconds, range 350, radius 70 splash, ground/air targeting. She can attack an enemy side tower from the player's side of the river and dies to Arrow Rain.
+- Added Zap: cost 2, radius 78, 225 damage and 1.5 second stun. Zap clears current targets, resets Laser Tower ramping, and resets Sparky charge.
+- Added Sparky: cost 6, HP 1500, ground-only 1200 damage with radius 90 splash and range 145. It charges continuously for 3.5 seconds even without a target, waits at full charge, and restarts charging after firing or after Zap.
+- Rune Mage cost 4 -> 3. Leaf Archer cost 3 -> 2. Kragg Berserker cooldown 1.6 -> 1.8 seconds.
+- Physics version bumped to 17 for stun/charge synchronization.
+
+## 17.1.0 - SUMMONER BALANCE & DECK UI (2026-09-10)
+
+- Necromancer periodic summon interval changed from 6.0 to 7.5 seconds; immediate three-Bone deployment summon remains.
+- Dark Necromancer periodic summon interval changed from 5.0 to 6.5 seconds; immediate two-Moon-Bat deployment summon remains.
+- Deck summary was compacted so “8 / 8 selected” and average cost share one row and the explanatory helper paragraph was removed.
+
 ## 17.0.0
 - Added Necromancer: cost 6, HP 1350, ranged ground/air splash attack, three Bones immediately on deploy and three more every six seconds while alive.
 - Added Dark Necromancer: cost 5, HP 1150, stronger ground-only ranged attack, two Moon Bats immediately on deploy and two more every five seconds while alive.

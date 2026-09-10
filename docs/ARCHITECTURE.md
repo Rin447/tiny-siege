@@ -1,6 +1,6 @@
-# TINY SIEGE v17.0 architecture
+# TINY SIEGE v18.0 architecture
 
-CPU練習、Nodeローカルサーバー、Cloudflare Durable Objectsは同じ `public/game/engine.js` を共有します。v17は27カード（24ユニットカード＋3呪文）、8枚デッキ、4枚手札です。
+CPU練習、Nodeローカルサーバー、Cloudflare Durable Objectsは同じ `public/game/engine.js` を共有します。v18は30カード（26ユニットカード＋4呪文）、8枚デッキ、4枚手札です。
 
 
 ## v16.1 spell ownership rendering
@@ -43,7 +43,16 @@ UI側の `hover` はカーソル/指位置の一時プレビュー専用です�
 
 ## compatibility
 
-`physicsVersion=16`。v17.0.0では新しい配置時召喚・定期召喚と新カード3枚を追加したため15から16へ更新しました。実戦デッキ保存キーは `tiny-deck-v17`、マイリストは `tiny-deck-presets-v17` を使用し、v16の保存内容をフォールバック読込して移行できます。
+`physicsVersion=17`。v18.0.0ではザップのスタン/攻撃対象リセットとスパーキーの常時充電/充電リセットがauthoritativeな戦闘状態へ追加されたため16から17へ更新しました。実戦デッキ保存キーは `tiny-deck-v18`、マイリストは `tiny-deck-presets-v18` を使用し、v17以前の保存内容をフォールバック読込して移行できます。
+
+## v18.0 long-range / stun / charge mechanics
+
+- Princess Archer is cost 3 / HP 300 / damage 275 / cooldown 3.0 / range 350 / splash radius 70. She targets ground and air, and her range is intentionally long enough to attack an enemy side tower before crossing the river.
+- Zap is a cost-2 instant spell with radius 78, 225 unit/building damage and a 1.5 second stun. `applyStun()` clears the current target, resets Laser Tower ramping, and resets Sparky charge. After stun ends, normal target selection runs again.
+- Sparky is cost 6 / HP 1500 / ground-only / damage 1200 / range 145 / splash radius 90. `sparkChargeStartAt` begins at deployment time even with no target. At 3.5 seconds it becomes `sparkCharged=true` and waits ready until a valid target enters range. Firing restarts the charge. Zap resets progress to zero and delays the new charge start until stun ends.
+- `viewMatch()` exposes Sparky charge and stun metadata used only for synchronized rendering; authoritative timers remain in the engine.
+- Rune Mage costs 3, Leaf Archer costs 2, and Kragg Berserker attack cooldown is 1.8 seconds.
+- Active deck storage writes `tiny-deck-v18` with v17 and older fallback. My List writes `tiny-deck-presets-v18` and can migrate v17/v16 presets.
 
 ## v16.2 deck builder UI
 
@@ -64,6 +73,10 @@ v16.2.0 keeps the authoritative battle simulation unchanged and adds client-side
 
 ## v16.3 card detail live demo
 Card details no longer use a separate hand-authored animation. They create a small controlled match and reuse the same `createMatch`, `deploy`, `tick`, `viewMatch`, and `drawArena` pipeline as normal play. Demo-only code chooses which real cards are deployed and where; combat stats, targeting, projectiles, zones, movement, tower logic and art stay authoritative in the normal engine/render modules.
+
+### v18.1 detail-demo render resilience
+
+`drawArena()` resets the Canvas transform to identity at the start of every frame. Generic projectile drawing also wraps its local `save()` in `try/finally` so `restore()` runs even when an effect throws. The Sparky `sparkblast` effect uses the function's `time` argument rather than an undefined local animation variable. This prevents a failed detail-demo frame from leaving a rotated/scaled transform that contaminates later frames or other card details.
 
 
 ## v16.4 balance and ability-focused live demos

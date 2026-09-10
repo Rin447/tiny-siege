@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#182f39">
-<title>TINY SIEGE — 27枚から8枚を選ぶ小さな攻城戦</title>
+<title>TINY SIEGE — 30枚から8枚を選ぶ小さな攻城戦</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/styles.css">
 </head>
@@ -27,8 +27,8 @@
   <section class="hero-copy">
     <div class="eyebrow"><span></span> PRIVATE 1V1 · REALTIME TACTICS</div>
     <h1>その一枚で、<br>戦況を<span>変えよう。</span></h1>
-    <p class="hero-desc">前衛で守る。後衛で射抜く。<br>21体＋3呪文から8枚を選び、<br>自分の編成で挑む2Dリアルタイム攻城戦。</p>
-    <div class="hero-stats"><div><strong>24</strong><small>21体＋3呪文</small></div><div><strong>3<span> min</span></strong><small>一手が変える攻防</small></div><div><strong>1v1</strong><small>友だちとオンライン</small></div></div>
+    <p class="hero-desc">前衛で守る。後衛で射抜く。<br>26体＋4呪文から8枚を選び、<br>自分の編成で挑む2Dリアルタイム攻城戦。</p>
+    <div class="hero-stats"><div><strong>30</strong><small>26体＋4呪文</small></div><div><strong>3<span> min</span></strong><small>一手が変える攻防</small></div><div><strong>1v1</strong><small>友だちとオンライン</small></div></div>
     <div class="hero-note"><span class="note-dot"></span><p>通話はいつものVCで。<br>ここでは、戦いに集中しよう。</p></div>
     <div class="version-stamp">DECK BUILDER · CARD PREVIEW <span>16 / MY LIST</span></div>
   </section>
@@ -44,7 +44,7 @@
     <div class="deck-summary">
       <div class="block-title"><span>DECK</span><h3>今回使う8枚</h3><small id="homeDeckAverage" class="deck-average-inline">平均コスト ◆ 0.0</small><button id="homeDeckBtn" class="textbtn" type="button">編集する</button></div>
       <div id="homeDeck" class="mini-roster deck-mini"></div>
-      <p class="field-help">27枚（24ユニットカード＋3呪文）から8枚を選択。平均コストを見ながら編成できます。対戦開始前なら何度でも変更できます。</p>
+      <p class="field-help">30枚（26ユニットカード＋4呪文）から8枚を選択。平均コストを見ながら編成できます。対戦開始前なら何度でも変更できます。</p>
     </div>
     <div class="practice-block">
       <div class="block-title"><span>01</span><h3>ひとりで練習</h3><small>CPU BATTLE</small></div>
@@ -104,7 +104,7 @@
     <div id="hand" class="hand"></div>
     <div class="energy-row"><span class="energy-icon">◆</span><strong id="energyValue">5</strong><div id="energyTrack" class="energy-track"></div><span id="nextCard">NEXT</span></div>
     <div class="battle-tools"><button id="physicsBtn" class="textbtn" aria-pressed="false">当たり判定を表示</button><span id="physicsLegend">地上と空中は別レイヤー</span></div>
-    <div id="battleHint" class="battle-hint">カードを選択。ユニットは配置、3種類の呪文は戦場の地点を指定します。</div>
+    <div id="battleHint" class="battle-hint">カードを選択。ユニットは配置、4種類の呪文は戦場の地点を指定します。</div>
   </section>
   <aside class="unit-inspector">
     <div class="section-label">SELECTED CARD</div>
@@ -114,18 +114,18 @@
     <div class="match-rules"><h4>この一戦のルール</h4><p>本拠地を壊せば即勝利。3分で同数なら延長戦。延長後も同数なら残りタワーHPで決着。</p><p>残り1分からエナジー回復が2倍。切り札を重ねて攻めよう。</p></div>
   </aside>
 </main>
-<footer id="footer"><span>ひとつのURLから、小さな戦場へ。</span><span>TINY SIEGE <i>/</i> v17.0.0 · SUMMONERS UPDATE</span></footer>
+<footer id="footer"><span>ひとつのURLから、小さな戦場へ。</span><span>TINY SIEGE <i>/</i> v18.1.0 · DETAIL DEMO RENDER FIX</span></footer>
 
 <div id="toast" class="toast" role="status" hidden></div>
 <dialog id="deckModal" class="deck-modal">
   <div class="modal-head"><div><span class="eyebrow">BUILD YOUR EIGHT</span><h2>デッキ編集</h2></div><button class="close-modal iconbtn" aria-label="閉じる">×</button></div>
   <div class="deck-sticky">
-    <div class="deck-editor-head"><div><strong id="deckCount">8 / 8</strong><span>選択中</span></div><div class="deck-average"><span>AVERAGE ENERGY</span><strong id="deckAverage">◆ 0.0</strong></div><p>カードをタップして「デッキに入れる / 外す」か「詳細を見る」を選択できます。</p></div>
+    <div class="deck-editor-head"><div class="deck-count-inline"><strong id="deckCount">8 / 8</strong><span>選択中</span></div><div class="deck-average"><span>平均コスト</span><strong id="deckAverage">◆ 0.0</strong></div></div>
     <div class="deck-utility-row"><button id="myListBtn" class="btn outline" type="button">マイリスト</button><button id="saveMyListBtn" class="btn outline" type="button">現在の8枚をマイリスト保存</button><span>最大10デッキ</span></div>
     <div id="deckSlots" class="deck-slots"></div>
   </div>
   <div id="myListPanel" class="mylist-panel" hidden><div class="mylist-head"><div><strong>MY LIST</strong><span>保存した8枚を呼び出せます</span><b id="myListCount">0 / 10</b></div><button id="closeMyListBtn" class="textbtn" type="button">閉じる</button></div><p id="myListStatus" class="mylist-status" role="status" hidden></p><div id="myListGrid" class="mylist-grid"></div><p id="myListEmpty" class="muted">まだ保存されたデッキはありません。「現在の8枚をマイリスト保存」を押すと自動名ですぐ登録されます。</p></div>
-  <div class="deck-pool-head"><div><span class="eyebrow">CARD POOL</span><h3>27枚から選ぶ</h3></div><small>PC・スマホとも3列固定。カードを押して操作を選択。</small></div>
+  <div class="deck-pool-head"><div><span class="eyebrow">CARD POOL</span><h3>30枚から選ぶ</h3></div><small>PC・スマホとも3列固定。カードを押して操作を選択。</small></div>
   <div id="deckPool" class="deck-pool"></div>
   <div class="deck-actions"><button id="deckDefaultBtn" class="btn outline">おすすめに戻す</button><button id="deckSaveBtn" class="btn dark">この8枚で保存</button></div>
   <p id="deckError" class="error" hidden></p>
@@ -152,7 +152,7 @@
     </section>
   </div>
 </dialog>
-<dialog id="libraryModal"><div class="modal-head"><div><span class="eyebrow">MEET YOUR TWENTY-FOUR</span><h2>カード図鑑</h2></div><button class="close-modal iconbtn" aria-label="閉じる">×</button></div><p class="muted">21体のユニットと3枚の呪文を確認できます。実戦に持ち込めるのはデッキで選んだ8枚です。</p><div class="roster-tools"><button id="libraryFacingBtn" class="btn outline" aria-pressed="false">後ろ姿を見る ↻</button><small>戦場では進行・攻撃方向で自動切り替え。</small></div><div id="libraryGrid" class="library-grid"></div></dialog>
+<dialog id="libraryModal"><div class="modal-head"><div><span class="eyebrow">MEET YOUR THIRTY</span><h2>カード図鑑</h2></div><button class="close-modal iconbtn" aria-label="閉じる">×</button></div><p class="muted">26体のユニットと4枚の呪文を確認できます。実戦に持ち込めるのはデッキで選んだ8枚です。</p><div class="roster-tools"><button id="libraryFacingBtn" class="btn outline" aria-pressed="false">後ろ姿を見る ↻</button><small>戦場では進行・攻撃方向で自動切り替え。</small></div><div id="libraryGrid" class="library-grid"></div></dialog>
 <dialog id="updatesModal" class="updates-modal"><div class="modal-head"><div><span class="eyebrow">LAST 7 DAYS</span><h2>アプデ情報</h2></div><button class="close-modal iconbtn" aria-label="閉じる">×</button></div>
   <div class="updates-intro"><p>直近7日以内に追加された変更だけを表示します。同じメジャー番号の更新は1つにまとめます。</p><span id="updatesRange">PATCH WINDOW</span></div>
   <div id="patchNotes" class="patch-notes"></div>
@@ -163,14 +163,14 @@
     <section><b>01</b><div><h3>まずはCPU戦から</h3><p>名前を入れて「CPUと対戦する」。オンラインはルームを作り、URLと6桁PASSを友だちへ共有します。</p></div></section>
     <section><b>02</b><div><h3>カード → 自分の陣地</h3><p>手札4枚から1枚を選び、画面下側の自陣にタップで配置。カードをフィールドへドラッグしてもOK。ユニットは自動で移動・攻撃します。砲台などの設置物は配置前に攻撃範囲が表示されます。</p></div></section>
     <section><b>03</b><div><h3>エナジーを使い分ける</h3><p>カード左上の数字が必要コスト。エナジーは最大10まで回復します。使ったカードは待機列へ入り、次の1枚が手札に補充されます。</p></div></section>
-    <section><b>04</b><div><h3>27枚から8枚を選ぶ</h3><p>「デッキ」はPC・スマホとも3列表示。カードを押すと「デッキに入れる / 外す」と「詳細を見る」を選べます。詳細では本番と同じ戦闘エンジンのLIVE BATTLE DEMOを確認でき、気に入った8枚はマイリストへ最大10個保存できます。</p></div></section>
+    <section><b>04</b><div><h3>30枚から8枚を選ぶ</h3><p>「デッキ」はPC・スマホとも3列表示。カードを押すと「デッキに入れる / 外す」と「詳細を見る」を選べます。詳細では本番と同じ戦闘エンジンのLIVE BATTLE DEMOを確認でき、気に入った8枚はマイリストへ最大10個保存できます。</p></div></section>
     <section><b>05</b><div><h3>本拠地は最初は休眠</h3><p>中央本拠地は3240HP、左右タワーは1980HP。中央は試合開始時は攻撃せず、左右どちらかのサイドタワーが壊れるか、中央自身が1度でもダメージを受けると起動して試合終了まで反撃します。本拠地を壊せば即勝利です。</p></div></section>
     <section><b>06</b><div><h3>通話はいつものVCで</h3><p>オンラインで切断したら最大45秒間一時停止して再接続を待ちます。戻れなければ切断側の敗北、両方切断は引き分け。CPU戦ではタブを離れると一時停止します。</p></div></section>
     <section><b>07</b><div><h3>タワー破壊で前線が進む</h3><p>敵サイドタワーを1本破壊すると、その側のレーンと中央の細い帯だけが白線まで前進します。左右2本とも破壊すると、白線より手前の敵陣前半が横幅いっぱい・中央の隙間なしで配置可能になります。</p></div></section>
     <section><b>08</b><div><h3>大きさと地上／空中</h3><p>味方は同じ高度で軽く押し合い、敵とはすり抜けず接触します。大きな衛士は押されにくく、細い道で場所を取ります。飛行は地上の部隊・建物を無視。対空攻撃ができることと、飛んでいることは別です。</p></div></section>
     <section><b>09</b><div><h3>向きと判定を確認</h3><p>敵陣へ進む自分の部隊は背中が見え、後ろの敵を狙えば正面を向きます。図鑑で正面／背面を切り替え。「当たり判定を表示」で足元の円を確認できます。矢・魔法は味方や建物で遮られません。スペルの範囲表示は青＋実線＝自分、赤＋点線＝相手です。</p></div></section>
     <section><b>10</b><div><h3>建物特攻と新しい相性</h3><p>ゴーレムとアイアンボアは敵兵を攻撃せず建物へ。ゴーレムは2850HP・288攻撃に調整され、倒されるとちびゴーレム2体へ分裂。親子とも死亡時に周囲へダメージを与えます。ナイトシェイドの無敵突進、砲台のHP減衰に加え、6コスト高火力のクラッグバーサーカーも参戦します。</p></div></section>
-    <section><b>11</b><div><h3>3種類の範囲呪文</h3><p>ファイヤーボールは高威力の偏差撃ち。ポイズントラップは半径90へ即展開し、離脱後も3秒毒が残ります。矢の雨は半径130と広く、330ダメージでファイヤーボールより速く着弾します。</p></div></section>
+    <section><b>11</b><div><h3>4種類の範囲呪文</h3><p>ファイヤーボールは高威力の偏差撃ち。ポイズントラップは継続毒、矢の雨は広範囲処理。ザップは半径78へ瞬時に225ダメージ＋1.5秒スタンを与え、攻撃対象・レーザー増幅・スパーキー充電をリセットします。</p></div></section>
   </div>
   <p class="help-note">オリジナルの試作ルールです。外部ゲームのキャラクター・画像・音源は使用していません。オンライン対戦はCloudflareへのサーバー込みの公開が必要です。</p>
 </dialog>

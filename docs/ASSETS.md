@@ -1,4 +1,4 @@
-# Original procedural art, v17.0
+# Original procedural art, v18.0
 
 外部キャラクター素材は使用せず、`public/game/art.js` のCanvas図形で描画します。
 
@@ -23,3 +23,11 @@ No external character art, GIFs, videos, or third-party game assets were added.
 - Dark Necromancer: darker original procedural variation with a separate `dark` projectile and bat-summoning theme.
 - Ash Squad card: original procedural three-swordsman composition. In battle it spawns three existing Ash Swordsman rigs, so the card and battle behavior stay consistent with the established unit.
 - Summon effects are rendered from the normal Canvas event pipeline; the Bone and Moon Bat minions are the real existing TINY SIEGE units rather than separate demo-only art.
+
+## v18.0 Princess / Zap / Sparky art
+No external character art, images, GIFs, videos, or third-party game assets were added.
+
+- Princess Archer: original procedural royal archer portrait/battle rig with an oversized bow and `royal_arrow` projectile.
+- Zap: original procedural electric spell portrait, impact ring and stun lightning effects.
+- Sparky: original procedural heavy electric cannon. Charge intensity increases visually with progress; full charge has a stronger glow/electric state and `sparkblast` projectile.
+- Stunned units/buildings receive synchronized electric status effects from battle snapshot metadata.

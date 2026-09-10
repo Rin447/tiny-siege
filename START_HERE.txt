@@ -1,16 +1,12 @@
-TINY SIEGE v17.0.0 - SUMMONERS UPDATE
+TINY SIEGE v18.1.0 - DETAIL DEMO RENDER FIX
 
-1. tiny-siege-cloudflare-v17.zip を展開します。
-2. 中身全部を GitHub の Rin447/tiny-siege ルートへ上書きします。
-3. main へ Commit します。例: Upgrade Tiny Siege to v17.0.0
-4. Cloudflare の自動 Deploy を待ちます。
-5. /api/config で version 17.0.0 / cards 27 / units 24 / spells 3 / physicsVersion 16 / maxDeck 8 を確認します。
+1. GitHub用ZIPを展開し、Rin447/tiny-siege の中身を上書きします。
+2. main へ Commit します。例: Fix Tiny Siege detail demo rendering in v18.1.0
+3. Cloudflareの自動Build/Deploy完了を待ちます。
+4. /api/config で version 18.1.0 / cards 30 / units 26 / spells 4 / physicsVersion 17 / maxDeck 8 を確認します。
 
-v17.0.0確認ポイント
-- ネクロマンサー: 6コスト / HP1350 / 配置直後ボーン3体 + 6秒ごと3体
-- ダークネクロマンサー: 5コスト / HP1150 / 配置直後ムーンバット2体 + 5秒ごと2体
-- アッシュ部隊: 5コスト / アッシュ剣士3体 / 前1・後2の三角陣形
-- 3枚とも「詳細を見る・デモ」で専用LIVE BATTLE DEMOが動く
-- v16.4までのマイリスト、3列デッキ編集、スペル陣営カラー、スマホ設置物修正などは維持
-
-physicsVersion は 16 です。公開後はPC・スマホとも強制再読み込みし、新しいルーム/PASSを作って確認してください。
+v18.1.0確認ポイント
+- スパーキーのカード詳細LIVE BATTLE DEMOを最後まで再生しても、戦場が斜めに重ならない。
+- デモがループ再生へ戻った後も描画が正常。
+- そのままリーフ弓兵など別キャラの詳細へ移動してもCanvasが正常表示される。
+- カード性能・対戦ロジックはv18.0.0から変更なし。physicsVersionは17のまま。

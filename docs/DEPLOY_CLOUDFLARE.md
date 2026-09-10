@@ -1,8 +1,8 @@
-# Cloudflare deploy - v17.0.0
+# Cloudflare deploy - v18.1.0
 
-1. `Rin447/tiny-siege` にv17.0.0フォルダの中身を上書きアップロードします。
-2. `main` に Commit（例: `Upgrade Tiny Siege to v17.0.0`）。
-3. Cloudflare のGitHub連携による自動Build/Deployを待ちます。
-4. `/api/config` で `version: 17.0.0`, `cards: 27`, `units: 24`, `spells: 3`, `physicsVersion: 16`, `maxDeck: 8` を確認します。
+1. `Rin447/tiny-siege` にv18.1.0フォルダの中身を上書きアップロードします。
+2. `main` に Commit（例: `Fix Tiny Siege detail demo rendering in v18.1.0`）。
+3. Cloudflareの自動Build/Deploy完了を待ちます。
+4. `/api/config` で `version: 18.1.0`, `cards: 30`, `units: 26`, `spells: 4`, `physicsVersion: 17`, `maxDeck: 8` を確認します。
 
-v17.0.0は配置時召喚・定期召喚と新カード3枚を追加するため、対戦シミュレーション互換番号を `physicsVersion=16` へ更新しています。公開後は両端末を強制再読み込みし、新しいルーム/PASSを使用してください。
+v18.1.0はカード詳細LIVE BATTLE DEMOの描画不具合だけを修正するリリースです。対戦ロジックは変更していないため `physicsVersion=17` を維持します。公開後はブラウザを強制再読み込みし、スパーキー詳細デモを最後まで再生→別キャラ詳細へ移動して描画が崩れないことを確認してください。

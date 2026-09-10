@@ -4,6 +4,21 @@ import {drawArena,drawPortrait,orient} from './game/art.js';
 
 const $=s=>document.querySelector(s);
 const PATCH_NOTES = Object.freeze([
+  {version:'18.1.0',date:'2026-09-10',title:'DETAIL DEMO RENDER FIX',items:[
+    'スパーキーのLIVE BATTLE DEMOで初回砲撃後に描画が崩れ、戦場が斜めに重なって表示される不具合を修正しました。',
+    'スパーキー弾の電撃エフェクトが未定義の時間変数を参照していたため、drawArenaのtimeへ統一しました。',
+    '各フレームの開始時にCanvas変形を初期化し、投射物描画は必ずrestoreされるよう保護して、詳細画面を開き直したり別キャラへ移動しても正常描画へ復帰するようにしました。'
+  ]},
+  {version:'18.0.0',date:'2026-09-10',title:'LONGSHOT & VOLTAGE',items:[
+    '新ユニット「プリンセスアーチャー」を追加。3コスト・HP300・攻撃275・3秒間隔。地上/空中へ半径70の範囲攻撃を行い、射程350で橋を渡らず敵サイドタワーを狙えます。',
+    '新スペル「ザップ」を追加。2コスト・半径78・225ダメージ・1.5秒スタン。攻撃対象を解除し、レーザー塔の増幅とスパーキーの充電もリセットします。',
+    '新ユニット「スパーキー」を追加。6コスト・HP1500・地上のみ・攻撃1200・半径90。敵がいなくても常時3.5秒充電し、満充電後は射程145で一撃を放ちます。',
+    'ルーン術師を4→3コスト、リーフ弓兵を3→2コストへ変更。クラッグバーサーカーの攻撃間隔を1.6→1.8秒へ少し遅くしました。'
+  ]},
+  {version:'17.1.0',date:'2026-09-10',title:'SUMMONER BALANCE & DECK UI',items:[
+    'ネクロマンサーの定期召喚を6秒ごとから7.5秒ごとへ、ダークネクロマンサーを5秒ごとから6.5秒ごとへ調整。配置直後の召喚は維持。',
+    'デッキ編集の説明文を省き、8 / 8 選択中と平均コストを同じ1行へ整理。選択数表示も平均コストと同程度の文字サイズへ調整。'
+  ]},
   {version:'17.0.0',date:'2026-09-10',title:'SUMMONERS UPDATE',items:[
     '新ユニット「ネクロマンサー」を追加。6コスト・HP1350・地上/空中への範囲攻撃。配置直後にボーン3体、その後6秒ごとに3体を召喚します。',
     '新ユニット「ダークネクロマンサー」を追加。5コスト・HP1150・地上のみを攻撃。配置直後にムーンバット2体、その後5秒ごとに2体を召喚します。',
@@ -111,10 +126,10 @@ function migrateDeck(raw){
   return normalizeDeck(out);
 }
 function loadDeck(){
-  try{const raw=JSON.parse(safeStorage('local','tiny-deck-v17')||safeStorage('local','tiny-deck-v16')||safeStorage('local','tiny-deck-v15')||safeStorage('local','tiny-deck-v14')||safeStorage('local','tiny-deck-v13')||safeStorage('local','tiny-deck-v12')||safeStorage('local','tiny-deck-v11')||safeStorage('local','tiny-deck-v10')||safeStorage('local','tiny-deck-v9')||safeStorage('local','tiny-deck-v8')||safeStorage('local','tiny-deck-v7')||safeStorage('local','tiny-deck-v6')||safeStorage('local','tiny-deck-v5')||safeStorage('local','tiny-deck-v4')||safeStorage('local','tiny-deck-v3')||'null');return migrateDeck(raw);}catch{return [...DEFAULT_DECK];}
+  try{const raw=JSON.parse(safeStorage('local','tiny-deck-v18')||safeStorage('local','tiny-deck-v17')||safeStorage('local','tiny-deck-v16')||safeStorage('local','tiny-deck-v15')||safeStorage('local','tiny-deck-v14')||safeStorage('local','tiny-deck-v13')||safeStorage('local','tiny-deck-v12')||safeStorage('local','tiny-deck-v11')||safeStorage('local','tiny-deck-v10')||safeStorage('local','tiny-deck-v9')||safeStorage('local','tiny-deck-v8')||safeStorage('local','tiny-deck-v7')||safeStorage('local','tiny-deck-v6')||safeStorage('local','tiny-deck-v5')||safeStorage('local','tiny-deck-v4')||safeStorage('local','tiny-deck-v3')||'null');return migrateDeck(raw);}catch{return [...DEFAULT_DECK];}
 }
 let playerDeck=loadDeck();
-const MYLIST_KEY='tiny-deck-presets-v17',LEGACY_MYLIST_KEYS=['tiny-deck-presets-v16'],MAX_MYLIST=10;
+const MYLIST_KEY='tiny-deck-presets-v18',LEGACY_MYLIST_KEYS=['tiny-deck-presets-v17','tiny-deck-presets-v16'],MAX_MYLIST=10;
 function storageFor(store='local'){return store==='session'?window.sessionStorage:window.localStorage;}
 function verifiedStorageWrite(store,key,value){
   try{const storage=storageFor(store);storage.setItem(key,value);return storage.getItem(key)===value;}catch{return false;}
@@ -139,7 +154,7 @@ function persistDeckPresets(){
 function nextPresetName(){
   const used=new Set(deckPresets.map(p=>p.name));for(let i=1;i<=MAX_MYLIST+1;i++){const name=`マイデッキ ${i}`;if(!used.has(name))return name;}return `マイデッキ ${deckPresets.length+1}`;
 }
-function persistDeck(){safeStorage('local','tiny-deck-v17',JSON.stringify(playerDeck));renderDeckSummaries();}
+function persistDeck(){safeStorage('local','tiny-deck-v18',JSON.stringify(playerDeck));renderDeckSummaries();}
 function averageDeckCost(deck){if(!Array.isArray(deck)||!deck.length)return 0;return deck.reduce((sum,id)=>sum+(UNITS[id]?.cost||0),0)/deck.length;}
 function formatAverage(deck){return `◆ ${averageDeckCost(deck).toFixed(1)}`;}
 function deckReady(deck=playerDeck){return Array.isArray(deck)&&deck.length===MAX_DECK&&new Set(deck).size===MAX_DECK&&deck.every(id=>DECK.includes(id));}
@@ -557,11 +572,12 @@ function toggleDeckCard(id,{fromDetail=false}={}){
 }
 function targetLabel(d){return d.targetsAir?'地上＋空中':'地上のみ';}
 function detailStatsFor(d){
-  if(d.spell)return [['COST',d.cost],['TYPE','SPELL'],['範囲',`R${d.radius}`],['兵ダメージ',d.damage],['建物ダメージ',d.buildingDamage]];
-  const dmg=d.laserTower?`${d.laserBaseDps} DPS〜`:d.damage;const interval=d.laserTower?'継続':d.cooldown?`${d.cooldown.toFixed(2).replace(/0+$/,'').replace(/\.$/,'')}秒`:'—';
+  if(d.spell){const stats=[['COST',d.cost],['TYPE','SPELL'],['範囲',`R${d.radius}`],['兵ダメージ',d.damage],['建物ダメージ',d.buildingDamage]];if(d.stunDuration)stats.push(['スタン',`${d.stunDuration}秒`]);return stats;}
+  const dmg=d.laserTower?`${d.laserBaseDps} DPS〜`:d.damage;const interval=d.laserTower?'継続':d.sparkUnit?`${d.sparkChargeTime}秒チャージ`:d.cooldown?`${d.cooldown.toFixed(2).replace(/0+$/,'').replace(/\.$/,'')}秒`:'—';
   const stats=[['COST',d.cost],['HP',`${d.hp}${d.count>1?` ×${d.count}`:''}`],['攻撃',dmg],['攻撃間隔',interval],['射程',d.range],['対象',targetLabel(d)],['移動',d.building?'固定':d.air?`飛行 ${d.speed}`:`地上 ${d.speed}`]];
   if(d.summonType)stats.push(['召喚',`配置時＋${d.summonInterval}秒ごと ×${d.summonCount}`]);
   if(d.spawnType==='blade')stats.push(['編成','前1・後2の3体']);
+  if(d.sparkUnit)stats.push(['充電','敵不在でも常時・ザップで0へ']);
   return stats;
 }
 function refreshDetailToggle(){if(!detailCardId)return;const inDeck=editingDeck.includes(detailCardId);el('detailDeckToggleBtn').textContent=inDeck?'デッキから外す':editingDeck.length>=MAX_DECK?'入れ替えて追加':'デッキに入れる';}
@@ -576,13 +592,16 @@ function demoStageUnit(u,x,y,{hp=null,spawn=0,cd=0}={}){
   if(!u)return null;u.x=x;u.y=y;u.lane=x<360?190:530;u.target=null;u.moving=false;u.spawn=spawn;u.cd=cd;if(Number.isFinite(hp))u.hp=Math.max(1,Math.min(u.maxHp,hp));return u;
 }
 function createDetailDemo(id){
-  const g=createMatch({seed:17000+DECK.indexOf(id),bot:false,difficulty:'normal',decks:[DEFAULT_DECK,DEFAULT_DECK]});g.phase='battle';g.countdown=0;g.time=0;g.bot=false;for(const p of g.players)p.energy=10;
+  const g=createMatch({seed:18000+DECK.indexOf(id),bot:false,difficulty:'normal',decks:[DEFAULT_DECK,DEFAULT_DECK]});g.phase='battle';g.countdown=0;g.time=0;g.bot=false;for(const p of g.players)p.energy=10;
   const d=UNITS[id],lane=530;let label='本番と同じ戦闘ロジックでAUTO実演',scenarioKey='standard',duration=8.5;
   const put=(owner,type,x,y)=>demoDeployUnits(g,owner,type,x,y).units;
   const enemy=(type,x=lane,y=420)=>put(1,type,x,y);
   const own=(type,x=lane,y=650)=>put(0,type,x,y);
   if(d.spell){
-    if(id==='poison'){
+    if(id==='zap'){
+      const [laser]=enemy('lasertower',lane,420),[sparky]=enemy('sparky',480,420),[guard]=own('knight',lane,650);demoStageUnit(laser,lane,515);demoStageUnit(sparky,480,540);demoStageUnit(guard,lane,650);if(laser){laser.laserStage=4;laser.laserDps=320;laser.target=guard?.id||null;laser.laserTarget=guard?.id||null;laser.laserLockTime=6;}if(sparky){sparky.sparkCharged=true;sparky.sparkChargeProgress=1;}demoDeploy(g,0,id,505,525);
+      label='レーザー塔＋満充電スパーキーへ電撃 → 1.5秒スタン＋攻撃対象/増幅/充電をリセット';scenarioKey='zap-reset-stun';duration=7;
+    }else if(id==='poison'){
       const [guard]=enemy('knight',lane,420);demoStageUnit(guard,lane,505);demoDeploy(g,0,id,lane,500);
       label='高HPのアイアン衛士が毒を通過 → 範囲DoT＋範囲外の残留毒';scenarioKey='poison-zone-linger';duration=10;
     }else if(id==='arrowrain'){
@@ -603,19 +622,23 @@ function createDetailDemo(id){
     label='高HPのアイアン衛士へ実際の泥弾 → 泥沼で30%減速＋30の継続ダメージ';scenarioKey='muddragon-slow-dot';duration=9;
   }else if(id==='necromancer'){
     g.towers.forEach(t=>t.range=0);
-    const deployed=own(id,lane,650),summoner=deployed.find(u=>u.type==='necromancer');demoStageUnit(summoner,lane,610);if(summoner)summoner.summonNextAt=6;
+    const deployed=own(id,lane,650),summoner=deployed.find(u=>u.type==='necromancer');demoStageUnit(summoner,lane,610);if(summoner)summoner.summonNextAt=7.5;
     const swarm=enemy('mossling',500,420);swarm.forEach((u,i)=>{demoStageUnit(u,485+(i%3)*32,460+Math.floor(i/3)*30,{cd:1.2});u.damage=0;});
     const bats=enemy('bat',565,420);bats.forEach((u,i)=>{demoStageUnit(u,555+(i%2)*28,470+Math.floor(i/2)*26,{cd:1.2});u.damage=0;});
-    label='配置直後にボーン3体 → 地上/空中への範囲魔法 → 6秒後にボーン3体を追加召喚';scenarioKey='necromancer-bone-summon';duration=10.5;
+    label='配置直後にボーン3体 → 地上/空中への範囲魔法 → 7.5秒後にボーン3体を追加召喚';scenarioKey='necromancer-bone-summon';duration=12;
   }else if(id==='darknecro'){
     g.towers.forEach(t=>t.range=0);
-    const deployed=own(id,lane,650),summoner=deployed.find(u=>u.type==='darknecro');demoStageUnit(summoner,lane,610);if(summoner)summoner.summonNextAt=5;
+    const deployed=own(id,lane,650),summoner=deployed.find(u=>u.type==='darknecro');demoStageUnit(summoner,lane,610);if(summoner)summoner.summonNextAt=6.5;
     const [guard]=enemy('knight',lane,420);demoStageUnit(guard,lane,500,{cd:1.2});if(guard)guard.damage=0;const bats=enemy('bat',485,420);bats.forEach((u,i)=>{demoStageUnit(u,475+(i%2)*26,485+Math.floor(i/2)*24,{cd:1.2});u.damage=0;});
-    label='配置直後にムーンバット2体 → 本体は地上だけを高火力攻撃 → 5秒後にバット2体を追加召喚';scenarioKey='darknecro-bat-summon';duration=9.5;
+    label='配置直後にムーンバット2体 → 本体は地上近接攻撃 → 6.5秒後にバット2体を追加召喚';scenarioKey='darknecro-bat-summon';duration=11;
   }else if(id==='ashsquad'){
     const blades=own(id,lane,650);const deployed=enemy('necromancer',lane,420),summoner=deployed.find(u=>u.type==='necromancer');demoStageUnit(summoner,lane,525,{hp:800,cd:1.5});
     blades.forEach((u,i)=>demoStageUnit(u,lane+(i===0?0:(i===1?-28:28)),i===0?605:635,{spawn:0,cd:.4}));
     label='アッシュ剣士3体を前1・後2の三角陣形で展開 → 召喚系の後衛へ一斉に接近して処理';scenarioKey='ash-squad-triangle-counter';duration=8.5;
+  }else if(id==='princess'){
+    g.towers.forEach(t=>t.damage=0);const [princess]=own(id,lane,650);demoStageUnit(princess,lane,600);label='自陣の橋手前から射程350で敵サイドタワーへ超長距離の範囲矢を発射';scenarioKey='princess-cross-river-shot';duration=9;
+  }else if(id==='sparky'){
+    g.towers.forEach(t=>t.range=0);const [spark]=own(id,lane,650);demoStageUnit(spark,lane,625);const swarm=enemy('mossling',lane,420);const spots=[[500,500],[530,505],[557,510],[515,530],[548,535]];swarm.forEach((u,i)=>{demoStageUnit(u,...spots[i%spots.length]);u.damage=0;u.speed=0;});label='敵がいなくても配置直後から3.5秒充電 → 満充電エフェクト → 地上群体へ1200範囲砲撃';scenarioKey='sparky-always-charge';duration=9;
   }else if(id==='tigger'){
     demoDeploy(g,0,id,lane,325);label='自軍本拠地から地下潜行 → 敵タワー横へ出現 → 奇襲攻撃';scenarioKey='tigger-burrow';duration=9;
   }else if(id==='lasertower'){

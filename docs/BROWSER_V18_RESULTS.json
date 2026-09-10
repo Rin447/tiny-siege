@@ -1,0 +1,16 @@
+{
+  "passed": 10,
+  "checks": [
+    "Deck builder exposes all 30 selectable cards, including Princess Archer, Zap and Sparky",
+    "Princess Archer detail shows cost 3, HP 300, attack 275, 3-second fire rate and cross-river range 350",
+    "Sparky detail renders through its charged shot and end-of-demo replay without corrupting the canvas",
+    "Card detail canvas remains healthy after switching away from Sparky",
+    "Zap detail shows cost 2, 225 damage, radius 78, 1.5-second stun and reset mechanics",
+    "v17.1 summoner balance remains intact at 7.5s and 6.5s",
+    "My List persists the current eight-card deck under the v18 storage key",
+    "Patch Notes shows v18.1.0 render fix plus v18.0.0 and retained v17 history",
+    "Self-contained HTML starts a playable CPU battle with a four-card hand and visible arena",
+    "No uncaught JavaScript errors in the v18 deck, detail demos, Patch Notes or CPU battle flow"
+  ],
+  "errors": []
+}
