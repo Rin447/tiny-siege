@@ -1,0 +1,2 @@
+PASS: actual canvas renderer shows own spell tint toward blue and enemy tint toward red
+{'own': [163, 183, 181, 255], 'enemy': [207, 168, 143, 255]}

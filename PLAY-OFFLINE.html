@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#182f39">
-<title>TINY SIEGE — 24枚から8枚を選ぶ小さな攻城戦</title>
+<title>TINY SIEGE — 27枚から8枚を選ぶ小さな攻城戦</title>
 
 <style>:root{--paper:#f6f5ef;--ink:#203843;--muted:#7b8c8d;--line:#dce1d7;--green:#47796d;--mint:#dce9c8;--coral:#d6896c;--card:#fffef8;--board: min(420px,calc((100dvh - 282px)*.6923));font-family:"Segoe UI","Noto Sans JP","Hiragino Kaku Gothic ProN","Meiryo",sans-serif;color:var(--ink);background:var(--paper)}
 *{box-sizing:border-box}body{margin:0}button,input{font:inherit}button{cursor:pointer;transition:background .16s,transform .16s,border-color .16s}button:disabled{cursor:not-allowed;opacity:.44}button:focus-visible,input:focus-visible,canvas:focus-visible{outline:3px solid #d89e5c;outline-offset:3px}
@@ -56,13 +56,23 @@ dialog{border:1px solid #d7dfcf;background:#f9faf3;color:var(--ink);border-radiu
 /* v12 eight-card deck metrics and building-placement clarity */
 .deck-average{display:flex!important;flex-direction:column;align-items:flex-end!important;gap:2px!important;margin-left:auto}.deck-average strong{font-size:19px!important;color:#785f91}.deck-average span{font-size:7px!important;letter-spacing:1.2px}.deck-average-inline{margin-left:auto;font-size:8px;color:#7c728e;white-space:nowrap}.section-label b{font:inherit;color:#7c728e}@media(max-width:800px){.deck-average{align-items:flex-start!important;margin-left:0}.deck-average-inline{display:none}}
 
-/* v14 underground ambush + mud control + v13 target lock / patch notes */
+/* v16.1 spell ownership + v16 balance/mobile placement + v14 underground/mud + v13 target lock/patch notes */
 .update-nav{position:relative}.update-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#e98f68;margin-left:4px;vertical-align:middle;box-shadow:0 0 0 3px rgba(233,143,104,.13)}
-.updates-modal{width:min(820px,94vw)}.updates-intro{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:12px 14px;margin-bottom:14px;border:1px solid var(--line);border-radius:12px;background:#f5f7ed}.updates-intro p{font-size:10px;color:#71867c}.updates-intro span{font-size:8px;letter-spacing:1.3px;color:#8d9a8e;white-space:nowrap}.patch-notes{display:grid;gap:12px;max-height:min(62vh,650px);overflow:auto;padding-right:4px}.patch-note{border:1px solid #dce3d5;border-radius:14px;background:#fffef8;padding:15px 16px}.patch-head{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:11px;margin-bottom:9px}.patch-head strong{background:#203e43;color:#fff;padding:5px 8px;border-radius:8px;font-size:9px;letter-spacing:.5px}.patch-head h3{font-size:13px;color:#18393d}.patch-head time{font-size:8px;color:#91a092}.patch-note ul{margin:0;padding-left:18px;display:grid;gap:6px}.patch-note li{font-size:10px;line-height:1.65;color:#627970}.patch-note:first-child{border-color:#adc59d;background:#f5f8e9;box-shadow:inset 3px 0 0 #8eaa76}
-@media(max-width:800px){.topbar nav{gap:5px}.topbar .navbtn{font-size:9px;padding:7px 5px}.update-dot{width:5px;height:5px}.updates-intro{align-items:flex-start;flex-direction:column;gap:4px}.patch-head{grid-template-columns:auto 1fr}.patch-head time{grid-column:2}.patch-note{padding:13px}.patch-notes{max-height:68vh}}
+.updates-modal{width:min(820px,94vw)}.updates-intro{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:12px 14px;margin-bottom:14px;border:1px solid var(--line);border-radius:12px;background:#f5f7ed}.updates-intro p{font-size:10px;color:#71867c}.updates-intro span{font-size:8px;letter-spacing:1.3px;color:#8d9a8e;white-space:nowrap}.patch-notes{display:grid;gap:12px;max-height:min(62vh,650px);overflow:auto;padding-right:4px}.patch-note{border:1px solid #dce3d5;border-radius:14px;background:#fffef8;padding:15px 16px}.patch-head{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:11px;margin-bottom:9px}.patch-head>strong{background:#203e43;color:#fff;padding:5px 8px;border-radius:8px;font-size:9px;letter-spacing:.5px}.patch-head h3{font-size:13px;color:#18393d}.patch-head time{font-size:8px;color:#91a092}.patch-release{padding-top:10px}.patch-release+.patch-release{border-top:1px dashed #ccd8c8;margin-top:13px;padding-top:14px}.patch-release-head{display:grid;grid-template-columns:auto 1fr auto;gap:9px;align-items:center;margin-bottom:8px}.patch-release-head strong{font-size:9px;color:#377c8f;background:#eaf4f5;border:1px solid #cae0e4;border-radius:7px;padding:3px 7px}.patch-release-head span{font-size:10px;font-weight:700;color:#425f62;letter-spacing:.35px}.patch-release-head time{font-size:8px;color:#91a092}.patch-note ul{margin:0;padding-left:18px;display:grid;gap:6px}.patch-note li{font-size:10px;line-height:1.65;color:#627970}.patch-note:first-child{border-color:#adc59d;background:#f5f8e9;box-shadow:inset 3px 0 0 #8eaa76}
+@media(max-width:800px){.topbar nav{gap:5px}.topbar .navbtn{font-size:9px;padding:7px 5px}.update-dot{width:5px;height:5px}.updates-intro{align-items:flex-start;flex-direction:column;gap:4px}.patch-head{grid-template-columns:auto 1fr}.patch-head time{grid-column:2}.patch-release-head{grid-template-columns:auto 1fr}.patch-release-head time{grid-column:2}.patch-note{padding:13px}.patch-notes{max-height:68vh}}
 @media(max-width:520px){.topbar .navbtn{font-size:8px}.updates-modal{padding:16px}.patch-head h3{font-size:11px}.patch-note li{font-size:9px}}
 
 @media(max-width:550px){.topbar nav{gap:3px}.topbar .navbtn{padding:7px 3px}.update-nav{font-size:0!important}.update-nav::before{content:'アプデ';font-size:9px}.update-nav .update-dot{margin-left:2px}}
+
+/* v16.2 deck builder: three-column pool, My List, action choice and optional animated details */
+.deck-sticky{position:sticky;top:0;z-index:8;background:linear-gradient(#f9faf3 86%,rgba(249,250,243,.94));padding:4px 0 8px;border-bottom:1px solid transparent}.deck-sticky:after{content:'';position:absolute;left:0;right:0;bottom:-8px;height:8px;background:linear-gradient(#c9d4c51a,transparent);pointer-events:none}.deck-utility-row{display:flex;align-items:center;gap:8px;margin:10px 0 0}.deck-utility-row .btn{width:auto;margin:0;min-height:34px;padding:7px 12px;font-size:9px}.deck-utility-row>span{margin-left:auto;font-size:8px;color:#91a092;letter-spacing:.6px}.deck-pool-head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin:18px 2px 10px}.deck-pool-head h3{font-size:16px;margin:3px 0}.deck-pool-head small{font-size:8px;color:#849589;text-align:right;line-height:1.6}
+.deck-pool{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:12px}.deck-choice{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:5px;text-align:center;min-width:0;min-height:190px;padding:12px 10px 10px}.deck-choice canvas{width:clamp(96px,38%,142px);height:auto;aspect-ratio:1;object-fit:contain}.deck-choice .deck-copy{padding:0;min-width:0;width:100%}.deck-choice h3{font-size:clamp(11px,1vw,14px);margin:1px 0 4px;line-height:1.35}.deck-choice small{display:block;font-size:clamp(7px,.72vw,9px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.deck-choice p{display:none}.deck-choice .deck-cost{left:9px;top:9px}.deck-choice .deck-check{right:8px;top:8px}.deck-choice:after{content:'操作を選ぶ';font-size:7px;letter-spacing:.4px;color:#9aa69d;margin-top:auto;padding-top:4px}
+.deck-slots{margin:12px 0 4px}.deck-slot{transition:transform .15s ease,box-shadow .15s ease}.deck-slot.filled:hover{transform:translateY(-1px);box-shadow:0 5px 14px #25443312}.deck-slot.filled:after{content:'•••';position:absolute;right:5px;bottom:3px;font-size:8px;color:#9aae9a;letter-spacing:1px}
+.mylist-panel{margin:13px 0 18px;border:1px solid #d2ddcf;border-radius:14px;background:#f4f7eb;padding:14px}.mylist-head{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:10px}.mylist-head>div{display:flex;align-items:baseline;gap:9px}.mylist-head strong{font-size:12px;letter-spacing:1px}.mylist-head span{font-size:8px;color:#819185}.mylist-head b{font-size:8px;color:#607d6d;background:#e7efe0;border-radius:999px;padding:3px 7px}.mylist-head .textbtn{font-size:9px}.mylist-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.mylist-card{border:1px solid #d6dfd1;border-radius:12px;background:#fffef8;padding:11px;min-width:0}.mylist-card-head{display:flex;align-items:center;justify-content:space-between;gap:8px}.mylist-card-head strong{font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mylist-card-head span{font-size:8px;color:#7b6b8c;white-space:nowrap}.mylist-mini{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;margin:7px 0}.mylist-mini canvas{width:100%;height:auto;min-width:0}.mylist-actions{display:grid;grid-template-columns:1.15fr repeat(3,auto);gap:5px}.mylist-actions button{border:1px solid #d8e0d2;border-radius:7px;background:#f8faf1;color:#526a61;padding:6px 7px;font-size:7px}.mylist-actions button:first-child{background:#203e43;color:#fff;border-color:#203e43}.mylist-actions button.danger{color:#a85a54}.mylist-panel>.muted{font-size:9px;padding:8px 0}.mylist-status{margin:0 0 10px;padding:8px 10px;border-radius:9px;background:#e7f2e0;color:#49664f;font-size:9px;font-weight:700}.mylist-status.error{background:#f8e4df;color:#9d4d49}
+.deck-card-actions,.card-detail-panel{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:16px}.deck-card-actions[hidden],.card-detail-panel[hidden]{display:none!important}.deck-action-backdrop{position:absolute;inset:0;border:0;background:#17323ab8;backdrop-filter:blur(4px);cursor:default}.deck-action-sheet,.card-detail-sheet{position:relative;z-index:1;width:min(430px,calc(100vw - 28px));max-height:calc(100dvh - 28px);overflow:auto;border:1px solid #dbe3d5;border-radius:18px;background:#fbfcf5;box-shadow:0 28px 90px #102a3266;padding:18px}.deck-action-card{display:grid;grid-template-columns:104px 1fr;align-items:center;gap:14px;margin-bottom:12px}.deck-action-card canvas{width:104px;height:104px}.deck-action-card h3{font-size:19px;margin:5px 0}.deck-action-card small{font-size:9px;color:#75897d}.deck-action-cost{display:inline-grid;place-items:center;width:27px;height:29px;border-radius:8px;background:#9c86b3;color:#fff;font-size:13px;font-weight:700}.deck-action-sheet>.btn{margin:8px 0 0}.deck-action-sheet>.textbtn{display:block;margin:14px auto 0;font-size:9px}.deck-replace-panel{margin-top:14px;padding-top:13px;border-top:1px dashed #cbd7c7}.deck-replace-panel>strong{display:block;font-size:10px;margin-bottom:9px}.deck-replace-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.deck-replace-grid button{position:relative;border:1px solid #d5dfd0;border-radius:9px;background:#fff;padding:4px;color:#40564e}.deck-replace-grid canvas{width:100%;height:auto}.deck-replace-grid span{display:block;font-size:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-detail-sheet{width:min(760px,calc(100vw - 28px));padding:20px}.card-detail-head{display:flex;align-items:center;justify-content:space-between;gap:16px}.card-detail-head h2{font-size:24px;margin:4px 0 8px}.card-demo-wrap{border:1px solid #cfdbcf;background:#eaf0df;border-radius:14px;padding:9px;margin:6px 0 14px}.card-demo-label{display:flex;align-items:center;gap:7px;font-size:7px;letter-spacing:1.2px;color:#6f8378;margin:0 3px 8px}.card-demo-label #cardDemoScenario{margin-left:auto;letter-spacing:.3px}.card-demo-label .textbtn{font-size:7px;white-space:nowrap}.card-demo-wrap canvas{display:block;width:min(100%,390px);height:auto;aspect-ratio:720/1040;border-radius:12px;background:#f2f5e9;margin:0 auto;box-shadow:0 8px 24px #1d3b4418}.card-detail-stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;margin:12px 0}.card-detail-stat{border:1px solid #dce3d5;border-radius:10px;background:#fffef8;padding:9px 7px;text-align:center;min-width:0}.card-detail-stat small{display:block;font-size:7px;color:#91a092;letter-spacing:.8px}.card-detail-stat strong{display:block;font-size:11px;margin-top:4px;overflow:hidden;text-overflow:ellipsis}.card-detail-ability{border-left:3px solid #89a67d;padding:9px 12px;background:#f3f7e9;border-radius:0 9px 9px 0}.card-detail-ability small{font-size:7px;letter-spacing:1px;color:#83947f}.card-detail-ability p{font-size:10px;line-height:1.8;color:#5f756b;margin-top:5px}.card-detail-actions{display:grid;grid-template-columns:1.35fr 1fr;gap:9px;margin-top:14px}.card-detail-actions .btn{margin:0}
+@media(max-width:800px){.deck-pool{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px}.deck-choice{min-height:150px;padding:9px 6px}.deck-choice canvas{width:min(100%,104px)}.deck-choice h3{font-size:10px}.deck-choice small{font-size:7px}.deck-choice:after{font-size:6px}.deck-editor-head{gap:5px}.deck-utility-row{gap:5px}.deck-utility-row .btn{font-size:8px;padding:6px 8px}.mylist-grid{grid-template-columns:1fr}.card-detail-stats{grid-template-columns:repeat(3,1fr)}.deck-sticky{top:-1px}.deck-pool-head small{max-width:150px}}
+@media(max-width:520px){.card-demo-label{flex-wrap:wrap}.card-demo-label #cardDemoScenario{order:3;width:100%;margin-left:20px}.card-demo-wrap canvas{width:min(100%,330px)}.deck-modal{padding:14px}.deck-pool{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:6px}.deck-choice{min-height:132px;padding:7px 4px}.deck-choice canvas{width:min(100%,88px)}.deck-choice h3{font-size:8.5px;margin-bottom:2px}.deck-choice small{font-size:6.5px}.deck-choice .deck-cost{left:4px;top:4px;width:20px;height:22px;font-size:10px;border-width:1px}.deck-choice .deck-check{right:4px;top:4px;font-size:6px;padding:3px 4px}.deck-choice:after{font-size:5.5px}.deck-slots{gap:5px}.deck-slot{min-height:72px}.deck-slot strong{font-size:7px}.deck-utility-row{flex-wrap:wrap}.deck-utility-row>span{display:none}.deck-utility-row .btn{flex:1 1 44%;font-size:7px;white-space:nowrap}.deck-pool-head{align-items:flex-start}.deck-pool-head small{font-size:7px}.mylist-card{padding:8px}.mylist-actions{grid-template-columns:1fr 1fr;gap:4px}.mylist-actions button{font-size:7px}.deck-action-sheet{padding:15px}.deck-action-card{grid-template-columns:82px 1fr}.deck-action-card canvas{width:82px;height:82px}.deck-action-card h3{font-size:16px}.card-detail-sheet{padding:14px}.card-detail-head h2{font-size:19px}.card-detail-stats{grid-template-columns:repeat(3,1fr);gap:5px}.card-detail-stat{padding:7px 4px}.card-detail-stat strong{font-size:9px}.card-detail-actions{grid-template-columns:1fr}.card-detail-ability p{font-size:9px}.deck-replace-grid{grid-template-columns:repeat(4,1fr)}}
 </style>
 </head>
 <body>
@@ -88,7 +98,7 @@ dialog{border:1px solid #d7dfcf;background:#f9faf3;color:var(--ink);border-radiu
     <p class="hero-desc">前衛で守る。後衛で射抜く。<br>21体＋3呪文から8枚を選び、<br>自分の編成で挑む2Dリアルタイム攻城戦。</p>
     <div class="hero-stats"><div><strong>24</strong><small>21体＋3呪文</small></div><div><strong>3<span> min</span></strong><small>一手が変える攻防</small></div><div><strong>1v1</strong><small>友だちとオンライン</small></div></div>
     <div class="hero-note"><span class="note-dot"></span><p>通話はいつものVCで。<br>ここでは、戦いに集中しよう。</p></div>
-    <div class="version-stamp">LONG RANGE · RAMPING LASER <span>15 / LOCK & BURN</span></div>
+    <div class="version-stamp">DECK BUILDER · CARD PREVIEW <span>16 / MY LIST</span></div>
   </section>
   <section class="demo-area" aria-label="ゲームの自動デモ">
     <div class="demo-label"><span class="live-dot"></span> LIVE ARENA PREVIEW <span>AUTOPLAY</span></div>
@@ -102,7 +112,7 @@ dialog{border:1px solid #d7dfcf;background:#f9faf3;color:var(--ink);border-radiu
     <div class="deck-summary">
       <div class="block-title"><span>DECK</span><h3>今回使う8枚</h3><small id="homeDeckAverage" class="deck-average-inline">平均コスト ◆ 0.0</small><button id="homeDeckBtn" class="textbtn" type="button">編集する</button></div>
       <div id="homeDeck" class="mini-roster deck-mini"></div>
-      <p class="field-help">24枚（21体＋3呪文）から8枚を選択。平均コストを見ながら編成できます。対戦開始前なら何度でも変更できます。</p>
+      <p class="field-help">27枚（24ユニットカード＋3呪文）から8枚を選択。平均コストを見ながら編成できます。対戦開始前なら何度でも変更できます。</p>
     </div>
     <div class="practice-block">
       <div class="block-title"><span>01</span><h3>ひとりで練習</h3><small>CPU BATTLE</small></div>
@@ -172,20 +182,47 @@ dialog{border:1px solid #d7dfcf;background:#f9faf3;color:var(--ink);border-radiu
     <div class="match-rules"><h4>この一戦のルール</h4><p>本拠地を壊せば即勝利。3分で同数なら延長戦。延長後も同数なら残りタワーHPで決着。</p><p>残り1分からエナジー回復が2倍。切り札を重ねて攻めよう。</p></div>
   </aside>
 </main>
-<footer id="footer"><span>ひとつのURLから、小さな戦場へ。</span><span>TINY SIEGE <i>/</i> v15.0.0 · LONG RANGE & LASER</span></footer>
+<footer id="footer"><span>ひとつのURLから、小さな戦場へ。</span><span>TINY SIEGE <i>/</i> v17.0.0 · SUMMONERS UPDATE</span></footer>
 
 <div id="toast" class="toast" role="status" hidden></div>
 <dialog id="deckModal" class="deck-modal">
   <div class="modal-head"><div><span class="eyebrow">BUILD YOUR EIGHT</span><h2>デッキ編集</h2></div><button class="close-modal iconbtn" aria-label="閉じる">×</button></div>
-  <div class="deck-editor-head"><div><strong id="deckCount">8 / 8</strong><span>選択中</span></div><div class="deck-average"><span>AVERAGE ENERGY</span><strong id="deckAverage">◆ 0.0</strong></div><p>24枚から8枚を選択。手札は4枚のままなので、主力カードが戻るまでの読み合いが長くなります。</p></div>
-  <div id="deckSlots" class="deck-slots"></div>
+  <div class="deck-sticky">
+    <div class="deck-editor-head"><div><strong id="deckCount">8 / 8</strong><span>選択中</span></div><div class="deck-average"><span>AVERAGE ENERGY</span><strong id="deckAverage">◆ 0.0</strong></div><p>カードをタップして「デッキに入れる / 外す」か「詳細を見る」を選択できます。</p></div>
+    <div class="deck-utility-row"><button id="myListBtn" class="btn outline" type="button">マイリスト</button><button id="saveMyListBtn" class="btn outline" type="button">現在の8枚をマイリスト保存</button><span>最大10デッキ</span></div>
+    <div id="deckSlots" class="deck-slots"></div>
+  </div>
+  <div id="myListPanel" class="mylist-panel" hidden><div class="mylist-head"><div><strong>MY LIST</strong><span>保存した8枚を呼び出せます</span><b id="myListCount">0 / 10</b></div><button id="closeMyListBtn" class="textbtn" type="button">閉じる</button></div><p id="myListStatus" class="mylist-status" role="status" hidden></p><div id="myListGrid" class="mylist-grid"></div><p id="myListEmpty" class="muted">まだ保存されたデッキはありません。「現在の8枚をマイリスト保存」を押すと自動名ですぐ登録されます。</p></div>
+  <div class="deck-pool-head"><div><span class="eyebrow">CARD POOL</span><h3>27枚から選ぶ</h3></div><small>PC・スマホとも3列固定。カードを押して操作を選択。</small></div>
   <div id="deckPool" class="deck-pool"></div>
   <div class="deck-actions"><button id="deckDefaultBtn" class="btn outline">おすすめに戻す</button><button id="deckSaveBtn" class="btn dark">この8枚で保存</button></div>
   <p id="deckError" class="error" hidden></p>
+
+  <div id="deckCardActions" class="deck-card-actions" hidden role="dialog" aria-modal="true" aria-label="カード操作">
+    <button id="deckActionBackdrop" class="deck-action-backdrop" type="button" aria-label="カード操作を閉じる"></button>
+    <section class="deck-action-sheet">
+      <div class="deck-action-card"><canvas id="deckActionPortrait" width="150" height="150"></canvas><div><span id="deckActionCost" class="deck-action-cost">3</span><small id="deckActionRole"></small><h3 id="deckActionName"></h3></div></div>
+      <button id="deckCardToggleBtn" class="btn primary" type="button">デッキに入れる</button>
+      <button id="deckCardDetailBtn" class="btn outline" type="button">詳細を見る・デモ ▶</button>
+      <div id="deckReplacePanel" class="deck-replace-panel" hidden><strong>デッキが8枚です。入れ替えるカードを選択</strong><div id="deckReplaceGrid" class="deck-replace-grid"></div></div>
+      <button id="deckActionClose" class="textbtn" type="button">キャンセル</button>
+    </section>
+  </div>
+
+  <div id="cardDetailPanel" class="card-detail-panel" hidden role="dialog" aria-modal="true" aria-label="カード詳細">
+    <button id="cardDetailBackdrop" class="deck-action-backdrop" type="button" aria-label="カード詳細を閉じる"></button>
+    <section class="card-detail-sheet">
+      <div class="card-detail-head"><div><span id="cardDetailRole" class="eyebrow"></span><h2 id="cardDetailName"></h2></div><button id="cardDetailClose" class="iconbtn" type="button" aria-label="詳細を閉じる">×</button></div>
+      <div class="card-demo-wrap"><div class="card-demo-label"><span class="live-dot"></span> LIVE BATTLE DEMO <span id="cardDemoScenario">本番と同じ戦闘ロジック</span><button id="cardDemoReplayBtn" class="textbtn" type="button">↻ もう一度</button></div><canvas id="cardDetailDemo" width="720" height="1040" aria-label="実戦と同じ戦闘エンジンによるカードデモ"></canvas></div>
+      <div id="cardDetailStats" class="card-detail-stats"></div>
+      <div class="card-detail-ability"><small>ABILITY / ROLE</small><p id="cardDetailDesc"></p></div>
+      <div class="card-detail-actions"><button id="detailDeckToggleBtn" class="btn primary" type="button">デッキに入れる</button><button id="cardDetailBack" class="btn outline" type="button">カード一覧へ戻る</button></div>
+    </section>
+  </div>
 </dialog>
 <dialog id="libraryModal"><div class="modal-head"><div><span class="eyebrow">MEET YOUR TWENTY-FOUR</span><h2>カード図鑑</h2></div><button class="close-modal iconbtn" aria-label="閉じる">×</button></div><p class="muted">21体のユニットと3枚の呪文を確認できます。実戦に持ち込めるのはデッキで選んだ8枚です。</p><div class="roster-tools"><button id="libraryFacingBtn" class="btn outline" aria-pressed="false">後ろ姿を見る ↻</button><small>戦場では進行・攻撃方向で自動切り替え。</small></div><div id="libraryGrid" class="library-grid"></div></dialog>
 <dialog id="updatesModal" class="updates-modal"><div class="modal-head"><div><span class="eyebrow">LAST 7 DAYS</span><h2>アプデ情報</h2></div><button class="close-modal iconbtn" aria-label="閉じる">×</button></div>
-  <div class="updates-intro"><p>直近7日以内に追加された変更だけを表示します。</p><span id="updatesRange">PATCH WINDOW</span></div>
+  <div class="updates-intro"><p>直近7日以内に追加された変更だけを表示します。同じメジャー番号の更新は1つにまとめます。</p><span id="updatesRange">PATCH WINDOW</span></div>
   <div id="patchNotes" class="patch-notes"></div>
   <p id="noPatchNotes" class="muted" hidden>直近7日以内のアップデートはありません。</p>
 </dialog>
@@ -194,12 +231,12 @@ dialog{border:1px solid #d7dfcf;background:#f9faf3;color:var(--ink);border-radiu
     <section><b>01</b><div><h3>まずはCPU戦から</h3><p>名前を入れて「CPUと対戦する」。オンラインはルームを作り、URLと6桁PASSを友だちへ共有します。</p></div></section>
     <section><b>02</b><div><h3>カード → 自分の陣地</h3><p>手札4枚から1枚を選び、画面下側の自陣にタップで配置。カードをフィールドへドラッグしてもOK。ユニットは自動で移動・攻撃します。砲台などの設置物は配置前に攻撃範囲が表示されます。</p></div></section>
     <section><b>03</b><div><h3>エナジーを使い分ける</h3><p>カード左上の数字が必要コスト。エナジーは最大10まで回復します。使ったカードは待機列へ入り、次の1枚が手札に補充されます。</p></div></section>
-    <section><b>04</b><div><h3>24枚から8枚を選ぶ</h3><p>「デッキ」から8枚を編集。平均エネルギーコストも確認できます。手札は4枚のままなので、安いカードで回すか重い切り札を増やすかが重要です。</p></div></section>
+    <section><b>04</b><div><h3>27枚から8枚を選ぶ</h3><p>「デッキ」はPC・スマホとも3列表示。カードを押すと「デッキに入れる / 外す」と「詳細を見る」を選べます。詳細では本番と同じ戦闘エンジンのLIVE BATTLE DEMOを確認でき、気に入った8枚はマイリストへ最大10個保存できます。</p></div></section>
     <section><b>05</b><div><h3>本拠地は最初は休眠</h3><p>中央本拠地は3240HP、左右タワーは1980HP。中央は試合開始時は攻撃せず、左右どちらかのサイドタワーが壊れるか、中央自身が1度でもダメージを受けると起動して試合終了まで反撃します。本拠地を壊せば即勝利です。</p></div></section>
     <section><b>06</b><div><h3>通話はいつものVCで</h3><p>オンラインで切断したら最大45秒間一時停止して再接続を待ちます。戻れなければ切断側の敗北、両方切断は引き分け。CPU戦ではタブを離れると一時停止します。</p></div></section>
     <section><b>07</b><div><h3>タワー破壊で前線が進む</h3><p>敵サイドタワーを1本破壊すると、その側のレーンと中央の細い帯だけが白線まで前進します。左右2本とも破壊すると、白線より手前の敵陣前半が横幅いっぱい・中央の隙間なしで配置可能になります。</p></div></section>
     <section><b>08</b><div><h3>大きさと地上／空中</h3><p>味方は同じ高度で軽く押し合い、敵とはすり抜けず接触します。大きな衛士は押されにくく、細い道で場所を取ります。飛行は地上の部隊・建物を無視。対空攻撃ができることと、飛んでいることは別です。</p></div></section>
-    <section><b>09</b><div><h3>向きと判定を確認</h3><p>敵陣へ進む自分の部隊は背中が見え、後ろの敵を狙えば正面を向きます。図鑑で正面／背面を切り替え。「当たり判定を表示」で足元の円を確認できます。矢・魔法は味方や建物で遮られません。</p></div></section>
+    <section><b>09</b><div><h3>向きと判定を確認</h3><p>敵陣へ進む自分の部隊は背中が見え、後ろの敵を狙えば正面を向きます。図鑑で正面／背面を切り替え。「当たり判定を表示」で足元の円を確認できます。矢・魔法は味方や建物で遮られません。スペルの範囲表示は青＋実線＝自分、赤＋点線＝相手です。</p></div></section>
     <section><b>10</b><div><h3>建物特攻と新しい相性</h3><p>ゴーレムとアイアンボアは敵兵を攻撃せず建物へ。ゴーレムは2850HP・288攻撃に調整され、倒されるとちびゴーレム2体へ分裂。親子とも死亡時に周囲へダメージを与えます。ナイトシェイドの無敵突進、砲台のHP減衰に加え、6コスト高火力のクラッグバーサーカーも参戦します。</p></div></section>
     <section><b>11</b><div><h3>3種類の範囲呪文</h3><p>ファイヤーボールは高威力の偏差撃ち。ポイズントラップは半径90へ即展開し、離脱後も3秒毒が残ります。矢の雨は半径130と広く、330ダメージでファイヤーボールより速く着弾します。</p></div></section>
   </div>
@@ -207,7 +244,7 @@ dialog{border:1px solid #d7dfcf;background:#f9faf3;color:var(--ink);border-radiu
 </dialog>
 <script type="module">window.TINY_OFFLINE=true;
 /** Balance data: original prototype values. Both browser and server import this file. */
-const VERSION = '15.0.0';
+const VERSION = '17.0.0';
 const MAX_DECK = 8;
 const ARENA = Object.freeze({
   width:720, height:1040, riverTop:482, riverBottom:558, bridges:[190,530],
@@ -220,23 +257,26 @@ const UNITS = Object.freeze({
   archer:{id:'archer',mass:1.2,name:'リーフ弓兵',short:'弓兵',role:'遠距離・対空',cost:3,hp:430,damage:86,speed:50,range:185,cooldown:1.15,radius:14,count:1,air:false,targetsAir:true,projectile:'arrow',color:'#a6ca8b',desc:'離れた敵と飛行ユニットを狙える。前衛で守ると長く働く。'},
   mage:{id:'mage',mass:1.6,name:'ルーン術師',short:'術師',role:'範囲攻撃・対空',cost:4,hp:480,damage:105,speed:44,range:158,cooldown:1.5,radius:15,count:1,air:false,targetsAir:true,projectile:'orb',splash:54,color:'#b9a0ef',desc:'魔力弾が周囲にもダメージ。密集した敵やコウモリに有効。'},
   spear:{id:'spear',mass:1.2,name:'スパーク槍兵',short:'槍兵',role:'中距離・低コスト',cost:2,hp:410,damage:82,speed:64,range:68,cooldown:0.9,radius:14,count:1,air:false,targetsAir:false,color:'#f6a98d',desc:'長い槍で剣士より少し離れて攻撃。素早い援軍や防衛に。'},
-  bat:{id:'bat',mass:0.6,name:'ムーンバット',short:'バット',role:'飛行・3体編成',cost:2,hp:145,damage:46,speed:82,range:28,cooldown:0.85,radius:11,count:3,air:true,targetsAir:true,color:'#b7a7dc',desc:'3体で出撃し、川を飛び越える。対空できない敵に強い。'},
+  bat:{id:'bat',mass:0.6,name:'ムーンバット',short:'バット',role:'飛行・4体編成',cost:2,hp:145,damage:46,speed:82,range:28,cooldown:0.85,radius:11,count:4,air:true,targetsAir:true,color:'#b7a7dc',desc:'4体で出撃し、川を飛び越える。1体ずつは軽いが、対空できない敵を群れで一気に削る。'},
   bomber:{id:'bomber',mass:2,name:'ポット爆弾兵',short:'爆弾兵',role:'地上範囲攻撃',cost:3,hp:470,damage:174,speed:42,range:145,cooldown:1.8,radius:16,count:1,air:false,targetsAir:false,projectile:'bomb',splash:66,color:'#edaa66',desc:'爆弾で地上の密集を崩す。空中の敵には攻撃できない。'},
   cannon:{id:'cannon',mass:1000000,name:'ボルト砲台',short:'砲台',role:'防衛建物・耐久減衰',cost:3,hp:1080,damage:140,speed:0,range:218,cooldown:1.4,radius:24,count:1,air:false,targetsAir:false,projectile:'shell',building:true,decayPerSecond:30,color:'#8dbfb3',desc:'動かない防衛建物。最大HPは1080のまま、設置後は毎秒30ずつ耐久が減り、攻撃を受けなくても約36秒で崩れる。'},
   golem:{id:'golem',mass:16,name:'ストーンゴーレム',short:'ゴーレム',role:'建物特攻・分裂',cost:8,hp:2850,damage:288,speed:21,range:42,cooldown:1.85,radius:30,count:1,air:false,targetsAir:false,buildingOnly:true,deathDamage:180,deathRadius:75,splitType:'mini_golem',splitCount:2,color:'#8ea37d',desc:'建物だけを狙う大型兵。本体HPは2850へ調整。倒されるとちびゴーレム2体へ分裂し、死亡時に周囲へ180ダメージ。'},
   berserker:{id:'berserker',mass:8.2,name:'クラッグバーサーカー',short:'クラッグ',role:'重量アタッカー・高火力',cost:7,hp:2450,damage:465,speed:32,range:40,cooldown:1.6,radius:24,count:1,air:false,targetsAir:false,color:'#b96550',desc:'巨大な戦槌を振るう7コスト重量級アタッカー。HP2450と攻撃465で、地上の大型兵を真正面から削る切り札。'},
   mini_golem:{id:'mini_golem',hidden:true,mass:5.3,name:'ちびゴーレム',short:'ちび',role:'建物特攻・分裂後',cost:0,hp:1050,damage:96,speed:28,range:32,cooldown:1.55,radius:18,count:1,air:false,targetsAir:false,buildingOnly:true,deathDamage:60,deathRadius:45,color:'#9aa88a',desc:'ストーンゴーレムが倒れた後に2体現れる小型体。HP1050・攻撃96を持ち、死亡時に周囲へ60ダメージ。'},
   boar:{id:'boar',mass:9.5,name:'アイアンボア',short:'ボア',role:'建物突撃・チャージ',cost:4,hp:980,damage:178,speed:78,range:28,cooldown:1.05,radius:18,count:1,air:false,targetsAir:false,buildingOnly:true,chargeDistance:105,chargeMultiplier:2.25,shovePower:14,shoveMassLimit:2.2,shoveCompression:.62,color:'#b4785f',desc:'敵兵を無視して建物へ突進。軽量な地上兵を押しのけながら進み、105px走ると最初の体当たりが2.25倍になる。'},
-  tigger:{id:'tigger',mass:1.8,name:'穴掘りティガー',short:'ティガー',role:'奇襲・地下移動',cost:3,hp:1100,damage:15,speed:56,range:30,cooldown:.82,radius:16,count:1,air:false,targetsAir:false,tunnelAnywhere:true,burrowMin:.9,burrowMax:2.8,burrowBase:.55,burrowSpeedDivisor:380,color:'#c08a52',desc:'戦場の好きな地上地点を指定し、自軍中央本拠地から地下を掘って移動する奇襲兵。攻撃は15と低いが、潜行中は完全に攻撃対象外。地下移動はv15でやや遅くなり、遠い地点ほど到着に時間がかかる。'},
-  muddragon:{id:'muddragon',mass:4.8,name:'マッドドラゴン',short:'泥竜',role:'空中範囲・泥沼制圧',cost:5,hp:2000,damage:200,speed:36,range:78,cooldown:1.6,radius:22,count:1,air:true,targetsAir:true,projectile:'mud',splash:45,mudRadius:45,mudDuration:2,mudTickEvery:.5,mudDamage:30,mudSlow:.70,color:'#8b7657',desc:'少し遅い飛行ドラゴン。v15で射程を約半分の78へ短縮。地上・空中へ半径45の範囲攻撃を行い、着弾地点に2秒間の泥沼を残す。泥沼は地上兵だけに30ダメージの継続攻撃と30%移動低下を与える。'},
+  tigger:{id:'tigger',mass:1.8,name:'穴掘りティガー',short:'ティガー',role:'奇襲・地下移動',cost:3,hp:1100,damage:20,speed:56,range:30,cooldown:.82,radius:16,count:1,air:false,targetsAir:false,tunnelAnywhere:true,burrowMin:.9,burrowMax:2.8,burrowBase:.55,burrowSpeedDivisor:380,color:'#c08a52',desc:'戦場の好きな地上地点を指定し、自軍中央本拠地から地下を掘って移動する奇襲兵。v16.4で攻撃を15から20へ少し強化。潜行中は完全に攻撃対象外で、遠い地点ほど到着に時間がかかる。'},
+  muddragon:{id:'muddragon',mass:4.8,name:'マッドドラゴン',short:'泥竜',role:'空中範囲・泥沼制圧',cost:5,hp:1600,damage:200,speed:36,range:78,cooldown:1.6,radius:22,count:1,air:true,targetsAir:true,projectile:'mud',splash:45,mudRadius:45,mudDuration:2,mudTickEvery:.5,mudDamage:30,mudSlow:.70,color:'#8b7657',desc:'少し遅い飛行ドラゴン。射程78・半径45の範囲攻撃と2秒間の泥沼を持つが、v16でHPを2000から1600へ低下。泥沼は地上兵だけに30ダメージの継続攻撃と30%移動低下を与える。'},
   nightshade:{id:'nightshade',mass:1.05,name:'ナイトシェイド',short:'シェイド',role:'暗殺・無敵突進',cost:3,hp:520,damage:228,speed:88,range:30,cooldown:.82,radius:13,count:1,air:false,targetsAir:false,aggroRange:105,dashAggroRange:105,dashWindup:.6,dashMinRange:80,dashMaxRange:205,dashSpeed:650,dashMultiplier:2,dashCooldown:4,color:'#6f668f',desc:'近づいた敵や建物を捉えると0.6秒溜め、影の突進を行う。突進中は無敵で、到達時に通常の2倍ダメージ。その後は通常攻撃し、突進は4秒で再使用できる。'},
   mossling:{id:'mossling',mass:.45,name:'モスリング隊',short:'モス隊',role:'群体・5体編成',cost:3,hp:155,damage:45,speed:72,range:21,cooldown:.8,radius:9,count:5,air:false,targetsAir:false,color:'#8fb56b',desc:'小さな森の精霊5体で取り囲む群体。単体攻撃の大型に強いが、爆弾や範囲魔法にはとても弱い。'},
   boneswarm:{id:'boneswarm',mass:.20,name:'ボーンスウォーム',short:'ボーン隊',role:'群体・12体編成',cost:4,hp:45,damage:42,speed:78,range:19,cooldown:.72,radius:7,count:12,air:false,targetsAir:false,color:'#d9d2b5',desc:'HP45の小さな骨兵12体で大型を包囲する超群体。1体ずつは紙のように脆いが、単体攻撃のゴーレムやクラッグにはめっぽう強い。範囲攻撃には極端に弱い。'},
   lumina:{id:'lumina',mass:1.4,name:'ルミナ司祭',short:'司祭',role:'回復支援・後衛',cost:4,hp:590,damage:38,speed:44,range:145,cooldown:1.55,radius:15,count:1,air:false,targetsAir:false,projectile:'light',healPower:115,healRange:128,healCooldown:1.25,color:'#e7dba8',desc:'弱い光弾を放ちながら、周囲で最も傷ついた味方ユニットを回復する。タンクと好相性だが暗殺者に狙われやすい。'},
   frost:{id:'frost',mass:1.5,name:'フロストシャーマン',short:'シャーマン',role:'妨害・減速',cost:4,hp:535,damage:74,speed:42,range:170,cooldown:1.4,radius:15,count:1,air:false,targetsAir:false,projectile:'frost',slowMove:.62,slowAttack:.72,slowDuration:3,color:'#9ccfe2',desc:'氷弾で地上の敵を減速。移動と攻撃のテンポを奪い、ボアのチャージも削るため大型・突進系への時間稼ぎに強い。'},
   harpy:{id:'harpy',mass:1.05,name:'ストームハーピー',short:'ハーピー',role:'空中遠距離・連鎖雷',cost:4,hp:505,damage:94,speed:64,range:175,cooldown:1.25,radius:16,count:1,air:true,targetsAir:true,projectile:'lightning',chainCount:3,chainRange:105,chainFalloff:.78,color:'#8fa9d8',desc:'空から雷を放ち、近くの敵へ最大3体まで連鎖する。群体に強いが、弓兵などの対空遠距離に弱い。'},
+  necromancer:{id:'necromancer',mass:2.1,name:'ネクロマンサー',short:'ネクロ',role:'範囲対空・ボーン召喚',cost:6,hp:1350,damage:125,speed:44,range:158,cooldown:1.4,radius:17,count:1,air:false,targetsAir:true,projectile:'necro',splash:54,summonType:'boneswarm',summonCount:3,summonInterval:6,summonOnDeploy:true,color:'#8b79a8',desc:'地上・空中へ届く範囲魔法を放つ召喚士。配置した瞬間にボーン3体を呼び、その後も生存している間は6秒ごとに3体を追加召喚する。本体HPは1350。'},
+  darknecro:{id:'darknecro',mass:2.0,name:'ダークネクロマンサー',short:'闇ネクロ',role:'地上高火力・バット召喚',cost:5,hp:1150,damage:165,speed:46,range:145,cooldown:1.3,radius:16,count:1,air:false,targetsAir:false,projectile:'dark',summonType:'bat',summonCount:2,summonInterval:5,summonOnDeploy:true,color:'#65577c',desc:'地上だけを狙う高火力の闇術師。配置した瞬間にムーンバット2体を呼び、その後も生存している間は5秒ごとに2体を追加召喚する。本体は空中を攻撃できない。'},
+  ashsquad:{id:'ashsquad',mass:2,name:'アッシュ部隊',short:'アッシュ隊',role:'近接部隊・3体編成',cost:5,hp:780,damage:112,speed:56,range:34,cooldown:1.05,radius:16,count:3,air:false,targetsAir:false,spawnType:'blade',color:'#d8b56f',desc:'アッシュ剣士3体を一度に展開する部隊カード。敵方向へ1体を前、2体を後ろにした三角陣形で出現し、後衛ユニットへ重ねる防衛や一斉近接攻撃に向く。'},
 
-  blowdart:{id:'blowdart',mass:.9,name:'吹き矢ゴブリン',short:'吹き矢',role:'超長射程・高速対空',cost:3,hp:240,damage:110,speed:52,range:220,cooldown:.5,radius:12,count:1,air:false,targetsAir:true,projectile:'dart',color:'#8fbd63',desc:'HP240と非常に脆い代わりに、0.5秒ごとに110ダメージを放つ超長射程射手。橋を越えた直後からタワーを狙えるほど長い射程を持ち、地上・空中の両方に対応する。'},
+  blowdart:{id:'blowdart',mass:.9,name:'吹き矢ゴブリン',short:'吹き矢',role:'長射程・高速対空',cost:3,hp:240,damage:110,speed:52,range:195,cooldown:.5,radius:12,count:1,air:false,targetsAir:true,projectile:'dart',color:'#8fbd63',desc:'HP240と非常に脆い代わりに、0.5秒ごとに110ダメージを放つ長射程射手。v16で射程を220から195へ短縮し、タワーの反撃が届かない位置から一方的に攻撃できないよう調整。地上・空中の両方に対応する。'},
   lasertower:{id:'lasertower',mass:1000000,name:'レーザー塔',short:'レーザー塔',role:'防衛建物・単体増幅レーザー',cost:5,hp:2000,damage:20,speed:0,range:220,cooldown:.1,radius:26,count:1,air:false,targetsAir:true,building:true,laserTower:true,laserBaseDps:20,laserRampEvery:1.5,laserMultiplier:2,color:'#9c8ed0',desc:'同じ敵へ照射し続けるほど1.5秒ごとに威力が倍化する5コスト防衛建物。初期火力はボーン1体すらすぐ倒せないほど低いが、上限はない。対象が死亡・射程外・攻撃対象外になると次の対象へ切り替わり、火力は初期値へ戻る。'},
   fireball:{id:'fireball',cardType:'spell',spell:'fireball',name:'ファイヤーボール',short:'火球',role:'呪文・範囲爆撃',cost:4,damage:560,buildingDamage:140,radius:90,count:0,targetsAir:true,color:'#ed7a47',desc:'戦場の好きな場所へ本拠地から火球を放つ。半径90に560ダメージ、建物には140。遠いほど着弾が遅く、追尾しないため偏差撃ちが必要。'},
   poison:{id:'poison',cardType:'spell',spell:'poison',name:'ポイズントラップ',short:'ポイズン',role:'呪文・設置毒エリア',cost:3,damage:55,buildingDamage:10,radius:90,count:0,targetsAir:true,zoneDuration:6,tickEvery:.5,lingerDuration:3,lingerDamage:18,color:'#83a857',desc:'指定地点へ遅延なしで毒エリアを6秒設置。範囲内の敵へ継続ダメージを与え、離脱後も3秒毒が残る。建物にも低い継続ダメージが入る。'},
@@ -260,7 +300,7 @@ function normalizeDeck(value,{fallback=true}={}){
  * Ground bodies live on the lawn/bridges. Air bodies share a separate layer.
  * Buildings are static circles; tree/grass artwork is decorative only.
  */
-const PHYSICS_VERSION=13;
+const PHYSICS_VERSION=16;
 const FIELD={left:34,right:686,top:28,bottom:1012};
 const EPS=0.001,GRID=20,COLS=33,ROWS=49;
 const worldCaches=new WeakMap();
@@ -475,7 +515,7 @@ function projectStatic(g,u){
 function resolveBodies(g,dt=.1){
   const units=g.units.filter(u=>u.hp>0&&u.burrowState!=='burrow');
   for(const u of units)projectStatic(g,u);
-  for(let pass=0;pass<4;pass++)for(let i=0;i<units.length;i++)for(let j=i+1;j<units.length;j++){
+  for(let pass=0;pass<5;pass++)for(let i=0;i<units.length;i++)for(let j=i+1;j<units.length;j++){
     const a=units[i],b=units[j];if(!sameLayer(a,b)||isStructure(a)||isStructure(b))continue;
     const len=dist(a,b),min=pairDistance(a,b),over=min-len;if(over<=.005)continue;
     const side=(Number(String(a.id).replace(/\D/g,''))%2)?1:-1;
@@ -576,7 +616,8 @@ function canPlace(g,owner,id,x,y){
     return null;
   }
   if(!deploymentAllowed(g,owner,x,y))return '自分の陣地、または破壊した敵サイドタワー側の前線に配置してください。';
-  if(g.units.filter(u=>u.hp>0).length+d.count>ARENA.maxUnits)return 'フィールドのユニット上限です。';
+  const deployCount=d.count+(d.summonOnDeploy?(d.summonCount||0):0);
+  if(g.units.filter(u=>u.hp>0).length+deployCount>ARENA.maxUnits)return 'フィールドのユニット上限です。';
   if(!staticFree(g,d,{x,y},1))return '建物や岸から少し離して配置してください。';
   if(!spawnPositions(g,owner,d,x,y))return '配置する空間がありません。少し離してください。';
   return null;
@@ -589,7 +630,8 @@ function spendCard(g,owner,id){
 function makeUnit(g,owner,type,x,y){
   const d=UNITS[type];
   return {...d,id:`u${g.nextId++}`,type,owner,x,y,hp:d.hp,maxHp:d.hp,cd:0,spawn:0.5,anim:0,hit:0,walk:0,target:null,face:owner===0?-1:1,
-    lane:x<360?190:530,age:0,facing:owner===0?-Math.PI/2:Math.PI/2,moving:false};
+    lane:x<360?190:530,age:0,facing:owner===0?-Math.PI/2:Math.PI/2,moving:false,
+    summonNextAt:d.summonInterval?g.time+d.summonInterval:null};
 }
 function fireballTravelTime(core,target){return clamp(.45+distance(core,target)/620,.6,2);}
 function arrowRainTravelTime(core,target){return clamp(.2+distance(core,target)/1150,.35,1);}
@@ -623,8 +665,9 @@ function deploy(g,owner,id,x,y){
   }
   const positions=spawnPositions(g,owner,d,x,y);spendCard(g,owner,id);
   for(let i=0;i<d.count;i++){
-    const u=makeUnit(g,owner,id,positions[i].x,positions[i].y);
-    g.units.push(u);event(g,'spawn',{x:u.x,y:u.y,owner});
+    const unitType=d.spawnType||id,u=makeUnit(g,owner,unitType,positions[i].x,positions[i].y);
+    g.units.push(u);event(g,'spawn',{x:u.x,y:u.y,owner,card:id});
+    if(u.summonOnDeploy&&u.summonType&&u.summonCount)summonMinions(g,u,true);
   }
   return {ok:true};
 }
@@ -772,6 +815,30 @@ function refreshCoreWake(g){
     if(core.hp<core.maxHp||g.towers.some(t=>t.owner===owner&&t.kind==='tower'&&t.hp<=0))wakeCore(g,owner,core.hp<core.maxHp?'core-hit':'side-down');
   }
 }
+function summonMinions(g,parent,initial=false){
+  const d=UNITS[parent.summonType];if(!d||!parent.summonCount)return 0;
+  const available=Math.max(0,ARENA.maxUnits-g.units.filter(u=>u.hp>0).length),count=Math.min(parent.summonCount,available);if(!count)return 0;
+  const f=parent.owner===0?1:-1;
+  const base=count===2?[[-22,-12],[22,-12]]:count===3?[[0,-30],[-24,12],[24,12]]:Array.from({length:count},(_,i)=>{const a=-Math.PI/2+i*Math.PI*2/count;return [Math.cos(a)*28,Math.sin(a)*28];});
+  const candidates=[];
+  for(const [ox,oy] of base)candidates.push([ox,oy]);
+  for(const r of [38,50,64])for(let i=0;i<12;i++){const a=i*Math.PI*2/12+(parent.owner===1?Math.PI:0);candidates.push([Math.cos(a)*r,Math.sin(a)*r]);}
+  let made=0;
+  for(const [ox0,oy0] of candidates){
+    if(made>=count)break;const ox=ox0*f,oy=oy0*f,p={x:clamp(parent.x+ox,50,670),y:clamp(parent.y+oy,60,980)};
+    if(!staticFree(g,d,p,0))continue;
+    if(g.units.some(u=>u.hp>0&&!!u.air===!!d.air&&distance(p,u)<d.radius+(u.radius||12)*.80))continue;
+    const u=makeUnit(g,parent.owner,d.id,p.x,p.y);u.spawn=.3;u.lane=parent.lane;u.summonedBy=parent.id;g.units.push(u);event(g,'summon-spawn',{x:u.x,y:u.y,owner:u.owner,summoner:parent.type,minion:d.id,initial});made++;
+  }
+  return made;
+}
+function updateSummoner(g,u){
+  if(!u.summonType||!u.summonInterval||!Number.isFinite(u.summonNextAt)||u.hp<=0)return;
+  if(g.time+1e-8<u.summonNextAt)return;
+  summonMinions(g,u,false);
+  do{u.summonNextAt+=u.summonInterval;}while(u.summonNextAt<=g.time+1e-8);
+}
+
 function summonMiniGolems(g,parent){
   const d=UNITS[parent.splitType||'mini_golem'];if(!d)return;
   const count=Math.min(parent.splitCount||2,Math.max(0,ARENA.maxUnits-g.units.filter(u=>u.hp>0).length));
@@ -1024,6 +1091,7 @@ function tick(g,dt=ARENA.tick){
       u.age+=dt;
       if(updateBurrow(g,u,dt))continue;
       if(u.spawn>0){u.spawn=Math.max(0,u.spawn-dt);continue;}
+      updateSummoner(g,u);
       if(u.decayPerSecond){decayStructure(g,u,u.decayPerSecond*dt);if(u.hp<=0)continue;}
     }
     if(updateShadowRush(g,u,entities,dt))continue;
@@ -1064,7 +1132,7 @@ function viewMatch(g,seat=0){
   const p=g.players[seat];
   return {physicsVersion:PHYSICS_VERSION,phase:g.phase,countdown:g.countdown,time:rnd(g.time),overtime:g.overtime,winner:g.winner,reason:g.reason,
     scores:[towerScore(g,0),towerScore(g,1)],energy:rnd(p.energy),hand:[...p.hand],next:p.queue[0],deck:[...p.deck],
-    units:g.units.map(u=>({id:u.id,type:u.type,owner:u.owner,x:rnd(u.x),y:rnd(u.y),hp:u.hp,maxHp:u.maxHp,radius:u.radius,air:u.air,building:!!u.building,anim:u.anim,hit:u.hit,walk:u.walk,spawn:u.spawn,face:u.face,facing:u.facing,moving:!!u.moving,mass:u.mass,age:u.age,target:u.target||null,laserStage:u.laserStage||0,laserDps:rnd(u.laserDps||0),laserLockTime:rnd(u.laserLockTime||0),charged:!!u.charged,chargeRun:rnd(u.chargeRun||0),slowed:(u.slowUntil||0)>g.time,slowRemaining:rnd(Math.max(0,(u.slowUntil||0)-g.time)),poisoned:(u.poisonUntil||0)>g.time,poisonRemaining:rnd(Math.max(0,(u.poisonUntil||0)-g.time)),mudded:(u.mudUntil||0)>g.time,mudRemaining:rnd(Math.max(0,(u.mudUntil||0)-g.time)),burrowState:u.burrowState||null,burrowProgress:rnd(u.burrowProgress||0),dashState:u.dashState||null,dashWindupRemaining:rnd(Math.max(0,(u.dashWindupUntil||0)-g.time)),dashCooldownRemaining:rnd(Math.max(0,(u.dashReadyAt||0)-g.time)),invulnerable:(u.invulnerableUntil||0)>g.time})),
+    units:g.units.map(u=>({id:u.id,type:u.type,owner:u.owner,x:rnd(u.x),y:rnd(u.y),hp:u.hp,maxHp:u.maxHp,radius:u.radius,air:u.air,building:!!u.building,anim:u.anim,hit:u.hit,walk:u.walk,spawn:u.spawn,face:u.face,facing:u.facing,moving:!!u.moving,mass:u.mass,age:u.age,target:u.target||null,laserStage:u.laserStage||0,laserDps:rnd(u.laserDps||0),laserLockTime:rnd(u.laserLockTime||0),charged:!!u.charged,chargeRun:rnd(u.chargeRun||0),slowed:(u.slowUntil||0)>g.time,slowRemaining:rnd(Math.max(0,(u.slowUntil||0)-g.time)),poisoned:(u.poisonUntil||0)>g.time,poisonOwner:Number.isFinite(u.poisonOwner)?u.poisonOwner:null,poisonRemaining:rnd(Math.max(0,(u.poisonUntil||0)-g.time)),mudded:(u.mudUntil||0)>g.time,mudRemaining:rnd(Math.max(0,(u.mudUntil||0)-g.time)),burrowState:u.burrowState||null,burrowProgress:rnd(u.burrowProgress||0),summonType:u.summonType||null,summonCount:u.summonCount||0,summonRemaining:u.summonInterval?rnd(Math.max(0,(u.summonNextAt||g.time)-g.time)):0,dashState:u.dashState||null,dashWindupRemaining:rnd(Math.max(0,(u.dashWindupUntil||0)-g.time)),dashCooldownRemaining:rnd(Math.max(0,(u.dashReadyAt||0)-g.time)),invulnerable:(u.invulnerableUntil||0)>g.time})),
     towers:g.towers.map(t=>({id:t.id,kind:t.kind,owner:t.owner,x:t.x,y:t.y,hp:t.hp,maxHp:t.maxHp,radius:t.radius,anim:t.anim,hit:t.hit,facing:t.facing,awake:t.kind==='core'?!!t.awake:true})),
     projectiles:g.projectiles.map(p=>({id:p.id,owner:p.owner,x:rnd(p.x),y:rnd(p.y),tx:rnd(p.tx),ty:rnd(p.ty),kind:p.kind,spell:p.spell||null,progress:rnd(p.progress||0),radius:p.splash||0})),
     zones:(g.zones||[]).map(z=>({id:z.id,owner:z.owner,kind:z.kind,spell:z.spell,x:rnd(z.x),y:rnd(z.y),radius:z.radius,remaining:rnd(z.remaining),total:z.total})),
@@ -1076,6 +1144,16 @@ function viewMatch(g,seat=0){
 // Lightweight procedural cut-out rig: hips, knees, shoulders, hands and equipment.
 // All illustrations are original vectors; no external art or font assets are loaded.
 const TAU=Math.PI*2;
+
+// Spell ownership is always rendered from the local viewer's perspective:
+// blue + solid = your spell, red + dashed = the opponent's spell.
+// Keeping this separate from the unit palette makes spell danger readable at a glance.
+const SPELL_TEAM_COLORS = Object.freeze({
+  own:Object.freeze({base:'#4f9dff',bright:'#b9dcff',soft:'#85beff',dash:Object.freeze([])}),
+  enemy:Object.freeze({base:'#ff5f68',bright:'#ffc1c5',soft:'#ff8e96',dash:Object.freeze([7,6])})
+});
+function spellTeamStyle(owner,seat=0){return owner===seat?SPELL_TEAM_COLORS.own:SPELL_TEAM_COLORS.enemy;}
+function spellRing(c,style){c.setLineDash(style.dash);}
 function path(ctx,pts,fill,stroke=null,w=1){
   ctx.beginPath();ctx.moveTo(...pts[0]);for(const p of pts.slice(1))ctx.lineTo(...p);ctx.closePath();
   if(fill){ctx.fillStyle=fill;ctx.fill();}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=w;ctx.stroke();}
@@ -1501,13 +1579,35 @@ function renderOrder(g,seat=0){
  return all.sort((a,b)=>((a.entity.air?2000:0)+orient(a.entity,seat).y)-((b.entity.air?2000:0)+orient(b.entity,seat).y)||String(a.entity.id).localeCompare(String(b.entity.id)));
 }
 
+function drawNecromancer(c,opts={},darkMode=false){
+  const t=opts.time||0,walk=opts.walk||0,attack=opts.anim||0,moving=opts.moving??walk!==0,back=!!opts.back;
+  const ink='#202d37',team=TEAM_COLORS[opts.owner||0],robe=darkMode?'#30283f':'#57466f',robe2=darkMode?'#55436b':'#77618f',bone='#ddd6bc',glow=darkMode?'#dd75cf':'#91dfb1',staff=darkMode?'#54415f':'#695a4e';
+  const bob=(moving?Math.sin(walk)*1.1:Math.sin(t*2.2)*.45),pulse=.65+.35*Math.sin(t*5),cast=attack?Math.sin((1-attack/.35)*Math.PI):0;
+  c.save();c.translate(0,bob);
+  for(const side of [-1,1]){c.save();c.translate(side*7,-8);c.rotate(Math.sin(walk+(side>0?Math.PI:0))*(moving?.32:0));line(c,0,0,0,15,robe2,7);rr(c,-5,11,10,6,2,ink);c.restore();}
+  path(c,[[-17,-39],[17,-39],[22,-5],[8,2],[0,-8],[-8,2],[-22,-5]],robe,ink,1.6);rr(c,-14,-36,28,7,3,team,ink);
+  if(back){line(c,-9,-31,8,-12,'#8e7b7c',2.5);path(c,[[-6,-26],[0,-34],[6,-26],[0,-18]],glow,ink,1);}
+  else {path(c,[[-9,-29],[0,-22],[9,-29],[6,-13],[-6,-13]],robe2,ink,1);path(c,[[-4,-25],[0,-31],[4,-25],[0,-19]],glow,null);}
+  c.save();c.translate(14,-31);c.rotate(-.2-cast*.22);line(c,0,0,4,15,robe2,8);ellipse(c,4,15,4,4,bone);c.translate(4,15);line(c,0,10,0,-43,staff,4);ellipse(c,0,-48,9,8,bone);ellipse(c,-3,-50,2,2,ink);ellipse(c,3,-50,2,2,ink);ellipse(c,0,-44,2,2,glow);c.globalAlpha=.35+.35*pulse;ellipse(c,0,-47,14+cast*5,13+cast*5,glow);c.restore();
+  c.save();c.translate(-14,-31);c.rotate(.25+cast*.35);line(c,0,0,-3,14,robe2,8);ellipse(c,-3,14,4,4,bone);if(cast){c.globalAlpha=.45+.35*pulse;ellipse(c,-8,21,7+cast*5,7+cast*5,glow);}c.restore();
+  path(c,[[-15,-48],[-11,-64],[0,-73],[12,-64],[16,-48],[10,-37],[-10,-37]],darkMode?'#292234':'#4c3e61',ink,1.7);
+  if(back){line(c,0,-64,0,-41,robe2,1.5);}else{rr(c,-10,-53,20,12,5,'#1f2931',ink);ellipse(c,-4,-48,2,2,glow);ellipse(c,4,-48,2,2,glow);path(c,[[-5,-42],[0,-38],[5,-42]],bone,ink,.8);}
+  if(opts.hit){c.globalAlpha*=.5;ellipse(c,0,-31,22,30,'#fff0d2');}c.restore();
+}
+function drawAshSquadCard(c,opts={}){
+  const owner=opts.owner||0,time=opts.time||0;
+  drawUnit(c,'blade',0,-10,.60,{...opts,time,owner,noShadow:true,idle:true,back:opts.back});
+  drawUnit(c,'blade',-19,7,.52,{...opts,time:time+.4,owner,noShadow:true,idle:true,back:opts.back});
+  drawUnit(c,'blade',19,7,.52,{...opts,time:time+.8,owner,noShadow:true,idle:true,back:opts.back});
+}
+
 function drawUnit(c,type,x,y,scale=1,opts={}){
   const d=UNITS[type],t=opts.time||0,walk=opts.walk||0,attack=opts.anim||0,team=TEAM_COLORS[opts.owner||0];
   const ink='#233945',skin='#f0c7a2',dark='#233e42';
   const moving=opts.moving??walk!==0,bob=Math.sin(walk)*1.5+(opts.idle?Math.sin(t*2)*.65:0);
   c.save();c.translate(x,y);c.scale(scale,scale);
   if(opts.alpha!=null)c.globalAlpha=opts.alpha;
-  if(!opts.noShadow){const sr=type==='golem'?32:type==='mini_golem'?20:type==='berserker'?27:type==='boar'?25:type==='knight'?23:type==='mossling'?12:type==='boneswarm'?9:type==='tigger'?18:type==='muddragon'?26:type==='harpy'?20:18;ellipse(c,0,5,sr,type==='golem'?9:type==='mini_golem'?6:type==='boar'?8:6,'#172f3435');}
+  if(!opts.noShadow){const sr=type==='golem'?32:type==='mini_golem'?20:type==='berserker'?27:type==='boar'?25:type==='knight'?23:type==='mossling'?12:type==='boneswarm'?9:type==='tigger'?18:type==='muddragon'?26:type==='harpy'?20:type==='ashsquad'?30:type==='necromancer'||type==='darknecro'?21:18;ellipse(c,0,5,sr,type==='golem'?9:type==='mini_golem'?6:type==='boar'?8:6,'#172f3435');}
   if(opts.mirror)c.scale(-1,1);
   if(type==='golem'){drawStoneGolem(c,opts);c.restore();return;}
   if(type==='mini_golem'){c.scale(.62,.62);drawStoneGolem(c,opts);c.restore();return;}
@@ -1523,6 +1623,9 @@ function drawUnit(c,type,x,y,scale=1,opts={}){
   if(type==='lumina'){drawLumina(c,opts);c.restore();return;}
   if(type==='frost'){drawFrostShaman(c,opts);c.restore();return;}
   if(type==='harpy'){drawStormHarpy(c,opts);c.restore();return;}
+  if(type==='necromancer'){drawNecromancer(c,opts,false);c.restore();return;}
+  if(type==='darknecro'){drawNecromancer(c,opts,true);c.restore();return;}
+  if(type==='ashsquad'){drawAshSquadCard(c,opts);c.restore();return;}
   if(opts.back&&type!=='bat'&&type!=='cannon'){drawBackHumanoid(c,type,opts);c.restore();return;}
   if(type==='bat'){
     const flap=Math.sin(t*13+walk)*.55;
@@ -1737,9 +1840,10 @@ function drawArena(canvas,snapshot,options={}){
   }
   for(const z of g.zones||[]){
     const p=orient(z,seat),life=z.total?clamp(z.remaining/z.total,0,1):1,pulse=.92+.05*Math.sin(time*6);
-    const mud=z.kind==='mud';c.save();c.globalAlpha=.16+.11*life;c.fillStyle=mud?'#786548':z.kind==='poison'?'#70984f':'#9aa36d';c.beginPath();c.arc(p.x,p.y,z.radius*pulse,0,TAU);c.fill();
-    c.globalAlpha=.55;c.strokeStyle=mud?'#b6a276':'#c9ec82';c.lineWidth=2;c.setLineDash([5,6]);c.beginPath();c.arc(p.x,p.y,z.radius,0,TAU);c.stroke();c.setLineDash([]);
-    for(let i=0;i<7;i++){const a=i*TAU/7+time*.25,r=z.radius*(.25+.55*((i*37)%10)/10);ellipse(c,p.x+Math.cos(a)*r,p.y+Math.sin(a)*r*.65,3,2,mud?'#9b875f88':'#c7e38488');}
+    const mud=z.kind==='mud',poison=z.kind==='poison',spellStyle=poison?spellTeamStyle(z.owner,seat):null;
+    c.save();c.globalAlpha=.16+.11*life;c.fillStyle=mud?'#786548':poison?spellStyle.base:'#9aa36d';c.beginPath();c.arc(p.x,p.y,z.radius*pulse,0,TAU);c.fill();
+    c.globalAlpha=.62;c.strokeStyle=mud?'#b6a276':poison?spellStyle.bright:'#c9ec82';c.lineWidth=poison?2.4:2;if(poison)spellRing(c,spellStyle);else c.setLineDash([5,6]);c.beginPath();c.arc(p.x,p.y,z.radius,0,TAU);c.stroke();c.setLineDash([]);
+    for(let i=0;i<7;i++){const a=i*TAU/7+time*.25,r=z.radius*(.25+.55*((i*37)%10)/10);ellipse(c,p.x+Math.cos(a)*r,p.y+Math.sin(a)*r*.65,3,2,mud?'#9b875f88':poison?spellStyle.soft+'99':'#c7e38488');}
     c.restore();
   }
   // Continuous laser beams are drawn beneath units so the locked target remains readable.
@@ -1760,7 +1864,7 @@ function drawArena(canvas,snapshot,options={}){
     c.strokeStyle=TEAM_COLORS[owner]+'b0';c.lineWidth=2;c.beginPath();c.ellipse(p.x,p.y+4,u.radius+4,(u.radius+4)*.34,0,0,TAU);c.stroke();
     drawUnit(c,u.type,p.x,p.y,u.type==='mossling'?.9:u.type==='boneswarm'?.78:u.type==='tigger'?1.0:u.type==='muddragon'?.92:u.type==='blowdart'?.9:u.type==='lasertower'?.92:u.type==='bat'?.93:u.type==='golem'?.92:u.type==='mini_golem'?.72:u.type==='berserker'?.94:u.type==='harpy'?.9:.95,{time,walk:u.walk,moving:u.moving,owner,anim:u.anim,hit:u.hit,charged:u.charged,dashWindup:u.dashState==='windup',dashing:u.dashState==='rush',invulnerable:!!u.invulnerable,alpha:u.spawn>0?.5:1,back:facing.back,mirror:u.building?false:facing.mirror,facing:facing.angle});
     if(u.slowed){c.save();c.strokeStyle='#a9ebffcc';c.lineWidth=2;c.setLineDash([3,4]);c.beginPath();c.ellipse(p.x,p.y+3,u.radius+8,(u.radius+8)*.42,0,0,TAU);c.stroke();c.restore();}
-    if(u.poisoned){c.save();c.strokeStyle='#c9e77dcc';c.lineWidth=2;c.setLineDash([2,4]);c.beginPath();c.ellipse(p.x,p.y+3,u.radius+7,(u.radius+7)*.48,0,0,TAU);c.stroke();c.restore();}
+    if(u.poisoned){const ps=spellTeamStyle(u.poisonOwner,seat);c.save();c.strokeStyle=ps.bright+'dd';c.lineWidth=2;spellRing(c,ps);c.beginPath();c.ellipse(p.x,p.y+3,u.radius+7,(u.radius+7)*.48,0,0,TAU);c.stroke();c.restore();}
     if(u.mudded){c.save();c.strokeStyle='#b59c6dcc';c.lineWidth=2;c.setLineDash([5,3]);c.beginPath();c.ellipse(p.x,p.y+4,u.radius+9,(u.radius+9)*.42,0,0,TAU);c.stroke();c.restore();}
     const hp=u.hp/u.maxHp,w=u.type==='golem'?50:u.type==='mini_golem'?32:u.type==='berserker'?42:u.type==='boar'?38:u.type==='knight'?38:u.type==='mossling'?20:u.type==='boneswarm'?16:28;
     if(hp<.999){rr(c,p.x-w/2,p.y-(u.air?48:82),w,5,2,'#25363eaa');rr(c,p.x-w/2+1,p.y-(u.air?47:81),(w-2)*hp,3,1,TEAM_COLORS[owner]);}
@@ -1776,16 +1880,17 @@ function drawArena(canvas,snapshot,options={}){
   for(const p of g.projectiles){
     const pos=orient(p,seat),target=orient({x:p.tx,y:p.ty},seat),angle=Math.atan2(target.y-pos.y,target.x-pos.x);
     if(p.kind==='arrowrain'){
-      const progress=clamp(p.progress||0,0,1),warn=progress>.35;
-      if(warn){c.save();c.globalAlpha=.1+progress*.18;c.fillStyle='#d9c295';c.beginPath();c.arc(target.x,target.y,p.radius||130,0,TAU);c.fill();c.strokeStyle='#f4dfaf';c.lineWidth=1.5;c.setLineDash([5,5]);c.stroke();c.restore();}
-      c.save();c.strokeStyle='#f0dfbb';c.lineWidth=1.6;
-      for(let i=0;i<11;i++){const a=i*2.39,rad=(p.radius||130)*(.18+.7*((i*37)%10)/10),ax=target.x+Math.cos(a)*rad,ay=target.y+Math.sin(a)*rad*.55-80*(1-progress);line(c,ax-6,ay-18,ax+2,ay+6,'#ead8b4',1.8);path(c,[[ax-1,ay+5],[ax+5,ay+10],[ax+1,ay+1]],'#d5a46f');}
+      const progress=clamp(p.progress||0,0,1),warn=progress>.35,ss=spellTeamStyle(p.owner,seat);
+      if(warn){c.save();c.globalAlpha=.12+progress*.2;c.fillStyle=ss.base;c.beginPath();c.arc(target.x,target.y,p.radius||130,0,TAU);c.fill();c.globalAlpha=.9;c.strokeStyle=ss.bright;c.lineWidth=2;spellRing(c,ss);c.stroke();c.restore();}
+      c.save();
+      for(let i=0;i<11;i++){const a=i*2.39,rad=(p.radius||130)*(.18+.7*((i*37)%10)/10),ax=target.x+Math.cos(a)*rad,ay=target.y+Math.sin(a)*rad*.55-80*(1-progress);line(c,ax-6,ay-18,ax+2,ay+6,ss.base,3.2);line(c,ax-6,ay-18,ax+2,ay+6,'#ead8b4',1.35);path(c,[[ax-1,ay+5],[ax+5,ay+10],[ax+1,ay+1]],ss.soft);}
       c.restore();continue;
     }
     if(p.kind==='fireball'){
-      const progress=clamp(p.progress||0,0,1),arc=Math.sin(Math.PI*progress)*72;
-      if(progress>.72){c.save();c.globalAlpha=.16+(progress-.72)*1.5;c.fillStyle='#f36f4d';c.beginPath();c.arc(target.x,target.y,p.radius||90,0,TAU);c.fill();c.strokeStyle='#ffd39a';c.lineWidth=2;c.setLineDash([7,6]);c.stroke();c.restore();}
+      const progress=clamp(p.progress||0,0,1),arc=Math.sin(Math.PI*progress)*72,ss=spellTeamStyle(p.owner,seat);
+      if(progress>.72){c.save();c.globalAlpha=.18+(progress-.72)*1.5;c.fillStyle=ss.base;c.beginPath();c.arc(target.x,target.y,p.radius||90,0,TAU);c.fill();c.globalAlpha=.95;c.strokeStyle=ss.bright;c.lineWidth=2.5;spellRing(c,ss);c.stroke();c.restore();}
       c.save();c.translate(pos.x,pos.y-18-arc);c.rotate(angle);
+      c.globalAlpha=.72;c.strokeStyle=ss.base;c.lineWidth=5;c.beginPath();c.arc(0,0,15,0,TAU);c.stroke();c.globalAlpha=1;
       for(let i=0;i<4;i++)ellipse(c,-13-i*7,0,10-i*1.6,7-i,'#f08a4f'+(i===0?'dd':'77'));
       ellipse(c,0,0,12,12,'#f15e3d');ellipse(c,2,-2,7,7,'#ffbf63');ellipse(c,4,-4,3,3,'#fff0a5');c.restore();continue;
     }
@@ -1797,6 +1902,8 @@ function drawArena(canvas,snapshot,options={}){
     else if(p.kind==='lightning'){line(c,-10,0,-2,-5,'#ffe074',3);line(c,-2,-5,3,4,'#fff1a4',3);line(c,3,4,12,0,'#ffe074',3);}
     else if(p.kind==='light'){ellipse(c,0,0,7,7,'#ffe7a3');ellipse(c,0,0,3,3,'#e6ffff');}
     else if(p.kind==='mud'){ellipse(c,0,0,9,7,'#806847');ellipse(c,-4,-2,4,3,'#b09a6e');ellipse(c,4,1,3,2,'#5f513b');}
+    else if(p.kind==='necro'){ellipse(c,0,0,9,9,'#7ecf9b');ellipse(c,0,0,5,5,'#d9f4c9');ellipse(c,-5,-2,2,2,'#806b9d');}
+    else if(p.kind==='dark'){ellipse(c,0,0,9,9,'#6d557e');ellipse(c,0,0,5,5,'#e384d3');ellipse(c,-5,-2,2,2,'#d6a2e3');}
     else{ellipse(c,0,0,p.kind==='orb'?8:5,p.kind==='orb'?8:5,p.kind==='orb'?'#c8b0f1':'#f9d494');ellipse(c,-4,0,3,3,'#fff3ca');}
     c.restore();
   }
@@ -1837,20 +1944,22 @@ function drawArena(canvas,snapshot,options={}){
     }else if(e.type==='mud-deploy'){
       c.strokeStyle='#b7a477';c.lineWidth=3;c.beginPath();c.arc(p.x,p.y,(e.radius||45)*(1-fade*.22),0,TAU);c.stroke();for(let i=0;i<8;i++){const a=i*TAU/8+e.id;ellipse(c,p.x+Math.cos(a)*(1-fade)*(e.radius||45)*.65,p.y+Math.sin(a)*(1-fade)*(e.radius||45)*.45,3,2,'#8e7452');}
     }else if(e.type==='poison-deploy'){
-      c.strokeStyle='#c9eb83';c.lineWidth=3;c.beginPath();c.arc(p.x,p.y,(e.radius||90)*(1-fade*.35),0,TAU);c.stroke();
-      for(let i=0;i<10;i++){const a=i*TAU/10+e.id,len=(1-fade)*(e.radius||90)*.65;ellipse(c,p.x+Math.cos(a)*len,p.y+Math.sin(a)*len*.6,3+fade*4,2+fade*3,'#97bd63');}
+      const ss=spellTeamStyle(e.owner,seat);c.strokeStyle=ss.bright;c.lineWidth=3;spellRing(c,ss);c.beginPath();c.arc(p.x,p.y,(e.radius||90)*(1-fade*.35),0,TAU);c.stroke();c.setLineDash([]);
+      for(let i=0;i<10;i++){const a=i*TAU/10+e.id,len=(1-fade)*(e.radius||90)*.65;ellipse(c,p.x+Math.cos(a)*len,p.y+Math.sin(a)*len*.6,3+fade*4,2+fade*3,ss.soft);}
     }else if(e.type==='arrowrain-impact'){
-      c.strokeStyle='#f0d4a0';c.lineWidth=3;c.beginPath();c.arc(p.x,p.y,(e.radius||130)*(1-fade*.18),0,TAU);c.stroke();
-      for(let i=0;i<16;i++){const a=i*2.17,len=(1-fade)*(e.radius||130)*.85;line(c,p.x+Math.cos(a)*len-5,p.y+Math.sin(a)*len*.55-14,p.x+Math.cos(a)*len+2,p.y+Math.sin(a)*len*.55+7,'#e7d6b2',1.5);}
+      const ss=spellTeamStyle(e.owner,seat);c.strokeStyle=ss.bright;c.lineWidth=3;spellRing(c,ss);c.beginPath();c.arc(p.x,p.y,(e.radius||130)*(1-fade*.18),0,TAU);c.stroke();c.setLineDash([]);
+      for(let i=0;i<16;i++){const a=i*2.17,len=(1-fade)*(e.radius||130)*.85,x=p.x+Math.cos(a)*len,y=p.y+Math.sin(a)*len*.55;line(c,x-5,y-14,x+2,y+7,ss.base,3);line(c,x-5,y-14,x+2,y+7,'#e7d6b2',1.2);}
     }else if(e.type==='fireball-impact'){
-      c.fillStyle='#f45f3f44';c.beginPath();c.arc(p.x,p.y,(e.radius||90)*(1-fade*.18),0,TAU);c.fill();
-      c.strokeStyle='#ffd48c';c.lineWidth=5*fade+1;c.beginPath();c.arc(p.x,p.y,(e.radius||90)*(1-fade*.35),0,TAU);c.stroke();
+      const ss=spellTeamStyle(e.owner,seat);c.globalAlpha=fade*.34;c.fillStyle=ss.base;c.beginPath();c.arc(p.x,p.y,(e.radius||90)*(1-fade*.18),0,TAU);c.fill();c.globalAlpha=fade;
+      c.strokeStyle=ss.bright;c.lineWidth=5*fade+1;spellRing(c,ss);c.beginPath();c.arc(p.x,p.y,(e.radius||90)*(1-fade*.35),0,TAU);c.stroke();c.setLineDash([]);
       for(let i=0;i<14;i++){const a=i*TAU/14+e.id,len=(1-fade)*(e.radius||90);ellipse(c,p.x+Math.cos(a)*len,p.y+Math.sin(a)*len*.65,5+fade*8,4+fade*7,i%2?'#ffb457':'#ef6742');}
     }else if(e.type==='death-blast'){
       c.strokeStyle=e.unitType==='mini_golem'?'#d8d7aa':'#ecd39b';c.lineWidth=3;c.beginPath();c.arc(p.x,p.y-8,(e.radius||55)*(1-fade*.25),0,TAU);c.stroke();
       for(let i=0;i<9;i++){const a=i*TAU/9+e.id,len=(1-fade)*(e.radius||55);ellipse(c,p.x+Math.cos(a)*len,p.y-8+Math.sin(a)*len*.6,3+fade*6,3+fade*5,'#b8ad89');}
     }else if(e.type==='split-spawn'){
       c.strokeStyle='#cfe5aa';c.lineWidth=2;c.beginPath();c.arc(p.x,p.y-9,10+(1-fade)*18,0,TAU);c.stroke();
+    }else if(e.type==='summon-spawn'){
+      const dark=e.summoner==='darknecro',col=dark?'#e58bd8':'#9ae7b3';c.strokeStyle=col;c.lineWidth=2.4;c.beginPath();c.arc(p.x,p.y-9,9+(1-fade)*22,0,TAU);c.stroke();c.globalAlpha=fade*.7;for(let i=0;i<5;i++){const a=i*TAU/5+e.id;ellipse(c,p.x+Math.cos(a)*(1-fade)*18,p.y-9+Math.sin(a)*(1-fade)*12,2.5,2.5,col);}
     }else if(e.type==='death'||e.type==='blast'){
       for(let i=0;i<8;i++){
         const a=i*TAU/8+e.id,len=(1-fade)*(e.type==='blast'?e.radius:35);
@@ -1863,11 +1972,11 @@ function drawArena(canvas,snapshot,options={}){
   if(options.selected&&ghost&&g.phase==='battle'){
     const d=UNITS[options.selected];
     if(d.spell){
-      const poison=d.spell==='poison',arrows=d.spell==='arrowrain',fill=poison?'#7fa64d':arrows?'#d0af78':'#ef754d',stroke=poison?'#d9f49a':arrows?'#f5dfb0':'#ffd79a';
-      c.save();c.globalAlpha=.2;c.fillStyle=ghost.valid?fill:'#fa9b80';c.beginPath();c.arc(ghost.x,ghost.y,d.radius,0,TAU);c.fill();c.globalAlpha=.8;c.strokeStyle=ghost.valid?stroke:'#ff987f';c.lineWidth=2;c.setLineDash([7,6]);c.stroke();c.setLineDash([]);
-      if(poison){ellipse(c,ghost.x,ghost.y,13,9,'#789850');for(const a of [0,2.1,4.2])ellipse(c,ghost.x+Math.cos(a)*14,ghost.y+Math.sin(a)*9,4,3,'#bddd77');}
-      else if(arrows){for(let i=-2;i<=2;i++)line(c,ghost.x+i*6-3,ghost.y-15,ghost.x+i*6+2,ghost.y+10,'#ead8b5',2);}
-      else{ellipse(c,ghost.x,ghost.y,14,14,'#ef633e');ellipse(c,ghost.x+3,ghost.y-3,7,7,'#ffd36f');}c.restore();
+      const poison=d.spell==='poison',arrows=d.spell==='arrowrain',ss=SPELL_TEAM_COLORS.own,fill=ghost.valid?ss.base:'#8c969c',stroke=ghost.valid?ss.bright:'#c7ced1';
+      c.save();c.globalAlpha=.2;c.fillStyle=fill;c.beginPath();c.arc(ghost.x,ghost.y,d.radius,0,TAU);c.fill();c.globalAlpha=.88;c.strokeStyle=stroke;c.lineWidth=2.4;c.setLineDash(ghost.valid?[]:[5,5]);c.stroke();c.setLineDash([]);
+      if(poison){ellipse(c,ghost.x,ghost.y,13,9,ghost.valid?'#4f87d8':'#778185');for(const a of [0,2.1,4.2])ellipse(c,ghost.x+Math.cos(a)*14,ghost.y+Math.sin(a)*9,4,3,ghost.valid?ss.soft:'#aeb5b7');}
+      else if(arrows){for(let i=-2;i<=2;i++){line(c,ghost.x+i*6-3,ghost.y-15,ghost.x+i*6+2,ghost.y+10,ss.base,3);line(c,ghost.x+i*6-3,ghost.y-15,ghost.x+i*6+2,ghost.y+10,'#ead8b5',1.2);}}
+      else{ellipse(c,ghost.x,ghost.y,16,16,ghost.valid?ss.base:'#8c969c');ellipse(c,ghost.x,ghost.y,12,12,'#ef633e');ellipse(c,ghost.x+3,ghost.y-3,7,7,'#ffd36f');}c.restore();
     }else{
       if(d.tunnelAnywhere){
         const core=g.towers.find(t=>t.owner===seat&&t.kind==='core'&&t.hp>0);if(core){const q=orient(core,seat);c.save();c.globalAlpha=.65;c.strokeStyle=ghost.valid?'#d6b778':'#ff9d87';c.lineWidth=2;c.setLineDash([5,7]);c.beginPath();c.moveTo(q.x,q.y);c.quadraticCurveTo((q.x+ghost.x)/2,(q.y+ghost.y)/2-28,ghost.x,ghost.y);c.stroke();c.setLineDash([]);c.fillStyle='#f3dfb1';c.font='bold 10px sans-serif';c.textAlign='center';c.fillText('地下移動',ghost.x,Math.max(22,ghost.y-38));c.restore();}}
@@ -1904,8 +2013,8 @@ function drawPortrait(canvas,type,time=0,owner=0,selected=false,back=false){
     c.fillStyle='#fff6db';c.font='bold 10px sans-serif';c.textAlign='center';c.fillText('SPELL',60,111);c.restore();return;
   }
   ellipse(c,60,105,40,8,'#1f39451b');
-  const scale=type==='golem'?.92:type==='mini_golem'?1.15:type==='berserker'?1.18:type==='boar'?1.28:type==='tigger'?1.35:type==='muddragon'?1.34:type==='blowdart'?1.42:type==='lasertower'?1.35:type==='mossling'?2.05:type==='boneswarm'?1.8:type==='harpy'?1.45:type==='bat'?1.6:type==='cannon'?1.5:type==='mage'?1.12:type==='nightshade'?1.28:type==='lumina'?1.22:type==='frost'?1.2:1.32;
-  const py=type==='golem'?112:type==='mini_golem'?104:type==='berserker'?108:type==='boar'?96:type==='tigger'?101:type==='muddragon'?94:type==='blowdart'?102:type==='lasertower'?96:type==='mossling'?91:type==='boneswarm'?96:type==='harpy'?91:type==='bat'?83:type==='cannon'?(back?94:80):104;
+  const scale=type==='golem'?.92:type==='mini_golem'?1.15:type==='berserker'?1.18:type==='boar'?1.28:type==='tigger'?1.35:type==='muddragon'?1.34:type==='blowdart'?1.42:type==='lasertower'?1.35:type==='mossling'?2.05:type==='boneswarm'?1.8:type==='harpy'?1.45:type==='necromancer'?1.26:type==='darknecro'?1.28:type==='ashsquad'?1.25:type==='bat'?1.6:type==='cannon'?1.5:type==='mage'?1.12:type==='nightshade'?1.28:type==='lumina'?1.22:type==='frost'?1.2:1.32;
+  const py=type==='golem'?112:type==='mini_golem'?104:type==='berserker'?108:type==='boar'?96:type==='tigger'?101:type==='muddragon'?94:type==='blowdart'?102:type==='lasertower'?96:type==='mossling'?91:type==='boneswarm'?96:type==='harpy'?91:type==='necromancer'?104:type==='darknecro'?104:type==='ashsquad'?101:type==='bat'?83:type==='cannon'?(back?94:80):104;
   drawUnit(c,type,60,py,scale,{time,owner,idle:true,noShadow:true,anim:0,back,facing:back?-Math.PI/2:Math.PI/2});c.restore();
 }
 
@@ -1914,6 +2023,42 @@ function drawPortrait(canvas,type,time=0,owner=0,selected=false,back=false){
 
 const $=s=>document.querySelector(s);
 const PATCH_NOTES = Object.freeze([
+  {version:'17.0.0',date:'2026-09-10',title:'SUMMONERS UPDATE',items:[
+    '新ユニット「ネクロマンサー」を追加。6コスト・HP1350・地上/空中への範囲攻撃。配置直後にボーン3体、その後6秒ごとに3体を召喚します。',
+    '新ユニット「ダークネクロマンサー」を追加。5コスト・HP1150・地上のみを攻撃。配置直後にムーンバット2体、その後5秒ごとに2体を召喚します。',
+    '新カード「アッシュ部隊」を追加。5コストで既存アッシュ剣士3体を、敵方向へ前1体・後ろ2体の三角陣形で展開します。',
+    '3枚ともカード詳細に本番エンジンの専用LIVE BATTLE DEMOを追加。ネクロ系は初回召喚と定期召喚、アッシュ部隊は三角陣形から後衛へ突入する動きを確認できます。'
+  ]},
+  {version:'16.4.0',date:'2026-09-10',title:'ABILITY DEMO & BALANCE',items:[
+    '穴掘りティガーの攻撃力を15から20へ少し強化。地下移動・HP・コストはそのままです。',
+    'ムーンバットの出現数を3体から4体へ増加。1体あたりのHP145・攻撃46・コスト2は維持します。',
+    '特殊能力持ちカードのLIVE BATTLE DEMOを能力専用シチュエーションへ刷新。能力が実際に発動する配置・相手・HPからAUTO実演します。',
+    'ストーンゴーレムは敵タワー前の瀕死状態から死亡爆発→周囲のボーン隊とタワーへダメージ→ちびゴーレム2体へ分裂。マッドドラゴンは高HPのアイアン衛士へ泥沼を当て、30%減速と継続ダメージまで見せます。'
+  ]},
+  {version:'16.3.0',date:'2026-09-10',title:'MY LIST & LIVE DEMO FIX',items:[
+    'マイリスト保存を修正。名前入力を待たず「マイデッキ 1」などの自動名で即保存し、保存後に名前変更できる方式へ変更しました。',
+    'マイリストは保存直後にストレージへ書き込めたか検証し、失敗時は明確なエラーを表示。再読み込み後も保存デッキを復元します。',
+    'カード詳細の簡易アニメーションを廃止し、ゲーム本体と同じ戦闘エンジン・ユニット・攻撃・エフェクトを使うLIVE BATTLE DEMOへ変更。',
+    '詳細デモはカードごとに能力が見えやすい相手と配置を自動構成し、実際の戦場でAUTO戦闘をループ再生します。'
+  ]},
+  {version:'16.2.0',date:'2026-09-10',title:'DECK BUILDER UPDATE',items:[
+    'デッキ編集のカード一覧をPC・スマホとも3列固定へ変更。画面幅に合わせてカード自体の大きさと文字量を自動調整します。',
+    'カードをタップしても即デッキ変更せず、「デッキに入れる / 外す」と「詳細を見る」を選べるアクションメニューを追加。8枚時はその場で交換相手を選べます。',
+    'カード詳細にステータス・能力説明・ループ再生のミニデモを追加。新しいカードの動きや攻撃方法をデッキ編集中に確認できます。',
+    '最大10個の8枚デッキを保存できるマイリストを追加。保存・呼び出し・名前変更・上書き・削除に対応し、選択中デッキはスクロールしても追従します。'
+  ]},
+  {version:'16.1.0',date:'2026-09-10',title:'SPELL TEAM COLORS',items:[
+    '全スペル共通の陣営カラーを導入。自分が発動したスペルは青、相手が発動したスペルは赤で表示します。',
+    'ファイヤーボールは着弾予告・飛翔中の外周光・爆発の衝撃波を陣営色に統一。炎本体のオレンジ色は維持します。',
+    '矢の雨は着弾予告・矢の軌跡・着弾エフェクト、ポイズントラップは設置範囲・毒エリア・残留毒表示を陣営色へ変更。',
+    '色だけに依存しないよう、自分のスペル範囲は実線、相手のスペル範囲は点線で表示します。オンラインでも各プレイヤーの画面で「青＝自分 / 赤＝相手」になります。'
+  ]},
+  {version:'16.0.0',date:'2026-09-10',title:'BALANCE & MOBILE FIX',items:[
+    'マッドドラゴンのHPを2000から1600へ低下。射程78・攻撃200・範囲攻撃・泥沼性能は維持。',
+    '吹き矢ゴブリンの射程を220から195へ短縮。タワーの反撃圏外から一方的にタワーを攻撃できないよう実効射程を調整。',
+    'スマホの設置物操作を修正。1回目のタップで決めた設置候補を、指を離したりpointerleaveが発生しても保持します。',
+    'ボルト砲台・レーザー塔はスマホで「1回目＝位置と射程を確認 / 2回目＝設置」に統一。2回目は約24px以内を同じ地点として扱います。'
+  ]},
   {version:'15.0.0',date:'2026-09-09',title:'LONG RANGE & LASER',items:[
     'マッドドラゴンの攻撃射程を155から78へ短縮。範囲攻撃・泥沼性能は維持。',
     '穴掘りティガーの攻撃を30から15へ低下し、地下移動時間を約0.9〜2.8秒へ延長。',
@@ -1963,13 +2108,13 @@ const PATCH_NOTES = Object.freeze([
 
 const el=id=>document.getElementById(id);
 const views=['home','lobby','battle'];
-let currentView='home',selected=null,hover=null,inspectId='blade',snapshot=null,previous=null,receivedAt=0;
+let currentView='home',selected=null,hover=null,pendingBuildingPlacement=null,inspectId='blade',snapshot=null,previous=null,receivedAt=0;
 let room=null,seat=0,session=null,socket=null,socketGeneration=0,connected=false,retryTimer=null,retries=0,pingTimer=null;
 let localGame=null,localTimer=null,lastLocal=0,localPaused=false,gameMode=null,difficulty='normal',entryTab='create';
 let demoGame=createMatch({seed:48164,bot:true}),demoLast=0,demoAutoAt=0,animationLast=0;
 let handSignature='',memberSignature='',lobbyCode='',previousPhase='',soundOn=false,audio=null,toastTimer;
 let serverAvailable=false,apiChecked=false,onlineBusy=false;
-let physicsOverlay=false,rosterBack=false,incompatibleVersion=false,editingDeck=[];
+let physicsOverlay=false,rosterBack=false,incompatibleVersion=false,editingDeck=[],deckPresets=[],deckActionId=null,detailCardId=null,detailDemoGame=null,detailDemoLast=0,detailDemoDuration=9,detailDemoScenarioKey='standard',detailDemoEvidence={};
 const standalone=!!window.TINY_OFFLINE||location.protocol==='file:';
 function safeStorage(store,key,value){
   try{const storage=store==='session'?window.sessionStorage:window.localStorage;
@@ -1985,10 +2130,35 @@ function migrateDeck(raw){
   return normalizeDeck(out);
 }
 function loadDeck(){
-  try{const raw=JSON.parse(safeStorage('local','tiny-deck-v15')||safeStorage('local','tiny-deck-v14')||safeStorage('local','tiny-deck-v13')||safeStorage('local','tiny-deck-v12')||safeStorage('local','tiny-deck-v11')||safeStorage('local','tiny-deck-v10')||safeStorage('local','tiny-deck-v9')||safeStorage('local','tiny-deck-v8')||safeStorage('local','tiny-deck-v7')||safeStorage('local','tiny-deck-v6')||safeStorage('local','tiny-deck-v5')||safeStorage('local','tiny-deck-v4')||safeStorage('local','tiny-deck-v3')||'null');return migrateDeck(raw);}catch{return [...DEFAULT_DECK];}
+  try{const raw=JSON.parse(safeStorage('local','tiny-deck-v17')||safeStorage('local','tiny-deck-v16')||safeStorage('local','tiny-deck-v15')||safeStorage('local','tiny-deck-v14')||safeStorage('local','tiny-deck-v13')||safeStorage('local','tiny-deck-v12')||safeStorage('local','tiny-deck-v11')||safeStorage('local','tiny-deck-v10')||safeStorage('local','tiny-deck-v9')||safeStorage('local','tiny-deck-v8')||safeStorage('local','tiny-deck-v7')||safeStorage('local','tiny-deck-v6')||safeStorage('local','tiny-deck-v5')||safeStorage('local','tiny-deck-v4')||safeStorage('local','tiny-deck-v3')||'null');return migrateDeck(raw);}catch{return [...DEFAULT_DECK];}
 }
 let playerDeck=loadDeck();
-function persistDeck(){safeStorage('local','tiny-deck-v15',JSON.stringify(playerDeck));renderDeckSummaries();}
+const MYLIST_KEY='tiny-deck-presets-v17',LEGACY_MYLIST_KEYS=['tiny-deck-presets-v16'],MAX_MYLIST=10;
+function storageFor(store='local'){return store==='session'?window.sessionStorage:window.localStorage;}
+function verifiedStorageWrite(store,key,value){
+  try{const storage=storageFor(store);storage.setItem(key,value);return storage.getItem(key)===value;}catch{return false;}
+}
+function normalizePresetList(raw){
+  const source=Array.isArray(raw)?raw:Array.isArray(raw?.presets)?raw.presets:[];
+  const out=[];for(const [i,item] of source.entries()){const cards=normalizeDeck(item?.cards,{fallback:false});if(!cards)continue;const name=String(item?.name||`マイデッキ ${i+1}`).trim().slice(0,24)||`マイデッキ ${i+1}`;out.push({id:String(item?.id||`preset-${Date.now()}-${i}`),name,cards:[...cards]});if(out.length>=MAX_MYLIST)break;}return out;
+}
+function loadDeckPresets(){
+  for(const key of [MYLIST_KEY,...LEGACY_MYLIST_KEYS])for(const store of ['local','session']){
+    try{const text=safeStorage(store,key);if(!text)continue;const parsed=JSON.parse(text),out=normalizePresetList(parsed);if(out.length||Array.isArray(parsed)||Array.isArray(parsed?.presets))return out;}catch{}
+  }
+  return [];
+}
+deckPresets=loadDeckPresets();
+function persistDeckPresets(){
+  const payload=JSON.stringify({schema:1,version:VERSION,presets:deckPresets});
+  if(verifiedStorageWrite('local',MYLIST_KEY,payload)){safeStorage('session',MYLIST_KEY,null);return {ok:true,persistent:true};}
+  if(verifiedStorageWrite('session',MYLIST_KEY,payload))return {ok:true,persistent:false};
+  return {ok:true,persistent:false,memoryOnly:true};
+}
+function nextPresetName(){
+  const used=new Set(deckPresets.map(p=>p.name));for(let i=1;i<=MAX_MYLIST+1;i++){const name=`マイデッキ ${i}`;if(!used.has(name))return name;}return `マイデッキ ${deckPresets.length+1}`;
+}
+function persistDeck(){safeStorage('local','tiny-deck-v17',JSON.stringify(playerDeck));renderDeckSummaries();}
 function averageDeckCost(deck){if(!Array.isArray(deck)||!deck.length)return 0;return deck.reduce((sum,id)=>sum+(UNITS[id]?.cost||0),0)/deck.length;}
 function formatAverage(deck){return `◆ ${averageDeckCost(deck).toFixed(1)}`;}
 function deckReady(deck=playerDeck){return Array.isArray(deck)&&deck.length===MAX_DECK&&new Set(deck).size===MAX_DECK&&deck.every(id=>DECK.includes(id));}
@@ -2011,7 +2181,7 @@ function showView(id){
   currentView=id;views.forEach(v=>el(v).hidden=v!==id);
   document.body.classList.toggle('playing',id==='battle');
   el('footer').hidden=id==='battle';
-  if(id!=='battle'){selected=null;hover=null;}
+  if(id!=='battle'){selected=null;hover=null;pendingBuildingPlacement=null;}
   window.scrollTo({top:0,behavior:'instant'});
 }
 function inputName(){
@@ -2081,7 +2251,7 @@ function connect(){
       return;
     }
     if(m.type==='error'){toast(m.error);if(currentView==='home')entryError(m.error);return;}
-    if(m.type==='placed'){selected=null;hover=null;sound('place');updateHand();return;}
+    if(m.type==='placed'){const placedName=UNITS[m.card]?.building?UNITS[m.card].name:null;selected=null;hover=null;pendingBuildingPlacement=null;sound('place');if(placedName)toast(`${placedName}を設置しました。`);updateHand();return;}
     if(m.type==='auth-error'||m.type==='expired'){toast(m.error);resetConnection();showView('home');return;}
     if(m.type==='left'){resetConnection();showView('home');return;}
     if(m.type==='pong')el('battleConnection').textContent=`ONLINE · ${Math.max(0,Date.now()-m.at)}ms`;
@@ -2152,7 +2322,7 @@ function startPractice(){
   clearInterval(localTimer);gameMode='cpu';seat=0;room=null;previous=null;previousPhase='';handSignature='';
   if(!deckReady()){openDeckEditor();entryError('対戦には8枚のデッキが必要です。');return;}
   localGame=createMatch({seed:crypto.getRandomValues(new Uint32Array(1))[0],bot:true,difficulty,decks:[playerDeck,DEFAULT_DECK]});
-  snapshot=viewMatch(localGame,0);selected=null;hover=null;localPaused=false;
+  snapshot=viewMatch(localGame,0);selected=null;hover=null;pendingBuildingPlacement=null;localPaused=false;
   el('matchType').textContent='CPU PRACTICE · '+({easy:'EASY',normal:'NORMAL',hard:'HARD'}[difficulty]);
   el('ownName').textContent=name;el('enemyName').textContent='CPU · '+({easy:'やさしい',normal:'ふつう',hard:'手ごわい'}[difficulty]);
   showView('battle');status('CPU練習中');lastLocal=performance.now();
@@ -2167,7 +2337,7 @@ function startPractice(){
   updateInspector('blade');acceptSnapshot(snapshot);sound('start');
 }
 el('practiceBtn').addEventListener('click',startPractice);
-function stopPractice(){clearInterval(localTimer);localTimer=null;localGame=null;snapshot=null;gameMode=null;selected=null;hover=null;showView('home');status(serverAvailable?'オンライン対応':'CPU練習が使えます');}
+function stopPractice(){clearInterval(localTimer);localTimer=null;localGame=null;snapshot=null;gameMode=null;selected=null;hover=null;pendingBuildingPlacement=null;showView('home');status(serverAvailable?'オンライン対応':'CPU練習が使えます');}
 function acceptSnapshot(g){
   previous=snapshot;snapshot=g;receivedAt=performance.now();
   if(previousPhase!==g.phase){
@@ -2175,7 +2345,7 @@ function acceptSnapshot(g){
     if(g.phase==='ended')sound(g.winner===seat?'win':'lose');
     previousPhase=g.phase;
   }
-  if(selected&&!g.hand.includes(selected)){selected=null;hover=null;}
+  if(selected&&!g.hand.includes(selected)){selected=null;hover=null;pendingBuildingPlacement=null;}
   updateHUD();
 }
 function updateHUD(){
@@ -2209,12 +2379,12 @@ function updateHUD(){
     el('rematchBtn').textContent=gameMode==='cpu'?'もう一度対戦':seat===room?.host?'再戦の待機ルームへ':'ホストの再戦操作を待っています';
     el('rematchBtn').disabled=gameMode==='online'&&seat!==room?.host;
   }
-  el('battleHint').textContent=selected?(()=>{const d=UNITS[selected];if(!d.spell){if(d.tunnelAnywhere)return `${d.name}：戦場の好きな地上地点を指定 / コスト ${d.cost}。自軍本拠地から地下移動し、遠いほど到着が遅れます。`;if(d.building)return `${d.name}を配置 / 必要エナジー ${d.cost}。配置前に攻撃射程を表示します。スマホは1回目のタップで射程確認、2回目で設置。`;return `${d.name}を配置 / 必要エナジー ${d.cost}`;}if(d.spell==='poison')return `${d.name}：地点を指定すると即展開 / コスト ${d.cost}。範囲外へ出ても毒が残ります。`;if(d.spell==='arrowrain')return `${d.name}：広い着弾地点を指定 / コスト ${d.cost}。ファイヤーボールより速く届きます。`;return `${d.name}：着弾地点を指定 / コスト ${d.cost}。遠いほど着弾が遅れます。`;})():'カードを選択。片塔破壊はそのレーン＋中央細帯、両塔破壊後は敵陣前半を横いっぱい使えます。';
+  el('battleHint').textContent=selected?(()=>{const d=UNITS[selected];if(!d.spell){if(d.tunnelAnywhere)return `${d.name}：戦場の好きな地上地点を指定 / コスト ${d.cost}。自軍本拠地から地下移動し、遠いほど到着が遅れます。`;if(d.building)return `${d.name}を配置 / 必要エナジー ${d.cost}。配置前に攻撃射程を表示します。スマホは1回目で位置と射程を固定し、指を離しても候補を保持。2回目で設置。`;return `${d.name}を配置 / 必要エナジー ${d.cost}`;}if(d.spell==='poison')return `${d.name}：地点を指定すると即展開 / コスト ${d.cost}。範囲外へ出ても毒が残ります。`;if(d.spell==='arrowrain')return `${d.name}：広い着弾地点を指定 / コスト ${d.cost}。ファイヤーボールより速く届きます。`;return `${d.name}：着弾地点を指定 / コスト ${d.cost}。遠いほど着弾が遅れます。`;})():'カードを選択。片塔破壊はそのレーン＋中央細帯、両塔破壊後は敵陣前半を横いっぱい使えます。';
 }
 for(let i=0;i<10;i++){const seg=document.createElement('i'),fill=document.createElement('b');seg.append(fill);el('energyTrack').append(seg);}
 function choose(id){
   if(!snapshot||snapshot.phase==='ended')return;
-  selected=selected===id?null:id;hover=null;updateInspector(id);updateHand();
+  selected=selected===id?null:id;hover=null;pendingBuildingPlacement=null;updateInspector(id);updateHand();
 }
 function updateHand(){
   if(!snapshot)return;
@@ -2230,7 +2400,7 @@ function updateHand(){
       b.append(cost,key,can,name);el('hand').append(b);
       let startPoint=null,dragged=false;
       b.addEventListener('pointerdown',e=>{
-        e.preventDefault();selected=id;hover=null;updateInspector(id);updateHand();
+        e.preventDefault();selected=id;hover=null;pendingBuildingPlacement=null;updateInspector(id);updateHand();
         startPoint={x:e.clientX,y:e.clientY};dragged=false;b.setPointerCapture(e.pointerId);
       });
       b.addEventListener('pointermove',e=>{
@@ -2273,18 +2443,29 @@ el('arenaCanvas').addEventListener('pointerleave',()=>hover=null);
 el('arenaCanvas').addEventListener('pointerdown',e=>{
   if(!selected){toast('下のカードを1枚選んでください。');return;}
   e.preventDefault();const p=pointFromEvent(e),d=UNITS[selected];
-  if(e.pointerType==='touch'&&d?.building){
-    if(!hover||Math.hypot(hover.x-p.x,hover.y-p.y)>12){hover=p;toast('攻撃射程を確認できます。もう一度同じ場所をタップして設置。');return;}
+  const touchLike=e.pointerType==='touch'||(e.pointerType!=='mouse'&&window.matchMedia?.('(pointer: coarse)').matches);
+  if(touchLike&&d?.building){
+    const pending=pendingBuildingPlacement;
+    const same=pending&&pending.card===selected&&Math.hypot(pending.x-p.x,pending.y-p.y)<=24;
+    if(!same){
+      pendingBuildingPlacement={card:selected,x:p.x,y:p.y,valid:p.valid};
+      hover=p;
+      toast(p.valid?'設置位置と攻撃射程を保持しました。もう一度同じ場所をタップして設置。':'この位置には置けません。別の場所をタップしてください。');
+      return;
+    }
+    const confirm={x:pending.x,y:pending.y,valid:pending.valid};
+    hover=confirm;place(confirm);return;
   }
-  place(p);
+  pendingBuildingPlacement=null;place(p);
 });
 function place(p){
   if(!selected||!p||!snapshot||snapshot.phase!=='battle')return;
   const pos=orient(p,seat);
   if(gameMode==='cpu'){
-    const r=deploy(localGame,0,selected,pos.x,pos.y);
+    const card=selected,placedName=UNITS[card]?.building?UNITS[card].name:null;
+    const r=deploy(localGame,0,card,pos.x,pos.y);
     if(!r.ok){toast(r.error);return;}
-    sound('place');selected=null;hover=null;acceptSnapshot(viewMatch(localGame,0));
+    sound('place');selected=null;hover=null;pendingBuildingPlacement=null;if(placedName)toast(`${placedName}を設置しました。`);acceptSnapshot(viewMatch(localGame,0));
   }else send({type:'deploy',card:selected,x:pos.x,y:pos.y});
 }
 document.addEventListener('keydown',e=>{
@@ -2330,52 +2511,226 @@ function renderDeckSummaries(){
   if(el('homeDeckAverage'))el('homeDeckAverage').textContent=`平均コスト ${formatAverage(playerDeck)}`;
   if(el('lobbyDeckAverage'))el('lobbyDeckAverage').textContent=`平均 ${formatAverage(playerDeck)}`;
 }
+function createPortraitCanvas(id,size=120){
+  const can=document.createElement('canvas');can.width=size;can.height=size;can.dataset.portrait=id;return can;
+}
+function setDeckError(text=''){el('deckError').textContent=text;el('deckError').hidden=!text;}
+function updateMyListStatus(text='',error=false){const node=el('myListStatus');if(!node)return;node.textContent=text;node.hidden=!text;node.classList.toggle('error',error);}
+function commitPresetMutation(mutator,successText){
+  const before=deckPresets.map(p=>({...p,cards:[...p.cards]}));mutator();const saved=persistDeckPresets();
+  if(!saved.ok){deckPresets=before;renderMyList();setDeckError('マイリストを保存できませんでした。ブラウザのストレージ設定を確認してください。');updateMyListStatus('保存に失敗しました。',true);return false;}
+  renderMyList();setDeckError('');const suffix=saved.persistent?'':saved.memoryOnly?'（この画面を閉じるまでの一時保存）':'（このブラウザでは一時保存）';updateMyListStatus(successText+suffix);toast(successText);return true;
+}
+function renderMyList(){
+  const host=el('myListGrid'),empty=el('myListEmpty');if(!host)return;host.replaceChildren();empty.hidden=deckPresets.length>0;if(el('myListCount'))el('myListCount').textContent=`${deckPresets.length} / ${MAX_MYLIST}`;
+  deckPresets.forEach((preset,index)=>{
+    const card=document.createElement('article');card.className='mylist-card';
+    const head=document.createElement('div');head.className='mylist-card-head';const name=document.createElement('strong');name.textContent=preset.name;const avg=document.createElement('span');avg.textContent=formatAverage(preset.cards);head.append(name,avg);
+    const mini=document.createElement('div');mini.className='mylist-mini';for(const id of preset.cards)mini.append(createPortraitCanvas(id,90));
+    const actions=document.createElement('div');actions.className='mylist-actions';
+    const use=document.createElement('button');use.type='button';use.textContent='このデッキを使用';use.onclick=()=>{editingDeck=[...preset.cards];renderDeckEditor();el('myListPanel').hidden=true;toast(`${preset.name}を編集デッキに反映しました。保存で確定します。`);};
+    const rename=document.createElement('button');rename.type='button';rename.textContent='名前変更';rename.onclick=()=>{const next=prompt('マイリスト名を入力してください。',preset.name);if(next===null)return;const clean=next.trim().slice(0,24);if(!clean)return;commitPresetMutation(()=>{deckPresets[index]={...preset,name:clean};},'マイリスト名を変更しました。');};
+    const overwrite=document.createElement('button');overwrite.type='button';overwrite.textContent='上書き';overwrite.onclick=()=>{if(!deckReady(editingDeck)){setDeckError('マイリストへ保存するには8枚そろえてください。');return;}if(!confirm(`${preset.name}を現在の8枚で上書きしますか？`))return;commitPresetMutation(()=>{deckPresets[index]={...preset,cards:[...editingDeck]};},'マイリストを上書きしました。');};
+    const del=document.createElement('button');del.type='button';del.textContent='削除';del.className='danger';del.onclick=()=>{if(!confirm(`${preset.name}をマイリストから削除しますか？`))return;commitPresetMutation(()=>{deckPresets.splice(index,1);},'マイリストから削除しました。');};
+    actions.append(use,rename,overwrite,del);card.append(head,mini,actions);host.append(card);
+  });
+}
+function saveCurrentToMyList(){
+  setDeckError('');updateMyListStatus('');if(!deckReady(editingDeck)){setDeckError('マイリストへ保存するには8枚そろえてください。');return;}if(deckPresets.length>=MAX_MYLIST){setDeckError('マイリストは最大10デッキです。不要なデッキを削除してから保存してください。');return;}
+  const name=nextPresetName(),preset={id:`preset-${Date.now()}-${Math.random().toString(36).slice(2,7)}`,name,cards:[...editingDeck]};
+  if(commitPresetMutation(()=>deckPresets.push(preset),`${name}としてマイリストに保存しました。`)){el('myListPanel').hidden=false;}
+}
 function renderDeckEditor(){
-  el('deckCount').textContent=`${editingDeck.length} / ${MAX_DECK}`;el('deckError').hidden=true;if(el('deckAverage'))el('deckAverage').textContent=formatAverage(editingDeck);
-  el('deckSaveBtn').disabled=editingDeck.length!==MAX_DECK;
+  el('deckCount').textContent=`${editingDeck.length} / ${MAX_DECK}`;setDeckError('');if(el('deckAverage'))el('deckAverage').textContent=formatAverage(editingDeck);el('deckSaveBtn').disabled=editingDeck.length!==MAX_DECK;
   el('deckSlots').replaceChildren();
   for(let i=0;i<MAX_DECK;i++){
-    const id=editingDeck[i],slot=document.createElement('button');slot.type='button';slot.className='deck-slot '+(id?'filled':'empty');
+    const id=editingDeck[i],slot=document.createElement('button');slot.type='button';slot.className='deck-slot '+(id?'filled':'empty');slot.dataset.slot=String(i);
     const n=document.createElement('em');n.textContent=String(i+1);slot.append(n);
-    if(id){const can=document.createElement('canvas');can.width=120;can.height=120;can.dataset.portrait=id;const name=document.createElement('strong');name.textContent=UNITS[id].short;slot.append(can,name);slot.onclick=()=>{editingDeck.splice(i,1);renderDeckEditor();};}
+    if(id){slot.dataset.card=id;const can=createPortraitCanvas(id);const name=document.createElement('strong');name.textContent=UNITS[id].short;slot.append(can,name);slot.onclick=()=>openDeckCardActions(id);}
     el('deckSlots').append(slot);
   }
   el('deckPool').replaceChildren();
   for(const id of DECK){
-    const d=UNITS[id],selected=editingDeck.includes(id),b=document.createElement('button');b.type='button';b.className='deck-choice'+(selected?' selected':'');
-    const can=document.createElement('canvas');can.width=120;can.height=120;can.dataset.portrait=id;
-    const cost=document.createElement('span');cost.className='deck-cost';cost.textContent=d.cost;
-    const copy=document.createElement('div');copy.className='deck-copy';const h=document.createElement('h3');h.textContent=d.name;const sm=document.createElement('small');sm.textContent=d.role;const desc=document.createElement('p');desc.textContent=d.desc;copy.append(h,sm,desc);b.append(can,cost,copy);
-    if(selected){const chk=document.createElement('span');chk.className='deck-check';chk.textContent='選択中';b.append(chk);}
-    b.onclick=()=>{const at=editingDeck.indexOf(id);if(at>=0)editingDeck.splice(at,1);else if(editingDeck.length<MAX_DECK)editingDeck.push(id);else{el('deckError').textContent='デッキは最大8枚です。1枚外してから追加してください。';el('deckError').hidden=false;return;}renderDeckEditor();};
-    el('deckPool').append(b);
+    const d=UNITS[id],selected=editingDeck.includes(id),b=document.createElement('button');b.type='button';b.dataset.card=id;b.className='deck-choice'+(selected?' selected':'');
+    const can=createPortraitCanvas(id);const cost=document.createElement('span');cost.className='deck-cost';cost.textContent=d.cost;
+    const copy=document.createElement('div');copy.className='deck-copy';const h=document.createElement('h3');h.textContent=d.name;const sm=document.createElement('small');sm.textContent=d.role;copy.append(h,sm);b.append(can,cost,copy);
+    if(selected){const chk=document.createElement('span');chk.className='deck-check';chk.textContent='DECK';b.append(chk);}b.onclick=()=>openDeckCardActions(id);el('deckPool').append(b);
   }
+  renderMyList();
 }
+function closeDeckCardActions(){el('deckCardActions').hidden=true;el('deckReplacePanel').hidden=true;deckActionId=null;}
+function refreshDeckAction(id){
+  const d=UNITS[id],inDeck=editingDeck.includes(id);deckActionId=id;el('deckActionName').textContent=d.name;el('deckActionRole').textContent=d.role;el('deckActionCost').textContent=d.cost;drawPortrait(el('deckActionPortrait'),id,performance.now()/1000);
+  el('deckCardToggleBtn').textContent=inDeck?'デッキから外す':editingDeck.length>=MAX_DECK?'入れ替えて追加':'デッキに入れる';el('deckReplacePanel').hidden=true;
+}
+function openDeckCardActions(id){refreshDeckAction(id);el('deckCardActions').hidden=false;}
+function removeFromEditingDeck(id){const at=editingDeck.indexOf(id);if(at>=0){editingDeck.splice(at,1);renderDeckEditor();return true;}return false;}
+function addToEditingDeck(id){if(editingDeck.includes(id))return true;if(editingDeck.length>=MAX_DECK)return false;editingDeck.push(id);renderDeckEditor();return true;}
+function renderReplacementChoices(id){
+  const host=el('deckReplaceGrid');host.replaceChildren();for(const current of editingDeck){const b=document.createElement('button');b.type='button';const can=createPortraitCanvas(current,88),name=document.createElement('span');name.textContent=UNITS[current].short;b.append(can,name);b.onclick=()=>{const at=editingDeck.indexOf(current);if(at>=0)editingDeck[at]=id;closeDeckCardActions();renderDeckEditor();toast(`${UNITS[current].short} → ${UNITS[id].short} に入れ替えました。`);};host.append(b);}el('deckReplacePanel').hidden=false;
+}
+function toggleDeckCard(id,{fromDetail=false}={}){
+  if(editingDeck.includes(id)){removeFromEditingDeck(id);if(fromDetail)refreshDetailToggle();else closeDeckCardActions();return;}
+  if(addToEditingDeck(id)){if(fromDetail)refreshDetailToggle();else closeDeckCardActions();return;}
+  if(fromDetail){closeCardDetail();openDeckCardActions(id);}renderReplacementChoices(id);
+}
+function targetLabel(d){return d.targetsAir?'地上＋空中':'地上のみ';}
+function detailStatsFor(d){
+  if(d.spell)return [['COST',d.cost],['TYPE','SPELL'],['範囲',`R${d.radius}`],['兵ダメージ',d.damage],['建物ダメージ',d.buildingDamage]];
+  const dmg=d.laserTower?`${d.laserBaseDps} DPS〜`:d.damage;const interval=d.laserTower?'継続':d.cooldown?`${d.cooldown.toFixed(2).replace(/0+$/,'').replace(/\.$/,'')}秒`:'—';
+  const stats=[['COST',d.cost],['HP',`${d.hp}${d.count>1?` ×${d.count}`:''}`],['攻撃',dmg],['攻撃間隔',interval],['射程',d.range],['対象',targetLabel(d)],['移動',d.building?'固定':d.air?`飛行 ${d.speed}`:`地上 ${d.speed}`]];
+  if(d.summonType)stats.push(['召喚',`配置時＋${d.summonInterval}秒ごと ×${d.summonCount}`]);
+  if(d.spawnType==='blade')stats.push(['編成','前1・後2の3体']);
+  return stats;
+}
+function refreshDetailToggle(){if(!detailCardId)return;const inDeck=editingDeck.includes(detailCardId);el('detailDeckToggleBtn').textContent=inDeck?'デッキから外す':editingDeck.length>=MAX_DECK?'入れ替えて追加':'デッキに入れる';}
+function demoReadyCard(g,owner,id){
+  const fillers=DECK.filter(k=>k!==id);g.players[owner].hand=[id,...fillers.slice(0,3)];g.players[owner].queue=fillers.slice(3,7);g.players[owner].deck=[id,...fillers.slice(0,7)];g.players[owner].energy=10;
+}
+function demoDeploy(g,owner,id,x,y){demoReadyCard(g,owner,id);const result=deploy(g,owner,id,x,y);g.players[owner].energy=10;return result;}
+function demoDeployUnits(g,owner,id,x,y){
+  const before=g.units.length,result=demoDeploy(g,owner,id,x,y);return {result,units:g.units.slice(before)};
+}
+function demoStageUnit(u,x,y,{hp=null,spawn=0,cd=0}={}){
+  if(!u)return null;u.x=x;u.y=y;u.lane=x<360?190:530;u.target=null;u.moving=false;u.spawn=spawn;u.cd=cd;if(Number.isFinite(hp))u.hp=Math.max(1,Math.min(u.maxHp,hp));return u;
+}
+function createDetailDemo(id){
+  const g=createMatch({seed:17000+DECK.indexOf(id),bot:false,difficulty:'normal',decks:[DEFAULT_DECK,DEFAULT_DECK]});g.phase='battle';g.countdown=0;g.time=0;g.bot=false;for(const p of g.players)p.energy=10;
+  const d=UNITS[id],lane=530;let label='本番と同じ戦闘ロジックでAUTO実演',scenarioKey='standard',duration=8.5;
+  const put=(owner,type,x,y)=>demoDeployUnits(g,owner,type,x,y).units;
+  const enemy=(type,x=lane,y=420)=>put(1,type,x,y);
+  const own=(type,x=lane,y=650)=>put(0,type,x,y);
+  if(d.spell){
+    if(id==='poison'){
+      const [guard]=enemy('knight',lane,420);demoStageUnit(guard,lane,505);demoDeploy(g,0,id,lane,500);
+      label='高HPのアイアン衛士が毒を通過 → 範囲DoT＋範囲外の残留毒';scenarioKey='poison-zone-linger';duration=10;
+    }else if(id==='arrowrain'){
+      enemy('mossling',lane,420);enemy('boneswarm',470,410);demoDeploy(g,0,id,lane,455);
+      label='密集した小型群体へ着弾予告 → 広範囲一斉ダメージ';scenarioKey='arrowrain-wide-swarm';duration=7;
+    }else{
+      enemy('knight',lane,420);enemy('archer',485,405);demoDeploy(g,0,id,lane,475);
+      label='地上兵＋後衛へ実際の飛翔 → 着弾 → 範囲ダメージ';scenarioKey='fireball-splash';duration=7;
+    }
+  }else if(id==='golem'){
+    const [golem]=own(id,lane,650);demoStageUnit(golem,lane,318,{hp:60,cd:99});if(golem)golem.speed=0;
+    const bones=enemy('boneswarm',lane,390);const cx=lane,cy=318,r=42;
+    bones.forEach((u,i)=>{const a=Math.PI*2*i/Math.max(1,bones.length);demoStageUnit(u,cx+Math.cos(a)*r,cy+Math.sin(a)*r,{cd:.85});});
+    const tower=g.towers.find(t=>t.owner===1&&t.kind==='tower'&&t.x===lane);if(tower)tower.cd=.85;
+    label='瀕死のゴーレム → 死亡爆発でタワー＋ボーン隊へ180ダメージ → ちび2体へ分裂';scenarioKey='golem-death-blast-split';duration=7;
+  }else if(id==='muddragon'){
+    const [dragon]=own(id,lane,650),[guard]=enemy('knight',lane,420);demoStageUnit(dragon,lane,620);demoStageUnit(guard,lane,520);
+    label='高HPのアイアン衛士へ実際の泥弾 → 泥沼で30%減速＋30の継続ダメージ';scenarioKey='muddragon-slow-dot';duration=9;
+  }else if(id==='necromancer'){
+    g.towers.forEach(t=>t.range=0);
+    const deployed=own(id,lane,650),summoner=deployed.find(u=>u.type==='necromancer');demoStageUnit(summoner,lane,610);if(summoner)summoner.summonNextAt=6;
+    const swarm=enemy('mossling',500,420);swarm.forEach((u,i)=>{demoStageUnit(u,485+(i%3)*32,460+Math.floor(i/3)*30,{cd:1.2});u.damage=0;});
+    const bats=enemy('bat',565,420);bats.forEach((u,i)=>{demoStageUnit(u,555+(i%2)*28,470+Math.floor(i/2)*26,{cd:1.2});u.damage=0;});
+    label='配置直後にボーン3体 → 地上/空中への範囲魔法 → 6秒後にボーン3体を追加召喚';scenarioKey='necromancer-bone-summon';duration=10.5;
+  }else if(id==='darknecro'){
+    g.towers.forEach(t=>t.range=0);
+    const deployed=own(id,lane,650),summoner=deployed.find(u=>u.type==='darknecro');demoStageUnit(summoner,lane,610);if(summoner)summoner.summonNextAt=5;
+    const [guard]=enemy('knight',lane,420);demoStageUnit(guard,lane,500,{cd:1.2});if(guard)guard.damage=0;const bats=enemy('bat',485,420);bats.forEach((u,i)=>{demoStageUnit(u,475+(i%2)*26,485+Math.floor(i/2)*24,{cd:1.2});u.damage=0;});
+    label='配置直後にムーンバット2体 → 本体は地上だけを高火力攻撃 → 5秒後にバット2体を追加召喚';scenarioKey='darknecro-bat-summon';duration=9.5;
+  }else if(id==='ashsquad'){
+    const blades=own(id,lane,650);const deployed=enemy('necromancer',lane,420),summoner=deployed.find(u=>u.type==='necromancer');demoStageUnit(summoner,lane,525,{hp:800,cd:1.5});
+    blades.forEach((u,i)=>demoStageUnit(u,lane+(i===0?0:(i===1?-28:28)),i===0?605:635,{spawn:0,cd:.4}));
+    label='アッシュ剣士3体を前1・後2の三角陣形で展開 → 召喚系の後衛へ一斉に接近して処理';scenarioKey='ash-squad-triangle-counter';duration=8.5;
+  }else if(id==='tigger'){
+    demoDeploy(g,0,id,lane,325);label='自軍本拠地から地下潜行 → 敵タワー横へ出現 → 奇襲攻撃';scenarioKey='tigger-burrow';duration=9;
+  }else if(id==='lasertower'){
+    const [laser]=own(id,lane,650),[golem]=enemy('golem',lane,390);demoStageUnit(laser,lane,650);demoStageUnit(golem,lane,500);
+    label='高HPゴーレムを同じ対象のまま照射 → 1.5秒ごとにレーザー火力が倍化';scenarioKey='laser-ramp';duration=11;
+  }else if(id==='cannon'){
+    const [cannon]=own(id,lane,650),[guard]=enemy('knight',lane,420);demoStageUnit(cannon,lane,650);demoStageUnit(guard,lane,515);
+    label='アイアン衛士をロックして防衛。設置後は耐久も毎秒30ずつ自然減衰';scenarioKey='cannon-lock-decay';duration=9;
+  }else if(id==='lumina'){
+    const [guard]=own('knight',500,650);demoStageUnit(guard,500,625,{hp:Math.round(UNITS.knight.hp*.32)});const [priest]=own(id,555,700);demoStageUnit(priest,555,680);const [blade]=enemy('blade',lane,420);demoStageUnit(blade,515,515);
+    label='瀕死に近い味方衛士を実際の回復AIで115ずつ回復';scenarioKey='lumina-heal';duration=8.5;
+  }else if(id==='harpy'){
+    own(id,lane,650);const swarm=enemy('mossling',lane,420);swarm.forEach((u,i)=>demoStageUnit(u,490+(i%3)*42,455+Math.floor(i/3)*34));
+    label='複数の敵を近くに配置 → 雷が最大3体まで連鎖して威力減衰';scenarioKey='harpy-chain';duration=8;
+  }else if(id==='frost'){
+    const [shaman]=own(id,lane,650),[guard]=enemy('knight',lane,420);demoStageUnit(shaman,lane,650);demoStageUnit(guard,lane,515);
+    label='アイアン衛士へ氷弾 → 移動速度62%・攻撃速度72%へ低下';scenarioKey='frost-dual-slow';duration=8.5;
+  }else if(id==='nightshade'){
+    const [shade]=own(id,lane,650),[guard]=enemy('knight',lane,420);demoStageUnit(shade,lane,650);demoStageUnit(guard,lane,550);
+    label='敵を感知 → 0.6秒溜め → 無敵ダッシュ → 2倍の初撃';scenarioKey='nightshade-rush';duration=8;
+  }else if(id==='boar'){
+    const [boar]=own(id,lane,650);demoStageUnit(boar,lane,700);const swarm=enemy('mossling',lane,420);const spots=[[512,575],[548,555],[528,535],[550,515],[512,495]];swarm.forEach((u,i)=>demoStageUnit(u,...spots[i%spots.length]));
+    label='建物へ105px走ってチャージ → 軽量モスリングを押しのけながらタワーへ突撃';scenarioKey='boar-charge-shove';duration=10;
+  }else if(id==='mage'||id==='bomber'){
+    own(id,lane,650);enemy('mossling',lane,420);label='密集したモスリング隊へ実際の範囲攻撃';scenarioKey=`${id}-splash`;duration=8;
+  }else if(id==='blowdart'||id==='archer'){
+    own(id,lane,650);enemy('bat',lane,420);label='ムーンバットを相手に実際の射程・攻撃速度・対空攻撃';scenarioKey=`${id}-anti-air`;
+  }else if(id==='bat'){
+    own(id,lane,650);enemy('archer',lane,420);label='4体のムーンバットが川を越えて飛行し、対空ユニットと交戦';scenarioKey='moon-bat-four';
+  }else{
+    own(id,lane,650);enemy('knight',lane,420);
+  }
+  return {game:g,label,duration,scenarioKey};
+}
+function resetDetailDemo(){
+  if(!detailCardId)return;const demo=createDetailDemo(detailCardId);detailDemoGame=demo.game;detailDemoDuration=demo.duration;detailDemoScenarioKey=demo.scenarioKey;detailDemoEvidence={seenSummonEvents:new Set(),initialSummons:0,periodicSummons:0};detailDemoLast=performance.now();if(el('cardDemoScenario'))el('cardDemoScenario').textContent=demo.label;
+  const can=el('cardDetailDemo');can.dataset.demoEngine='live';can.dataset.demoCard=detailCardId;can.dataset.demoScenario=detailDemoScenarioKey;can.dataset.demoTime='0';can.dataset.demoDeathBlast='false';can.dataset.demoMiniGolems='0';can.dataset.demoTowerDamaged='false';can.dataset.demoBonesHit='false';can.dataset.demoMudZone='false';can.dataset.demoMudded='false';can.dataset.demoInitialSummons='0';can.dataset.demoPeriodicSummons='0';updateDetailDemoEvidence(can);drawArena(can,viewMatch(detailDemoGame,0),{time:0,seat:0});
+}
+function updateDetailDemoEvidence(can){
+  if(!detailDemoGame)return;const g=detailDemoGame,events=g.events||[];
+  if(events.some(e=>e.type==='death-blast'&&e.unitType==='golem'))detailDemoEvidence.deathBlast=true;
+  if(events.some(e=>e.type==='death'&&e.owner===1)&&detailDemoScenarioKey==='golem-death-blast-split')detailDemoEvidence.bonesHit=true;
+  const minis=g.units.filter(u=>u.hp>0&&u.type==='mini_golem'&&u.owner===0).length;detailDemoEvidence.miniGolems=Math.max(detailDemoEvidence.miniGolems||0,minis);
+  const enemySide=g.towers.find(t=>t.owner===1&&t.kind==='tower'&&t.x===530);if(enemySide&&enemySide.hp<enemySide.maxHp)detailDemoEvidence.towerDamaged=true;
+  if((g.zones||[]).some(z=>z.kind==='mud'&&z.remaining>0))detailDemoEvidence.mudZone=true;
+  if(g.units.some(u=>u.owner===1&&u.type==='knight'&&(u.mudUntil||0)>g.time))detailDemoEvidence.mudded=true;
+  const summonEvents=events.filter(e=>e.type==='summon-spawn'&&e.owner===0);for(const e of summonEvents){if(detailDemoEvidence.seenSummonEvents.has(e.id))continue;detailDemoEvidence.seenSummonEvents.add(e.id);if(e.initial)detailDemoEvidence.initialSummons++;else detailDemoEvidence.periodicSummons++;}
+  can.dataset.demoDeathBlast=String(!!detailDemoEvidence.deathBlast);can.dataset.demoMiniGolems=String(detailDemoEvidence.miniGolems||0);can.dataset.demoTowerDamaged=String(!!detailDemoEvidence.towerDamaged);can.dataset.demoBonesHit=String(!!detailDemoEvidence.bonesHit);can.dataset.demoMudZone=String(!!detailDemoEvidence.mudZone);can.dataset.demoMudded=String(!!detailDemoEvidence.mudded);can.dataset.demoInitialSummons=String(detailDemoEvidence.initialSummons||0);can.dataset.demoPeriodicSummons=String(detailDemoEvidence.periodicSummons||0);
+}
+function openCardDetail(id){
+  detailCardId=id;const d=UNITS[id];el('cardDetailRole').textContent=d.role;el('cardDetailName').textContent=d.name;el('cardDetailDesc').textContent=d.desc;const stats=el('cardDetailStats');stats.replaceChildren();
+  for(const [label,value] of detailStatsFor(d)){const box=document.createElement('div');box.className='card-detail-stat';const sm=document.createElement('small');sm.textContent=label;const st=document.createElement('strong');st.textContent=value;box.append(sm,st);stats.append(box);}refreshDetailToggle();el('cardDetailPanel').hidden=false;resetDetailDemo();
+}
+function closeCardDetail(){el('cardDetailPanel').hidden=true;detailCardId=null;detailDemoGame=null;}
 function openDeckEditor(){
-  if(currentView==='battle'&&snapshot?.phase!=='ended'){toast('対戦中はデッキを変更できません。');return;}
-  editingDeck=[...playerDeck];renderDeckEditor();el('deckModal').showModal();
+  if(currentView==='battle'&&snapshot?.phase!=='ended'){toast('対戦中はデッキを変更できません。');return;}editingDeck=[...playerDeck];closeDeckCardActions();closeCardDetail();el('myListPanel').hidden=true;renderDeckEditor();el('deckModal').showModal();
 }
 el('deckBtn').onclick=openDeckEditor;el('homeDeckBtn').onclick=openDeckEditor;el('lobbyDeckBtn').onclick=()=>{if(room?.members[seat]?.ready){toast('準備OKを取り消してから編集してください。');return;}openDeckEditor();};
 el('deckDefaultBtn').onclick=()=>{editingDeck=[...DEFAULT_DECK];renderDeckEditor();};
-el('deckSaveBtn').onclick=()=>{if(!deckReady(editingDeck)){el('deckError').textContent='対戦に使う8枚を選んでください。';el('deckError').hidden=false;return;}playerDeck=[...editingDeck];persistDeck();el('deckModal').close();toast('デッキを保存しました。');};
+el('deckSaveBtn').onclick=()=>{if(!deckReady(editingDeck)){setDeckError('対戦に使う8枚を選んでください。');return;}playerDeck=[...editingDeck];persistDeck();el('deckModal').close();toast('デッキを保存しました。');};
+el('myListBtn').onclick=()=>{const opening=el('myListPanel').hidden;if(opening){const stored=loadDeckPresets();if(stored.length||!deckPresets.length)deckPresets=stored;updateMyListStatus('');renderMyList();}el('myListPanel').hidden=!el('myListPanel').hidden;};el('closeMyListBtn').onclick=()=>el('myListPanel').hidden=true;el('saveMyListBtn').onclick=saveCurrentToMyList;
+el('deckCardActions').addEventListener('click',e=>e.stopPropagation());el('cardDetailPanel').addEventListener('click',e=>e.stopPropagation());
+el('deckActionBackdrop').onclick=closeDeckCardActions;el('deckActionClose').onclick=closeDeckCardActions;el('deckCardToggleBtn').onclick=()=>deckActionId&&toggleDeckCard(deckActionId);el('deckCardDetailBtn').onclick=()=>{const id=deckActionId;if(!id)return;closeDeckCardActions();openCardDetail(id);};
+el('cardDetailBackdrop').onclick=closeCardDetail;el('cardDetailClose').onclick=closeCardDetail;el('cardDetailBack').onclick=closeCardDetail;el('cardDemoReplayBtn').onclick=resetDetailDemo;el('detailDeckToggleBtn').onclick=()=>detailCardId&&toggleDeckCard(detailCardId,{fromDetail:true});
 function renderPatchNotes(){
   const host=el('patchNotes'),none=el('noPatchNotes'),range=el('updatesRange');
   if(!host)return;
   const now=new Date(),today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
   const cutoff=new Date(today);cutoff.setDate(cutoff.getDate()-6);
   const recent=PATCH_NOTES.filter(n=>{const d=new Date(`${n.date}T00:00:00`);return d>=cutoff&&d<=new Date(today.getTime()+86400000-1);});
+  const groups=[];
+  for(const note of recent){
+    const major=String(note.version).split('.')[0];let group=groups.find(g=>g.major===major);
+    if(!group){group={major,notes:[]};groups.push(group);}group.notes.push(note);
+  }
   host.replaceChildren();
   range.textContent=`${cutoff.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric'})} — ${today.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric'})}`;
-  none.hidden=recent.length>0;
-  for(const note of recent){
+  none.hidden=groups.length>0;
+  for(const group of groups){
     const article=document.createElement('article');article.className='patch-note';
-    const head=document.createElement('div');head.className='patch-head';
-    const version=document.createElement('strong');version.textContent=`v${note.version}`;
-    const title=document.createElement('h3');title.textContent=note.title;
-    const date=document.createElement('time');date.dateTime=note.date;date.textContent=new Date(`${note.date}T00:00:00`).toLocaleDateString('ja-JP',{month:'short',day:'numeric'});
-    head.append(version,title,date);
-    const ul=document.createElement('ul');for(const item of note.items){const li=document.createElement('li');li.textContent=item;ul.append(li);}
-    article.append(head,ul);host.append(article);
+    const latest=group.notes[0],head=document.createElement('div');head.className='patch-head';
+    const version=document.createElement('strong');version.textContent=`v${group.major}`;
+    const title=document.createElement('h3');title.textContent=group.notes.length>1?`v${group.major} UPDATE SERIES`:latest.title;
+    const date=document.createElement('time');date.dateTime=latest.date;date.textContent=new Date(`${latest.date}T00:00:00`).toLocaleDateString('ja-JP',{month:'short',day:'numeric'});
+    head.append(version,title,date);article.append(head);
+    for(const note of group.notes){
+      const section=document.createElement('section');section.className='patch-release';
+      const releaseHead=document.createElement('div');releaseHead.className='patch-release-head';
+      const releaseVersion=document.createElement('strong');releaseVersion.textContent=`v${note.version}`;
+      const releaseTitle=document.createElement('span');releaseTitle.textContent=note.title;
+      const releaseDate=document.createElement('time');releaseDate.dateTime=note.date;releaseDate.textContent=new Date(`${note.date}T00:00:00`).toLocaleDateString('ja-JP',{month:'short',day:'numeric'});
+      releaseHead.append(releaseVersion,releaseTitle,releaseDate);
+      const ul=document.createElement('ul');for(const item of note.items){const li=document.createElement('li');li.textContent=item;ul.append(li);}
+      section.append(releaseHead,ul);article.append(section);
+    }
+    host.append(article);
   }
 }
 el('libraryBtn').onclick=()=>{el('libraryModal').showModal();};
@@ -2383,6 +2738,7 @@ el('helpBtn').onclick=()=>{el('helpModal').showModal();};
 el('updatesBtn').onclick=()=>{renderPatchNotes();el('updatesModal').showModal();};
 for(const b of document.querySelectorAll('.close-modal'))b.onclick=()=>b.closest('dialog').close();
 for(const dlg of document.querySelectorAll('dialog'))dlg.addEventListener('close',()=>{
+  if(dlg.id==='deckModal'){closeDeckCardActions();closeCardDetail();el('myListPanel').hidden=true;}
   if(gameMode==='cpu'){localPaused=document.hidden||el('helpModal').open||el('libraryModal').open||el('updatesModal').open||el('deckModal').open;updateHUD();}
 });
 for(const dlg of document.querySelectorAll('dialog'))dlg.addEventListener('click',e=>{const r=dlg.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dlg.close();});
@@ -2417,11 +2773,16 @@ function animation(now){
     drawArena(el('demoCanvas'),viewMatch(demoGame,0),{time,seat:0});
   }
   if(currentView==='battle'&&snapshot){
-    drawArena(el('arenaCanvas'),interpolate(snapshot,now),{time,seat,selected,ghost:hover,physics:physicsOverlay});
+    drawArena(el('arenaCanvas'),interpolate(snapshot,now),{time,seat,selected,ghost:hover||(pendingBuildingPlacement?.card===selected?pendingBuildingPlacement:null),physics:physicsOverlay});
     if(window.innerWidth>800)drawPortrait(el('inspectorCanvas'),inspectId,time);
   }
   if(now%200<36||currentView==='battle'){
     for(const can of document.querySelectorAll('canvas[data-portrait]'))if(can.getClientRects().length)drawPortrait(can,can.dataset.portrait,time,0,false,rosterBack&&!!can.closest('#libraryModal'));
+  }
+  if(detailCardId&&!el('cardDetailPanel').hidden&&detailDemoGame){
+    const can=el('cardDetailDemo');
+    if(now-detailDemoLast>=90){const steps=Math.min(10,Math.max(1,Math.floor((now-detailDemoLast)/100)));for(let i=0;i<steps;i++){tick(detailDemoGame,.1);updateDetailDemoEvidence(can);}detailDemoLast=now;if(detailDemoGame.phase==='ended'||detailDemoGame.time>=detailDemoDuration)resetDetailDemo();}
+    can.dataset.demoTime=detailDemoGame.time.toFixed(1);can.dataset.demoUnits=String(detailDemoGame.units.filter(u=>u.hp>0).length);updateDetailDemoEvidence(can);drawArena(can,viewMatch(detailDemoGame,0),{time,seat:0});
   }
 }
 requestAnimationFrame(animation);

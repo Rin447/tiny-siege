@@ -1,0 +1,20 @@
+PASS 1 Deck builder exposes 27 cards including Necromancer, Dark Necromancer and Ash Squad
+PASS 2 Necromancer LIVE DEMO proves the immediate three-Bone summon and the six-second follow-up wave
+PASS 3 Dark Necromancer LIVE DEMO proves the immediate two-Bat summon and the five-second follow-up wave
+PASS 4 Ash Squad detail identifies the front-one/rear-two formation and runs its backline-counter live scenario
+PASS 5 My List persists the current eight-card deck under the v17 storage key
+PASS 6 Patch Notes shows the new v17 Summoners Update while retaining the grouped v16 history
+PASS 7 No uncaught JavaScript errors in v17 deck, summon demos or Patch Notes flows
+{
+  "passed": 7,
+  "checks": [
+    "Deck builder exposes 27 cards including Necromancer, Dark Necromancer and Ash Squad",
+    "Necromancer LIVE DEMO proves the immediate three-Bone summon and the six-second follow-up wave",
+    "Dark Necromancer LIVE DEMO proves the immediate two-Bat summon and the five-second follow-up wave",
+    "Ash Squad detail identifies the front-one/rear-two formation and runs its backline-counter live scenario",
+    "My List persists the current eight-card deck under the v17 storage key",
+    "Patch Notes shows the new v17 Summoners Update while retaining the grouped v16 history",
+    "No uncaught JavaScript errors in v17 deck, summon demos or Patch Notes flows"
+  ],
+  "errors": []
+}

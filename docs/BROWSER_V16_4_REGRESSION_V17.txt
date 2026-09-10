@@ -1,0 +1,18 @@
+PASS 1 Tigger detail reflects attack 20 while keeping the live burrow scenario
+PASS 2 Moon Bat detail and live demo reflect the four-unit deployment
+PASS 3 Golem LIVE DEMO actually shows death blast hitting tower/bones and the two-unit split
+PASS 4 Mud Dragon LIVE DEMO actually creates mud and slows the high-HP Iron Guard
+PASS 5 Patch Notes groups v16.4.0 into the existing v16 update series
+PASS 6 No uncaught JavaScript errors in v16.4 balance and ability-demo flows
+{
+  "passed": 6,
+  "checks": [
+    "Tigger detail reflects attack 20 while keeping the live burrow scenario",
+    "Moon Bat detail and live demo reflect the four-unit deployment",
+    "Golem LIVE DEMO actually shows death blast hitting tower/bones and the two-unit split",
+    "Mud Dragon LIVE DEMO actually creates mud and slows the high-HP Iron Guard",
+    "Patch Notes groups v16.4.0 into the existing v16 update series",
+    "No uncaught JavaScript errors in v16.4 balance and ability-demo flows"
+  ],
+  "errors": []
+}

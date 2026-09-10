@@ -1,0 +1,13 @@
+{
+  "passed": 6,
+  "checks": [
+    "home preserves the eight-card deck",
+    "v16 patch-note group contains both v16.1.0 spell colors and v16.0.0 fixes",
+    "card library reflects Mud Dragon HP1600 and Blowdart range195",
+    "mobile CPU battle starts with Laser Tower available under deterministic seed",
+    "mobile two-tap building placement survives finger release and deploys on the second tap",
+    "no uncaught JavaScript errors in v16.1 desktop/mobile browser flow"
+  ],
+  "errors": [],
+  "note": "v16.1 self-contained offline HTML tested in headless Chromium. Mobile check uses a 390x844 touch-enabled context and real touchscreen taps; Cloudflare production and physical devices are not exercised."
+}

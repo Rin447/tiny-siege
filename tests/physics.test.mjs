@@ -12,10 +12,10 @@ function advance(g,n){for(let i=0;i<n;i++)tick(g,.1);}
 function body(g,type,owner,x,y){const u={...UNITS[type],id:`u${g.nextId++}`,type,owner,x,y,maxHp:UNITS[type].hp,spawn:0,cd:999,walk:0,age:0,anim:0,hit:0,lane:x<360?190:530,face:owner===0?-1:1};g.units.push(u);return u;}
 function checkStatics(g){for(const u of g.units)if(!u.building&&u.burrowState!=='burrow')assert.ok(staticFree(g,u,u),`${u.id} ${u.type} in static at ${u.x},${u.y}`);}
 
-test('v15 physics version and mass/radius data are explicit',()=>{
- assert.equal(VERSION,'15.0.0');assert.equal(PHYSICS_VERSION,13);
+test('v16 physics version and mass/radius data are explicit',()=>{
+ assert.equal(VERSION,'17.0.0');assert.equal(PHYSICS_VERSION,16);
  assert.ok(UNITS.knight.mass>UNITS.archer.mass);assert.ok(UNITS.knight.radius>UNITS.archer.radius);
- assert.equal(createMatch().physicsVersion,13);
+ assert.equal(createMatch().physicsVersion,16);
 });
 test('body may not put its edge across the river even if its centre is on land',()=>{
  const u=UNITS.knight;assert.equal(terrainFree(u,{x:350,y:480}),false);
@@ -26,9 +26,9 @@ test('ground rejects deployment inside towers; air may fly/deploy over them',()=
  const g=game();card(g,'knight');assert.ok(canPlace(g,0,'knight',190,805));
  card(g,'bat');assert.equal(canPlace(g,0,'bat',190,805),null);assert.ok(deploy(g,0,'bat',190,805).ok);
 });
-test('all three air group members have legal non-overlapping initial positions',()=>{
+test('all four air group members have legal non-overlapping initial positions',()=>{
  const g=game();card(g,'bat');assert.ok(deploy(g,0,'bat',60,605).ok);
- assert.equal(g.units.length,3);checkStatics(g);
+ assert.equal(g.units.length,4);checkStatics(g);
  for(const a of g.units)for(const b of g.units)if(a!==b)assert.ok(distance(a,b)>=a.radius+b.radius);
  for(const u of g.units)assert.ok(u.y>=600);
 });
@@ -145,7 +145,7 @@ test('rendering depth mixes towers and ground troops; air is always after ground
  assert.deepEqual(renderOrder(g,1).map(x=>x.entity.id),['front','tower','rear','air']);
 });
 test('server snapshots expose facing/mass/layer but not pathfinding internals',()=>{
- const g=game(),u=unit(g,'knight',0,190,930);advance(g,15);const snap=viewMatch(g,0);assert.equal(snap.physicsVersion,13);
+ const g=game(),u=unit(g,'knight',0,190,930);advance(g,15);const snap=viewMatch(g,0);assert.equal(snap.physicsVersion,16);
  assert.equal(snap.units[0].mass,6);assert.equal(typeof snap.units[0].facing,'number');assert.ok(!('_nav' in snap.units[0]));
 });
 test('legacy active matches terminate safely instead of resuming inside new obstacles',()=>{

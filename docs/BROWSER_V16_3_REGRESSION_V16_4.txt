@@ -1,0 +1,18 @@
+PASS 1 My List saves immediately with an automatic name and a verified storage payload
+PASS 2 A fresh page restores the saved My List preset from storage
+PASS 3 Card detail runs an actual engine-driven arena simulation with real units and effects
+PASS 4 Live battle demo can be restarted immediately
+PASS 5 Repeated saves create numbered My List presets without requiring a name prompt
+PASS 6 No uncaught JavaScript errors in v16.3 flows
+{
+  "passed": 6,
+  "checks": [
+    "My List saves immediately with an automatic name and a verified storage payload",
+    "A fresh page restores the saved My List preset from storage",
+    "Card detail runs an actual engine-driven arena simulation with real units and effects",
+    "Live battle demo can be restarted immediately",
+    "Repeated saves create numbered My List presets without requiring a name prompt",
+    "No uncaught JavaScript errors in v16.3 flows"
+  ],
+  "errors": []
+}

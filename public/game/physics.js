@@ -4,7 +4,7 @@ import {ARENA} from './units.js';
  * Ground bodies live on the lawn/bridges. Air bodies share a separate layer.
  * Buildings are static circles; tree/grass artwork is decorative only.
  */
-export const PHYSICS_VERSION=13;
+export const PHYSICS_VERSION=16;
 export const FIELD={left:34,right:686,top:28,bottom:1012};
 const EPS=0.001,GRID=20,COLS=33,ROWS=49;
 const worldCaches=new WeakMap();
@@ -219,7 +219,7 @@ function projectStatic(g,u){
 export function resolveBodies(g,dt=.1){
   const units=g.units.filter(u=>u.hp>0&&u.burrowState!=='burrow');
   for(const u of units)projectStatic(g,u);
-  for(let pass=0;pass<4;pass++)for(let i=0;i<units.length;i++)for(let j=i+1;j<units.length;j++){
+  for(let pass=0;pass<5;pass++)for(let i=0;i<units.length;i++)for(let j=i+1;j<units.length;j++){
     const a=units[i],b=units[j];if(!sameLayer(a,b)||isStructure(a)||isStructure(b))continue;
     const len=dist(a,b),min=pairDistance(a,b),over=min-len;if(over<=.005)continue;
     const side=(Number(String(a.id).replace(/\D/g,''))%2)?1:-1;

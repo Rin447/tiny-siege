@@ -1,5 +1,5 @@
 
-> tiny-siege@15.0.0 build:offline
+> tiny-siege@17.0.0 build:offline
 > node scripts/build-offline.mjs
 
 Built PLAY-OFFLINE.html (self-contained CPU practice).

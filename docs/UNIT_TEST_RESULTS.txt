@@ -1,944 +1,1010 @@
 
-> tiny-siege@15.0.0 test
+> tiny-siege@17.0.0 test
 > node --test tests/*.test.mjs
 
 TAP version 13
-# Subtest: twenty-four selectable cards, twenty-one units plus three spells, and eight-card deck rule
-ok 1 - twenty-four selectable cards, twenty-one units plus three spells, and eight-card deck rule
+# Subtest: spell team colors are viewer-relative: own blue/solid and enemy red/dashed
+ok 1 - spell team colors are viewer-relative: own blue/solid and enemy red/dashed
   ---
-  duration_ms: 2.545771
+  duration_ms: 3.066463
+  type: 'test'
+  ...
+# Subtest: lingering poison snapshot retains caster owner for spell-side rendering
+ok 2 - lingering poison snapshot retains caster owner for spell-side rendering
+  ---
+  duration_ms: 11.906758
+  type: 'test'
+  ...
+# Subtest: twenty-seven selectable cards, twenty-four unit cards plus three spells, and eight-card deck rule
+ok 3 - twenty-seven selectable cards, twenty-four unit cards plus three spells, and eight-card deck rule
+  ---
+  duration_ms: 12.45649
   type: 'test'
   ...
 # Subtest: deploy blade: energy, count, card rotation
-ok 2 - deploy blade: energy, count, card rotation
+ok 4 - deploy blade: energy, count, card rotation
   ---
-  duration_ms: 1.154241
+  duration_ms: 13.644075
   type: 'test'
   ...
 # Subtest: deploy knight: energy, count, card rotation
-ok 3 - deploy knight: energy, count, card rotation
+ok 5 - deploy knight: energy, count, card rotation
   ---
-  duration_ms: 0.358571
+  duration_ms: 1.765848
   type: 'test'
   ...
 # Subtest: deploy archer: energy, count, card rotation
-ok 4 - deploy archer: energy, count, card rotation
+ok 6 - deploy archer: energy, count, card rotation
   ---
-  duration_ms: 0.416128
+  duration_ms: 1.044283
   type: 'test'
   ...
 # Subtest: deploy mage: energy, count, card rotation
-ok 5 - deploy mage: energy, count, card rotation
+ok 7 - deploy mage: energy, count, card rotation
   ---
-  duration_ms: 0.865145
+  duration_ms: 0.635063
   type: 'test'
   ...
 # Subtest: deploy spear: energy, count, card rotation
-ok 6 - deploy spear: energy, count, card rotation
+ok 8 - deploy spear: energy, count, card rotation
   ---
-  duration_ms: 0.11943
+  duration_ms: 0.449114
   type: 'test'
   ...
 # Subtest: deploy bat: energy, count, card rotation
-ok 7 - deploy bat: energy, count, card rotation
+ok 9 - deploy bat: energy, count, card rotation
   ---
-  duration_ms: 0.219441
+  duration_ms: 1.561244
   type: 'test'
   ...
 # Subtest: deploy bomber: energy, count, card rotation
-ok 8 - deploy bomber: energy, count, card rotation
+ok 10 - deploy bomber: energy, count, card rotation
   ---
-  duration_ms: 0.234534
+  duration_ms: 0.887446
   type: 'test'
   ...
 # Subtest: deploy cannon: energy, count, card rotation
-ok 9 - deploy cannon: energy, count, card rotation
+ok 11 - deploy cannon: energy, count, card rotation
   ---
-  duration_ms: 0.309166
+  duration_ms: 1.669444
   type: 'test'
   ...
 # Subtest: deploy golem: energy, count, card rotation
-ok 10 - deploy golem: energy, count, card rotation
+ok 12 - deploy golem: energy, count, card rotation
   ---
-  duration_ms: 0.409308
+  duration_ms: 2.676799
   type: 'test'
   ...
 # Subtest: deploy berserker: energy, count, card rotation
-ok 11 - deploy berserker: energy, count, card rotation
+ok 13 - deploy berserker: energy, count, card rotation
   ---
-  duration_ms: 0.18568
+  duration_ms: 0.817371
   type: 'test'
   ...
 # Subtest: deploy boar: energy, count, card rotation
-ok 12 - deploy boar: energy, count, card rotation
+ok 14 - deploy boar: energy, count, card rotation
   ---
-  duration_ms: 0.124297
+  duration_ms: 0.72289
   type: 'test'
   ...
 # Subtest: deploy tigger: energy, count, card rotation
-ok 13 - deploy tigger: energy, count, card rotation
+ok 15 - deploy tigger: energy, count, card rotation
   ---
-  duration_ms: 0.213041
+  duration_ms: 0.975431
   type: 'test'
   ...
 # Subtest: deploy muddragon: energy, count, card rotation
-ok 14 - deploy muddragon: energy, count, card rotation
+ok 16 - deploy muddragon: energy, count, card rotation
   ---
-  duration_ms: 0.103015
+  duration_ms: 0.397699
   type: 'test'
   ...
 # Subtest: deploy nightshade: energy, count, card rotation
-ok 15 - deploy nightshade: energy, count, card rotation
+ok 17 - deploy nightshade: energy, count, card rotation
   ---
-  duration_ms: 0.097948
+  duration_ms: 0.603243
   type: 'test'
   ...
 # Subtest: deploy mossling: energy, count, card rotation
-ok 16 - deploy mossling: energy, count, card rotation
+ok 18 - deploy mossling: energy, count, card rotation
   ---
-  duration_ms: 0.111308
+  duration_ms: 0.990836
   type: 'test'
   ...
 # Subtest: deploy boneswarm: energy, count, card rotation
-ok 17 - deploy boneswarm: energy, count, card rotation
+ok 19 - deploy boneswarm: energy, count, card rotation
   ---
-  duration_ms: 0.279402
+  duration_ms: 3.644071
   type: 'test'
   ...
 # Subtest: deploy lumina: energy, count, card rotation
-ok 18 - deploy lumina: energy, count, card rotation
+ok 20 - deploy lumina: energy, count, card rotation
   ---
-  duration_ms: 0.207723
+  duration_ms: 1.33267
   type: 'test'
   ...
 # Subtest: deploy frost: energy, count, card rotation
-ok 19 - deploy frost: energy, count, card rotation
+ok 21 - deploy frost: energy, count, card rotation
   ---
-  duration_ms: 0.130207
+  duration_ms: 0.860652
   type: 'test'
   ...
 # Subtest: deploy harpy: energy, count, card rotation
-ok 20 - deploy harpy: energy, count, card rotation
+ok 22 - deploy harpy: energy, count, card rotation
   ---
-  duration_ms: 0.116386
+  duration_ms: 0.704801
+  type: 'test'
+  ...
+# Subtest: deploy necromancer: energy, count, card rotation
+ok 23 - deploy necromancer: energy, count, card rotation
+  ---
+  duration_ms: 5.431608
+  type: 'test'
+  ...
+# Subtest: deploy darknecro: energy, count, card rotation
+ok 24 - deploy darknecro: energy, count, card rotation
+  ---
+  duration_ms: 1.951307
+  type: 'test'
+  ...
+# Subtest: deploy ashsquad: energy, count, card rotation
+ok 25 - deploy ashsquad: energy, count, card rotation
+  ---
+  duration_ms: 1.379814
   type: 'test'
   ...
 # Subtest: deploy blowdart: energy, count, card rotation
-ok 21 - deploy blowdart: energy, count, card rotation
+ok 26 - deploy blowdart: energy, count, card rotation
   ---
-  duration_ms: 0.457801
+  duration_ms: 1.026885
   type: 'test'
   ...
 # Subtest: deploy lasertower: energy, count, card rotation
-ok 22 - deploy lasertower: energy, count, card rotation
+ok 27 - deploy lasertower: energy, count, card rotation
   ---
-  duration_ms: 0.123416
+  duration_ms: 1.215894
   type: 'test'
   ...
 # Subtest: deploy fireball: energy, count, card rotation
-ok 23 - deploy fireball: energy, count, card rotation
+ok 28 - deploy fireball: energy, count, card rotation
   ---
-  duration_ms: 0.255075
+  duration_ms: 1.783304
   type: 'test'
   ...
 # Subtest: deploy poison: energy, count, card rotation
-ok 24 - deploy poison: energy, count, card rotation
+ok 29 - deploy poison: energy, count, card rotation
   ---
-  duration_ms: 0.106862
+  duration_ms: 0.906808
   type: 'test'
   ...
 # Subtest: deploy arrowrain: energy, count, card rotation
-ok 25 - deploy arrowrain: energy, count, card rotation
+ok 30 - deploy arrowrain: energy, count, card rotation
   ---
-  duration_ms: 0.108965
+  duration_ms: 0.743739
+  type: 'test'
+  ...
+# Subtest: necromancer summons three bones immediately and three more every six seconds
+ok 31 - necromancer summons three bones immediately and three more every six seconds
+  ---
+  duration_ms: 130.129606
+  type: 'test'
+  ...
+# Subtest: dark necromancer summons two bats immediately and two more every five seconds
+ok 32 - dark necromancer summons two bats immediately and two more every five seconds
+  ---
+  duration_ms: 66.482067
+  type: 'test'
+  ...
+# Subtest: dead summoners never create another periodic wave
+ok 33 - dead summoners never create another periodic wave
+  ---
+  duration_ms: 109.243336
+  type: 'test'
+  ...
+# Subtest: summoner deployment reserves room for the full guaranteed first summon wave
+ok 34 - summoner deployment reserves room for the full guaranteed first summon wave
+  ---
+  duration_ms: 1.074449
+  type: 'test'
+  ...
+# Subtest: ash squad spends one card but creates three ordinary ash swordsmen in front-one rear-two formation
+ok 35 - ash squad spends one card but creates three ordinary ash swordsmen in front-one rear-two formation
+  ---
+  duration_ms: 1.18299
   type: 'test'
   ...
 # Subtest: countdown blocks deployments and becomes battle after three seconds
-ok 26 - countdown blocks deployments and becomes battle after three seconds
+ok 36 - countdown blocks deployments and becomes battle after three seconds
   ---
-  duration_ms: 0.469979
+  duration_ms: 0.466767
   type: 'test'
   ...
-# Subtest: tower HP and dormant core rules remain unchanged in v15
-ok 27 - tower HP and dormant core rules remain unchanged in v15
+# Subtest: tower HP and dormant core rules remain unchanged in v16
+ok 37 - tower HP and dormant core rules remain unchanged in v16
   ---
-  duration_ms: 0.149606
+  duration_ms: 0.345759
   type: 'test'
   ...
 # Subtest: one destroyed side tower advances that lane plus a narrow centre connector
-ok 28 - one destroyed side tower advances that lane plus a narrow centre connector
+ok 38 - one destroyed side tower advances that lane plus a narrow centre connector
   ---
-  duration_ms: 0.193952
+  duration_ms: 0.732398
   type: 'test'
   ...
 # Subtest: destroying both side towers unlocks the enemy front half across the full width
-ok 29 - destroying both side towers unlocks the enemy front half across the full width
+ok 39 - destroying both side towers unlocks the enemy front half across the full width
   ---
-  duration_ms: 0.254264
+  duration_ms: 0.792649
   type: 'test'
   ...
 # Subtest: frontline lane and centre connector are symmetric for player two
-ok 30 - frontline lane and centre connector are symmetric for player two
+ok 40 - frontline lane and centre connector are symmetric for player two
   ---
-  duration_ms: 0.235094
+  duration_ms: 0.544193
   type: 'test'
   ...
 # Subtest: invalid coordinates, ownership and opponents territory are rejected without spending
-ok 31 - invalid coordinates, ownership and opponents territory are rejected without spending
+ok 41 - invalid coordinates, ownership and opponents territory are rejected without spending
   ---
-  duration_ms: 0.256437
+  duration_ms: 5.809927
   type: 'test'
   ...
 # Subtest: unknown card and non-hand card rejected
-ok 32 - unknown card and non-hand card rejected
+ok 42 - unknown card and non-hand card rejected
   ---
-  duration_ms: 0.120132
+  duration_ms: 0.390093
   type: 'test'
   ...
 # Subtest: not enough energy never spawns or changes hand
-ok 33 - not enough energy never spawns or changes hand
+ok 43 - not enough energy never spawns or changes hand
   ---
-  duration_ms: 0.11237
+  duration_ms: 0.720085
   type: 'test'
   ...
 # Subtest: tower and building placement overlap rejected
-ok 34 - tower and building placement overlap rejected
+ok 44 - tower and building placement overlap rejected
   ---
-  duration_ms: 0.250739
+  duration_ms: 0.695413
   type: 'test'
   ...
 # Subtest: energy regenerates, caps at ten and doubles after two minutes
-ok 35 - energy regenerates, caps at ten and doubles after two minutes
+ok 45 - energy regenerates, caps at ten and doubles after two minutes
   ---
-  duration_ms: 3.856138
+  duration_ms: 17.25078
   type: 'test'
   ...
 # Subtest: friendly ground units move, obey banks and eventually cross a bridge
-ok 36 - friendly ground units move, obey banks and eventually cross a bridge
+ok 46 - friendly ground units move, obey banks and eventually cross a bridge
   ---
-  duration_ms: 30.770134
+  duration_ms: 96.61046
   type: 'test'
   ...
 # Subtest: flying bats are permitted over the river
-ok 37 - flying bats are permitted over the river
+ok 47 - flying bats are permitted over the river
   ---
-  duration_ms: 11.809948
+  duration_ms: 26.416571
   type: 'test'
   ...
 # Subtest: cannon stays fixed while its HP decays by 30 per second until it collapses
-ok 38 - cannon stays fixed while its HP decays by 30 per second until it collapses
+ok 48 - cannon stays fixed while its HP decays by 30 per second until it collapses
   ---
-  duration_ms: 12.877639
+  duration_ms: 77.627886
   type: 'test'
   ...
 # Subtest: ground-only attacker cannot damage a bat
-ok 39 - ground-only attacker cannot damage a bat
+ok 49 - ground-only attacker cannot damage a bat
   ---
-  duration_ms: 11.069806
+  duration_ms: 59.777726
   type: 'test'
   ...
 # Subtest: archer can hit airborne enemies
-ok 40 - archer can hit airborne enemies
+ok 50 - archer can hit airborne enemies
   ---
-  duration_ms: 1.264007
+  duration_ms: 10.614624
   type: 'test'
   ...
 # Subtest: bomber splash damages two close ground targets
-ok 41 - bomber splash damages two close ground targets
+ok 51 - bomber splash damages two close ground targets
   ---
-  duration_ms: 2.201481
+  duration_ms: 18.956619
   type: 'test'
   ...
 # Subtest: kragg berserker is a slow heavy ground attacker with high single-target damage
-ok 42 - kragg berserker is a slow heavy ground attacker with high single-target damage
+ok 52 - kragg berserker is a slow heavy ground attacker with high single-target damage
   ---
-  duration_ms: 1.273551
+  duration_ms: 12.805918
   type: 'test'
   ...
 # Subtest: stone golem ignores enemy troops and damages structures only
-ok 43 - stone golem ignores enemy troops and damages structures only
+ok 53 - stone golem ignores enemy troops and damages structures only
   ---
-  duration_ms: 43.218877
+  duration_ms: 157.763675
   type: 'test'
   ...
 # Subtest: iron boar ignores troops and consumes a charged hit on structures
-ok 44 - iron boar ignores troops and consumes a charged hit on structures
+ok 54 - iron boar ignores troops and consumes a charged hit on structures
   ---
-  duration_ms: 0.580265
+  duration_ms: 1.821044
   type: 'test'
   ...
 # Subtest: iron boar earns charge by running toward a building
-ok 45 - iron boar earns charge by running toward a building
+ok 55 - iron boar earns charge by running toward a building
   ---
-  duration_ms: 5.718788
+  duration_ms: 4.691785
   type: 'test'
   ...
 # Subtest: nightshade troop acquisition is about half the old 205px aggro radius
-ok 46 - nightshade troop acquisition is about half the old 205px aggro radius
+ok 56 - nightshade troop acquisition is about half the old 205px aggro radius
   ---
-  duration_ms: 0.446884
+  duration_ms: 2.253877
   type: 'test'
   ...
 # Subtest: nightshade winds up, becomes invulnerable during rush and lands a double-damage opening hit
-ok 47 - nightshade winds up, becomes invulnerable during rush and lands a double-damage opening hit
+ok 57 - nightshade winds up, becomes invulnerable during rush and lands a double-damage opening hit
   ---
-  duration_ms: 0.783973
+  duration_ms: 6.07461
   type: 'test'
   ...
 # Subtest: nightshade can shadow-rush an enemy tower
-ok 48 - nightshade can shadow-rush an enemy tower
+ok 58 - nightshade can shadow-rush an enemy tower
   ---
-  duration_ms: 0.440375
+  duration_ms: 1.893973
   type: 'test'
   ...
 # Subtest: nightshade ignores damage while the rush state is invulnerable
-ok 49 - nightshade ignores damage while the rush state is invulnerable
+ok 59 - nightshade ignores damage while the rush state is invulnerable
   ---
-  duration_ms: 0.328045
+  duration_ms: 1.536257
   type: 'test'
   ...
 # Subtest: Tigger underground travel time increases with distance from its own core
-ok 50 - Tigger underground travel time increases with distance from its own core
+ok 60 - Tigger underground travel time increases with distance from its own core
   ---
-  duration_ms: 0.176407
+  duration_ms: 0.696722
   type: 'test'
   ...
 # Subtest: hole-digger Tigger can target enemy territory, stays untargetable underground, and surfaces after distance-based travel
-ok 51 - hole-digger Tigger can target enemy territory, stays untargetable underground, and surfaces after distance-based travel
+ok 61 - hole-digger Tigger can target enemy territory, stays untargetable underground, and surfaces after distance-based travel
   ---
-  duration_ms: 0.482318
+  duration_ms: 2.651145
   type: 'test'
   ...
 # Subtest: mud dragon splash creates a two-second non-stacking ground mud zone with damage and movement slow
-ok 52 - mud dragon splash creates a two-second non-stacking ground mud zone with damage and movement slow
+ok 62 - mud dragon splash creates a two-second non-stacking ground mud zone with damage and movement slow
   ---
-  duration_ms: 1.785043
+  duration_ms: 6.767317
   type: 'test'
   ...
 # Subtest: mossling card spawns five legal individual bodies
-ok 53 - mossling card spawns five legal individual bodies
+ok 63 - mossling card spawns five legal individual bodies
   ---
-  duration_ms: 0.217989
+  duration_ms: 0.692455
   type: 'test'
   ...
 # Subtest: bone swarm spawns twelve ultra-fragile individual ground attackers
-ok 54 - bone swarm spawns twelve ultra-fragile individual ground attackers
+ok 64 - bone swarm spawns twelve ultra-fragile individual ground attackers
   ---
-  duration_ms: 0.204208
+  duration_ms: 1.259179
   type: 'test'
   ...
 # Subtest: lumina priest heals a damaged nearby ally but never a building
-ok 55 - lumina priest heals a damaged nearby ally but never a building
+ok 65 - lumina priest heals a damaged nearby ally but never a building
   ---
-  duration_ms: 3.005375
+  duration_ms: 13.606705
   type: 'test'
   ...
 # Subtest: frost shaman slows ground movement and strips part of a boar charge
-ok 56 - frost shaman slows ground movement and strips part of a boar charge
+ok 66 - frost shaman slows ground movement and strips part of a boar charge
   ---
-  duration_ms: 1.725844
+  duration_ms: 3.392337
   type: 'test'
   ...
 # Subtest: storm harpy chain lightning damages up to three clustered enemies
-ok 57 - storm harpy chain lightning damages up to three clustered enemies
+ok 67 - storm harpy chain lightning damages up to three clustered enemies
   ---
-  duration_ms: 64.438162
+  duration_ms: 157.678296
   type: 'test'
   ...
 # Subtest: central core stays dormant while side towers are alive and the core is untouched
-ok 58 - central core stays dormant while side towers are alive and the core is untouched
+ok 68 - central core stays dormant while side towers are alive and the core is untouched
   ---
-  duration_ms: 0.514015
+  duration_ms: 1.033965
   type: 'test'
   ...
 # Subtest: damaging a dormant core wakes it permanently and it starts attacking
-ok 59 - damaging a dormant core wakes it permanently and it starts attacking
+ok 69 - damaging a dormant core wakes it permanently and it starts attacking
   ---
-  duration_ms: 0.433544
+  duration_ms: 0.948614
   type: 'test'
   ...
 # Subtest: destroying either side tower wakes the owning central core
-ok 60 - destroying either side tower wakes the owning central core
+ok 70 - destroying either side tower wakes the owning central core
   ---
-  duration_ms: 0.422287
+  duration_ms: 1.1039
   type: 'test'
   ...
 # Subtest: fireball can target anywhere and flight time grows with distance without tracking
-ok 61 - fireball can target anywhere and flight time grows with distance without tracking
+ok 71 - fireball can target anywhere and flight time grows with distance without tracking
   ---
-  duration_ms: 0.514977
+  duration_ms: 1.001841
   type: 'test'
   ...
 # Subtest: fireball hits ground and air units for 560, buildings for 140, and never friendly units
-ok 62 - fireball hits ground and air units for 560, buildings for 140, and never friendly units
+ok 72 - fireball hits ground and air units for 560, buildings for 140, and never friendly units
   ---
-  duration_ms: 2.168541
+  duration_ms: 3.756426
   type: 'test'
   ...
 # Subtest: fireball damage wakes a dormant central core
-ok 63 - fireball damage wakes a dormant central core
+ok 73 - fireball damage wakes a dormant central core
   ---
-  duration_ms: 0.380444
+  duration_ms: 0.623459
   type: 'test'
   ...
 # Subtest: poison trap deploys instantly, wipes bone swarm quickly and leaves lingering poison
-ok 64 - poison trap deploys instantly, wipes bone swarm quickly and leaves lingering poison
+ok 74 - poison trap deploys instantly, wipes bone swarm quickly and leaves lingering poison
   ---
-  duration_ms: 1.565112
+  duration_ms: 8.385411
   type: 'test'
   ...
 # Subtest: poison trap chips towers at reduced damage and wakes the central core
-ok 65 - poison trap chips towers at reduced damage and wakes the central core
+ok 75 - poison trap chips towers at reduced damage and wakes the central core
   ---
-  duration_ms: 0.301815
+  duration_ms: 0.46814
   type: 'test'
   ...
 # Subtest: arrow rain is broader, lower damage and faster than fireball while still hitting air and towers
-ok 66 - arrow rain is broader, lower damage and faster than fireball while still hitting air and towers
+ok 76 - arrow rain is broader, lower damage and faster than fireball while still hitting air and towers
   ---
-  duration_ms: 14.64154
+  duration_ms: 142.404442
   type: 'test'
   ...
 # Subtest: stone golem death blasts nearby enemies and still splits into two mini golems
-ok 67 - stone golem death blasts nearby enemies and still splits into two mini golems
+ok 77 - stone golem death blasts nearby enemies and still splits into two mini golems
   ---
-  duration_ms: 1.095653
+  duration_ms: 2.753457
   type: 'test'
   ...
 # Subtest: mini golem death blast is exactly one third of the parent blast
-ok 68 - mini golem death blast is exactly one third of the parent blast
+ok 78 - mini golem death blast is exactly one third of the parent blast
   ---
-  duration_ms: 4.365146
+  duration_ms: 28.488088
   type: 'test'
   ...
 # Subtest: side tower locks its target even when a closer enemy enters range
-ok 69 - side tower locks its target even when a closer enemy enters range
+ok 79 - side tower locks its target even when a closer enemy enters range
   ---
-  duration_ms: 1.046358
+  duration_ms: 2.107048
   type: 'test'
   ...
 # Subtest: structure target lock releases on range exit or untargetable state
-ok 70 - structure target lock releases on range exit or untargetable state
+ok 80 - structure target lock releases on range exit or untargetable state
   ---
-  duration_ms: 1.10053
+  duration_ms: 8.193461
   type: 'test'
   ...
 # Subtest: bolt cannon uses the same target-lock contract
-ok 71 - bolt cannon uses the same target-lock contract
+ok 81 - bolt cannon uses the same target-lock contract
   ---
-  duration_ms: 0.92105
+  duration_ms: 6.781319
   type: 'test'
   ...
 # Subtest: blowdart goblin is a fragile long-range anti-air attacker
-ok 72 - blowdart goblin is a fragile long-range anti-air attacker
+ok 82 - blowdart goblin is a fragile long-range anti-air attacker
   ---
-  duration_ms: 0.637161
+  duration_ms: 1.810812
+  type: 'test'
+  ...
+# Subtest: blowdart tower pressure is inside side-tower retaliation distance in v16
+ok 83 - blowdart tower pressure is inside side-tower retaliation distance in v16
+  ---
+  duration_ms: 0.422708
   type: 'test'
   ...
 # Subtest: laser tower starts below bone-swarm kill speed, ramps every 1.5s, and resets after retarget
-ok 73 - laser tower starts below bone-swarm kill speed, ramps every 1.5s, and resets after retarget
+ok 84 - laser tower starts below bone-swarm kill speed, ramps every 1.5s, and resets after retarget
   ---
-  duration_ms: 2.338237
+  duration_ms: 11.393766
   type: 'test'
   ...
 # Subtest: awake central core locks a target until a release condition occurs
-ok 74 - awake central core locks a target until a release condition occurs
+ok 85 - awake central core locks a target until a release condition occurs
   ---
-  duration_ms: 0.747557
+  duration_ms: 2.553378
   type: 'test'
   ...
 # Subtest: main tower destruction ends match immediately
-ok 75 - main tower destruction ends match immediately
+ok 86 - main tower destruction ends match immediately
   ---
-  duration_ms: 0.210768
+  duration_ms: 0.531104
   type: 'test'
   ...
 # Subtest: simultaneous main tower destruction is a draw
-ok 76 - simultaneous main tower destruction is a draw
+ok 87 - simultaneous main tower destruction is a draw
   ---
-  duration_ms: 0.15243
+  duration_ms: 0.449199
   type: 'test'
   ...
 # Subtest: three minute unequal tower count decides the winner
-ok 77 - three minute unequal tower count decides the winner
+ok 88 - three minute unequal tower count decides the winner
   ---
-  duration_ms: 0.203257
+  duration_ms: 0.676733
   type: 'test'
   ...
 # Subtest: equal tower count starts overtime; first tower wins
-ok 78 - equal tower count starts overtime; first tower wins
+ok 89 - equal tower count starts overtime; first tower wins
   ---
-  duration_ms: 0.202405
+  duration_ms: 0.593367
   type: 'test'
   ...
 # Subtest: full timeout uses remaining tower HP and exact tie draws
-ok 79 - full timeout uses remaining tower HP and exact tie draws
+ok 90 - full timeout uses remaining tower HP and exact tie draws
   ---
-  duration_ms: 0.249036
+  duration_ms: 0.774899
   type: 'test'
   ...
 # Subtest: ended matches do not continue to simulate
-ok 80 - ended matches do not continue to simulate
+ok 91 - ended matches do not continue to simulate
   ---
-  duration_ms: 0.162435
+  duration_ms: 0.502761
   type: 'test'
   ...
 # Subtest: snapshots never contain seed, enemy hand, queue or damage internals
-ok 81 - snapshots never contain seed, enemy hand, queue or damage internals
+ok 92 - snapshots never contain seed, enemy hand, queue or damage internals
   ---
-  duration_ms: 0.220874
+  duration_ms: 0.72304
   type: 'test'
   ...
 # Subtest: same seed plus same commands remains deterministic for four minutes
-ok 82 - same seed plus same commands remains deterministic for four minutes
+ok 93 - same seed plus same commands remains deterministic for four minutes
   ---
-  duration_ms: 302.52768
+  duration_ms: 1876.742285
   type: 'test'
   ...
 # Subtest: invalid tick duration is rejected
-ok 83 - invalid tick duration is rejected
+ok 94 - invalid tick duration is rejected
   ---
-  duration_ms: 0.534737
+  duration_ms: 1.882415
   type: 'test'
   ...
 # Subtest: maximum unit cap rejects a multi-unit card atomically
-ok 84 - maximum unit cap rejects a multi-unit card atomically
+ok 95 - maximum unit cap rejects a multi-unit card atomically
   ---
-  duration_ms: 0.229977
+  duration_ms: 0.578572
   type: 'test'
   ...
 # Subtest: eight-card default deck keeps four-card hand and four-card queue
-ok 85 - eight-card default deck keeps four-card hand and four-card queue
+ok 96 - eight-card default deck keeps four-card hand and four-card queue
   ---
-  duration_ms: 0.150567
+  duration_ms: 0.287536
   type: 'test'
   ...
-# Subtest: v15 physics version and mass/radius data are explicit
-ok 86 - v15 physics version and mass/radius data are explicit
+# Subtest: v16 physics version and mass/radius data are explicit
+ok 97 - v16 physics version and mass/radius data are explicit
   ---
-  duration_ms: 1.777512
+  duration_ms: 6.65316
   type: 'test'
   ...
 # Subtest: body may not put its edge across the river even if its centre is on land
-ok 87 - body may not put its edge across the river even if its centre is on land
+ok 98 - body may not put its edge across the river even if its centre is on land
   ---
-  duration_ms: 0.332211
+  duration_ms: 1.119044
   type: 'test'
   ...
 # Subtest: ground rejects deployment inside towers; air may fly/deploy over them
-ok 88 - ground rejects deployment inside towers; air may fly/deploy over them
+ok 99 - ground rejects deployment inside towers; air may fly/deploy over them
   ---
-  duration_ms: 1.481956
+  duration_ms: 5.219051
   type: 'test'
   ...
-# Subtest: all three air group members have legal non-overlapping initial positions
-ok 89 - all three air group members have legal non-overlapping initial positions
+# Subtest: all four air group members have legal non-overlapping initial positions
+ok 100 - all four air group members have legal non-overlapping initial positions
   ---
-  duration_ms: 1.458451
+  duration_ms: 2.124398
   type: 'test'
   ...
 # Subtest: spawn near a ground ally shifts to free space without spending twice
-ok 90 - spawn near a ground ally shifts to free space without spending twice
+ok 101 - spawn near a ground ally shifts to free space without spending twice
   ---
-  duration_ms: 0.969483
+  duration_ms: 10.332722
   type: 'test'
   ...
 # Subtest: building cannot be placed underneath an existing ground unit
-ok 91 - building cannot be placed underneath an existing ground unit
+ok 102 - building cannot be placed underneath an existing ground unit
   ---
-  duration_ms: 0.479954
+  duration_ms: 2.166208
   type: 'test'
   ...
 # Subtest: blade seat 0: rear deployment navigates its tower and bridge
-ok 92 - blade seat 0: rear deployment navigates its tower and bridge
+ok 103 - blade seat 0: rear deployment navigates its tower and bridge
   ---
-  duration_ms: 27.26041
+  duration_ms: 122.263688
   type: 'test'
   ...
 # Subtest: knight seat 0: rear deployment navigates its tower and bridge
-ok 93 - knight seat 0: rear deployment navigates its tower and bridge
+ok 104 - knight seat 0: rear deployment navigates its tower and bridge
   ---
-  duration_ms: 15.893249
+  duration_ms: 101.830599
   type: 'test'
   ...
 # Subtest: archer seat 0: rear deployment navigates its tower and bridge
-ok 94 - archer seat 0: rear deployment navigates its tower and bridge
+ok 105 - archer seat 0: rear deployment navigates its tower and bridge
   ---
-  duration_ms: 20.844399
+  duration_ms: 162.731442
   type: 'test'
   ...
 # Subtest: mage seat 0: rear deployment navigates its tower and bridge
-ok 95 - mage seat 0: rear deployment navigates its tower and bridge
+ok 106 - mage seat 0: rear deployment navigates its tower and bridge
   ---
-  duration_ms: 19.889478
+  duration_ms: 50.040867
   type: 'test'
   ...
 # Subtest: spear seat 0: rear deployment navigates its tower and bridge
-ok 96 - spear seat 0: rear deployment navigates its tower and bridge
+ok 107 - spear seat 0: rear deployment navigates its tower and bridge
   ---
-  duration_ms: 21.094997
+  duration_ms: 60.569344
   type: 'test'
   ...
 # Subtest: bomber seat 0: rear deployment navigates its tower and bridge
-ok 97 - bomber seat 0: rear deployment navigates its tower and bridge
+ok 108 - bomber seat 0: rear deployment navigates its tower and bridge
   ---
-  duration_ms: 19.102861
+  duration_ms: 87.698384
   type: 'test'
   ...
 # Subtest: blade seat 1: rear deployment navigates its tower and bridge
-ok 98 - blade seat 1: rear deployment navigates its tower and bridge
+ok 109 - blade seat 1: rear deployment navigates its tower and bridge
   ---
-  duration_ms: 11.084014
+  duration_ms: 48.967486
   type: 'test'
   ...
 # Subtest: knight seat 1: rear deployment navigates its tower and bridge
-ok 99 - knight seat 1: rear deployment navigates its tower and bridge
+ok 110 - knight seat 1: rear deployment navigates its tower and bridge
   ---
-  duration_ms: 9.880618
+  duration_ms: 79.089248
   type: 'test'
   ...
 # Subtest: archer seat 1: rear deployment navigates its tower and bridge
-ok 100 - archer seat 1: rear deployment navigates its tower and bridge
+ok 111 - archer seat 1: rear deployment navigates its tower and bridge
   ---
-  duration_ms: 8.593105
+  duration_ms: 27.555918
   type: 'test'
   ...
 # Subtest: mage seat 1: rear deployment navigates its tower and bridge
-ok 101 - mage seat 1: rear deployment navigates its tower and bridge
+ok 112 - mage seat 1: rear deployment navigates its tower and bridge
   ---
-  duration_ms: 11.312588
+  duration_ms: 52.400994
   type: 'test'
   ...
 # Subtest: spear seat 1: rear deployment navigates its tower and bridge
-ok 102 - spear seat 1: rear deployment navigates its tower and bridge
+ok 113 - spear seat 1: rear deployment navigates its tower and bridge
   ---
-  duration_ms: 5.283131
+  duration_ms: 70.888424
   type: 'test'
   ...
 # Subtest: bomber seat 1: rear deployment navigates its tower and bridge
-ok 103 - bomber seat 1: rear deployment navigates its tower and bridge
+ok 114 - bomber seat 1: rear deployment navigates its tower and bridge
   ---
-  duration_ms: 15.603646
+  duration_ms: 126.924936
   type: 'test'
   ...
 # Subtest: air crosses river and a tower in a straight path without ground detours
-ok 104 - air crosses river and a tower in a straight path without ground detours
+ok 115 - air crosses river and a tower in a straight path without ground detours
   ---
-  duration_ms: 0.529929
+  duration_ms: 1.939551
   type: 'test'
   ...
 # Subtest: ground and air occupying the same point exert no separation force
-ok 105 - ground and air occupying the same point exert no separation force
+ok 116 - ground and air occupying the same point exert no separation force
   ---
-  duration_ms: 0.147392
+  duration_ms: 0.295771
   type: 'test'
   ...
 # Subtest: ground versus enemy air also does not physically block movement
-ok 106 - ground versus enemy air also does not physically block movement
+ok 117 - ground versus enemy air also does not physically block movement
   ---
-  duration_ms: 0.250127
+  duration_ms: 0.537645
   type: 'test'
   ...
 # Subtest: allied ground bodies yield softly and a heavy knight moves less
-ok 107 - allied ground bodies yield softly and a heavy knight moves less
+ok 118 - allied ground bodies yield softly and a heavy knight moves less
   ---
-  duration_ms: 0.326703
+  duration_ms: 0.787549
   type: 'test'
   ...
 # Subtest: same-air-layer allies separate, without any ground movement
-ok 108 - same-air-layer allies separate, without any ground movement
+ok 119 - same-air-layer allies separate, without any ground movement
   ---
-  duration_ms: 0.192971
+  duration_ms: 0.473524
   type: 'test'
   ...
 # Subtest: enemies cannot tunnel through one another, even with a long requested displacement
-ok 109 - enemies cannot tunnel through one another, even with a long requested displacement
+ok 120 - enemies cannot tunnel through one another, even with a long requested displacement
   ---
-  duration_ms: 0.290879
+  duration_ms: 0.768984
   type: 'test'
   ...
 # Subtest: air opponents respect each other while ignoring ground units
-ok 110 - air opponents respect each other while ignoring ground units
+ok 121 - air opponents respect each other while ignoring ground units
   ---
-  duration_ms: 0.13253
+  duration_ms: 0.316307
   type: 'test'
   ...
 # Subtest: building remains fixed while an ally tries to move into it
-ok 111 - building remains fixed while an ally tries to move into it
+ok 122 - building remains fixed while an ally tries to move into it
   ---
-  duration_ms: 12.876127
+  duration_ms: 35.04931
   type: 'test'
   ...
 # Subtest: enemy bodies block, but are not an infinite wall across the whole lane
-ok 112 - enemy bodies block, but are not an infinite wall across the whole lane
+ok 123 - enemy bodies block, but are not an infinite wall across the whole lane
   ---
-  duration_ms: 0.940659
+  duration_ms: 2.526945
   type: 'test'
   ...
 # Subtest: iron boar can shove lightweight enemy troops and keep moving through bridge congestion
-ok 113 - iron boar can shove lightweight enemy troops and keep moving through bridge congestion
+ok 124 - iron boar can shove lightweight enemy troops and keep moving through bridge congestion
   ---
-  duration_ms: 3.414772
+  duration_ms: 6.179063
   type: 'test'
   ...
 # Subtest: crowd separation does not push units into a solid tower or water
-ok 114 - crowd separation does not push units into a solid tower or water
+ok 125 - crowd separation does not push units into a solid tower or water
   ---
-  duration_ms: 33.615643
+  duration_ms: 188.672444
   type: 'test'
   ...
 # Subtest: defeated tower immediately loses collision and invalidates the route cache
-ok 115 - defeated tower immediately loses collision and invalidates the route cache
+ok 126 - defeated tower immediately loses collision and invalidates the route cache
   ---
-  duration_ms: 4.961596
+  duration_ms: 12.898838
   type: 'test'
   ...
 # Subtest: fully decayed cannon is removed from the solid obstacle set
-ok 116 - fully decayed cannon is removed from the solid obstacle set
+ok 127 - fully decayed cannon is removed from the solid obstacle set
   ---
-  duration_ms: 0.493485
+  duration_ms: 2.385491
   type: 'test'
   ...
 # Subtest: navigation around a cannon produces real extra travel, not a spawn delay
-ok 117 - navigation around a cannon produces real extra travel, not a spawn delay
+ok 128 - navigation around a cannon produces real extra travel, not a spawn delay
   ---
-  duration_ms: 8.004066
+  duration_ms: 31.383218
   type: 'test'
   ...
 # Subtest: navigation with no accessible target fails closed instead of teleporting
-ok 118 - navigation with no accessible target fails closed instead of teleporting
+ok 129 - navigation with no accessible target fails closed instead of teleporting
   ---
-  duration_ms: 17.901018
+  duration_ms: 81.490377
   type: 'test'
   ...
 # Subtest: zero-distance crowd fixture never produces NaN coordinates
-ok 119 - zero-distance crowd fixture never produces NaN coordinates
+ok 130 - zero-distance crowd fixture never produces NaN coordinates
   ---
-  duration_ms: 5.9252
+  duration_ms: 45.891671
   type: 'test'
   ...
 # Subtest: facing retains direction on horizontal movement and tracks rear attacks
-ok 120 - facing retains direction on horizontal movement and tracks rear attacks
+ok 131 - facing retains direction on horizontal movement and tracks rear attacks
   ---
-  duration_ms: 0.13861
+  duration_ms: 5.579275
   type: 'test'
   ...
 # Subtest: both players see their advancing units from behind and enemies from the front
-ok 121 - both players see their advancing units from behind and enemies from the front
+ok 132 - both players see their advancing units from behind and enemies from the front
   ---
-  duration_ms: 0.151158
+  duration_ms: 0.670178
   type: 'test'
   ...
 # Subtest: unit attacks a rear target with its facing rather than owner-based fixed pose
-ok 122 - unit attacks a rear target with its facing rather than owner-based fixed pose
+ok 133 - unit attacks a rear target with its facing rather than owner-based fixed pose
   ---
-  duration_ms: 0.360474
+  duration_ms: 1.343615
   type: 'test'
   ...
 # Subtest: rendering depth mixes towers and ground troops; air is always after ground
-ok 123 - rendering depth mixes towers and ground troops; air is always after ground
+ok 134 - rendering depth mixes towers and ground troops; air is always after ground
   ---
-  duration_ms: 0.780277
+  duration_ms: 4.340465
   type: 'test'
   ...
 # Subtest: server snapshots expose facing/mass/layer but not pathfinding internals
-ok 124 - server snapshots expose facing/mass/layer but not pathfinding internals
+ok 135 - server snapshots expose facing/mass/layer but not pathfinding internals
   ---
-  duration_ms: 7.705846
+  duration_ms: 21.67658
   type: 'test'
   ...
 # Subtest: legacy active matches terminate safely instead of resuming inside new obstacles
-ok 125 - legacy active matches terminate safely instead of resuming inside new obstacles
+ok 136 - legacy active matches terminate safely instead of resuming inside new obstacles
   ---
-  duration_ms: 2.480823
+  duration_ms: 9.117004
   type: 'test'
   ...
 # Subtest: new physics remains deterministic across JSON save/restore
-ok 126 - new physics remains deterministic across JSON save/restore
+ok 137 - new physics remains deterministic across JSON save/restore
   ---
-  duration_ms: 41.491165
+  duration_ms: 243.452322
   type: 'test'
   ...
 # Subtest: full mixed-army match stays finite and outside all static obstacles
-ok 127 - full mixed-army match stays finite and outside all static obstacles
+ok 138 - full mixed-army match stays finite and outside all static obstacles
   ---
-  duration_ms: 176.776131
+  duration_ms: 368.996135
   type: 'test'
   ...
 # Subtest: names reject empty, too long and nonstring input
-ok 128 - names reject empty, too long and nonstring input
+ok 139 - names reject empty, too long and nonstring input
   ---
-  duration_ms: 1.459713
+  duration_ms: 6.358723
   type: 'test'
   ...
 # Subtest: new room has two hour TTL, six digit code and strong private token
-ok 129 - new room has two hour TTL, six digit code and strong private token
+ok 140 - new room has two hour TTL, six digit code and strong private token
   ---
-  duration_ms: 3.120648
+  duration_ms: 21.182831
   type: 'test'
   ...
 # Subtest: two members connect, third cannot join
-ok 130 - two members connect, third cannot join
+ok 141 - two members connect, third cannot join
   ---
-  duration_ms: 1.229095
+  duration_ms: 25.034288
   type: 'test'
   ...
 # Subtest: unauthenticated sockets receive no room state
-ok 131 - unauthenticated sockets receive no room state
+ok 142 - unauthenticated sockets receive no room state
   ---
-  duration_ms: 0.52365
+  duration_ms: 2.592111
   type: 'test'
   ...
 # Subtest: wrong token is rejected
-ok 132 - wrong token is rejected
+ok 143 - wrong token is rejected
   ---
-  duration_ms: 0.444691
+  duration_ms: 1.452851
   type: 'test'
   ...
 # Subtest: snapshots expose no member authentication tokens
-ok 133 - snapshots expose no member authentication tokens
+ok 144 - snapshots expose no member authentication tokens
   ---
-  duration_ms: 0.276667
+  duration_ms: 0.730833
   type: 'test'
   ...
 # Subtest: ready requires a valid eight-card deck and snapshot hides deck contents
-ok 134 - ready requires a valid eight-card deck and snapshot hides deck contents
+ok 145 - ready requires a valid eight-card deck and snapshot hides deck contents
   ---
-  duration_ms: 0.458882
+  duration_ms: 1.428623
   type: 'test'
   ...
 # Subtest: only ready connected players and host may start
-ok 135 - only ready connected players and host may start
+ok 146 - only ready connected players and host may start
   ---
-  duration_ms: 1.811924
+  duration_ms: 6.614231
   type: 'test'
   ...
 # Subtest: server owns player seat and ignores forged owner in commands
-ok 136 - server owns player seat and ignores forged owner in commands
+ok 147 - server owns player seat and ignores forged owner in commands
   ---
-  duration_ms: 5.810777
+  duration_ms: 13.372834
   type: 'test'
   ...
 # Subtest: disconnect pauses game and reconnect restores without resetting time
-ok 137 - disconnect pauses game and reconnect restores without resetting time
+ok 148 - disconnect pauses game and reconnect restores without resetting time
   ---
-  duration_ms: 2.358508
+  duration_ms: 20.845623
   type: 'test'
   ...
 # Subtest: old socket close cannot disconnect replacement socket
-ok 138 - old socket close cannot disconnect replacement socket
+ok 149 - old socket close cannot disconnect replacement socket
   ---
-  duration_ms: 0.363959
+  duration_ms: 0.995265
   type: 'test'
   ...
 # Subtest: 45 second disconnect forfeits; both disconnect draw
-ok 139 - 45 second disconnect forfeits; both disconnect draw
+ok 150 - 45 second disconnect forfeits; both disconnect draw
   ---
-  duration_ms: 0.814508
+  duration_ms: 2.347749
   type: 'test'
   ...
 # Subtest: surrender ends a game and host can reset to same lobby
-ok 140 - surrender ends a game and host can reset to same lobby
+ok 151 - surrender ends a game and host can reset to same lobby
   ---
-  duration_ms: 0.499133
+  duration_ms: 1.526591
   type: 'test'
   ...
 # Subtest: explicit leave promotes remaining member to host
-ok 141 - explicit leave promotes remaining member to host
+ok 152 - explicit leave promotes remaining member to host
   ---
-  duration_ms: 0.210317
+  duration_ms: 0.555744
   type: 'test'
   ...
 # Subtest: malformed, oversized and unknown socket messages cannot mutate game
-ok 142 - malformed, oversized and unknown socket messages cannot mutate game
+ok 153 - malformed, oversized and unknown socket messages cannot mutate game
   ---
-  duration_ms: 0.280263
+  duration_ms: 0.977621
   type: 'test'
   ...
 # Subtest: expired rooms reject new joins and close participants
-ok 143 - expired rooms reject new joins and close participants
+ok 154 - expired rooms reject new joins and close participants
   ---
-  duration_ms: 0.223006
+  duration_ms: 0.589172
   type: 'test'
   ...
 # Subtest: join during live game rejected
-ok 144 - join during live game rejected
+ok 155 - join during live game rejected
   ---
-  duration_ms: 0.323007
+  duration_ms: 0.833069
   type: 'test'
   ...
 # Subtest: repeated state snapshots never leak the other hand
-ok 145 - repeated state snapshots never leak the other hand
+ok 156 - repeated state snapshots never leak the other hand
   ---
-  duration_ms: 0.383799
+  duration_ms: 1.524085
   type: 'test'
   ...
 # Subtest: worker health and config identify twenty-one units plus three spells custom-deck game
-ok 146 - worker health and config identify twenty-one units plus three spells custom-deck game
+ok 157 - worker health and config identify twenty-one units plus three spells custom-deck game
   ---
-  duration_ms: 33.083946
+  duration_ms: 131.602447
   type: 'test'
   ...
 # Subtest: worker static assets use ASSETS binding
-ok 147 - worker static assets use ASSETS binding
+ok 158 - worker static assets use ASSETS binding
   ---
-  duration_ms: 0.658864
+  duration_ms: 1.408302
   type: 'test'
   ...
 # Subtest: worker origin guard and API 404
-ok 148 - worker origin guard and API 404
+ok 159 - worker origin guard and API 404
   ---
-  duration_ms: 1.130226
+  duration_ms: 2.305229
   type: 'test'
   ...
 # Subtest: worker entry and creation rate limits
-ok 149 - worker entry and creation rate limits
+ok 160 - worker entry and creation rate limits
   ---
-  duration_ms: 1.171617
+  duration_ms: 4.884948
   type: 'test'
   ...
 # Subtest: worker creates room, persists it and joins through DO fetch adapter
-ok 150 - worker creates room, persists it and joins through DO fetch adapter
+ok 161 - worker creates room, persists it and joins through DO fetch adapter
   ---
-  duration_ms: 4.698078
+  duration_ms: 20.44642
   type: 'test'
   ...
 # Subtest: unknown DO room returns not-found rather than creating a new game
-ok 151 - unknown DO room returns not-found rather than creating a new game
+ok 162 - unknown DO room returns not-found rather than creating a new game
   ---
-  duration_ms: 0.836762
+  duration_ms: 4.714448
   type: 'test'
   ...
 # Subtest: large request is rejected before parsing
-ok 152 - large request is rejected before parsing
+ok 163 - large request is rejected before parsing
   ---
-  duration_ms: 0.813136
+  duration_ms: 3.577761
   type: 'test'
   ...
 # Subtest: DO storage restoration interrupts active games instead of rewinding
-ok 153 - DO storage restoration interrupts active games instead of rewinding
+ok 164 - DO storage restoration interrupts active games instead of rewinding
   ---
-  duration_ms: 1.163235
+  duration_ms: 4.779463
   type: 'test'
   ...
 # Subtest: DO alarm deletes stored room and makes it unavailable
-ok 154 - DO alarm deletes stored room and makes it unavailable
+ok 165 - DO alarm deletes stored room and makes it unavailable
   ---
-  duration_ms: 1.278769
+  duration_ms: 5.258089
   type: 'test'
   ...
 # Subtest: DO WebSocket handshake and first-frame authentication
-ok 155 - DO WebSocket handshake and first-frame authentication
+ok 166 - DO WebSocket handshake and first-frame authentication
   ---
-  duration_ms: 2.927517
+  duration_ms: 16.273923
   type: 'test'
   ...
-1..155
-# tests 155
+1..166
+# tests 166
 # suites 0
-# pass 155
+# pass 166
 # fail 0
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 646.516184
+# duration_ms 3792.455235

@@ -1,0 +1,17 @@
+{
+  "passed": 10,
+  "checks": [
+    "desktop deck pool is fixed to three columns with all 27 cards",
+    "card tap opens action menu without immediately changing the deck",
+    "details are optional and show stats, ability text, and a live canvas demo",
+    "adding to a full deck offers an in-place replacement choice and keeps eight cards",
+    "My List panel and save control are available from the sticky deck editor",
+    "selected eight-card deck remains sticky while browsing lower cards",
+    "v16.2.0 is grouped with v16.1.0 and v16.0.0 inside the v16 update card",
+    "390px phone keeps three readable columns and a fitting action sheet",
+    "mobile card details preserve the optional demo flow",
+    "no uncaught JavaScript errors in v16.2 desktop/mobile deck-builder flow"
+  ],
+  "errors": [],
+  "note": "v16.2 deck builder tested in self-contained offline HTML with desktop 1440x1000 and touch-enabled 390x844 Chromium contexts."
+}

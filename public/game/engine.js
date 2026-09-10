@@ -48,7 +48,8 @@ export function canPlace(g,owner,id,x,y){
     return null;
   }
   if(!deploymentAllowed(g,owner,x,y))return '自分の陣地、または破壊した敵サイドタワー側の前線に配置してください。';
-  if(g.units.filter(u=>u.hp>0).length+d.count>ARENA.maxUnits)return 'フィールドのユニット上限です。';
+  const deployCount=d.count+(d.summonOnDeploy?(d.summonCount||0):0);
+  if(g.units.filter(u=>u.hp>0).length+deployCount>ARENA.maxUnits)return 'フィールドのユニット上限です。';
   if(!staticFree(g,d,{x,y},1))return '建物や岸から少し離して配置してください。';
   if(!spawnPositions(g,owner,d,x,y))return '配置する空間がありません。少し離してください。';
   return null;
@@ -61,7 +62,8 @@ function spendCard(g,owner,id){
 function makeUnit(g,owner,type,x,y){
   const d=UNITS[type];
   return {...d,id:`u${g.nextId++}`,type,owner,x,y,hp:d.hp,maxHp:d.hp,cd:0,spawn:0.5,anim:0,hit:0,walk:0,target:null,face:owner===0?-1:1,
-    lane:x<360?190:530,age:0,facing:owner===0?-Math.PI/2:Math.PI/2,moving:false};
+    lane:x<360?190:530,age:0,facing:owner===0?-Math.PI/2:Math.PI/2,moving:false,
+    summonNextAt:d.summonInterval?g.time+d.summonInterval:null};
 }
 function fireballTravelTime(core,target){return clamp(.45+distance(core,target)/620,.6,2);}
 function arrowRainTravelTime(core,target){return clamp(.2+distance(core,target)/1150,.35,1);}
@@ -95,8 +97,9 @@ export function deploy(g,owner,id,x,y){
   }
   const positions=spawnPositions(g,owner,d,x,y);spendCard(g,owner,id);
   for(let i=0;i<d.count;i++){
-    const u=makeUnit(g,owner,id,positions[i].x,positions[i].y);
-    g.units.push(u);event(g,'spawn',{x:u.x,y:u.y,owner});
+    const unitType=d.spawnType||id,u=makeUnit(g,owner,unitType,positions[i].x,positions[i].y);
+    g.units.push(u);event(g,'spawn',{x:u.x,y:u.y,owner,card:id});
+    if(u.summonOnDeploy&&u.summonType&&u.summonCount)summonMinions(g,u,true);
   }
   return {ok:true};
 }
@@ -244,6 +247,30 @@ function refreshCoreWake(g){
     if(core.hp<core.maxHp||g.towers.some(t=>t.owner===owner&&t.kind==='tower'&&t.hp<=0))wakeCore(g,owner,core.hp<core.maxHp?'core-hit':'side-down');
   }
 }
+function summonMinions(g,parent,initial=false){
+  const d=UNITS[parent.summonType];if(!d||!parent.summonCount)return 0;
+  const available=Math.max(0,ARENA.maxUnits-g.units.filter(u=>u.hp>0).length),count=Math.min(parent.summonCount,available);if(!count)return 0;
+  const f=parent.owner===0?1:-1;
+  const base=count===2?[[-22,-12],[22,-12]]:count===3?[[0,-30],[-24,12],[24,12]]:Array.from({length:count},(_,i)=>{const a=-Math.PI/2+i*Math.PI*2/count;return [Math.cos(a)*28,Math.sin(a)*28];});
+  const candidates=[];
+  for(const [ox,oy] of base)candidates.push([ox,oy]);
+  for(const r of [38,50,64])for(let i=0;i<12;i++){const a=i*Math.PI*2/12+(parent.owner===1?Math.PI:0);candidates.push([Math.cos(a)*r,Math.sin(a)*r]);}
+  let made=0;
+  for(const [ox0,oy0] of candidates){
+    if(made>=count)break;const ox=ox0*f,oy=oy0*f,p={x:clamp(parent.x+ox,50,670),y:clamp(parent.y+oy,60,980)};
+    if(!staticFree(g,d,p,0))continue;
+    if(g.units.some(u=>u.hp>0&&!!u.air===!!d.air&&distance(p,u)<d.radius+(u.radius||12)*.80))continue;
+    const u=makeUnit(g,parent.owner,d.id,p.x,p.y);u.spawn=.3;u.lane=parent.lane;u.summonedBy=parent.id;g.units.push(u);event(g,'summon-spawn',{x:u.x,y:u.y,owner:u.owner,summoner:parent.type,minion:d.id,initial});made++;
+  }
+  return made;
+}
+function updateSummoner(g,u){
+  if(!u.summonType||!u.summonInterval||!Number.isFinite(u.summonNextAt)||u.hp<=0)return;
+  if(g.time+1e-8<u.summonNextAt)return;
+  summonMinions(g,u,false);
+  do{u.summonNextAt+=u.summonInterval;}while(u.summonNextAt<=g.time+1e-8);
+}
+
 function summonMiniGolems(g,parent){
   const d=UNITS[parent.splitType||'mini_golem'];if(!d)return;
   const count=Math.min(parent.splitCount||2,Math.max(0,ARENA.maxUnits-g.units.filter(u=>u.hp>0).length));
@@ -496,6 +523,7 @@ export function tick(g,dt=ARENA.tick){
       u.age+=dt;
       if(updateBurrow(g,u,dt))continue;
       if(u.spawn>0){u.spawn=Math.max(0,u.spawn-dt);continue;}
+      updateSummoner(g,u);
       if(u.decayPerSecond){decayStructure(g,u,u.decayPerSecond*dt);if(u.hp<=0)continue;}
     }
     if(updateShadowRush(g,u,entities,dt))continue;
@@ -536,7 +564,7 @@ export function viewMatch(g,seat=0){
   const p=g.players[seat];
   return {physicsVersion:PHYSICS_VERSION,phase:g.phase,countdown:g.countdown,time:rnd(g.time),overtime:g.overtime,winner:g.winner,reason:g.reason,
     scores:[towerScore(g,0),towerScore(g,1)],energy:rnd(p.energy),hand:[...p.hand],next:p.queue[0],deck:[...p.deck],
-    units:g.units.map(u=>({id:u.id,type:u.type,owner:u.owner,x:rnd(u.x),y:rnd(u.y),hp:u.hp,maxHp:u.maxHp,radius:u.radius,air:u.air,building:!!u.building,anim:u.anim,hit:u.hit,walk:u.walk,spawn:u.spawn,face:u.face,facing:u.facing,moving:!!u.moving,mass:u.mass,age:u.age,target:u.target||null,laserStage:u.laserStage||0,laserDps:rnd(u.laserDps||0),laserLockTime:rnd(u.laserLockTime||0),charged:!!u.charged,chargeRun:rnd(u.chargeRun||0),slowed:(u.slowUntil||0)>g.time,slowRemaining:rnd(Math.max(0,(u.slowUntil||0)-g.time)),poisoned:(u.poisonUntil||0)>g.time,poisonRemaining:rnd(Math.max(0,(u.poisonUntil||0)-g.time)),mudded:(u.mudUntil||0)>g.time,mudRemaining:rnd(Math.max(0,(u.mudUntil||0)-g.time)),burrowState:u.burrowState||null,burrowProgress:rnd(u.burrowProgress||0),dashState:u.dashState||null,dashWindupRemaining:rnd(Math.max(0,(u.dashWindupUntil||0)-g.time)),dashCooldownRemaining:rnd(Math.max(0,(u.dashReadyAt||0)-g.time)),invulnerable:(u.invulnerableUntil||0)>g.time})),
+    units:g.units.map(u=>({id:u.id,type:u.type,owner:u.owner,x:rnd(u.x),y:rnd(u.y),hp:u.hp,maxHp:u.maxHp,radius:u.radius,air:u.air,building:!!u.building,anim:u.anim,hit:u.hit,walk:u.walk,spawn:u.spawn,face:u.face,facing:u.facing,moving:!!u.moving,mass:u.mass,age:u.age,target:u.target||null,laserStage:u.laserStage||0,laserDps:rnd(u.laserDps||0),laserLockTime:rnd(u.laserLockTime||0),charged:!!u.charged,chargeRun:rnd(u.chargeRun||0),slowed:(u.slowUntil||0)>g.time,slowRemaining:rnd(Math.max(0,(u.slowUntil||0)-g.time)),poisoned:(u.poisonUntil||0)>g.time,poisonOwner:Number.isFinite(u.poisonOwner)?u.poisonOwner:null,poisonRemaining:rnd(Math.max(0,(u.poisonUntil||0)-g.time)),mudded:(u.mudUntil||0)>g.time,mudRemaining:rnd(Math.max(0,(u.mudUntil||0)-g.time)),burrowState:u.burrowState||null,burrowProgress:rnd(u.burrowProgress||0),summonType:u.summonType||null,summonCount:u.summonCount||0,summonRemaining:u.summonInterval?rnd(Math.max(0,(u.summonNextAt||g.time)-g.time)):0,dashState:u.dashState||null,dashWindupRemaining:rnd(Math.max(0,(u.dashWindupUntil||0)-g.time)),dashCooldownRemaining:rnd(Math.max(0,(u.dashReadyAt||0)-g.time)),invulnerable:(u.invulnerableUntil||0)>g.time})),
     towers:g.towers.map(t=>({id:t.id,kind:t.kind,owner:t.owner,x:t.x,y:t.y,hp:t.hp,maxHp:t.maxHp,radius:t.radius,anim:t.anim,hit:t.hit,facing:t.facing,awake:t.kind==='core'?!!t.awake:true})),
     projectiles:g.projectiles.map(p=>({id:p.id,owner:p.owner,x:rnd(p.x),y:rnd(p.y),tx:rnd(p.tx),ty:rnd(p.ty),kind:p.kind,spell:p.spell||null,progress:rnd(p.progress||0),radius:p.splash||0})),
     zones:(g.zones||[]).map(z=>({id:z.id,owner:z.owner,kind:z.kind,spell:z.spell,x:rnd(z.x),y:rnd(z.y),radius:z.radius,remaining:rnd(z.remaining),total:z.total})),
