@@ -1,26 +1,34 @@
-PASS 1 Deck builder exposes all 30 selectable cards, including Princess Archer, Zap and Sparky
+PASS 1 Deck builder exposes all 33 selectable cards, including Laser Dragon, Elekitel Wizard, Princess Archer, Zap and Sparky
 PASS 2 Princess Archer detail shows cost 3, HP 300, attack 275, 3-second fire rate and cross-river range 350
-PASS 3 Sparky detail renders through its charged shot and end-of-demo replay without corrupting the canvas
+PASS 3 Sparky detail shows its 1.8s summon delay, then renders through charged-shot replay safely
 PASS 4 Card detail canvas remains healthy after switching away from Sparky
 PASS 5 Zap detail shows cost 2, 225 damage, radius 78, 1.5-second stun and reset mechanics
-PASS 6 v17.1 summoner balance remains intact at 7.5s and 6.5s
-PASS 7 My List persists the current eight-card deck under the v18 storage key
-PASS 8 Patch Notes shows v18.1.0 render fix plus v18.0.0 and retained v17 history
-PASS 9 Self-contained HTML starts a playable CPU battle with a four-card hand and visible arena
-PASS 10 No uncaught JavaScript errors in the v18 deck, detail demos, Patch Notes or CPU battle flow
+PASS 6 Elekitel Wizard detail shows 4 cost, 135 splash, range 185 and 1-second area stun
+PASS 7 Harpy and Goblin Squad details expose fixed chain damage and thrown-spear range 160
+PASS 8 Laser Dragon detail shows 5 cost, HP1300, flying speed46, range145 and ramping laser
+PASS 9 Detail UI exposes Golem 2.5s summon delay and Tigger no-extra-delay exception
+PASS 10 Summoner details show 1.5s/1.2s parent delays while retaining 7.5s/6.5s intervals
+PASS 11 My List persists the current eight-card deck under the current storage key
+PASS 12 Patch Notes shows v21 laser dragon rules plus retained v20/v19/v18/v17 history
+PASS 13 Self-contained HTML starts a playable CPU battle with a four-card hand and visible arena
+PASS 14 No uncaught JavaScript errors in the v21 deck, detail demos, Patch Notes or CPU battle flow
 {
-  "passed": 10,
+  "passed": 14,
   "checks": [
-    "Deck builder exposes all 30 selectable cards, including Princess Archer, Zap and Sparky",
+    "Deck builder exposes all 33 selectable cards, including Laser Dragon, Elekitel Wizard, Princess Archer, Zap and Sparky",
     "Princess Archer detail shows cost 3, HP 300, attack 275, 3-second fire rate and cross-river range 350",
-    "Sparky detail renders through its charged shot and end-of-demo replay without corrupting the canvas",
+    "Sparky detail shows its 1.8s summon delay, then renders through charged-shot replay safely",
     "Card detail canvas remains healthy after switching away from Sparky",
     "Zap detail shows cost 2, 225 damage, radius 78, 1.5-second stun and reset mechanics",
-    "v17.1 summoner balance remains intact at 7.5s and 6.5s",
-    "My List persists the current eight-card deck under the v18 storage key",
-    "Patch Notes shows v18.1.0 render fix plus v18.0.0 and retained v17 history",
+    "Elekitel Wizard detail shows 4 cost, 135 splash, range 185 and 1-second area stun",
+    "Harpy and Goblin Squad details expose fixed chain damage and thrown-spear range 160",
+    "Laser Dragon detail shows 5 cost, HP1300, flying speed46, range145 and ramping laser",
+    "Detail UI exposes Golem 2.5s summon delay and Tigger no-extra-delay exception",
+    "Summoner details show 1.5s/1.2s parent delays while retaining 7.5s/6.5s intervals",
+    "My List persists the current eight-card deck under the current storage key",
+    "Patch Notes shows v21 laser dragon rules plus retained v20/v19/v18/v17 history",
     "Self-contained HTML starts a playable CPU battle with a four-card hand and visible arena",
-    "No uncaught JavaScript errors in the v18 deck, detail demos, Patch Notes or CPU battle flow"
+    "No uncaught JavaScript errors in the v21 deck, detail demos, Patch Notes or CPU battle flow"
   ],
   "errors": []
 }

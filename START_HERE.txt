@@ -1,12 +1,17 @@
-TINY SIEGE v18.1.0 - DETAIL DEMO RENDER FIX
+TINY SIEGE v21.0.0 - LASER DRAGON UPDATE
 
-1. GitHub用ZIPを展開し、Rin447/tiny-siege の中身を上書きします。
-2. main へ Commit します。例: Fix Tiny Siege detail demo rendering in v18.1.0
-3. Cloudflareの自動Build/Deploy完了を待ちます。
-4. /api/config で version 18.1.0 / cards 30 / units 26 / spells 4 / physicsVersion 17 / maxDeck 8 を確認します。
+1. このフォルダの中身をGitHubリポジトリへ上書きアップロードします。
+2. main へ Commit します。例: Update Tiny Siege laser dragon to v21.0.0
+3. Cloudflareの自動Build/Deployを待ちます。
+4. /api/config で version 21.0.0 / cards 33 / units 29 / spells 4 / physicsVersion 26 / maxDeck 8 を確認します。
 
-v18.1.0確認ポイント
-- スパーキーのカード詳細LIVE BATTLE DEMOを最後まで再生しても、戦場が斜めに重ならない。
-- デモがループ再生へ戻った後も描画が正常。
-- そのままリーフ弓兵など別キャラの詳細へ移動してもCanvasが正常表示される。
-- カード性能・対戦ロジックはv18.0.0から変更なし。physicsVersionは17のまま。
+v21.0.0確認ポイント
+- 新ユニット「レーザードラゴン」: 5コスト / HP1300 / 飛行 / 地上・空中 / 速度46 / 射程145。
+- レーザー塔と同じく20 DPS開始。同じ対象へ1.5秒照射ごとに火力が倍化。
+- 対象変更・射程外・スタンでレーザー増幅は初期化。
+- スタン中は通常攻撃クールタイムを減算しない。解除後はスタン前の残り時間から再開。
+- 上記クールタイム停止は通常ユニット、タワー、設置物に共通。
+- スパーキー充電、レーザー増幅、ナイトシェイド突進など既存のスタン特殊リセットは維持。
+
+オフライン確認は PLAY-OFFLINE.html を直接開いてください。
+更新履歴は UPDATE-HISTORY.html 1枚に統合しています。

@@ -1,17 +1,412 @@
 {
-  "version": "18.1.0",
-  "files": {
-    "public/index.html": "069fa5b3bcc21f29e6ad71ec7523281d20002b0f6fa4d3fd5dc6a0a3d9ee2a44",
-    "public/app.js": "83c5426b4d06593be8743cf795e83c0275e6221b468ad8ea7491b10dc40a2346",
-    "public/styles.css": "c57fd00a3084ccf9171eb96a3e8f81fd40cb2ed48e8869f9477dfec326b607ed",
-    "public/game/units.js": "5f3ced4002a63a9b6118823a435ec92be215a8ab49944e8ff125280020bd0c1f",
-    "public/game/engine.js": "8e5a153bbd1e643463975acfbf8ea0e78e74cb045de70f7ee5fbc7959b1d6d83",
-    "public/game/art.js": "72b3f799820923a8f590d55186904875fab5e6aa7cb3cb27ac976e667eded549",
-    "public/game/physics.js": "8e6998f02f663d78fbc489e20fc365592b7ef949793fc089513d7a649ca2a5ad",
-    "src/worker.js": "9418150a5843c41f19934135e75c937bbc924d620d2147a268ee4fc7958ff47e",
-    "src/room-model.js": "f16e56becda0be25326c2e68fdf13fbf1ae2177c8db8611b9f8d3402ede78180",
-    "package.json": "e7095f03ebc6e71407219c8f8f9ffcb05df366dccea77a09993522c7a1873d8c",
-    "wrangler.jsonc": "8345390c031848603d337045d916d8c9aabf19dd94ce31537ace1bb05fe76317",
-    "PLAY-OFFLINE.html": "1005662b19a236fe3130bf2cd7ad6f890d2d114e3ce71c3d6ee1f898d79f2453"
-  }
+  "version": "21.0.0",
+  "physicsVersion": 26,
+  "fileCountExcludingManifest": 81,
+  "files": [
+    {
+      "path": ".gitignore",
+      "sha256": "4aca62d97620b7d9944f5c31357792df70c7da7935f4377c33bd80be6a6303a7",
+      "bytes": 59
+    },
+    {
+      "path": "01-SETUP-CLOUDFLARE.bat",
+      "sha256": "59f8d9d2ab8ac2d9b171eb9872bd02b5c43a986213e10d04551e7b722cc6471f",
+      "bytes": 157
+    },
+    {
+      "path": "02-LOGIN-CLOUDFLARE.bat",
+      "sha256": "41395c95bc414b462e3b73d8c2835725c03207e9cb9a508c4476427e1907a8c6",
+      "bytes": 117
+    },
+    {
+      "path": "03-DEPLOY-CLOUDFLARE.bat",
+      "sha256": "b4f1165c3d70695ba44933e31e46bb36cdf65101265da10b527d6020a37eab9c",
+      "bytes": 445
+    },
+    {
+      "path": "DEPLOY-GUIDE.html",
+      "sha256": "a9f64cc7e6b72ad2fc4601d129dc936fc18936a12472cfead269c79a00a5ac31",
+      "bytes": 1240
+    },
+    {
+      "path": "PLAY-OFFLINE.html",
+      "sha256": "8c2072e128f382567b255be63f180111a292f75847ec4c4a8ac0bb457c23beff",
+      "bytes": 303807
+    },
+    {
+      "path": "README.md",
+      "sha256": "ce8e2a078a8eadb9f624f81a76ca48918471c32cb38b7634e140c313786110ed",
+      "bytes": 3769
+    },
+    {
+      "path": "START-LOCAL-WINDOWS.bat",
+      "sha256": "252247a9e0a4233fc0e1bcc402601d388317b6b74c2436d978718f3a38489b56",
+      "bytes": 329
+    },
+    {
+      "path": "START-PRACTICE-WINDOWS.bat",
+      "sha256": "9adbc2082920b754902bc79217044399bbaeab07902a97df1a23fa40332d50be",
+      "bytes": 61
+    },
+    {
+      "path": "START_HERE.txt",
+      "sha256": "a05f001ea6753c9e96fadb080e54192630f59f0ffd0e79d3d9ba2fe1aaaae6bc",
+      "bytes": 1202
+    },
+    {
+      "path": "UPDATE-HISTORY.html",
+      "sha256": "3fb70781d3d1946fff135faa8d11a277ece029e09098ef588591083b7e859301",
+      "bytes": 13484
+    },
+    {
+      "path": "docs/ARCHITECTURE.md",
+      "sha256": "277d159201518328841023a7109213bc2d5f25c93fe104f0e2984543f77ed9de",
+      "bytes": 14670
+    },
+    {
+      "path": "docs/ASSETS.md",
+      "sha256": "f61f20f2d6667c1f505469a4105838cd6813ee0f686845aceee8a2741aaddf47",
+      "bytes": 2587
+    },
+    {
+      "path": "docs/BROWSER_V16_1_OUTPUT.txt",
+      "sha256": "b481fe57378440204936b679ac9af91db462a96a6cca110bd175cbdebfe4026d",
+      "bytes": 1157
+    },
+    {
+      "path": "docs/BROWSER_V16_1_REGRESSION_V16_4.txt",
+      "sha256": "b481fe57378440204936b679ac9af91db462a96a6cca110bd175cbdebfe4026d",
+      "bytes": 1157
+    },
+    {
+      "path": "docs/BROWSER_V16_1_REGRESSION_V17.txt",
+      "sha256": "b481fe57378440204936b679ac9af91db462a96a6cca110bd175cbdebfe4026d",
+      "bytes": 1157
+    },
+    {
+      "path": "docs/BROWSER_V16_1_RESULTS.json",
+      "sha256": "c255c8206c33222d2d879ed3e7908eca7778b6a2a60d111b3ce0e4af02b3faec",
+      "bytes": 711
+    },
+    {
+      "path": "docs/BROWSER_V16_2_OUTPUT.txt",
+      "sha256": "dec5b40998cb27d02c6aa65250970788c9733c028e9920da8ee95d0139aee64f",
+      "bytes": 1704
+    },
+    {
+      "path": "docs/BROWSER_V16_2_REGRESSION_V16_4.txt",
+      "sha256": "dec5b40998cb27d02c6aa65250970788c9733c028e9920da8ee95d0139aee64f",
+      "bytes": 1704
+    },
+    {
+      "path": "docs/BROWSER_V16_2_REGRESSION_V17.txt",
+      "sha256": "602e87fbf63dc492d2904580ce9a390e2a02fcc44c15a5ab066c4b9864209da3",
+      "bytes": 1704
+    },
+    {
+      "path": "docs/BROWSER_V16_2_RESULTS.json",
+      "sha256": "ecbef6ec4a8049ba3a5564de8d8e44835039ec052c5e2e18cdf4c6e7d87ba294",
+      "bytes": 946
+    },
+    {
+      "path": "docs/BROWSER_V16_3_OUTPUT.txt",
+      "sha256": "68d7fdf45d1faee46e3c0b36300896979d52c4b143ffa03d630cb38541e2bff3",
+      "bytes": 928
+    },
+    {
+      "path": "docs/BROWSER_V16_3_REGRESSION_V16_4.txt",
+      "sha256": "68d7fdf45d1faee46e3c0b36300896979d52c4b143ffa03d630cb38541e2bff3",
+      "bytes": 928
+    },
+    {
+      "path": "docs/BROWSER_V16_3_RESULTS.json",
+      "sha256": "82a162961a69b204bcc072480b6ad10155d82485628c1a4e2fb5b6a381b431fc",
+      "bytes": 489
+    },
+    {
+      "path": "docs/BROWSER_V16_4_OUTPUT.txt",
+      "sha256": "ed75128ccaf579b3d2d043e0e32a52c8c680f202f87b4fcd07a42c52491793ba",
+      "bytes": 994
+    },
+    {
+      "path": "docs/BROWSER_V16_4_REGRESSION_V17.txt",
+      "sha256": "ed75128ccaf579b3d2d043e0e32a52c8c680f202f87b4fcd07a42c52491793ba",
+      "bytes": 994
+    },
+    {
+      "path": "docs/BROWSER_V16_4_RESULTS.json",
+      "sha256": "c4f68bccf56c52952b96be99784d49557192cb8789793e8fe3a1cef66210b67f",
+      "bytes": 522
+    },
+    {
+      "path": "docs/BROWSER_V18_OUTPUT.txt",
+      "sha256": "8b27c54af51d24c4a66d914b86ca880f76684bd8a4d5c7eb7836a4e9542e9647",
+      "bytes": 2674
+    },
+    {
+      "path": "docs/BROWSER_V18_RESULTS.json",
+      "sha256": "42b39c094aae4226dbe3d0b3f98bbacac34241c1d8781ba006b81e2b20ce1997",
+      "bytes": 1360
+    },
+    {
+      "path": "docs/CHANGELOG.md",
+      "sha256": "6c7dc5340c3bad754260bf9d26d259a9e0accf7bf51b72ef579be037a81a77b9",
+      "bytes": 10319
+    },
+    {
+      "path": "docs/CHECK_RESULTS.txt",
+      "sha256": "a355cad0a651cdb7a2bcf3465a2532427d10a066a218be31fae4c5fd4efce107",
+      "bytes": 145
+    },
+    {
+      "path": "docs/DEPLOY_CLOUDFLARE.md",
+      "sha256": "17ecfefd148051658ab539de1e65de29cb716d9e5f5859b949cc4e5c80db189a",
+      "bytes": 1097
+    },
+    {
+      "path": "docs/NETWORK_TEST_RESULTS.txt",
+      "sha256": "6c27dae31f0aaf9b21ab8fa382de0dbd827b952f194b66eb3c764af0fe7ea84c",
+      "bytes": 1824
+    },
+    {
+      "path": "docs/OFFLINE_BUILD_RESULTS.txt",
+      "sha256": "547e83e4cfa89048346116ba55b69a84f9e4124c13c021be88fe336911271505",
+      "bytes": 124
+    },
+    {
+      "path": "docs/SPELL_COLOR_BROWSER_OUTPUT.txt",
+      "sha256": "46caf884758b5afdef723690e64714f22f9f1917c4b89b30e4ee0a5c8db2f790",
+      "bytes": 149
+    },
+    {
+      "path": "docs/SPELL_COLOR_BROWSER_RESULTS.txt",
+      "sha256": "46caf884758b5afdef723690e64714f22f9f1917c4b89b30e4ee0a5c8db2f790",
+      "bytes": 149
+    },
+    {
+      "path": "docs/SPELL_COLOR_REGRESSION_V16_4.txt",
+      "sha256": "46caf884758b5afdef723690e64714f22f9f1917c4b89b30e4ee0a5c8db2f790",
+      "bytes": 149
+    },
+    {
+      "path": "docs/SPELL_COLOR_REGRESSION_V17.txt",
+      "sha256": "46caf884758b5afdef723690e64714f22f9f1917c4b89b30e4ee0a5c8db2f790",
+      "bytes": 149
+    },
+    {
+      "path": "docs/STRESS_RESULTS.json",
+      "sha256": "e173aaae4609b474bc34436e12c4e74b573cb1d96b5a0c047f2f5a88ad3dff7d",
+      "bytes": 393
+    },
+    {
+      "path": "docs/STRESS_RESULTS.txt",
+      "sha256": "6d75330f9cbc1fd7d2e96e32bf051ae74921a60b9b46d2fefc1c8d7c2dfa70bb",
+      "bytes": 394
+    },
+    {
+      "path": "docs/TEST_REPORT.md",
+      "sha256": "8b677546ffe63129e1733603ca4358ea8f62d7ff76a5aeb609899aa7ef449082",
+      "bytes": 2035
+    },
+    {
+      "path": "docs/UNIT_TEST_RESULTS.txt",
+      "sha256": "cd0481569c8d9b169d278e66f489c33833b467048aec1b70b07d90f5a3a5dfc5",
+      "bytes": 38399
+    },
+    {
+      "path": "docs/concepts/stone-golem-concept.png",
+      "sha256": "c7a24cca558b7d9e7dcd8ead01dd496183b493912479edd3bd54b707ca73f441",
+      "bytes": 2381711
+    },
+    {
+      "path": "docs/previews-v16-1/00-v16-1-patch-notes.png",
+      "sha256": "ff53e833e9a914670e9a1201e67977337602e943bce2c57a7ba1dd36d793c167",
+      "bytes": 278576
+    },
+    {
+      "path": "docs/previews-v16-1/01-v16-1-library.png",
+      "sha256": "35ab10182437d6cec4bc00e3c788c63ae98efb1d82d23e53a1305a463b1456f3",
+      "bytes": 365410
+    },
+    {
+      "path": "docs/previews-v16-1/02-v16-1-mobile-building-preview.png",
+      "sha256": "bb22794297a3b085442397baa1379d4bb7290dc9b3ac36b6787731f34ea494cc",
+      "bytes": 104939
+    },
+    {
+      "path": "docs/previews-v16-1/03-v16-1-mobile-building-placed.png",
+      "sha256": "0f0ab58dbfda8eed549ea13c4d45e486547c3a77e92f27ac68e57b2f474ab2ef",
+      "bytes": 87363
+    },
+    {
+      "path": "docs/previews-v17/00-v17-deck-new-cards.png",
+      "sha256": "50978f18a4650150a568d5d268962e7154f43149e1309dff7f064bb68608be7b",
+      "bytes": 284313
+    },
+    {
+      "path": "docs/previews-v17/01-v17-necromancer-live-demo.png",
+      "sha256": "3a95a55ccb26bda6c1e102aaab52c244da6988c4a4380ee0ef41cbc0cc964f00",
+      "bytes": 130067
+    },
+    {
+      "path": "docs/previews-v17/02-v17-darknecro-live-demo.png",
+      "sha256": "93449263810ae06e4cd49d72467a342b35fe2ebeb64f3456942a8241eb42f778",
+      "bytes": 132021
+    },
+    {
+      "path": "docs/previews-v17/03-v17-ash-squad-live-demo.png",
+      "sha256": "f3322153d6153f8bda1d353df40898411f48dd945866b6b4ef8252702d44e671",
+      "bytes": 132167
+    },
+    {
+      "path": "docs/previews-v17/04-v17-patch-notes.png",
+      "sha256": "5df918be8cdcab0b534500e6c83477813f7bec5f65ed61d20afe1ad3d03f7fc7",
+      "bytes": 212726
+    },
+    {
+      "path": "package.json",
+      "sha256": "52ad13dc8beb83651dd21e401b6067dd8003f7e7b49189fa6f41fec68317e24a",
+      "bytes": 775
+    },
+    {
+      "path": "public/_headers",
+      "sha256": "c7de6a7870c6be86e1a3fdec983bed1f6b4a609fef67d677d9b21f983b964ea9",
+      "bytes": 526
+    },
+    {
+      "path": "public/app.js",
+      "sha256": "6a758506926e9b7432c1a3d628ff63538221adec9aff8485eb8026068876b649",
+      "bytes": 83354
+    },
+    {
+      "path": "public/favicon.svg",
+      "sha256": "f501439940e2a7dcdd4219632f2ad931a9fd29690cdce2faedb780f4ad06c1e5",
+      "bytes": 263
+    },
+    {
+      "path": "public/game/art.js",
+      "sha256": "aa79861efd786d7789d199a1b0d5214279b763942c409160b046641396431b3b",
+      "bytes": 88345
+    },
+    {
+      "path": "public/game/engine.js",
+      "sha256": "e9caaf26c85bf7619f5bc2d60b23b3bc65f171ca3c32a9add3d2650e49157ccb",
+      "bytes": 41990
+    },
+    {
+      "path": "public/game/physics.js",
+      "sha256": "9fbfb2776a22994c728b0fafc0691b57297f20c074bfbc83169752807d026c7c",
+      "bytes": 14740
+    },
+    {
+      "path": "public/game/units.js",
+      "sha256": "88ff3e4d5ea6401fb580cb55614f06ab49e2f93358d627e5908f4a1d9e95e742",
+      "bytes": 19510
+    },
+    {
+      "path": "public/index.html",
+      "sha256": "25f8fc98656cabfdca50cbcbc39a255e3975e4a7ce412af3c03987b2fcd32ba1",
+      "bytes": 20235
+    },
+    {
+      "path": "public/styles.css",
+      "sha256": "c57fd00a3084ccf9171eb96a3e8f81fd40cb2ed48e8869f9477dfec326b607ed",
+      "bytes": 36698
+    },
+    {
+      "path": "scripts/build-offline.mjs",
+      "sha256": "ba5adbc753dcc15df24ba1ead76402165edd6fd51f74f7c922fcb36b16e64e8f",
+      "bytes": 926
+    },
+    {
+      "path": "scripts/check.mjs",
+      "sha256": "aab6cf659096ee25299ad51d8a538fdb0edd9e0890415da4825cd9e8754fdc36",
+      "bytes": 1141
+    },
+    {
+      "path": "server/dev.mjs",
+      "sha256": "dcdddb359990ad5d487990534511e04603b7ec33bd6b23158480a7a840567365",
+      "bytes": 10343
+    },
+    {
+      "path": "src/room-model.js",
+      "sha256": "f16e56becda0be25326c2e68fdf13fbf1ae2177c8db8611b9f8d3402ede78180",
+      "bytes": 9718
+    },
+    {
+      "path": "src/worker.js",
+      "sha256": "203c3fb6a2c00e218d5762366ecefdf4233c3760a0178530c14e658db0c5e223",
+      "bytes": 10383
+    },
+    {
+      "path": "tests/art.test.mjs",
+      "sha256": "1a291cd1327d2517e7ef6dd60a39580b96a7da6176c1af84b0ced878c2d0c291",
+      "bytes": 2331
+    },
+    {
+      "path": "tests/browser-v16-1.py",
+      "sha256": "62c164fb2ce1fdfd860c356c0538189e510117c7c2ebb6c034647782e9b50724",
+      "bytes": 5409
+    },
+    {
+      "path": "tests/browser-v16-2.py",
+      "sha256": "e0de05b321c293b29a1a82285fe83036e98a0b59c809dd011154a627dfa7ccf5",
+      "bytes": 7000
+    },
+    {
+      "path": "tests/browser-v16-3.py",
+      "sha256": "990e43f1033f7d3ba8eb1ba69a5bd2fc2d966654281b3523670a5085c21bc66a",
+      "bytes": 5185
+    },
+    {
+      "path": "tests/browser-v16-4.py",
+      "sha256": "0d518b3472da55c9fb4c310bef1394d644518ab644f5b7459eb1cfa1304987d8",
+      "bytes": 4729
+    },
+    {
+      "path": "tests/browser-v18.py",
+      "sha256": "1d0bf8f29f61ef12e6d1ad286bfcbe3be130d108a5920b0ad63594d03191ccce",
+      "bytes": 11298
+    },
+    {
+      "path": "tests/engine.test.mjs",
+      "sha256": "d6b8c1004b4f7a5a28b6fb8f737e1c09653916694b93f2ca7aefd06d6d3d7d4e",
+      "bytes": 58442
+    },
+    {
+      "path": "tests/network.mjs",
+      "sha256": "1a69d98e0b258983b4760984f6ff7fe1589341b521926ea9ca363e53d365ef04",
+      "bytes": 6801
+    },
+    {
+      "path": "tests/physics.test.mjs",
+      "sha256": "980a549f8085a2005092b12b0460cd409d4492308f7582e56989ed4055019b32",
+      "bytes": 11748
+    },
+    {
+      "path": "tests/room.test.mjs",
+      "sha256": "ebf2cea0b81b0011b32cafa8985a2f563f90400478fdfdb001669503fe4bf4ca",
+      "bytes": 6632
+    },
+    {
+      "path": "tests/spell-colors-browser-v16-1.py",
+      "sha256": "162e0f07cbdef93709e13a0f5953d89a0ce600eda74dd64bffba77c595fc6527",
+      "bytes": 4253
+    },
+    {
+      "path": "tests/stress.mjs",
+      "sha256": "83b8112055d2bb7ebaffd8d861244021effe072e4f0494c0563cb9d25e454e3d",
+      "bytes": 2361
+    },
+    {
+      "path": "tests/worker.test.mjs",
+      "sha256": "39fb6dcf1fd026f62da0a25b02fba6f6bbe403385efef8cea1c497c652c185c5",
+      "bytes": 5460
+    },
+    {
+      "path": "wrangler.jsonc",
+      "sha256": "8345390c031848603d337045d916d8c9aabf19dd94ce31537ace1bb05fe76317",
+      "bytes": 937
+    }
+  ]
 }

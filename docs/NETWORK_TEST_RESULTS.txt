@@ -1,5 +1,5 @@
 
-> tiny-siege@18.1.0 test:network
+> tiny-siege@21.0.0 test:network
 > node tests/network.mjs
 
 PASS 1: health and game config identify the correct game
@@ -10,7 +10,7 @@ PASS 5: join same code and reject a third participant
 PASS 6: two native WebSocket clients receive the same roster
 PASS 7: non-host cannot start; both ready and host starts
 PASS 8: validated deployment is synchronized to both players
-PASS 9: server sends v18 / physics-v17 facing, summon, stun, charge, mud, burrow, poison, dash, laser, tower-awake and collision metadata identically to both seats
+PASS 9: server sends v21 / physics-v26 deployment, facing, summon, stun, charge, mud, burrow, poison, dash, laser and collision metadata identically to both seats
 PASS 10: opponent territory is rejected without spawning
 PASS 11: disconnect pauses and token reconnect resumes
 PASS 12: surrender result reaches both clients and rematch keeps code
@@ -27,7 +27,7 @@ PASS 14: cross-origin mutation rejected
     "two native WebSocket clients receive the same roster",
     "non-host cannot start; both ready and host starts",
     "validated deployment is synchronized to both players",
-    "server sends v18 / physics-v17 facing, summon, stun, charge, mud, burrow, poison, dash, laser, tower-awake and collision metadata identically to both seats",
+    "server sends v21 / physics-v26 deployment, facing, summon, stun, charge, mud, burrow, poison, dash, laser and collision metadata identically to both seats",
     "opponent territory is rejected without spawning",
     "disconnect pauses and token reconnect resumes",
     "surrender result reaches both clients and rematch keeps code",

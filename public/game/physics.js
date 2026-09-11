@@ -4,7 +4,7 @@ import {ARENA} from './units.js';
  * Ground bodies live on the lawn/bridges. Air bodies share a separate layer.
  * Buildings are static circles; tree/grass artwork is decorative only.
  */
-export const PHYSICS_VERSION=17;
+export const PHYSICS_VERSION=26;
 export const FIELD={left:34,right:686,top:28,bottom:1012};
 const EPS=0.001,GRID=20,COLS=33,ROWS=49;
 const worldCaches=new WeakMap();
@@ -13,7 +13,7 @@ const clampP=(n,a,b)=>Math.max(a,Math.min(b,n));
 export const isStructure=u=>!!(u.kind||u.building);
 export const bodyRadius=u=>u.radius||12;
 export const sameLayer=(a,b)=>!!a.air===!!b.air;
-export const solidStructures=g=>[...g.towers,...g.units.filter(u=>u.building)].filter(u=>u.hp>0);
+export const solidStructures=g=>[...g.towers,...g.units.filter(u=>u.building&&!u.collisionDisabled)].filter(u=>u.hp>0);
 
 export function deploymentAllowed(g,owner,x,y){
   if(owner!==0&&owner!==1)return false;
@@ -161,7 +161,7 @@ function timeOfContact(start,delta,other,radius){
 function allowableFraction(g,u,dx,dy,{allies=true,soft=true}={}){
   const start={x:u.x,y:u.y},delta={x:dx,y:dy};let f=1;
   for(const v of g.units){
-    if(v===u||v.id===u.id||v.hp<=0||!sameLayer(u,v)||isStructure(v))continue;
+    if(v===u||v.id===u.id||v.hp<=0||v.collisionDisabled||!sameLayer(u,v)||isStructure(v))continue;
     if(!allies&&v.owner===u.owner)continue;
     const shoveable=!u.air&&!v.air&&u.owner!==v.owner&&u.shovePower&&((v.mass||1)<=u.shoveMassLimit);
     const collisionRadius=pairDistance(u,v,soft)*(shoveable?(u.shoveCompression||.65):1);
@@ -217,9 +217,9 @@ function projectStatic(g,u){
   }
 }
 export function resolveBodies(g,dt=.1){
-  const units=g.units.filter(u=>u.hp>0&&u.burrowState!=='burrow');
+  const units=g.units.filter(u=>u.hp>0&&u.burrowState!=='burrow'&&!u.collisionDisabled);
   for(const u of units)projectStatic(g,u);
-  for(let pass=0;pass<5;pass++)for(let i=0;i<units.length;i++)for(let j=i+1;j<units.length;j++){
+  for(let pass=0;pass<8;pass++)for(let i=0;i<units.length;i++)for(let j=i+1;j<units.length;j++){
     const a=units[i],b=units[j];if(!sameLayer(a,b)||isStructure(a)||isStructure(b))continue;
     const len=dist(a,b),min=pairDistance(a,b),over=min-len;if(over<=.005)continue;
     const side=(Number(String(a.id).replace(/\D/g,''))%2)?1:-1;
@@ -246,8 +246,8 @@ function groupOffset(count,i,spacing=24){
   const cols=Math.ceil(Math.sqrt(count)),row=Math.floor(i/cols),col=i%cols;
   return {x:(col-(cols-1)/2)*spacing,y:(row-(Math.ceil(count/cols)-1)/2)*spacing};
 }
-export function spawnPositions(g,owner,data,x,y){
-  const points=[],f=owner===0?1:-1;
+export function spawnPositions(g,owner,data,x,y,structures=null){
+  const points=[],f=owner===0?1:-1,blockers=structures||solidStructures(g);
   for(let i=0;i<data.count;i++){
     const off=groupOffset(data.count,i,data.radius<=10?20:24);
     const wanted={x:x+off.x*f,y:y+off.y*f};
@@ -259,7 +259,7 @@ export function spawnPositions(g,owner,data,x,y){
       for(let k=0;k<n;k++){
         const a=k*Math.PI*2/n+(owner===1?Math.PI:0),p={x:wanted.x+Math.cos(a)*rr,y:wanted.y+Math.sin(a)*rr};
         if(p.x<48||p.x>672||p.y<58||p.y>982||!deploymentAllowed(g,owner,p.x,p.y))continue;
-        if(!staticFree(g,data,p,1))continue;
+        if(!staticFree(g,data,p,1,blockers))continue;
         if(g.units.some(u=>u.hp>0&&sameLayer(data,u)&&dist(p,u)<bodyRadius(data)+bodyRadius(u)+.5))continue;
         if(points.some(q=>dist(p,q)<data.radius*2+.5))continue;
         found=p;break;

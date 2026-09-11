@@ -1,4 +1,4 @@
-import {ARENA, UNITS, DECK, DEFAULT_DECK, MAX_DECK, normalizeDeck} from './units.js';
+import {ARENA, UNITS, DECK, DEFAULT_DECK, MAX_DECK, normalizeDeck, summonDelayFor} from './units.js';
 import {PHYSICS_VERSION, staticFree, staticLineFree, spawnPositions, navigationWaypoint, moveBody, resolveBodies, faceToward, deploymentAllowed} from './physics.js';
 
 export function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
@@ -26,6 +26,7 @@ export function createMatch({seed=12345,bot=false,difficulty='normal',decks=[DEF
   return g;
 }
 export function inRiver(x,y){return y>ARENA.riverTop && y<ARENA.riverBottom && !ARENA.bridges.some(b=>Math.abs(x-b)<=ARENA.bridgeHalf);}
+function placementStructures(g){return [...g.towers,...g.units.filter(u=>u.building&&u.hp>0)];}
 export function canPlace(g,owner,id,x,y){
   if(g.phase!=='battle')return 'まだ出撃できません。';
   if(owner!==0 && owner!==1)return '参加者ではありません。';
@@ -50,8 +51,9 @@ export function canPlace(g,owner,id,x,y){
   if(!deploymentAllowed(g,owner,x,y))return '自分の陣地、または破壊した敵サイドタワー側の前線に配置してください。';
   const deployCount=d.count+(d.summonOnDeploy?(d.summonCount||0):0);
   if(g.units.filter(u=>u.hp>0).length+deployCount>ARENA.maxUnits)return 'フィールドのユニット上限です。';
-  if(!staticFree(g,d,{x,y},1))return '建物や岸から少し離して配置してください。';
-  if(!spawnPositions(g,owner,d,x,y))return '配置する空間がありません。少し離してください。';
+  const blockers=placementStructures(g);
+  if(!staticFree(g,d,{x,y},1,blockers))return '建物や岸から少し離して配置してください。';
+  if(!spawnPositions(g,owner,d,x,y,blockers))return '配置する空間がありません。少し離してください。';
   return null;
 }
 function event(g,type,data){g.events.push({id:g.nextId++,type,life:type==='death'?0.9:0.5,...data});}
@@ -61,10 +63,33 @@ function spendCard(g,owner,id){
 }
 function makeUnit(g,owner,type,x,y){
   const d=UNITS[type];
-  return {...d,id:`u${g.nextId++}`,type,owner,x,y,hp:d.hp,maxHp:d.hp,cd:0,spawn:0.5,anim:0,hit:0,walk:0,target:null,face:owner===0?-1:1,
+  return {...d,id:`u${g.nextId++}`,type,owner,x,y,hp:d.hp,maxHp:d.hp,cd:0,spawn:0.5,anim:0,hit:0,walk:0,target:null,targetLock:null,targetable:true,collisionDisabled:false,deploying:false,deployTotal:0,deployRemaining:0,face:owner===0?-1:1,
     lane:x<360?190:530,age:0,facing:owner===0?-Math.PI/2:Math.PI/2,moving:false,
-    summonNextAt:d.summonInterval?g.time+d.summonInterval:null,
+    summonNextAt:d.summonInterval?g.time+d.summonInterval:null,summonCastingUntil:0,
     stunUntil:0,sparkCharged:false,sparkChargeStartAt:d.sparkChargeTime?g.time:null,sparkChargeProgress:0};
+}
+function startDeployment(g,u,cardData){
+  const total=summonDelayFor(cardData);
+  if(total<=0)return false;
+  u.deploying=true;u.deployTotal=total;u.deployRemaining=total;u.targetable=false;u.collisionDisabled=true;u.spawn=0;u.target=null;u.targetLock=null;
+  if(u.summonInterval)u.summonNextAt=null;
+  if(u.sparkUnit){u.sparkCharged=false;u.sparkChargeProgress=0;u.sparkChargeStartAt=null;}
+  event(g,'deploy-start',{x:u.x,y:u.y,owner:u.owner,unitType:u.type,card:cardData.id,duration:total,building:!!u.building});
+  return true;
+}
+function completeDeployment(g,u){
+  u.deploying=false;u.deployRemaining=0;u.targetable=true;u.collisionDisabled=false;u.target=null;u.targetLock=null;
+  if(u.sparkUnit)u.sparkChargeStartAt=g.time;
+  if(u.summonInterval)u.summonNextAt=g.time+u.summonInterval;
+  event(g,'deploy-ready',{x:u.x,y:u.y,owner:u.owner,unitType:u.type,building:!!u.building});
+  if(u.summonOnDeploy&&u.summonType&&u.summonCount)summonMinions(g,u,true);
+}
+function updateDeployment(g,u,dt){
+  if(!u.deploying)return false;
+  u.moving=false;u.target=null;u.targetLock=null;u.targetable=false;u.collisionDisabled=true;
+  u.deployRemaining=Math.max(0,(u.deployRemaining||0)-dt);
+  if(u.deployRemaining<=1e-8){completeDeployment(g,u);return true;}
+  return true;
 }
 function fireballTravelTime(core,target){return clamp(.45+distance(core,target)/620,.6,2);}
 function arrowRainTravelTime(core,target){return clamp(.2+distance(core,target)/1150,.35,1);}
@@ -84,7 +109,7 @@ function castSpell(g,owner,id,x,y){
     event(g,'zap-impact',{x,y,owner,radius:d.radius,damage:d.damage,stunDuration:d.stunDuration});
     const centre={x,y};
     for(const t of alive(g)){
-      if(t.owner===owner||t.hp<=0||t.burrowState==='burrow'||distance(centre,t)>d.radius+(t.radius||12)*.35)continue;
+      if(t.owner===owner||t.hp<=0||t.targetable===false||t.burrowState==='burrow'||distance(centre,t)>d.radius+(t.radius||12)*.35)continue;
       damage(g,t,(t.kind||t.building)?d.buildingDamage:d.damage,owner);
       if(t.hp>0)applyStun(g,t,d.stunDuration,owner);
     }
@@ -106,11 +131,11 @@ export function deploy(g,owner,id,x,y){
     g.units.push(u);event(g,'burrow-start',{x:core.x,y:core.y,tx:x,ty:y,owner,travel});
     return {ok:true,burrow:true,travelTime:travel};
   }
-  const positions=spawnPositions(g,owner,d,x,y);spendCard(g,owner,id);
+  const positions=spawnPositions(g,owner,d,x,y,placementStructures(g));spendCard(g,owner,id);
   for(let i=0;i<d.count;i++){
-    const unitType=d.spawnType||id,u=makeUnit(g,owner,unitType,positions[i].x,positions[i].y);
-    g.units.push(u);event(g,'spawn',{x:u.x,y:u.y,owner,card:id});
-    if(u.summonOnDeploy&&u.summonType&&u.summonCount)summonMinions(g,u,true);
+    const unitType=(Array.isArray(d.spawnTypes)&&d.spawnTypes[i])||d.spawnType||id,u=makeUnit(g,owner,unitType,positions[i].x,positions[i].y);
+    startDeployment(g,u,d);g.units.push(u);event(g,'spawn',{x:u.x,y:u.y,owner,card:id});
+    if(!u.deploying&&u.summonOnDeploy&&u.summonType&&u.summonCount)summonMinions(g,u,true);
   }
   return {ok:true};
 }
@@ -136,16 +161,31 @@ function preferredTower(g,u){
   const out=g.towers.find(t=>t.owner===enemy&&t.kind==='tower'&&t.x===u.lane&&t.hp>0);
   return out||g.towers.find(t=>t.owner===enemy&&t.kind==='core'&&t.hp>0);
 }
+function nearestMobileCombatTarget(u,entities){
+  const reach=u.aggroRange??Math.max(205,u.range+35);
+  let best=null,bestD=Infinity;
+  for(const t of entities){
+    if(!targetable(u,t))continue;
+    const d=distance(u,t)-t.radius-(u.aggroRange?u.range:0);
+    if(d<=reach&&d<bestD){best=t;bestD=d;}
+  }
+  return best;
+}
+function commitMobileTarget(u,t){
+  if(!u.kind&&!u.building&&!u.buildingOnly&&t&&targetable(u,t))u.targetLock=t.id;
+}
 function getTarget(g,u,entities){
-  // Defensive structures lock their current target until it dies, leaves range, or becomes untargetable.
+  // Defensive structures keep the existing v13 contract: lock while the target remains valid and in range.
   // A closer enemy entering range does not steal aggro mid-lock.
   if(u.kind||u.building){
     const locked=lockedStructureTarget(u,entities);
     if(locked)return locked;
     return nearestStructureTarget(u,entities);
   }
-  // Building-only mobile units ignore troops completely and march toward the nearest enemy structure.
+  // Building-only mobile units NEVER hard-lock. They continuously re-evaluate the nearest enemy structure.
+  // This intentionally allows pulls toward a newly-closer defence or even the central core.
   if(u.buildingOnly){
+    u.targetLock=null;
     let best=null,bestD=Infinity;
     for(const t of entities){
       if(!targetable(u,t)||!(t.kind||t.building))continue;
@@ -154,28 +194,35 @@ function getTarget(g,u,entities){
     }
     return best;
   }
-  // Nearest combatant in the aggro radius; buildings never chase.
-  const reach=u.kind||u.building?u.range+30:(u.aggroRange??Math.max(205,u.range+35));
-  let best=null,bestD=Infinity;
-  for(const t of entities){
-    if(!targetable(u,t))continue;
-    const d=distance(u,t)-t.radius-(u.aggroRange?u.range:0);
-    if(d<=reach&&(d<bestD)){best=t;bestD=d;}
+  // Ordinary mobile units only hard-lock AFTER they actually commit an attack.
+  // Until the first attack, they keep re-evaluating the nearest valid enemy every tick.
+  // After an attack, leaving attack/aggro range does not break the lock: the unit chases the same target.
+  if(u.targetLock){
+    const locked=entities.find(t=>t.id===u.targetLock);
+    if(locked&&targetable(u,locked))return locked;
+    u.targetLock=null;
   }
-  if(!best && !u.kind && !u.building)best=preferredTower(g,u);
-  return best;
+  const best=nearestMobileCombatTarget(u,entities);
+  if(best)return best;
+  // A preferred tower is only a navigation objective while it is outside aggro range.
+  // It becomes a real hard lock only after the unit actually attacks it.
+  return preferredTower(g,u);
 }
 function dashEndpoint(u,t){
   const dx=u.x-t.x,dy=u.y-t.y,len=Math.hypot(dx,dy)||1;
   const stop=Math.max(1,u.range+t.radius-1);
   return {x:t.x+dx/len*stop,y:t.y+dy/len*stop};
 }
-function canShadowRush(g,u,t){
-  if(!u.dashWindup||g.time<(u.dashReadyAt||0)||u.dashState)return false;
+function shadowRushTargetReady(g,u,t){
+  if(!t||!targetable(u,t))return false;
   const gap=Math.max(0,distance(u,t)-(u.range+t.radius));
   if(gap<(u.dashMinRange||0)||gap>(u.dashAggroRange??u.dashMaxRange??Infinity))return false;
   const end=dashEndpoint(u,t);
   return staticLineFree(g,u,u,end,1);
+}
+function canShadowRush(g,u,t){
+  if(!u.dashWindup||g.time<(u.dashReadyAt||0)||u.dashState)return false;
+  return shadowRushTargetReady(g,u,t);
 }
 function beginShadowWindup(g,u,t){
   u.dashState='windup';u.dashTarget=t.id;u.dashWindupUntil=g.time+u.dashWindup;u.moving=false;
@@ -184,6 +231,8 @@ function beginShadowWindup(g,u,t){
 function beginShadowRush(g,u,t){
   const end=dashEndpoint(u,t);
   if(!staticLineFree(g,u,u,end,1)){u.dashState=null;u.dashTarget=null;return false;}
+  // The rush itself is the attack commitment, so the target becomes locked here, not during windup.
+  commitMobileTarget(u,t);
   u.dashState='rush';u.dashEnd=end;u.invulnerableUntil=g.time+Math.max(.12,distance(u,end)/(u.dashSpeed||650)+.12);
   faceToward(u,t.x,t.y);event(g,'shadow-rush',{x:u.x,y:u.y,tx:end.x,ty:end.y,owner:u.owner});return true;
 }
@@ -197,11 +246,19 @@ function finishShadowRush(g,u,t){
 }
 function updateShadowRush(g,u,entities,dt){
   if(!u.dashState)return false;
-  const t=entities.find(e=>e.id===u.dashTarget&&e.hp>0);
+  let t=entities.find(e=>e.id===u.dashTarget&&e.hp>0);
   if(u.dashState==='windup'){
-    u.moving=false;if(t)faceToward(u,t.x,t.y);
+    // Windup is still pre-attack: keep following the currently nearest rush-valid target.
+    // This prevents a fast enemy from dragging Nightshade forever before the rush actually starts.
+    const nearest=nearestMobileCombatTarget(u,entities);
+    if(nearest&&shadowRushTargetReady(g,u,nearest)){
+      t=nearest;u.dashTarget=t.id;u.target=t.id;
+    }else if(!t||!shadowRushTargetReady(g,u,t)){
+      u.dashState=null;u.dashTarget=null;u.dashReadyAt=g.time+.35;return true;
+    }
+    u.moving=false;faceToward(u,t.x,t.y);
     if(g.time+1e-8>=u.dashWindupUntil){
-      if(!t||!targetable(u,t)||!canRushAfterWindup(g,u,t)){u.dashState=null;u.dashTarget=null;u.dashReadyAt=g.time+.35;}
+      if(!canRushAfterWindup(g,u,t)){u.dashState=null;u.dashTarget=null;u.dashReadyAt=g.time+.35;}
       else beginShadowRush(g,u,t);
     }
     return true;
@@ -217,7 +274,7 @@ function updateShadowRush(g,u,entities,dt){
 }
 function updateBurrow(g,u,dt){
   if(u.burrowState!=='burrow')return false;
-  u.moving=false;u.target=null;u.targetable=false;u.burrowRemaining=Math.max(0,(u.burrowRemaining||0)-dt);
+  u.moving=false;u.target=null;u.targetLock=null;u.targetable=false;u.burrowRemaining=Math.max(0,(u.burrowRemaining||0)-dt);
   const total=Math.max(.001,u.burrowTotal||1),progress=clamp(1-u.burrowRemaining/total,0,1);u.burrowProgress=progress;
   const a=u.burrowFrom||u,b=u.burrowTo||u;u.x=a.x+(b.x-a.x)*progress;u.y=a.y+(b.y-a.y)*progress;
   if(u.burrowRemaining<=1e-8){u.x=b.x;u.y=b.y;u.burrowState=null;u.targetable=true;u.spawn=.25;event(g,'burrow-arrive',{x:u.x,y:u.y,owner:u.owner});}
@@ -276,10 +333,22 @@ function summonMinions(g,parent,initial=false){
   return made;
 }
 function updateSummoner(g,u){
-  if(!u.summonType||!u.summonInterval||!Number.isFinite(u.summonNextAt)||u.hp<=0)return;
-  if(g.time+1e-8<u.summonNextAt)return;
+  if(!u.summonType||!u.summonInterval||!Number.isFinite(u.summonNextAt)||u.hp<=0)return false;
+  if((u.summonCastingUntil||0)>g.time+1e-8)return true;
+  if(u.summonCastingUntil&&g.time+1e-8>=u.summonCastingUntil){
+    summonMinions(g,u,false);u.summonCastingUntil=0;
+    do{u.summonNextAt+=u.summonInterval;}while(u.summonNextAt<=g.time+1e-8);
+    return false;
+  }
+  if(g.time+1e-8<u.summonNextAt)return false;
+  if((u.summonWindup||0)>0){
+    u.summonCastingUntil=g.time+u.summonWindup;u.target=null;u.targetLock=null;u.cd=Math.max(u.cd,u.summonWindup);
+    event(g,'summon-channel',{x:u.x,y:u.y,owner:u.owner,unitType:u.type,duration:u.summonWindup});
+    return true;
+  }
   summonMinions(g,u,false);
   do{u.summonNextAt+=u.summonInterval;}while(u.summonNextAt<=g.time+1e-8);
+  return false;
 }
 
 function summonMiniGolems(g,parent){
@@ -307,7 +376,7 @@ function handleUnitDeath(g,t){
   if(t.splitType&&t.splitCount)summonMiniGolems(g,t);
 }
 function damage(g,t,amount,owner){
-  if(t.hp<=0||t.burrowState==='burrow')return 0;
+  if(t.hp<=0||t.burrowState==='burrow'||t.targetable===false)return 0;
   if((t.invulnerableUntil||0)>g.time){if(t.type==='nightshade')event(g,'shadow-evade',{x:t.x,y:t.y,owner:t.owner});return 0;}
   const before=t.hp;t.hp=Math.max(0,t.hp-amount);t.hit=.18;
   if(t.kind==='core'&&t.hp<before)wakeCore(g,t.owner,'core-hit');
@@ -330,22 +399,30 @@ function heal(g,t,amount,owner){
 }
 function applySlow(g,t,p){
   if(!p.slowDuration||t.kind||t.building||t.air)return;
-  t.slowUntil=Math.max(t.slowUntil||0,g.time+p.slowDuration);
-  t.slowMoveFactor=Math.min(t.slowMoveFactor||1,p.slowMove||1);
-  t.slowAttackFactor=Math.min(t.slowAttackFactor||1,p.slowAttack||1);
+  const active=(t.slowUntil||0)>g.time;
+  const moveStages=Array.isArray(p.slowMoveStages)?p.slowMoveStages:null;
+  const attackStages=Array.isArray(p.slowAttackStages)?p.slowAttackStages:null;
+  const maxStage=Math.max(moveStages?.length||0,attackStages?.length||0,1);
+  const stage=Math.min(maxStage,active?Math.max(1,(t.slowStage||1)+1):1);
+  t.slowStage=stage;
+  t.slowUntil=g.time+p.slowDuration;
+  if(moveStages)t.slowMoveFactor=moveStages[Math.min(stage-1,moveStages.length-1)];
+  else t.slowMoveFactor=Math.min(t.slowMoveFactor||1,p.slowMove||1);
+  if(attackStages)t.slowAttackFactor=attackStages[Math.min(stage-1,attackStages.length-1)];
+  else t.slowAttackFactor=Math.min(t.slowAttackFactor||1,p.slowAttack||1);
   if(t.chargeDistance){
     t.chargeRun=Math.max(0,(t.chargeRun||0)-45);
     if(t.chargeRun<t.chargeDistance*.8)t.charged=false;
   }
-  event(g,'slow',{x:t.x,y:t.y,owner:p.owner});
+  event(g,'slow',{x:t.x,y:t.y,owner:p.owner,stage});
 }
 function resetSparkyCharge(g,u,delayUntil=g.time){
   if(!u.sparkUnit)return;
   u.sparkCharged=false;u.sparkChargeProgress=0;u.sparkChargeStartAt=delayUntil;
 }
 function applyStun(g,t,duration,owner){
-  const until=Math.max(t.stunUntil||0,g.time+(duration||0));t.stunUntil=until;t.target=null;
-  if(t.laserTower)resetLaserTower(t);
+  const until=Math.max(t.stunUntil||0,g.time+(duration||0));t.stunUntil=until;t.target=null;t.targetLock=null;
+  if(t.laserTower||t.laserUnit)resetLaserTower(t);
   if(t.sparkUnit)resetSparkyCharge(g,t,until);
   if(t.dashState){t.dashState=null;t.dashTarget=null;t.dashEnd=null;t.invulnerableUntil=0;t.dashReadyAt=Math.max(t.dashReadyAt||0,until+.35);}
   event(g,'stun',{x:t.x,y:t.y,owner,targetOwner:t.owner,duration});
@@ -377,9 +454,9 @@ function updatePoisonZones(g,dt){
     z.remaining=Math.max(0,z.remaining-dt);
     while(z.remaining>0&&z.nextTick<=g.time+1e-8){
       for(const t of entities){
-        if(t.owner===z.owner||t.hp<=0||distance(z,t)>z.radius+(t.radius||12)*.25)continue;
-        damage(g,t,(t.kind||t.building)?z.buildingDamage:z.damage,z.owner);
-        if(!t.kind&&!t.building&&t.hp>0){
+        if(t.owner===z.owner||t.hp<=0||t.targetable===false||distance(z,t)>z.radius+(t.radius||12)*.25)continue;
+        const dealt=damage(g,t,(t.kind||t.building)?z.buildingDamage:z.damage,z.owner);
+        if(dealt>0&&!t.kind&&!t.building&&t.hp>0){
           t.poisonOwner=z.owner;t.poisonUntil=Math.max(t.poisonUntil||0,g.time+z.lingerDuration);
           t.poisonDamage=Math.max(t.poisonDamage||0,z.lingerDamage);t.poisonTickEvery=z.tickEvery;
           t.poisonNextAt=Math.max(t.poisonNextAt||0,g.time+z.tickEvery);
@@ -408,7 +485,7 @@ function createMudZone(g,p){
 function updateMudZones(g){
   const zones=(g.zones||[]).filter(z=>z.kind==='mud'&&z.remaining>0);if(!zones.length)return;
   for(const t of alive(g)){
-    if(t.hp<=0||t.kind||t.building||t.air||t.burrowState==='burrow')continue;
+    if(t.hp<=0||t.kind||t.building||t.air||t.targetable===false||t.burrowState==='burrow')continue;
     const z=zones.find(q=>q.owner!==t.owner&&distance(q,t)<=q.radius+(t.radius||12)*.25);if(!z)continue;
     t.mudUntil=Math.max(t.mudUntil||0,g.time+Math.min(.55,z.remaining));t.mudSlowFactor=Math.min(t.mudSlowFactor||1,z.slow||.7);
     if((t.mudNextAt??-Infinity)<=g.time+1e-8){damage(g,t,z.damage||30,z.owner);t.mudNextAt=g.time+(z.tickEvery||.5);}
@@ -419,7 +496,8 @@ function impact(g,p,entities){
   if(p.chainCount&&target&&targetable(p,target)){
     const points=[];let current=target,amount=p.damage;const hit=new Set();
     for(let i=0;i<p.chainCount&&current;i++){
-      hit.add(current.id);damage(g,current,Math.round(amount),p.owner);points.push({x:current.x,y:current.y});
+      const hitDamage=Array.isArray(p.chainDamages)&&Number.isFinite(p.chainDamages[i])?p.chainDamages[i]:Math.round(amount);
+      hit.add(current.id);damage(g,current,hitDamage,p.owner);if(p.stunDuration&&current.hp>0)applyStun(g,current,p.stunDuration,p.owner);points.push({x:current.x,y:current.y,damage:hitDamage});
       amount*=p.chainFalloff||.8;
       const candidates=entities.filter(t=>!hit.has(t.id)&&targetable(p,t)&&!t.kind&&!t.building&&distance(current,t)<=p.chainRange+t.radius)
         .sort((a,b)=>distance(current,a)-distance(current,b)||String(a.id).localeCompare(String(b.id)));
@@ -428,15 +506,17 @@ function impact(g,p,entities){
     event(g,'chain',{x:p.x,y:p.y,owner:p.owner,points});
   }else if(p.splash){
     event(g,'blast',{x:p.x,y:p.y,owner:p.owner,radius:p.splash,color:p.kind});
-    for(const t of entities)if(targetable(p,t)&&distance(t,p)<=p.splash+t.radius*.35)damage(g,t,p.damage,p.owner);
+    for(const t of entities)if(targetable(p,t)&&distance(t,p)<=p.splash+t.radius*.35){damage(g,t,p.damage,p.owner);if(t.hp>0&&p.slowDuration)applySlow(g,t,p);if(t.hp>0&&p.stunDuration&&(!p.stunUnitsOnly||(!t.kind&&!t.building)))applyStun(g,t,p.stunDuration,p.owner);}
     createMudZone(g,p);
   }else if(target&&targetable(p,target)){damage(g,target,p.damage,p.owner);applySlow(g,target,p);}
 }
 function attack(g,u,t){
   if(u.sparkUnit&&!u.sparkCharged)return;
+  // First actual attack commits ordinary mobile units to this target.
+  commitMobileTarget(u,t);
   const attackFactor=(u.slowUntil||0)>g.time?(u.slowAttackFactor||1):1;
   u.cd=u.cooldown/Math.max(.15,attackFactor);u.anim=.35;faceToward(u,t.x,t.y);u.target=t.id;
-  let amount=u.damage;
+  let amount=(t.kind||t.building)&&Number.isFinite(u.structureDamage)?u.structureDamage:u.damage;
   if(u.sparkUnit){u.sparkCharged=false;u.sparkChargeProgress=0;u.sparkChargeStartAt=g.time;event(g,'sparky-fire',{x:u.x,y:u.y,tx:t.x,ty:t.y,owner:u.owner,radius:u.splash||90});}
   if(u.chargeMultiplier&&u.charged&&(t.kind||t.building)){
     amount=Math.round(amount*u.chargeMultiplier);u.charged=false;u.chargeRun=0;
@@ -444,9 +524,9 @@ function attack(g,u,t){
   }
   if(u.projectile){
     g.projectiles.push({id:`p${g.nextId++}`,owner:u.owner,x:u.x,y:u.y-6,sx:u.x,sy:u.y,tx:t.x,ty:t.y,target:t.id,
-    kind:u.projectile,speed:u.projectile==='bomb'?220:(u.projectile==='lightning'?520:(u.projectile==='dart'?560:(u.projectile==='mud'?300:(u.projectile==='royal_arrow'?470:(u.projectile==='sparkblast'?340:390))))),damage:amount,splash:u.splash||0,
-    targetsAir:u.targetsAir,life:3,slowMove:u.slowMove,slowAttack:u.slowAttack,slowDuration:u.slowDuration,
-    chainCount:u.chainCount,chainRange:u.chainRange,chainFalloff:u.chainFalloff,mudRadius:u.mudRadius,mudDuration:u.mudDuration,mudTickEvery:u.mudTickEvery,mudDamage:u.mudDamage,mudSlow:u.mudSlow});
+    kind:u.projectile,speed:u.projectile==='bomb'?220:(u.projectile==='lightning'?520:(u.projectile==='electro'?450:(u.projectile==='thrown_spear'?480:(u.projectile==='dart'?560:(u.projectile==='mud'?300:(u.projectile==='royal_arrow'?470:(u.projectile==='sparkblast'?340:390))))))),damage:amount,splash:u.splash||0,
+    targetsAir:u.targetsAir,life:3,slowMove:u.slowMove,slowAttack:u.slowAttack,slowMoveStages:u.slowMoveStages,slowAttackStages:u.slowAttackStages,slowDuration:u.slowDuration,
+    chainCount:u.chainCount,chainRange:u.chainRange,chainFalloff:u.chainFalloff,chainDamages:Array.isArray(u.chainDamages)?u.chainDamages.map(v=>u.damage?Math.round(v*(amount/u.damage)):0):u.chainDamages,stunDuration:u.stunDuration,stunUnitsOnly:u.stunUnitsOnly,mudRadius:u.mudRadius,mudDuration:u.mudDuration,mudTickEvery:u.mudTickEvery,mudDamage:u.mudDamage,mudSlow:u.mudSlow});
   }else{
     damage(g,t,amount,u.owner);event(g,'slash',{x:t.x,y:t.y,owner:u.owner,angle:Math.atan2(t.y-u.y,t.x-u.x),kind:u.type});
   }
@@ -455,9 +535,10 @@ function resetLaserTower(u){
   u.laserTarget=null;u.laserLockTime=0;u.laserStage=0;u.laserDps=u.laserBaseDps||20;
 }
 function updateLaserTower(g,u,t,dt){
-  if(!u.laserTower)return false;
+  if(!u.laserTower&&!u.laserUnit)return false;
   if(!t){resetLaserTower(u);u.target=null;return true;}
   if(u.laserTarget!==t.id){
+    if(u.laserUnit)commitMobileTarget(u,t);
     u.laserTarget=t.id;u.laserLockTime=0;u.laserStage=0;u.laserDps=u.laserBaseDps||20;
     event(g,'laser-lock',{x:u.x,y:u.y,tx:t.x,ty:t.y,owner:u.owner});
   }else u.laserLockTime=(u.laserLockTime||0)+dt;
@@ -548,26 +629,29 @@ export function tick(g,dt=ARENA.tick){
   for(const u of entities){
     if(u.hp<=0)continue;
     u.moving=false;
-    u.hit=Math.max(0,(u.hit||0)-dt);u.anim=Math.max(0,(u.anim||0)-dt);u.cd=Math.max(0,u.cd-dt);u.healCd=Math.max(0,(u.healCd||0)-dt);
+    const stunnedNow=(u.stunUntil||0)>g.time;
+    u.hit=Math.max(0,(u.hit||0)-dt);u.anim=Math.max(0,(u.anim||0)-dt);if(!stunnedNow)u.cd=Math.max(0,u.cd-dt);u.healCd=Math.max(0,(u.healCd||0)-dt);
     updateLingeringPoison(g,u);if(u.hp<=0)continue;
     if(u.kind==='core'&&!u.awake){u.target=null;continue;}
     if(!u.kind){
       u.age+=dt;
-      if(u.sparkUnit)updateSparkyCharge(g,u);
       if(updateBurrow(g,u,dt))continue;
+      if(updateDeployment(g,u,dt))continue;
+      if(u.sparkUnit)updateSparkyCharge(g,u);
       if(u.spawn>0){u.spawn=Math.max(0,u.spawn-dt);continue;}
       if(u.decayPerSecond){decayStructure(g,u,u.decayPerSecond*dt);if(u.hp<=0)continue;}
     }
-    if((u.stunUntil||0)>g.time){u.target=null;if(u.laserTower)resetLaserTower(u);continue;}
-    if(!u.kind)updateSummoner(g,u);
+    if((u.stunUntil||0)>g.time){u.target=null;if(u.laserTower||u.laserUnit)resetLaserTower(u);continue;}
+    if(!u.kind&&updateSummoner(g,u)){u.target=null;if(u.laserTower||u.laserUnit)resetLaserTower(u);continue;}
     if(updateShadowRush(g,u,entities,dt))continue;
     healingPulse(g,u,entities);
     const target=getTarget(g,u,entities);
-    if(!target){if(u.laserTower)resetLaserTower(u);u.target=null;continue;}
+    if(!target){if(u.laserTower||u.laserUnit)resetLaserTower(u);u.target=null;continue;}
     u.target=target.id;
     const reach=u.range+target.radius;
-    if(u.laserTower){
-      if(distance(u,target)<=reach)updateLaserTower(g,u,target,dt);else resetLaserTower(u);
+    if(u.laserTower||u.laserUnit){
+      if(distance(u,target)<=reach)updateLaserTower(g,u,target,dt);
+      else {resetLaserTower(u);if(u.laserUnit&&!u.kind&&!u.building)move(g,u,target,dt);}
       continue;
     }
     if(canShadowRush(g,u,target)){beginShadowWindup(g,u,target);continue;}
@@ -598,7 +682,7 @@ export function viewMatch(g,seat=0){
   const p=g.players[seat];
   return {physicsVersion:PHYSICS_VERSION,phase:g.phase,countdown:g.countdown,time:rnd(g.time),overtime:g.overtime,winner:g.winner,reason:g.reason,
     scores:[towerScore(g,0),towerScore(g,1)],energy:rnd(p.energy),hand:[...p.hand],next:p.queue[0],deck:[...p.deck],
-    units:g.units.map(u=>({id:u.id,type:u.type,owner:u.owner,x:rnd(u.x),y:rnd(u.y),hp:u.hp,maxHp:u.maxHp,radius:u.radius,air:u.air,building:!!u.building,anim:u.anim,hit:u.hit,walk:u.walk,spawn:u.spawn,face:u.face,facing:u.facing,moving:!!u.moving,mass:u.mass,age:u.age,target:u.target||null,laserStage:u.laserStage||0,laserDps:rnd(u.laserDps||0),laserLockTime:rnd(u.laserLockTime||0),charged:!!u.charged,chargeRun:rnd(u.chargeRun||0),sparkCharged:!!u.sparkCharged,sparkChargeProgress:rnd(u.sparkChargeProgress||0),stunned:(u.stunUntil||0)>g.time,stunRemaining:rnd(Math.max(0,(u.stunUntil||0)-g.time)),slowed:(u.slowUntil||0)>g.time,slowRemaining:rnd(Math.max(0,(u.slowUntil||0)-g.time)),poisoned:(u.poisonUntil||0)>g.time,poisonOwner:Number.isFinite(u.poisonOwner)?u.poisonOwner:null,poisonRemaining:rnd(Math.max(0,(u.poisonUntil||0)-g.time)),mudded:(u.mudUntil||0)>g.time,mudRemaining:rnd(Math.max(0,(u.mudUntil||0)-g.time)),burrowState:u.burrowState||null,burrowProgress:rnd(u.burrowProgress||0),summonType:u.summonType||null,summonCount:u.summonCount||0,summonRemaining:u.summonInterval?rnd(Math.max(0,(u.summonNextAt||g.time)-g.time)):0,dashState:u.dashState||null,dashWindupRemaining:rnd(Math.max(0,(u.dashWindupUntil||0)-g.time)),dashCooldownRemaining:rnd(Math.max(0,(u.dashReadyAt||0)-g.time)),invulnerable:(u.invulnerableUntil||0)>g.time})),
+    units:g.units.map(u=>({id:u.id,type:u.type,owner:u.owner,x:rnd(u.x),y:rnd(u.y),hp:u.hp,maxHp:u.maxHp,radius:u.radius,air:u.air,building:!!u.building,anim:u.anim,hit:u.hit,walk:u.walk,spawn:u.spawn,face:u.face,facing:u.facing,moving:!!u.moving,mass:u.mass,age:u.age,target:u.target||null,targetable:u.targetable!==false,deploying:!!u.deploying,deployTotal:rnd(u.deployTotal||0),deployRemaining:rnd(u.deployRemaining||0),collisionDisabled:!!u.collisionDisabled,laserStage:u.laserStage||0,laserDps:rnd(u.laserDps||0),laserLockTime:rnd(u.laserLockTime||0),charged:!!u.charged,chargeRun:rnd(u.chargeRun||0),sparkCharged:!!u.sparkCharged,sparkChargeProgress:rnd(u.sparkChargeProgress||0),stunned:(u.stunUntil||0)>g.time,stunRemaining:rnd(Math.max(0,(u.stunUntil||0)-g.time)),slowed:(u.slowUntil||0)>g.time,slowStage:(u.slowUntil||0)>g.time?(u.slowStage||1):0,slowRemaining:rnd(Math.max(0,(u.slowUntil||0)-g.time)),poisoned:(u.poisonUntil||0)>g.time,poisonOwner:Number.isFinite(u.poisonOwner)?u.poisonOwner:null,poisonRemaining:rnd(Math.max(0,(u.poisonUntil||0)-g.time)),mudded:(u.mudUntil||0)>g.time,mudRemaining:rnd(Math.max(0,(u.mudUntil||0)-g.time)),burrowState:u.burrowState||null,burrowProgress:rnd(u.burrowProgress||0),summonType:u.summonType||null,summonCount:u.summonCount||0,summonRemaining:u.summonInterval?rnd(Math.max(0,(u.summonNextAt||g.time)-g.time)):0,summonCasting:(u.summonCastingUntil||0)>g.time,summonWindupRemaining:rnd(Math.max(0,(u.summonCastingUntil||0)-g.time)),dashState:u.dashState||null,dashWindupRemaining:rnd(Math.max(0,(u.dashWindupUntil||0)-g.time)),dashCooldownRemaining:rnd(Math.max(0,(u.dashReadyAt||0)-g.time)),invulnerable:(u.invulnerableUntil||0)>g.time})),
     towers:g.towers.map(t=>({id:t.id,kind:t.kind,owner:t.owner,x:t.x,y:t.y,hp:t.hp,maxHp:t.maxHp,radius:t.radius,anim:t.anim,hit:t.hit,facing:t.facing,awake:t.kind==='core'?!!t.awake:true,stunned:(t.stunUntil||0)>g.time,stunRemaining:rnd(Math.max(0,(t.stunUntil||0)-g.time))})),
     projectiles:g.projectiles.map(p=>({id:p.id,owner:p.owner,x:rnd(p.x),y:rnd(p.y),tx:rnd(p.tx),ty:rnd(p.ty),kind:p.kind,spell:p.spell||null,progress:rnd(p.progress||0),radius:p.splash||0})),
     zones:(g.zones||[]).map(z=>({id:z.id,owner:z.owner,kind:z.kind,spell:z.spell,x:rnd(z.x),y:rnd(z.y),radius:z.radius,remaining:rnd(z.remaining),total:z.total})),

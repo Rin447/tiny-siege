@@ -7,15 +7,15 @@ import {visualFacing,renderOrder} from '../public/game/art.js';
 import {RoomModel,newRoom} from '../src/room-model.js';
 function game(){const g=createMatch({seed:719});g.phase='battle';for(const t of g.towers)t.damage=0;return g;}
 function card(g,id,owner=0){const p=g.players[owner];p.energy=10;p.hand=[id,...DECK.filter(x=>x!==id).slice(0,3)];p.queue=DECK.filter(x=>!p.hand.includes(x));}
-function unit(g,type,owner,x,y){card(g,type,owner);const r=deploy(g,owner,type,x,y);assert.ok(r.ok,r.error);return g.units.at(-1);}
+function unit(g,type,owner,x,y){card(g,type,owner);const before=g.units.length,r=deploy(g,owner,type,x,y);assert.ok(r.ok,r.error);const made=g.units.slice(before);for(const u of made){u.spawn=0;u.deploying=false;u.deployRemaining=0;u.deployTotal=0;u.targetable=true;u.collisionDisabled=false;if(u.sparkUnit&&!Number.isFinite(u.sparkChargeStartAt))u.sparkChargeStartAt=g.time;if(u.summonInterval&&!Number.isFinite(u.summonNextAt))u.summonNextAt=g.time+u.summonInterval;}return made.at(-1);}
 function advance(g,n){for(let i=0;i<n;i++)tick(g,.1);}
 function body(g,type,owner,x,y){const u={...UNITS[type],id:`u${g.nextId++}`,type,owner,x,y,maxHp:UNITS[type].hp,spawn:0,cd:999,walk:0,age:0,anim:0,hit:0,lane:x<360?190:530,face:owner===0?-1:1};g.units.push(u);return u;}
 function checkStatics(g){for(const u of g.units)if(!u.building&&u.burrowState!=='burrow')assert.ok(staticFree(g,u,u),`${u.id} ${u.type} in static at ${u.x},${u.y}`);}
 
 test('v16 physics version and mass/radius data are explicit',()=>{
- assert.equal(VERSION,'18.1.0');assert.equal(PHYSICS_VERSION,17);
+ assert.equal(VERSION,'21.0.0');assert.equal(PHYSICS_VERSION,26);
  assert.ok(UNITS.knight.mass>UNITS.archer.mass);assert.ok(UNITS.knight.radius>UNITS.archer.radius);
- assert.equal(createMatch().physicsVersion,17);
+ assert.equal(createMatch().physicsVersion,26);
 });
 test('body may not put its edge across the river even if its centre is on land',()=>{
  const u=UNITS.knight;assert.equal(terrainFree(u,{x:350,y:480}),false);
@@ -91,7 +91,7 @@ test('enemy bodies block, but are not an infinite wall across the whole lane',()
 });
 test('iron boar can shove lightweight enemy troops and keep moving through bridge congestion',()=>{
  const g=game(),boar=body(g,'boar',0,190,620);boar.facing=-Math.PI/2;
- const pack=[body(g,'mossling',1,190,584),body(g,'mossling',1,177,575),body(g,'archer',1,203,575)];
+ const pack=[body(g,'goblin_melee',1,190,584),body(g,'goblin_spear',1,177,575),body(g,'archer',1,203,575)];
  const before=pack.map(u=>({x:u.x,y:u.y}));
  for(let i=0;i<35;i++){moveBody(g,boar,{x:190,y:500},.1);resolveBodies(g,.1);}
  assert.ok(boar.y<585,`boar stuck at ${boar.x},${boar.y}`);
@@ -145,7 +145,7 @@ test('rendering depth mixes towers and ground troops; air is always after ground
  assert.deepEqual(renderOrder(g,1).map(x=>x.entity.id),['front','tower','rear','air']);
 });
 test('server snapshots expose facing/mass/layer but not pathfinding internals',()=>{
- const g=game(),u=unit(g,'knight',0,190,930);advance(g,15);const snap=viewMatch(g,0);assert.equal(snap.physicsVersion,17);
+ const g=game(),u=unit(g,'knight',0,190,930);advance(g,15);const snap=viewMatch(g,0);assert.equal(snap.physicsVersion,26);
  assert.equal(snap.units[0].mass,6);assert.equal(typeof snap.units[0].facing,'number');assert.ok(!('_nav' in snap.units[0]));
 });
 test('legacy active matches terminate safely instead of resuming inside new obstacles',()=>{

@@ -41,5 +41,5 @@ test('sparkblast render uses drawArena time and frame rendering resets transform
   assert.match(source,/sparkblast'[\s\S]{0,260}time\*6/);
   assert.doesNotMatch(source,/sparkblast'[\s\S]{0,260}\+t\*6/);
   assert.match(source,/drawArena\(canvas,snapshot,options=\{\}\)[\s\S]{0,420}setTransform\(1,0,0,1,0,0\)/);
-  assert.match(source,/c\.save\(\);[\s\S]{0,120}try\{[\s\S]{0,1600}finally\{c\.restore\(\);\}/);
+  assert.match(source,/c\.save\(\);[\s\S]{0,120}try\{[\s\S]{0,2600}finally\{c\.restore\(\);\}/);
 });

@@ -1,6 +1,24 @@
-# TINY SIEGE v18.0 architecture
+# TINY SIEGE v21.0.0 architecture
 
-CPU練習、Nodeローカルサーバー、Cloudflare Durable Objectsは同じ `public/game/engine.js` を共有します。v18は30カード（26ユニットカード＋4呪文）、8枚デッキ、4枚手札です。
+CPU練習、Nodeローカルサーバー、Cloudflare Durable Objectsは同じ `public/game/engine.js` を共有します。v21.0は33カード（29ユニットカード＋4呪文）、8枚デッキ、4枚手札です。
+
+## v19.4 control / goblin combat changes
+- `tigger.structureDamage=70` を追加。通常の対ユニット攻撃は120で、`attack()` が建物ターゲット時だけ専用ダメージを選択します。
+- Frost projectile は半径38の splash と3段階 slow metadata を持ちます。同一の鈍足効果が有効中なら `slowStage` を最大3まで加算し、効果時間は命中時から3秒へ更新します。
+- Harpy projectile は `stunDuration=1` を持ち、chain の各命中先へ共通 `applyStun()` を適用します。ザップと同じリセット処理を共有します。
+- `mossling` は互換用カードIDのまま表示名をゴブリン部隊へ変更。`spawnTypes` により前3体を `goblin_melee`、後2体を `goblin_spear` として生成します。2種はhidden unitなので選択可能カード数は31のままです。
+- 更新案内は `UPDATE-HISTORY.html` だけを維持し、バージョン別HTMLは追加しません。
+- `physicsVersion=26`。
+
+## v19.3 summon delay system
+
+- 手札から直接配置したユニットはコスト別の召喚準備時間を持ちます（1〜7コスト: 0.4 / 0.5 / 0.7 / 0.9 / 1.2 / 1.5 / 1.8秒）。ストーンゴーレムは2.5秒、スパーキーは1.8秒の個別値です。
+- 召喚中は `targetable=false` / `collisionDisabled=true`。移動・攻撃・索敵をせず、通常攻撃・スペル・範囲ダメージを受けず、他ユニットの通行を妨げません。
+- 召喚完了時に通常当たり判定へ移行し、召喚士の配置時子分召喚やスパーキー充電を開始します。
+- 穴掘りティガーは既存の地下移動を召喚待ち扱いとし、追加待機はありません。能力で生まれる子分や分裂体にも追加待機はありません。
+- 設置物は1タップで位置確定後、その場所で建設ゲージを開始します。建設中もターゲット不可・無敵・衝突なしです。
+- `viewMatch()` は `deploying`, `deployTotal`, `deployRemaining`, `targetable`, `collisionDisabled` を同期し、描画は陣営色の円・半透明シルエット・進行ゲージを表示します。
+- 召喚完了直後の密集安定性を保つため、動的衝突解決を6パスから8パスへ増やしています。
 
 
 ## v16.1 spell ownership rendering
@@ -22,17 +40,9 @@ Patch-note data remains release-specific (`16.1.0`, `16.0.0`, etc.), while `rend
 - `targetsAir=true` で地上・空中の両方を狙います。
 - サイドタワーは射程226、半径32、吹き矢ゴブリン半径12。実効攻撃境界は吹き矢側 `195+32=227`、タワー側 `226+12=238` となり、吹き矢がタワーを攻撃可能な距離ではタワー側も反撃可能です。
 
-## スマホ設置物の2タップ状態
+## 設置物の1タップ配置
 
-UI側の `hover` はカーソル/指位置の一時プレビュー専用です。v16では別に `pendingBuildingPlacement` を持ちます。
-
-- `building=true` のカードをタッチ操作した1回目：`{card,x,y,valid}` を `pendingBuildingPlacement` に保存。
-- `pointerleave` / 指を離す操作では `hover` だけを消し、`pendingBuildingPlacement` は消しません。
-- 次のタップが同じカードかつ保存位置から24px以内なら、保存した候補地点で設置を確定します。
-- 24pxより離れた場所なら新しい候補位置へ更新し、まだ設置しません。
-- 別カード選択、カード消費、画面離脱、試合終了/手札離脱、設置成功時に候補状態をクリアします。
-- 描画時は `hover` がなければ保存済み候補位置を `ghost` として使うため、指を離した後も射程円が残ります。
-- 同じ仕組みはボルト砲台、レーザー塔、今後の `building=true` カードへ共通適用されます。
+v19.2以降、`building=true` のカードも通常ユニットと同じく、戦場を1回タップした時点で配置地点を確定します。v19.3では確定直後から建設ゲージが始まり、建設中はターゲット不可・無敵・衝突なしです。確認用の2回目タップは使いません。
 
 ## 既存システム
 
@@ -41,9 +51,13 @@ UI側の `hover` はカーソル/指位置の一時プレビュー専用です�
 - レーザー塔：初期DPS20、同じ対象を1.5秒ごとに照射し続けるたび倍化。対象変更で初期化。
 - 8枚デッキ / 4枚手札、平均コスト表示、直近7日パッチノートを維持。
 
-## compatibility
+## v19.3 compatibility
 
-`physicsVersion=17`。v18.0.0ではザップのスタン/攻撃対象リセットとスパーキーの常時充電/充電リセットがauthoritativeな戦闘状態へ追加されたため16から17へ更新しました。実戦デッキ保存キーは `tiny-deck-v18`、マイリストは `tiny-deck-presets-v18` を使用し、v17以前の保存内容をフォールバック読込して移行できます。
+`physicsVersion=23`。召喚準備中のターゲット可否・ダメージ無効・衝突無効・完了タイミングがオンライン同期対象になったため、v19.2のphysicsVersion 22から更新しています。
+
+## compatibility (historical v18.3)
+
+`physicsVersion=19`。v18.3.0では通常ユニットのロック確定を索敵時から最初の攻撃時へ変更したため18から19へ更新しました。実戦デッキ保存キーは `tiny-deck-v18`、マイリストは `tiny-deck-presets-v18` を使用し、v17以前の保存内容をフォールバック読込して移行できます。
 
 ## v18.0 long-range / stun / charge mechanics
 
@@ -101,3 +115,22 @@ Card details no longer use a separate hand-authored animation. They create a sma
 - `viewMatch()` exposes summon countdown metadata for rendering/inspection without changing the simulation source of truth.
 - Card detail demos still use the production engine. Demo-only setup controls starting locations/opponents so the immediate wave and next timed wave are visible; summon events are captured per engine tick to remain reliable even when a slow device needs catch-up ticks.
 - Active deck storage now writes `tiny-deck-v17` and falls back through v16 and older keys. My List writes `tiny-deck-presets-v17` and accepts `tiny-deck-presets-v16` as a migration source.
+
+### v18.2 mobile target-lock contract (historical; superseded by v18.3)
+
+In v18.2, target selection deliberately separated **combat lock** from **navigation objective**. Ordinary mobile units keep `targetLock` only after an enemy is acquired inside aggro range. A far preferred tower may still be used for navigation, but it is not hard-locked until it enters aggro range. Once locked, a mobile unit follows the same valid target even outside attack/aggro range; death, untargetable state, burrow/reset state, or Zap clears the lock.
+
+`buildingOnly` units are the exception: they never retain `targetLock` and continuously choose the nearest enemy structure by current distance. This permits tactical pulls toward player-built defences or the central core. Defensive structures retain the v13 rule: their `target` is locked only while the target remains valid and inside weapon range.
+
+For v18.2 this changed deterministic battle decisions shared between clients/server, so `PHYSICS_VERSION` was **18**. v18.3 supersedes the acquisition-time lock rule below.
+
+
+### v18.3 first-attack target-lock contract
+
+Ordinary mobile units distinguish **tracking target** from **committed lock**. Before the first attack, `getTarget` re-evaluates the nearest valid combat target each tick and `targetLock` stays `null`. The first actual attack commits `targetLock`; ranged attacks commit when fired, melee attacks commit when the strike executes, Sparky commits when the charged shot fires, and Nightshade commits when the rush begins. Once committed, the unit follows that target until death, untargetable state, burrow/reset state, or Zap clears the lock. Building-only mobile units never commit a lock and continuously re-evaluate the nearest enemy structure. Defensive structures retain their range-bound structure lock contract. The body solver runs six pair-resolution passes in v18.3 so the more dynamic pre-attack retargeting does not introduce visible enemy-body overlap in congested fights.
+
+
+## v21.0 Laser Dragon / stun clock
+- `laserUnit` extends the existing single-target laser ramp to a mobile flying unit.
+- Stunned entities preserve their remaining ordinary attack cooldown; `cd` is not decremented while `stunUntil > game.time`.
+- Special stun resets (Sparky charge, laser ramp, Nightshade rush) remain explicit.

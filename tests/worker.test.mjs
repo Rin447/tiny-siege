@@ -22,8 +22,8 @@ function env(){
 function req(url,method='GET',data=null,origin='https://test.invalid'){
  return new Request('https://test.invalid'+url,{method,headers:{'Content-Type':'application/json','Origin':origin},body:data?JSON.stringify(data):undefined});
 }
-test('worker health and config identify twenty-one units plus three spells custom-deck game',async()=>{
- const r=await worker.fetch(req('/api/config'),env());const b=await r.json();assert.equal(b.version,'18.1.0');assert.equal(b.cards,30);assert.equal(b.units,26);assert.equal(b.spells,4);assert.equal(b.physicsVersion,17);assert.equal(b.maxDeck,8);assert.equal(b.game,'tiny-siege');
+test('worker health and config identify twenty-nine units plus four spells custom-deck game',async()=>{
+ const r=await worker.fetch(req('/api/config'),env());const b=await r.json();assert.equal(b.version,'21.0.0');assert.equal(b.cards,33);assert.equal(b.units,29);assert.equal(b.spells,4);assert.equal(b.physicsVersion,26);assert.equal(b.maxDeck,8);assert.equal(b.game,'tiny-siege');
 });
 test('worker static assets use ASSETS binding',async()=>{
  const r=await worker.fetch(req('/'),env());assert.equal(await r.text(),'asset');

@@ -1,5 +1,80 @@
 # Changelog
 
+## 21.0.0 - LASER DRAGON UPDATE (2026-09-11)
+- Added レーザードラゴン: cost 5, HP 1300, flying, ground/air targeting, speed 46, range 145.
+- Mobile laser uses the Laser Tower ramp rule: 20 DPS base and doubles every 1.5 seconds on the same target; retarget, range loss, and stun reset the ramp.
+- Stun now freezes ordinary attack cooldown progress for units, towers, and buildings without resetting the remaining cooldown.
+- Existing special stun resets remain for Sparky charge, laser ramp, and Nightshade rush.
+- Card pool is now 33 cards (29 units + 4 spells); physicsVersion 26.
+
+## 20.0.0 - ELECTRIC FORMATION UPDATE (2026-09-11)
+- Added エレキテルウィザード: cost 4, HP 650, damage 135, range 185, cooldown 2.4s, radius 35 splash, ground/air targeting, and 1s stun to every enemy unit caught in the splash.
+- Goblin Spear range 21 -> 160 and changed to a thrown-spear projectile; it remains HP155 / damage45 / speed72 / 0.8s and can target ground and air.
+- Storm Harpy attack interval 1.25 -> 2.0s and fixed chain damage to 180 -> 130 -> 90 while retaining 1s stun on each chained target.
+- Selectable pool is now 32 cards: 28 unit cards + 4 spells.
+- physicsVersion 25.
+- Update notes continue to use the single `UPDATE-HISTORY.html` file.
+
+## 19.4.0 - CONTROL & GOBLIN UPDATE (2026-09-11)
+- 穴掘りティガー: ユニットへの通常攻撃120、タワー・設置物には70へ分離。攻撃間隔1.1秒は維持。
+- フロストシャーマン: 4→3コスト、氷弾を半径38の小範囲へ拡張。
+- フロスト鈍足を3段階重複制へ変更。効果中の再被弾でLv1→Lv2→Lv3、命中のたび3秒へ更新。移動速度係数80%/65%/50%、攻撃速度係数90%/80%/70%。
+- ストームハーピー: 連鎖雷の各命中先へ1秒スタン。ザップと同じターゲット・レーザー・スパーキー・ダッシュのリセット処理を利用。
+- モスリング隊をゴブリン部隊へ改名。前衛ゴブリン3体（攻撃65）＋ゴブリン槍兵2体（HP155/攻撃45/速度72/0.8秒、地上＋空中）へ変更。
+- バージョン別UPDATE HTMLを廃止し、`UPDATE-HISTORY.html` 1枚へ統合。
+- physicsVersion 24.
+
+## 19.3.0 - SUMMON DELAY SYSTEM (2026-09-11)
+- Added cost-based deployment/summon delay: cost 1=0.4s, 2=0.5s, 3=0.7s, 4=0.9s, 5=1.2s, 6=1.5s, 7=1.8s.
+- Stone Golem uses a 2.5s special delay and Sparky uses 1.8s; Tigger keeps burrow travel as its only deployment delay.
+- Directly deployed units are untargetable, damage-immune and collision-disabled while summoning.
+- The arena now shows team-colored summon/construction circles, translucent unit silhouettes and progress bars visible to both players.
+- Summon-on-deploy abilities fire when the parent finishes summoning. Ability minions and split mini golems do not receive an extra summon delay.
+- Buildings retain one-tap placement and begin their construction delay immediately after the tap.
+- 召喚完了直後の密集安定性のため、衝突解決パスを6回から8回へ増加。
+- physicsVersion 23.
+
+## 19.2.0 - RAPTOR BALANCE & QUICK PLACE (2026-09-11)
+- Dosranboss: cost 6, HP 1100, damage 170, speed 40, smaller battle sprite.
+- Dosranboss summons three Ranbos immediately on deploy, then every 10 seconds after a 3-second summon channel.
+- Iron Boar damage 178 -> 160.
+- Necromancer splash radius 54 -> 45.
+- Tigger damage 20 -> 40 and attack interval 0.82 -> 1.1 seconds.
+- Touch building placement now deploys on the first battlefield tap.
+- physicsVersion 22.
+
+## 19.1.0 - 2D RAPTOR MODEL UPDATE (2026-09-11)
+- ドスランボスとランボスを、3D由来の縦シルエットを持つ2Dドット風モデルへ再設計。
+- ドスランボスを 6コスト / HP1100 / 攻撃170 / やや速い移動 / やや遅い攻撃速度 に調整。
+- ランボスを本体の約1/3性能（HP360 / 攻撃58）へ再調整。
+- physicsVersion 21.
+
+## 19.0.0 - RAPTOR PACK UPDATE (2026-09-11)
+- 新ユニット「ドスランボス」と召喚子分「ランボス」を追加。
+- 初期実装のドスランボスは7コスト / HP2100 / 攻撃210 / 移動68。10秒ごとに3秒停止してランボス3体を召喚。
+- 初期実装のランボスはHP700 / 攻撃70。
+- physicsVersion 20.
+
+## 18.3.0 - FIRST ATTACK LOCK (2026-09-11)
+
+- 通常ユニットは索敵だけではハードロックせず、最初の攻撃が成立するまでは毎フレーム最寄りの攻撃可能な敵へターゲットを更新。
+- 最初の通常攻撃・投射攻撃・スパーキー砲撃、またはナイトシェイドの突進開始時にターゲットロックを確定。
+- 攻撃後はv18.2と同様、対象死亡・攻撃対象外・ザップ等のリセットまで同じ敵を追跡。
+- 建物特攻ユニットはロックせず常時最寄り建物を再判定する仕様を維持。
+- ナイトシェイドの溜め中も攻撃前扱いとし、より近い突進可能な敵が現れた場合は対象を更新。
+- タワー・防衛建物のロック仕様は変更なし。
+- 新しい追跡切替で密集時の経路が変わるため、衝突解決パスを5から6へ増やして敵同士の重なりを抑制。
+- 対戦ロジック変更に伴い `physicsVersion` を18から19へ更新。
+
+## 18.2.0 - TARGET LOCK TACTICS (2026-09-11)
+
+- 通常ユニットにハードターゲットロックを追加。索敵範囲で取得した対象は、より近い敵が現れても変更しない。
+- 移動ユニットは対象が射程・索敵範囲外へ出ても同じ対象を追跡。対象死亡・攻撃対象外・ザップで解除。
+- 建物特攻ユニットはロックせず、現在地から最も近い敵建物を常時再判定。中央本拠地も距離次第で選択可能。
+- タワー・防衛建物の既存ロック仕様は維持。
+- ザップで通常ユニットのロックも解除。
+- 対戦ロジック変更に伴い `physicsVersion` を17から18へ更新。
+
 ## 18.1.0 - DETAIL DEMO RENDER FIX (2026-09-10)
 
 - Fixed the Sparky LIVE BATTLE DEMO throwing during sparkblast rendering after the first charged shot.

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#182f39">
-<title>TINY SIEGE — 30枚から8枚を選ぶ小さな攻城戦</title>
+<title>TINY SIEGE — 33枚から8枚を選ぶ小さな攻城戦</title>
 
 <style>:root{--paper:#f6f5ef;--ink:#203843;--muted:#7b8c8d;--line:#dce1d7;--green:#47796d;--mint:#dce9c8;--coral:#d6896c;--card:#fffef8;--board: min(420px,calc((100dvh - 282px)*.6923));font-family:"Segoe UI","Noto Sans JP","Hiragino Kaku Gothic ProN","Meiryo",sans-serif;color:var(--ink);background:var(--paper)}
 *{box-sizing:border-box}body{margin:0}button,input{font:inherit}button{cursor:pointer;transition:background .16s,transform .16s,border-color .16s}button:disabled{cursor:not-allowed;opacity:.44}button:focus-visible,input:focus-visible,canvas:focus-visible{outline:3px solid #d89e5c;outline-offset:3px}
@@ -95,8 +95,8 @@ dialog{border:1px solid #d7dfcf;background:#f9faf3;color:var(--ink);border-radiu
   <section class="hero-copy">
     <div class="eyebrow"><span></span> PRIVATE 1V1 · REALTIME TACTICS</div>
     <h1>その一枚で、<br>戦況を<span>変えよう。</span></h1>
-    <p class="hero-desc">前衛で守る。後衛で射抜く。<br>26体＋4呪文から8枚を選び、<br>自分の編成で挑む2Dリアルタイム攻城戦。</p>
-    <div class="hero-stats"><div><strong>30</strong><small>26体＋4呪文</small></div><div><strong>3<span> min</span></strong><small>一手が変える攻防</small></div><div><strong>1v1</strong><small>友だちとオンライン</small></div></div>
+    <p class="hero-desc">前衛で守る。後衛で射抜く。<br>28体＋4呪文から8枚を選び、<br>自分の編成で挑む2Dリアルタイム攻城戦。</p>
+    <div class="hero-stats"><div><strong>32</strong><small>28体＋4呪文</small></div><div><strong>3<span> min</span></strong><small>一手が変える攻防</small></div><div><strong>1v1</strong><small>友だちとオンライン</small></div></div>
     <div class="hero-note"><span class="note-dot"></span><p>通話はいつものVCで。<br>ここでは、戦いに集中しよう。</p></div>
     <div class="version-stamp">DECK BUILDER · CARD PREVIEW <span>16 / MY LIST</span></div>
   </section>
@@ -112,7 +112,7 @@ dialog{border:1px solid #d7dfcf;background:#f9faf3;color:var(--ink);border-radiu
     <div class="deck-summary">
       <div class="block-title"><span>DECK</span><h3>今回使う8枚</h3><small id="homeDeckAverage" class="deck-average-inline">平均コスト ◆ 0.0</small><button id="homeDeckBtn" class="textbtn" type="button">編集する</button></div>
       <div id="homeDeck" class="mini-roster deck-mini"></div>
-      <p class="field-help">30枚（26ユニットカード＋4呪文）から8枚を選択。平均コストを見ながら編成できます。対戦開始前なら何度でも変更できます。</p>
+      <p class="field-help">33枚（29ユニットカード＋4呪文）から8枚を選択。平均コストを見ながら編成できます。対戦開始前なら何度でも変更できます。</p>
     </div>
     <div class="practice-block">
       <div class="block-title"><span>01</span><h3>ひとりで練習</h3><small>CPU BATTLE</small></div>
@@ -182,7 +182,7 @@ dialog{border:1px solid #d7dfcf;background:#f9faf3;color:var(--ink);border-radiu
     <div class="match-rules"><h4>この一戦のルール</h4><p>本拠地を壊せば即勝利。3分で同数なら延長戦。延長後も同数なら残りタワーHPで決着。</p><p>残り1分からエナジー回復が2倍。切り札を重ねて攻めよう。</p></div>
   </aside>
 </main>
-<footer id="footer"><span>ひとつのURLから、小さな戦場へ。</span><span>TINY SIEGE <i>/</i> v18.1.0 · DETAIL DEMO RENDER FIX</span></footer>
+<footer id="footer"><span>ひとつのURLから、小さな戦場へ。</span><span>TINY SIEGE <i>/</i> v21.0.0 · LASER DRAGON UPDATE</span></footer>
 
 <div id="toast" class="toast" role="status" hidden></div>
 <dialog id="deckModal" class="deck-modal">
@@ -193,7 +193,7 @@ dialog{border:1px solid #d7dfcf;background:#f9faf3;color:var(--ink);border-radiu
     <div id="deckSlots" class="deck-slots"></div>
   </div>
   <div id="myListPanel" class="mylist-panel" hidden><div class="mylist-head"><div><strong>MY LIST</strong><span>保存した8枚を呼び出せます</span><b id="myListCount">0 / 10</b></div><button id="closeMyListBtn" class="textbtn" type="button">閉じる</button></div><p id="myListStatus" class="mylist-status" role="status" hidden></p><div id="myListGrid" class="mylist-grid"></div><p id="myListEmpty" class="muted">まだ保存されたデッキはありません。「現在の8枚をマイリスト保存」を押すと自動名ですぐ登録されます。</p></div>
-  <div class="deck-pool-head"><div><span class="eyebrow">CARD POOL</span><h3>30枚から選ぶ</h3></div><small>PC・スマホとも3列固定。カードを押して操作を選択。</small></div>
+  <div class="deck-pool-head"><div><span class="eyebrow">CARD POOL</span><h3>33枚から選ぶ</h3></div><small>PC・スマホとも3列固定。カードを押して操作を選択。</small></div>
   <div id="deckPool" class="deck-pool"></div>
   <div class="deck-actions"><button id="deckDefaultBtn" class="btn outline">おすすめに戻す</button><button id="deckSaveBtn" class="btn dark">この8枚で保存</button></div>
   <p id="deckError" class="error" hidden></p>
@@ -220,7 +220,7 @@ dialog{border:1px solid #d7dfcf;background:#f9faf3;color:var(--ink);border-radiu
     </section>
   </div>
 </dialog>
-<dialog id="libraryModal"><div class="modal-head"><div><span class="eyebrow">MEET YOUR THIRTY</span><h2>カード図鑑</h2></div><button class="close-modal iconbtn" aria-label="閉じる">×</button></div><p class="muted">26体のユニットと4枚の呪文を確認できます。実戦に持ち込めるのはデッキで選んだ8枚です。</p><div class="roster-tools"><button id="libraryFacingBtn" class="btn outline" aria-pressed="false">後ろ姿を見る ↻</button><small>戦場では進行・攻撃方向で自動切り替え。</small></div><div id="libraryGrid" class="library-grid"></div></dialog>
+<dialog id="libraryModal"><div class="modal-head"><div><span class="eyebrow">MEET YOUR THIRTY-TWO</span><h2>カード図鑑</h2></div><button class="close-modal iconbtn" aria-label="閉じる">×</button></div><p class="muted">28体のユニットと4枚の呪文を確認できます。実戦に持ち込めるのはデッキで選んだ8枚です。</p><div class="roster-tools"><button id="libraryFacingBtn" class="btn outline" aria-pressed="false">後ろ姿を見る ↻</button><small>戦場では進行・攻撃方向で自動切り替え。</small></div><div id="libraryGrid" class="library-grid"></div></dialog>
 <dialog id="updatesModal" class="updates-modal"><div class="modal-head"><div><span class="eyebrow">LAST 7 DAYS</span><h2>アプデ情報</h2></div><button class="close-modal iconbtn" aria-label="閉じる">×</button></div>
   <div class="updates-intro"><p>直近7日以内に追加された変更だけを表示します。同じメジャー番号の更新は1つにまとめます。</p><span id="updatesRange">PATCH WINDOW</span></div>
   <div id="patchNotes" class="patch-notes"></div>
@@ -229,9 +229,9 @@ dialog{border:1px solid #d7dfcf;background:#f9faf3;color:var(--ink);border-radiu
 <dialog id="helpModal"><div class="modal-head"><div><span class="eyebrow">HOW TO PLAY</span><h2>3分でわかる、攻城戦。</h2></div><button class="close-modal iconbtn" aria-label="閉じる">×</button></div>
   <div class="help-steps">
     <section><b>01</b><div><h3>まずはCPU戦から</h3><p>名前を入れて「CPUと対戦する」。オンラインはルームを作り、URLと6桁PASSを友だちへ共有します。</p></div></section>
-    <section><b>02</b><div><h3>カード → 自分の陣地</h3><p>手札4枚から1枚を選び、画面下側の自陣にタップで配置。カードをフィールドへドラッグしてもOK。ユニットは自動で移動・攻撃します。砲台などの設置物は配置前に攻撃範囲が表示されます。</p></div></section>
+    <section><b>02</b><div><h3>カード → 自分の陣地</h3><p>手札4枚から1枚を選び、画面下側の自陣にタップで配置。カードをフィールドへドラッグしてもOK。ユニットは自動で移動・攻撃します。砲台などの設置物も1回タップで位置が確定し、その場で建設ゲージが始まります。</p></div></section>
     <section><b>03</b><div><h3>エナジーを使い分ける</h3><p>カード左上の数字が必要コスト。エナジーは最大10まで回復します。使ったカードは待機列へ入り、次の1枚が手札に補充されます。</p></div></section>
-    <section><b>04</b><div><h3>30枚から8枚を選ぶ</h3><p>「デッキ」はPC・スマホとも3列表示。カードを押すと「デッキに入れる / 外す」と「詳細を見る」を選べます。詳細では本番と同じ戦闘エンジンのLIVE BATTLE DEMOを確認でき、気に入った8枚はマイリストへ最大10個保存できます。</p></div></section>
+    <section><b>04</b><div><h3>33枚から8枚を選ぶ</h3><p>「デッキ」はPC・スマホとも3列表示。カードを押すと「デッキに入れる / 外す」と「詳細を見る」を選べます。詳細では本番と同じ戦闘エンジンのLIVE BATTLE DEMOを確認でき、気に入った8枚はマイリストへ最大10個保存できます。</p></div></section>
     <section><b>05</b><div><h3>本拠地は最初は休眠</h3><p>中央本拠地は3240HP、左右タワーは1980HP。中央は試合開始時は攻撃せず、左右どちらかのサイドタワーが壊れるか、中央自身が1度でもダメージを受けると起動して試合終了まで反撃します。本拠地を壊せば即勝利です。</p></div></section>
     <section><b>06</b><div><h3>通話はいつものVCで</h3><p>オンラインで切断したら最大45秒間一時停止して再接続を待ちます。戻れなければ切断側の敗北、両方切断は引き分け。CPU戦ではタブを離れると一時停止します。</p></div></section>
     <section><b>07</b><div><h3>タワー破壊で前線が進む</h3><p>敵サイドタワーを1本破壊すると、その側のレーンと中央の細い帯だけが白線まで前進します。左右2本とも破壊すると、白線より手前の敵陣前半が横幅いっぱい・中央の隙間なしで配置可能になります。</p></div></section>
@@ -244,13 +244,19 @@ dialog{border:1px solid #d7dfcf;background:#f9faf3;color:var(--ink);border-radiu
 </dialog>
 <script type="module">window.TINY_OFFLINE=true;
 /** Balance data: original prototype values. Both browser and server import this file. */
-const VERSION = '18.1.0';
+const VERSION = '21.0.0';
 const MAX_DECK = 8;
 const ARENA = Object.freeze({
   width:720, height:1040, riverTop:482, riverBottom:558, bridges:[190,530],
   bridgeHalf:42, deployBottom:600, deployTop:440, advancedDeployInset:120, advancedCenterHalf:40, maxUnits:120,
   duration:180, overtime:60, maxEnergy:10, tick:0.1
 });
+const SUMMON_DELAY_BY_COST = Object.freeze({1:.4,2:.5,3:.7,4:.9,5:1.2,6:1.5,7:1.8,8:2.1});
+function summonDelayFor(data){
+  if(!data||data.spell||data.hidden||data.tunnelAnywhere)return 0;
+  if(Number.isFinite(data.summonDelay))return Math.max(0,data.summonDelay);
+  return SUMMON_DELAY_BY_COST[data.cost]??Math.max(.4,Math.min(2.5,.3+(data.cost||1)*.25));
+}
 const UNITS = Object.freeze({
   blade: {id:'blade',mass:2,name:'アッシュ剣士',short:'剣士',role:'近接アタッカー',cost:2,hp:780,damage:112,speed:56,range:34,cooldown:1.05,radius:16,count:1,air:false,targetsAir:false,color:'#efc577',desc:'攻守の基準になる剣士。盾役の後ろで前線を押し上げる。'},
   knight:{id:'knight',mass:6,name:'アイアン衛士',short:'衛士',role:'近接タンク',cost:3,hp:1850,damage:98,speed:35,range:36,cooldown:1.35,radius:23,count:1,air:false,targetsAir:false,color:'#a7b9c3',desc:'高い体力で攻撃を受け止める。後ろに弓兵や術師を重ねよう。'},
@@ -260,26 +266,32 @@ const UNITS = Object.freeze({
   bat:{id:'bat',mass:0.6,name:'ムーンバット',short:'バット',role:'飛行・4体編成',cost:2,hp:145,damage:46,speed:82,range:28,cooldown:0.85,radius:11,count:4,air:true,targetsAir:true,color:'#b7a7dc',desc:'4体で出撃し、川を飛び越える。1体ずつは軽いが、対空できない敵を群れで一気に削る。'},
   bomber:{id:'bomber',mass:2,name:'ポット爆弾兵',short:'爆弾兵',role:'地上範囲攻撃',cost:3,hp:470,damage:174,speed:42,range:145,cooldown:1.8,radius:16,count:1,air:false,targetsAir:false,projectile:'bomb',splash:66,color:'#edaa66',desc:'爆弾で地上の密集を崩す。空中の敵には攻撃できない。'},
   cannon:{id:'cannon',mass:1000000,name:'ボルト砲台',short:'砲台',role:'防衛建物・耐久減衰',cost:3,hp:1080,damage:140,speed:0,range:218,cooldown:1.4,radius:24,count:1,air:false,targetsAir:false,projectile:'shell',building:true,decayPerSecond:30,color:'#8dbfb3',desc:'動かない防衛建物。最大HPは1080のまま、設置後は毎秒30ずつ耐久が減り、攻撃を受けなくても約36秒で崩れる。'},
-  golem:{id:'golem',mass:16,name:'ストーンゴーレム',short:'ゴーレム',role:'建物特攻・分裂',cost:8,hp:2850,damage:288,speed:21,range:42,cooldown:1.85,radius:30,count:1,air:false,targetsAir:false,buildingOnly:true,deathDamage:180,deathRadius:75,splitType:'mini_golem',splitCount:2,color:'#8ea37d',desc:'建物だけを狙う大型兵。本体HPは2850へ調整。倒されるとちびゴーレム2体へ分裂し、死亡時に周囲へ180ダメージ。'},
+  golem:{id:'golem',mass:16,name:'ストーンゴーレム',short:'ゴーレム',role:'建物特攻・分裂',cost:8,hp:2850,damage:288,speed:21,summonDelay:2.5,range:42,cooldown:1.85,radius:30,count:1,air:false,targetsAir:false,buildingOnly:true,deathDamage:180,deathRadius:75,splitType:'mini_golem',splitCount:2,color:'#8ea37d',desc:'建物だけを狙う大型兵。本体HPは2850。配置後は2.5秒かけて召喚され、完成後に進軍を開始する。倒されるとちびゴーレム2体へ分裂し、死亡時に周囲へ180ダメージ。'},
   berserker:{id:'berserker',mass:8.2,name:'クラッグバーサーカー',short:'クラッグ',role:'重量アタッカー・高火力',cost:7,hp:2450,damage:465,speed:32,range:40,cooldown:1.8,radius:24,count:1,air:false,targetsAir:false,color:'#b96550',desc:'巨大な戦槌を振るう7コスト重量級アタッカー。HP2450と攻撃465は維持しつつ、攻撃間隔を1.8秒へ少し遅く調整。'},
   mini_golem:{id:'mini_golem',hidden:true,mass:5.3,name:'ちびゴーレム',short:'ちび',role:'建物特攻・分裂後',cost:0,hp:1050,damage:96,speed:28,range:32,cooldown:1.55,radius:18,count:1,air:false,targetsAir:false,buildingOnly:true,deathDamage:60,deathRadius:45,color:'#9aa88a',desc:'ストーンゴーレムが倒れた後に2体現れる小型体。HP1050・攻撃96を持ち、死亡時に周囲へ60ダメージ。'},
-  boar:{id:'boar',mass:9.5,name:'アイアンボア',short:'ボア',role:'建物突撃・チャージ',cost:4,hp:980,damage:178,speed:78,range:28,cooldown:1.05,radius:18,count:1,air:false,targetsAir:false,buildingOnly:true,chargeDistance:105,chargeMultiplier:2.25,shovePower:14,shoveMassLimit:2.2,shoveCompression:.62,color:'#b4785f',desc:'敵兵を無視して建物へ突進。軽量な地上兵を押しのけながら進み、105px走ると最初の体当たりが2.25倍になる。'},
-  tigger:{id:'tigger',mass:1.8,name:'穴掘りティガー',short:'ティガー',role:'奇襲・地下移動',cost:3,hp:1100,damage:20,speed:56,range:30,cooldown:.82,radius:16,count:1,air:false,targetsAir:false,tunnelAnywhere:true,burrowMin:.9,burrowMax:2.8,burrowBase:.55,burrowSpeedDivisor:380,color:'#c08a52',desc:'戦場の好きな地上地点を指定し、自軍中央本拠地から地下を掘って移動する奇襲兵。v16.4で攻撃を15から20へ少し強化。潜行中は完全に攻撃対象外で、遠い地点ほど到着に時間がかかる。'},
+  boar:{id:'boar',mass:9.5,name:'アイアンボア',short:'ボア',role:'建物突撃・チャージ',cost:4,hp:980,damage:160,speed:78,range:28,cooldown:1.05,radius:18,count:1,air:false,targetsAir:false,buildingOnly:true,chargeDistance:105,chargeMultiplier:2.25,shovePower:14,shoveMassLimit:2.2,shoveCompression:.62,color:'#b4785f',desc:'敵兵を無視して建物へ突進。軽量な地上兵を押しのけながら進み、105px走ると最初の体当たりが2.25倍になる。v19.2で通常攻撃を160へ少し抑えた。'},
+  tigger:{id:'tigger',mass:1.8,name:'穴掘りティガー',short:'ティガー',role:'奇襲・対ユニット高火力',cost:3,hp:1100,damage:120,structureDamage:70,speed:56,range:30,cooldown:1.1,radius:16,count:1,air:false,targetsAir:false,tunnelAnywhere:true,burrowMin:.9,burrowMax:2.8,burrowBase:.55,burrowSpeedDivisor:380,color:'#c08a52',desc:'戦場の好きな地上地点へ地下移動する奇襲兵。地上に出た後は敵ユニットへ120ダメージ、タワー・設置物には70ダメージ。攻撃間隔1.1秒。潜行中は完全に攻撃対象外。'},
   muddragon:{id:'muddragon',mass:4.8,name:'マッドドラゴン',short:'泥竜',role:'空中範囲・泥沼制圧',cost:5,hp:1600,damage:200,speed:36,range:78,cooldown:1.6,radius:22,count:1,air:true,targetsAir:true,projectile:'mud',splash:45,mudRadius:45,mudDuration:2,mudTickEvery:.5,mudDamage:30,mudSlow:.70,color:'#8b7657',desc:'少し遅い飛行ドラゴン。射程78・半径45の範囲攻撃と2秒間の泥沼を持つが、v16でHPを2000から1600へ低下。泥沼は地上兵だけに30ダメージの継続攻撃と30%移動低下を与える。'},
   nightshade:{id:'nightshade',mass:1.05,name:'ナイトシェイド',short:'シェイド',role:'暗殺・無敵突進',cost:3,hp:520,damage:228,speed:88,range:30,cooldown:.82,radius:13,count:1,air:false,targetsAir:false,aggroRange:105,dashAggroRange:105,dashWindup:.6,dashMinRange:80,dashMaxRange:205,dashSpeed:650,dashMultiplier:2,dashCooldown:4,color:'#6f668f',desc:'近づいた敵や建物を捉えると0.6秒溜め、影の突進を行う。突進中は無敵で、到達時に通常の2倍ダメージ。その後は通常攻撃し、突進は4秒で再使用できる。'},
-  mossling:{id:'mossling',mass:.45,name:'モスリング隊',short:'モス隊',role:'群体・5体編成',cost:3,hp:155,damage:45,speed:72,range:21,cooldown:.8,radius:9,count:5,air:false,targetsAir:false,color:'#8fb56b',desc:'小さな森の精霊5体で取り囲む群体。単体攻撃の大型に強いが、爆弾や範囲魔法にはとても弱い。'},
+  mossling:{id:'mossling',mass:.45,name:'ゴブリン部隊',short:'ゴブ部隊',role:'混成群体・地上3＋槍2',cost:3,hp:155,damage:65,speed:72,range:21,cooldown:.8,radius:9,count:5,air:false,targetsAir:true,spawnTypes:['goblin_melee','goblin_melee','goblin_melee','goblin_spear','goblin_spear'],color:'#8fb56b',desc:'前衛ゴブリン3体と槍兵2体の混成部隊。前衛は攻撃65で地上のみ、槍兵は旧モスリング相当のHP155・攻撃45を維持し、地上と空中の両方を攻撃できる。'},
+  goblin_melee:{id:'goblin_melee',hidden:true,mass:.45,name:'ゴブリン',short:'ゴブリン',role:'地上前衛',cost:0,hp:155,damage:65,speed:72,range:21,cooldown:.8,radius:9,count:1,air:false,targetsAir:false,color:'#8fb56b',desc:'ゴブリン部隊の地上前衛。旧モスリングより攻撃力が高い。'},
+  goblin_spear:{id:'goblin_spear',hidden:true,mass:.45,name:'ゴブリン槍兵',short:'槍ゴブ',role:'遠距離投げ槍・対空',cost:0,hp:155,damage:45,speed:72,range:160,cooldown:.8,radius:9,count:1,air:false,targetsAir:true,projectile:'thrown_spear',color:'#9ebd72',desc:'ゴブリン部隊の後衛槍兵。槍を投げて射程160から地上・空中の両方を攻撃する。リーフ弓兵より少し短く、マッドドラゴンより長い射程を持つ。'},
   boneswarm:{id:'boneswarm',mass:.20,name:'ボーンスウォーム',short:'ボーン隊',role:'群体・12体編成',cost:4,hp:45,damage:42,speed:78,range:19,cooldown:.72,radius:7,count:12,air:false,targetsAir:false,color:'#d9d2b5',desc:'HP45の小さな骨兵12体で大型を包囲する超群体。1体ずつは紙のように脆いが、単体攻撃のゴーレムやクラッグにはめっぽう強い。範囲攻撃には極端に弱い。'},
   lumina:{id:'lumina',mass:1.4,name:'ルミナ司祭',short:'司祭',role:'回復支援・後衛',cost:4,hp:590,damage:38,speed:44,range:145,cooldown:1.55,radius:15,count:1,air:false,targetsAir:false,projectile:'light',healPower:115,healRange:128,healCooldown:1.25,color:'#e7dba8',desc:'弱い光弾を放ちながら、周囲で最も傷ついた味方ユニットを回復する。タンクと好相性だが暗殺者に狙われやすい。'},
-  frost:{id:'frost',mass:1.5,name:'フロストシャーマン',short:'シャーマン',role:'妨害・減速',cost:4,hp:535,damage:74,speed:42,range:170,cooldown:1.4,radius:15,count:1,air:false,targetsAir:false,projectile:'frost',slowMove:.62,slowAttack:.72,slowDuration:3,color:'#9ccfe2',desc:'氷弾で地上の敵を減速。移動と攻撃のテンポを奪い、ボアのチャージも削るため大型・突進系への時間稼ぎに強い。'},
-  harpy:{id:'harpy',mass:1.05,name:'ストームハーピー',short:'ハーピー',role:'空中遠距離・連鎖雷',cost:4,hp:505,damage:94,speed:64,range:175,cooldown:1.25,radius:16,count:1,air:true,targetsAir:true,projectile:'lightning',chainCount:3,chainRange:105,chainFalloff:.78,color:'#8fa9d8',desc:'空から雷を放ち、近くの敵へ最大3体まで連鎖する。群体に強いが、弓兵などの対空遠距離に弱い。'},
-  necromancer:{id:'necromancer',mass:2.1,name:'ネクロマンサー',short:'ネクロ',role:'範囲対空・ボーン召喚',cost:6,hp:1350,damage:125,speed:44,range:158,cooldown:1.4,radius:17,count:1,air:false,targetsAir:true,projectile:'necro',splash:54,summonType:'boneswarm',summonCount:3,summonInterval:7.5,summonOnDeploy:true,color:'#8b79a8',desc:'地上・空中へ届く範囲魔法を放つ召喚士。配置した瞬間にボーン3体を呼び、その後も生存している間は7.5秒ごとに3体を追加召喚する。本体HPは1350。'},
-  darknecro:{id:'darknecro',mass:2.0,name:'ダークネクロマンサー',short:'闇ネクロ',role:'地上近接・バット召喚',cost:5,hp:1150,damage:165,speed:46,range:34,cooldown:1.3,radius:16,count:1,air:false,targetsAir:false,summonType:'bat',summonCount:2,summonInterval:6.5,summonOnDeploy:true,color:'#65577c',desc:'地上だけを狙う高火力の近接召喚士。配置した瞬間にムーンバット2体を呼び、その後も生存している間は6.5秒ごとに2体を追加召喚する。本体は空中を攻撃できない。'},
+  frost:{id:'frost',mass:1.5,name:'フロストシャーマン',short:'シャーマン',role:'範囲妨害・3段階鈍足',cost:3,hp:535,damage:74,speed:42,range:170,cooldown:1.4,radius:15,count:1,air:false,targetsAir:false,projectile:'frost',splash:38,slowMoveStages:[.80,.65,.50],slowAttackStages:[.90,.80,.70],slowDuration:3,color:'#9ccfe2',desc:'3コストの氷術師。半径38の氷弾で地上の敵をまとめて攻撃し、鈍足を3段階まで重複させる。効果中に再被弾するとLvが上がり、Lv1/2/3で移動速度が80%/65%/50%へ低下。命中のたびに3秒へ更新する。'},
+  harpy:{id:'harpy',mass:1.05,name:'ストームハーピー',short:'ハーピー',role:'空中遠距離・減衰連鎖スタン',cost:4,hp:505,damage:180,speed:64,range:175,cooldown:2,radius:16,count:1,air:true,targetsAir:true,projectile:'lightning',chainCount:3,chainRange:105,chainDamages:[180,130,90],stunDuration:1,color:'#8fa9d8',desc:'2秒ごとに強力な連鎖雷を放つ。1体目180、2体目130、3体目90と連鎖するほどダメージが低下し、命中した各敵を1秒スタンしてザップと同じターゲット・特殊状態リセットを行う。'},
+  electrowizard:{id:'electrowizard',mass:1.7,name:'エレキテルウィザード',short:'エレキテル',role:'長射程・範囲スタン',cost:4,hp:650,damage:135,speed:42,range:185,cooldown:2.4,radius:15,count:1,air:false,targetsAir:true,projectile:'electro',splash:35,stunDuration:1,stunUnitsOnly:true,color:'#76bcd5',desc:'地上・空中へ届く長射程の電撃術師。2.4秒ごとに135ダメージの狭い範囲雷を放ち、範囲内の敵ユニット全員を1秒スタンする。射程はリーフ弓兵と同程度で、密集した部隊への妨害に強い。'},
+  necromancer:{id:'necromancer',mass:2.1,name:'ネクロマンサー',short:'ネクロ',role:'範囲対空・ボーン召喚',cost:6,hp:1350,damage:125,speed:44,range:158,cooldown:1.4,radius:17,count:1,air:false,targetsAir:true,projectile:'necro',splash:45,summonType:'boneswarm',summonCount:3,summonInterval:7.5,summonOnDeploy:true,color:'#8b79a8',desc:'地上・空中へ届く範囲魔法を放つ召喚士。1.5秒の本体召喚が完了した瞬間にボーン3体を呼び、その後も生存している間は7.5秒ごとに3体を追加召喚する。通常攻撃の範囲半径は45。'},
+  darknecro:{id:'darknecro',mass:2.0,name:'ダークネクロマンサー',short:'闇ネクロ',role:'地上近接・バット召喚',cost:5,hp:1150,damage:165,speed:46,range:34,cooldown:1.3,radius:16,count:1,air:false,targetsAir:false,summonType:'bat',summonCount:2,summonInterval:6.5,summonOnDeploy:true,color:'#65577c',desc:'地上だけを狙う高火力の近接召喚士。1.2秒の本体召喚が完了した瞬間にムーンバット2体を呼び、その後も生存している間は6.5秒ごとに2体を追加召喚する。本体は空中を攻撃できない。'},
+  dosranboss:{id:'dosranboss',mass:2.35,name:'ドスランボス',short:'ドスラン',role:'近接前衛・群れ召喚',cost:6,hp:1100,damage:170,speed:40,range:32,cooldown:1.45,radius:19,count:1,air:false,targetsAir:false,summonType:'ranbos',summonCount:3,summonInterval:10,summonWindup:3,summonOnDeploy:true,color:'#4c79a8',desc:'大型ラプトルの首領。移動速度は遅め。1.5秒の本体召喚が完了した瞬間にランボス3体を呼び、その後も10秒ごとに3秒足を止めてランボス3体を追加召喚する。'},
+  ranbos:{id:'ranbos',mass:0.88,name:'ランボス',short:'ランボス',role:'召喚子分',cost:0,hp:360,damage:58,speed:74,range:22,cooldown:1.15,radius:11,count:1,air:false,targetsAir:false,hidden:true,color:'#6f9cc9',desc:'ドスランボスに付き従う小型ラプター。性能は本体のおよそ3分の1で、素早く噛みついて前線をかく乱する。'},
   ashsquad:{id:'ashsquad',mass:2,name:'アッシュ部隊',short:'アッシュ隊',role:'近接部隊・3体編成',cost:5,hp:780,damage:112,speed:56,range:34,cooldown:1.05,radius:16,count:3,air:false,targetsAir:false,spawnType:'blade',color:'#d8b56f',desc:'アッシュ剣士3体を一度に展開する部隊カード。敵方向へ1体を前、2体を後ろにした三角陣形で出現し、後衛ユニットへ重ねる防衛や一斉近接攻撃に向く。'},
   princess:{id:'princess',mass:1.1,name:'プリンセスアーチャー',short:'プリンセス',role:'超長射程・範囲対空',cost:3,hp:300,damage:275,speed:28,range:350,cooldown:3,radius:14,count:1,air:false,targetsAir:true,projectile:'royal_arrow',splash:70,color:'#e5b7c9',desc:'巨大な弓を扱う超長射程の範囲射手。橋を渡らず自陣側から敵サイドタワーを狙える射程350を持ち、地上・空中へ3秒ごとに275ダメージ。着弾地点の半径70にも攻撃が広がる。HP300と非常に脆く、矢の雨なら一撃で倒される。'},
-  sparky:{id:'sparky',mass:8.8,name:'スパーキー',short:'スパーキー',role:'常時充電・超火力範囲',cost:6,hp:1500,damage:1200,speed:26,range:145,cooldown:0,radius:23,count:1,air:false,targetsAir:false,projectile:'sparkblast',splash:90,sparkUnit:true,sparkChargeTime:3.5,color:'#d8b45c',desc:'地上のみを狙う6コストの超火力兵器。配置直後から敵がいなくても3.5秒の充電を続け、満充電なら敵が射程へ入った瞬間に1200の広範囲攻撃を放つ。発射後は再充電。ザップを受けると充電が0へ戻り、スタン解除後に最初から充電し直す。'},
+  sparky:{id:'sparky',mass:8.8,name:'スパーキー',short:'スパーキー',role:'常時充電・超火力範囲',cost:6,hp:1500,damage:1200,speed:26,summonDelay:1.8,range:145,cooldown:0,radius:23,count:1,air:false,targetsAir:false,projectile:'sparkblast',splash:90,sparkUnit:true,sparkChargeTime:3.5,color:'#d8b45c',desc:'地上のみを狙う6コストの超火力兵器。1.8秒の召喚完了後から敵がいなくても3.5秒充電し、満充電なら敵が射程へ入った瞬間に1200の広範囲攻撃を放つ。発射後は再充電。ザップを受けると充電が0へ戻り、スタン解除後に最初から充電し直す。'},
 
   blowdart:{id:'blowdart',mass:.9,name:'吹き矢ゴブリン',short:'吹き矢',role:'長射程・高速対空',cost:3,hp:240,damage:110,speed:52,range:195,cooldown:.5,radius:12,count:1,air:false,targetsAir:true,projectile:'dart',color:'#8fbd63',desc:'HP240と非常に脆い代わりに、0.5秒ごとに110ダメージを放つ長射程射手。v16で射程を220から195へ短縮し、タワーの反撃が届かない位置から一方的に攻撃できないよう調整。地上・空中の両方に対応する。'},
   lasertower:{id:'lasertower',mass:1000000,name:'レーザー塔',short:'レーザー塔',role:'防衛建物・単体増幅レーザー',cost:5,hp:2000,damage:20,speed:0,range:220,cooldown:.1,radius:26,count:1,air:false,targetsAir:true,building:true,laserTower:true,laserBaseDps:20,laserRampEvery:1.5,laserMultiplier:2,color:'#9c8ed0',desc:'同じ敵へ照射し続けるほど1.5秒ごとに威力が倍化する5コスト防衛建物。初期火力はボーン1体すらすぐ倒せないほど低いが、上限はない。対象が死亡・射程外・攻撃対象外になると次の対象へ切り替わり、火力は初期値へ戻る。'},
+  laserdragon:{id:'laserdragon',mass:4.2,name:'レーザードラゴン',short:'レーザー竜',role:'飛行・単体増幅レーザー',cost:5,hp:1300,damage:20,speed:46,range:145,cooldown:.1,radius:21,count:1,air:true,targetsAir:true,laserUnit:true,laserBaseDps:20,laserRampEvery:1.5,laserMultiplier:2,color:'#71a4d6',desc:'地上・空中の両方を狙える5コスト飛行ドラゴン。移動速度は標準、射程145の中距離。レーザー塔と同じく同じ敵へ照射し続けるほど1.5秒ごとに火力が倍化し、対象変更・射程外・スタンで増幅が初期値へ戻る。'},
   fireball:{id:'fireball',cardType:'spell',spell:'fireball',name:'ファイヤーボール',short:'火球',role:'呪文・範囲爆撃',cost:4,damage:560,buildingDamage:140,radius:90,count:0,targetsAir:true,color:'#ed7a47',desc:'戦場の好きな場所へ本拠地から火球を放つ。半径90に560ダメージ、建物には140。遠いほど着弾が遅く、追尾しないため偏差撃ちが必要。'},
   poison:{id:'poison',cardType:'spell',spell:'poison',name:'ポイズントラップ',short:'ポイズン',role:'呪文・設置毒エリア',cost:3,damage:55,buildingDamage:10,radius:90,count:0,targetsAir:true,zoneDuration:6,tickEvery:.5,lingerDuration:3,lingerDamage:18,color:'#83a857',desc:'指定地点へ遅延なしで毒エリアを6秒設置。範囲内の敵へ継続ダメージを与え、離脱後も3秒毒が残る。建物にも低い継続ダメージが入る。'},
   arrowrain:{id:'arrowrain',cardType:'spell',spell:'arrowrain',name:'矢の雨',short:'矢の雨',role:'呪文・広範囲一斉射撃',cost:3,damage:330,buildingDamage:80,radius:130,count:0,targetsAir:true,color:'#c89b68',desc:'ファイヤーボールより広い半径130へ矢を降らせる。威力は330と控えめだが着弾が速く、散らばった小型群体の緊急処理に向く。'},
@@ -288,7 +300,7 @@ const UNITS = Object.freeze({
 const DECK = Object.freeze(Object.keys(UNITS).filter(id=>!UNITS[id].hidden));
 const UNIT_IDS = Object.freeze(DECK.filter(id=>!UNITS[id].spell));
 const SPELL_IDS = Object.freeze(DECK.filter(id=>!!UNITS[id].spell));
-const DEFAULT_DECK = Object.freeze(['knight','blowdart','archer','muddragon','lasertower','arrowrain','berserker','fireball']);
+const DEFAULT_DECK = Object.freeze(['knight','blowdart','archer','muddragon','dosranboss','arrowrain','lasertower','fireball']);
 const ROLE_ORDER = DECK;
 const TEAM_COLORS = ['#58b9ae','#ee9b81'];
 function normalizeDeck(value,{fallback=true}={}){
@@ -303,7 +315,7 @@ function normalizeDeck(value,{fallback=true}={}){
  * Ground bodies live on the lawn/bridges. Air bodies share a separate layer.
  * Buildings are static circles; tree/grass artwork is decorative only.
  */
-const PHYSICS_VERSION=17;
+const PHYSICS_VERSION=26;
 const FIELD={left:34,right:686,top:28,bottom:1012};
 const EPS=0.001,GRID=20,COLS=33,ROWS=49;
 const worldCaches=new WeakMap();
@@ -312,7 +324,7 @@ const clampP=(n,a,b)=>Math.max(a,Math.min(b,n));
 const isStructure=u=>!!(u.kind||u.building);
 const bodyRadius=u=>u.radius||12;
 const sameLayer=(a,b)=>!!a.air===!!b.air;
-const solidStructures=g=>[...g.towers,...g.units.filter(u=>u.building)].filter(u=>u.hp>0);
+const solidStructures=g=>[...g.towers,...g.units.filter(u=>u.building&&!u.collisionDisabled)].filter(u=>u.hp>0);
 
 function deploymentAllowed(g,owner,x,y){
   if(owner!==0&&owner!==1)return false;
@@ -460,7 +472,7 @@ function timeOfContact(start,delta,other,radius){
 function allowableFraction(g,u,dx,dy,{allies=true,soft=true}={}){
   const start={x:u.x,y:u.y},delta={x:dx,y:dy};let f=1;
   for(const v of g.units){
-    if(v===u||v.id===u.id||v.hp<=0||!sameLayer(u,v)||isStructure(v))continue;
+    if(v===u||v.id===u.id||v.hp<=0||v.collisionDisabled||!sameLayer(u,v)||isStructure(v))continue;
     if(!allies&&v.owner===u.owner)continue;
     const shoveable=!u.air&&!v.air&&u.owner!==v.owner&&u.shovePower&&((v.mass||1)<=u.shoveMassLimit);
     const collisionRadius=pairDistance(u,v,soft)*(shoveable?(u.shoveCompression||.65):1);
@@ -516,9 +528,9 @@ function projectStatic(g,u){
   }
 }
 function resolveBodies(g,dt=.1){
-  const units=g.units.filter(u=>u.hp>0&&u.burrowState!=='burrow');
+  const units=g.units.filter(u=>u.hp>0&&u.burrowState!=='burrow'&&!u.collisionDisabled);
   for(const u of units)projectStatic(g,u);
-  for(let pass=0;pass<5;pass++)for(let i=0;i<units.length;i++)for(let j=i+1;j<units.length;j++){
+  for(let pass=0;pass<8;pass++)for(let i=0;i<units.length;i++)for(let j=i+1;j<units.length;j++){
     const a=units[i],b=units[j];if(!sameLayer(a,b)||isStructure(a)||isStructure(b))continue;
     const len=dist(a,b),min=pairDistance(a,b),over=min-len;if(over<=.005)continue;
     const side=(Number(String(a.id).replace(/\D/g,''))%2)?1:-1;
@@ -545,8 +557,8 @@ function groupOffset(count,i,spacing=24){
   const cols=Math.ceil(Math.sqrt(count)),row=Math.floor(i/cols),col=i%cols;
   return {x:(col-(cols-1)/2)*spacing,y:(row-(Math.ceil(count/cols)-1)/2)*spacing};
 }
-function spawnPositions(g,owner,data,x,y){
-  const points=[],f=owner===0?1:-1;
+function spawnPositions(g,owner,data,x,y,structures=null){
+  const points=[],f=owner===0?1:-1,blockers=structures||solidStructures(g);
   for(let i=0;i<data.count;i++){
     const off=groupOffset(data.count,i,data.radius<=10?20:24);
     const wanted={x:x+off.x*f,y:y+off.y*f};
@@ -558,7 +570,7 @@ function spawnPositions(g,owner,data,x,y){
       for(let k=0;k<n;k++){
         const a=k*Math.PI*2/n+(owner===1?Math.PI:0),p={x:wanted.x+Math.cos(a)*rr,y:wanted.y+Math.sin(a)*rr};
         if(p.x<48||p.x>672||p.y<58||p.y>982||!deploymentAllowed(g,owner,p.x,p.y))continue;
-        if(!staticFree(g,data,p,1))continue;
+        if(!staticFree(g,data,p,1,blockers))continue;
         if(g.units.some(u=>u.hp>0&&sameLayer(data,u)&&dist(p,u)<bodyRadius(data)+bodyRadius(u)+.5))continue;
         if(points.some(q=>dist(p,q)<data.radius*2+.5))continue;
         found=p;break;
@@ -597,6 +609,7 @@ function createMatch({seed=12345,bot=false,difficulty='normal',decks=[DEFAULT_DE
   return g;
 }
 function inRiver(x,y){return y>ARENA.riverTop && y<ARENA.riverBottom && !ARENA.bridges.some(b=>Math.abs(x-b)<=ARENA.bridgeHalf);}
+function placementStructures(g){return [...g.towers,...g.units.filter(u=>u.building&&u.hp>0)];}
 function canPlace(g,owner,id,x,y){
   if(g.phase!=='battle')return 'まだ出撃できません。';
   if(owner!==0 && owner!==1)return '参加者ではありません。';
@@ -621,8 +634,9 @@ function canPlace(g,owner,id,x,y){
   if(!deploymentAllowed(g,owner,x,y))return '自分の陣地、または破壊した敵サイドタワー側の前線に配置してください。';
   const deployCount=d.count+(d.summonOnDeploy?(d.summonCount||0):0);
   if(g.units.filter(u=>u.hp>0).length+deployCount>ARENA.maxUnits)return 'フィールドのユニット上限です。';
-  if(!staticFree(g,d,{x,y},1))return '建物や岸から少し離して配置してください。';
-  if(!spawnPositions(g,owner,d,x,y))return '配置する空間がありません。少し離してください。';
+  const blockers=placementStructures(g);
+  if(!staticFree(g,d,{x,y},1,blockers))return '建物や岸から少し離して配置してください。';
+  if(!spawnPositions(g,owner,d,x,y,blockers))return '配置する空間がありません。少し離してください。';
   return null;
 }
 function event(g,type,data){g.events.push({id:g.nextId++,type,life:type==='death'?0.9:0.5,...data});}
@@ -632,10 +646,33 @@ function spendCard(g,owner,id){
 }
 function makeUnit(g,owner,type,x,y){
   const d=UNITS[type];
-  return {...d,id:`u${g.nextId++}`,type,owner,x,y,hp:d.hp,maxHp:d.hp,cd:0,spawn:0.5,anim:0,hit:0,walk:0,target:null,face:owner===0?-1:1,
+  return {...d,id:`u${g.nextId++}`,type,owner,x,y,hp:d.hp,maxHp:d.hp,cd:0,spawn:0.5,anim:0,hit:0,walk:0,target:null,targetLock:null,targetable:true,collisionDisabled:false,deploying:false,deployTotal:0,deployRemaining:0,face:owner===0?-1:1,
     lane:x<360?190:530,age:0,facing:owner===0?-Math.PI/2:Math.PI/2,moving:false,
-    summonNextAt:d.summonInterval?g.time+d.summonInterval:null,
+    summonNextAt:d.summonInterval?g.time+d.summonInterval:null,summonCastingUntil:0,
     stunUntil:0,sparkCharged:false,sparkChargeStartAt:d.sparkChargeTime?g.time:null,sparkChargeProgress:0};
+}
+function startDeployment(g,u,cardData){
+  const total=summonDelayFor(cardData);
+  if(total<=0)return false;
+  u.deploying=true;u.deployTotal=total;u.deployRemaining=total;u.targetable=false;u.collisionDisabled=true;u.spawn=0;u.target=null;u.targetLock=null;
+  if(u.summonInterval)u.summonNextAt=null;
+  if(u.sparkUnit){u.sparkCharged=false;u.sparkChargeProgress=0;u.sparkChargeStartAt=null;}
+  event(g,'deploy-start',{x:u.x,y:u.y,owner:u.owner,unitType:u.type,card:cardData.id,duration:total,building:!!u.building});
+  return true;
+}
+function completeDeployment(g,u){
+  u.deploying=false;u.deployRemaining=0;u.targetable=true;u.collisionDisabled=false;u.target=null;u.targetLock=null;
+  if(u.sparkUnit)u.sparkChargeStartAt=g.time;
+  if(u.summonInterval)u.summonNextAt=g.time+u.summonInterval;
+  event(g,'deploy-ready',{x:u.x,y:u.y,owner:u.owner,unitType:u.type,building:!!u.building});
+  if(u.summonOnDeploy&&u.summonType&&u.summonCount)summonMinions(g,u,true);
+}
+function updateDeployment(g,u,dt){
+  if(!u.deploying)return false;
+  u.moving=false;u.target=null;u.targetLock=null;u.targetable=false;u.collisionDisabled=true;
+  u.deployRemaining=Math.max(0,(u.deployRemaining||0)-dt);
+  if(u.deployRemaining<=1e-8){completeDeployment(g,u);return true;}
+  return true;
 }
 function fireballTravelTime(core,target){return clamp(.45+distance(core,target)/620,.6,2);}
 function arrowRainTravelTime(core,target){return clamp(.2+distance(core,target)/1150,.35,1);}
@@ -655,7 +692,7 @@ function castSpell(g,owner,id,x,y){
     event(g,'zap-impact',{x,y,owner,radius:d.radius,damage:d.damage,stunDuration:d.stunDuration});
     const centre={x,y};
     for(const t of alive(g)){
-      if(t.owner===owner||t.hp<=0||t.burrowState==='burrow'||distance(centre,t)>d.radius+(t.radius||12)*.35)continue;
+      if(t.owner===owner||t.hp<=0||t.targetable===false||t.burrowState==='burrow'||distance(centre,t)>d.radius+(t.radius||12)*.35)continue;
       damage(g,t,(t.kind||t.building)?d.buildingDamage:d.damage,owner);
       if(t.hp>0)applyStun(g,t,d.stunDuration,owner);
     }
@@ -677,11 +714,11 @@ function deploy(g,owner,id,x,y){
     g.units.push(u);event(g,'burrow-start',{x:core.x,y:core.y,tx:x,ty:y,owner,travel});
     return {ok:true,burrow:true,travelTime:travel};
   }
-  const positions=spawnPositions(g,owner,d,x,y);spendCard(g,owner,id);
+  const positions=spawnPositions(g,owner,d,x,y,placementStructures(g));spendCard(g,owner,id);
   for(let i=0;i<d.count;i++){
-    const unitType=d.spawnType||id,u=makeUnit(g,owner,unitType,positions[i].x,positions[i].y);
-    g.units.push(u);event(g,'spawn',{x:u.x,y:u.y,owner,card:id});
-    if(u.summonOnDeploy&&u.summonType&&u.summonCount)summonMinions(g,u,true);
+    const unitType=(Array.isArray(d.spawnTypes)&&d.spawnTypes[i])||d.spawnType||id,u=makeUnit(g,owner,unitType,positions[i].x,positions[i].y);
+    startDeployment(g,u,d);g.units.push(u);event(g,'spawn',{x:u.x,y:u.y,owner,card:id});
+    if(!u.deploying&&u.summonOnDeploy&&u.summonType&&u.summonCount)summonMinions(g,u,true);
   }
   return {ok:true};
 }
@@ -707,16 +744,31 @@ function preferredTower(g,u){
   const out=g.towers.find(t=>t.owner===enemy&&t.kind==='tower'&&t.x===u.lane&&t.hp>0);
   return out||g.towers.find(t=>t.owner===enemy&&t.kind==='core'&&t.hp>0);
 }
+function nearestMobileCombatTarget(u,entities){
+  const reach=u.aggroRange??Math.max(205,u.range+35);
+  let best=null,bestD=Infinity;
+  for(const t of entities){
+    if(!targetable(u,t))continue;
+    const d=distance(u,t)-t.radius-(u.aggroRange?u.range:0);
+    if(d<=reach&&d<bestD){best=t;bestD=d;}
+  }
+  return best;
+}
+function commitMobileTarget(u,t){
+  if(!u.kind&&!u.building&&!u.buildingOnly&&t&&targetable(u,t))u.targetLock=t.id;
+}
 function getTarget(g,u,entities){
-  // Defensive structures lock their current target until it dies, leaves range, or becomes untargetable.
+  // Defensive structures keep the existing v13 contract: lock while the target remains valid and in range.
   // A closer enemy entering range does not steal aggro mid-lock.
   if(u.kind||u.building){
     const locked=lockedStructureTarget(u,entities);
     if(locked)return locked;
     return nearestStructureTarget(u,entities);
   }
-  // Building-only mobile units ignore troops completely and march toward the nearest enemy structure.
+  // Building-only mobile units NEVER hard-lock. They continuously re-evaluate the nearest enemy structure.
+  // This intentionally allows pulls toward a newly-closer defence or even the central core.
   if(u.buildingOnly){
+    u.targetLock=null;
     let best=null,bestD=Infinity;
     for(const t of entities){
       if(!targetable(u,t)||!(t.kind||t.building))continue;
@@ -725,28 +777,35 @@ function getTarget(g,u,entities){
     }
     return best;
   }
-  // Nearest combatant in the aggro radius; buildings never chase.
-  const reach=u.kind||u.building?u.range+30:(u.aggroRange??Math.max(205,u.range+35));
-  let best=null,bestD=Infinity;
-  for(const t of entities){
-    if(!targetable(u,t))continue;
-    const d=distance(u,t)-t.radius-(u.aggroRange?u.range:0);
-    if(d<=reach&&(d<bestD)){best=t;bestD=d;}
+  // Ordinary mobile units only hard-lock AFTER they actually commit an attack.
+  // Until the first attack, they keep re-evaluating the nearest valid enemy every tick.
+  // After an attack, leaving attack/aggro range does not break the lock: the unit chases the same target.
+  if(u.targetLock){
+    const locked=entities.find(t=>t.id===u.targetLock);
+    if(locked&&targetable(u,locked))return locked;
+    u.targetLock=null;
   }
-  if(!best && !u.kind && !u.building)best=preferredTower(g,u);
-  return best;
+  const best=nearestMobileCombatTarget(u,entities);
+  if(best)return best;
+  // A preferred tower is only a navigation objective while it is outside aggro range.
+  // It becomes a real hard lock only after the unit actually attacks it.
+  return preferredTower(g,u);
 }
 function dashEndpoint(u,t){
   const dx=u.x-t.x,dy=u.y-t.y,len=Math.hypot(dx,dy)||1;
   const stop=Math.max(1,u.range+t.radius-1);
   return {x:t.x+dx/len*stop,y:t.y+dy/len*stop};
 }
-function canShadowRush(g,u,t){
-  if(!u.dashWindup||g.time<(u.dashReadyAt||0)||u.dashState)return false;
+function shadowRushTargetReady(g,u,t){
+  if(!t||!targetable(u,t))return false;
   const gap=Math.max(0,distance(u,t)-(u.range+t.radius));
   if(gap<(u.dashMinRange||0)||gap>(u.dashAggroRange??u.dashMaxRange??Infinity))return false;
   const end=dashEndpoint(u,t);
   return staticLineFree(g,u,u,end,1);
+}
+function canShadowRush(g,u,t){
+  if(!u.dashWindup||g.time<(u.dashReadyAt||0)||u.dashState)return false;
+  return shadowRushTargetReady(g,u,t);
 }
 function beginShadowWindup(g,u,t){
   u.dashState='windup';u.dashTarget=t.id;u.dashWindupUntil=g.time+u.dashWindup;u.moving=false;
@@ -755,6 +814,8 @@ function beginShadowWindup(g,u,t){
 function beginShadowRush(g,u,t){
   const end=dashEndpoint(u,t);
   if(!staticLineFree(g,u,u,end,1)){u.dashState=null;u.dashTarget=null;return false;}
+  // The rush itself is the attack commitment, so the target becomes locked here, not during windup.
+  commitMobileTarget(u,t);
   u.dashState='rush';u.dashEnd=end;u.invulnerableUntil=g.time+Math.max(.12,distance(u,end)/(u.dashSpeed||650)+.12);
   faceToward(u,t.x,t.y);event(g,'shadow-rush',{x:u.x,y:u.y,tx:end.x,ty:end.y,owner:u.owner});return true;
 }
@@ -768,11 +829,19 @@ function finishShadowRush(g,u,t){
 }
 function updateShadowRush(g,u,entities,dt){
   if(!u.dashState)return false;
-  const t=entities.find(e=>e.id===u.dashTarget&&e.hp>0);
+  let t=entities.find(e=>e.id===u.dashTarget&&e.hp>0);
   if(u.dashState==='windup'){
-    u.moving=false;if(t)faceToward(u,t.x,t.y);
+    // Windup is still pre-attack: keep following the currently nearest rush-valid target.
+    // This prevents a fast enemy from dragging Nightshade forever before the rush actually starts.
+    const nearest=nearestMobileCombatTarget(u,entities);
+    if(nearest&&shadowRushTargetReady(g,u,nearest)){
+      t=nearest;u.dashTarget=t.id;u.target=t.id;
+    }else if(!t||!shadowRushTargetReady(g,u,t)){
+      u.dashState=null;u.dashTarget=null;u.dashReadyAt=g.time+.35;return true;
+    }
+    u.moving=false;faceToward(u,t.x,t.y);
     if(g.time+1e-8>=u.dashWindupUntil){
-      if(!t||!targetable(u,t)||!canRushAfterWindup(g,u,t)){u.dashState=null;u.dashTarget=null;u.dashReadyAt=g.time+.35;}
+      if(!canRushAfterWindup(g,u,t)){u.dashState=null;u.dashTarget=null;u.dashReadyAt=g.time+.35;}
       else beginShadowRush(g,u,t);
     }
     return true;
@@ -788,7 +857,7 @@ function updateShadowRush(g,u,entities,dt){
 }
 function updateBurrow(g,u,dt){
   if(u.burrowState!=='burrow')return false;
-  u.moving=false;u.target=null;u.targetable=false;u.burrowRemaining=Math.max(0,(u.burrowRemaining||0)-dt);
+  u.moving=false;u.target=null;u.targetLock=null;u.targetable=false;u.burrowRemaining=Math.max(0,(u.burrowRemaining||0)-dt);
   const total=Math.max(.001,u.burrowTotal||1),progress=clamp(1-u.burrowRemaining/total,0,1);u.burrowProgress=progress;
   const a=u.burrowFrom||u,b=u.burrowTo||u;u.x=a.x+(b.x-a.x)*progress;u.y=a.y+(b.y-a.y)*progress;
   if(u.burrowRemaining<=1e-8){u.x=b.x;u.y=b.y;u.burrowState=null;u.targetable=true;u.spawn=.25;event(g,'burrow-arrive',{x:u.x,y:u.y,owner:u.owner});}
@@ -847,10 +916,22 @@ function summonMinions(g,parent,initial=false){
   return made;
 }
 function updateSummoner(g,u){
-  if(!u.summonType||!u.summonInterval||!Number.isFinite(u.summonNextAt)||u.hp<=0)return;
-  if(g.time+1e-8<u.summonNextAt)return;
+  if(!u.summonType||!u.summonInterval||!Number.isFinite(u.summonNextAt)||u.hp<=0)return false;
+  if((u.summonCastingUntil||0)>g.time+1e-8)return true;
+  if(u.summonCastingUntil&&g.time+1e-8>=u.summonCastingUntil){
+    summonMinions(g,u,false);u.summonCastingUntil=0;
+    do{u.summonNextAt+=u.summonInterval;}while(u.summonNextAt<=g.time+1e-8);
+    return false;
+  }
+  if(g.time+1e-8<u.summonNextAt)return false;
+  if((u.summonWindup||0)>0){
+    u.summonCastingUntil=g.time+u.summonWindup;u.target=null;u.targetLock=null;u.cd=Math.max(u.cd,u.summonWindup);
+    event(g,'summon-channel',{x:u.x,y:u.y,owner:u.owner,unitType:u.type,duration:u.summonWindup});
+    return true;
+  }
   summonMinions(g,u,false);
   do{u.summonNextAt+=u.summonInterval;}while(u.summonNextAt<=g.time+1e-8);
+  return false;
 }
 
 function summonMiniGolems(g,parent){
@@ -878,7 +959,7 @@ function handleUnitDeath(g,t){
   if(t.splitType&&t.splitCount)summonMiniGolems(g,t);
 }
 function damage(g,t,amount,owner){
-  if(t.hp<=0||t.burrowState==='burrow')return 0;
+  if(t.hp<=0||t.burrowState==='burrow'||t.targetable===false)return 0;
   if((t.invulnerableUntil||0)>g.time){if(t.type==='nightshade')event(g,'shadow-evade',{x:t.x,y:t.y,owner:t.owner});return 0;}
   const before=t.hp;t.hp=Math.max(0,t.hp-amount);t.hit=.18;
   if(t.kind==='core'&&t.hp<before)wakeCore(g,t.owner,'core-hit');
@@ -901,22 +982,30 @@ function heal(g,t,amount,owner){
 }
 function applySlow(g,t,p){
   if(!p.slowDuration||t.kind||t.building||t.air)return;
-  t.slowUntil=Math.max(t.slowUntil||0,g.time+p.slowDuration);
-  t.slowMoveFactor=Math.min(t.slowMoveFactor||1,p.slowMove||1);
-  t.slowAttackFactor=Math.min(t.slowAttackFactor||1,p.slowAttack||1);
+  const active=(t.slowUntil||0)>g.time;
+  const moveStages=Array.isArray(p.slowMoveStages)?p.slowMoveStages:null;
+  const attackStages=Array.isArray(p.slowAttackStages)?p.slowAttackStages:null;
+  const maxStage=Math.max(moveStages?.length||0,attackStages?.length||0,1);
+  const stage=Math.min(maxStage,active?Math.max(1,(t.slowStage||1)+1):1);
+  t.slowStage=stage;
+  t.slowUntil=g.time+p.slowDuration;
+  if(moveStages)t.slowMoveFactor=moveStages[Math.min(stage-1,moveStages.length-1)];
+  else t.slowMoveFactor=Math.min(t.slowMoveFactor||1,p.slowMove||1);
+  if(attackStages)t.slowAttackFactor=attackStages[Math.min(stage-1,attackStages.length-1)];
+  else t.slowAttackFactor=Math.min(t.slowAttackFactor||1,p.slowAttack||1);
   if(t.chargeDistance){
     t.chargeRun=Math.max(0,(t.chargeRun||0)-45);
     if(t.chargeRun<t.chargeDistance*.8)t.charged=false;
   }
-  event(g,'slow',{x:t.x,y:t.y,owner:p.owner});
+  event(g,'slow',{x:t.x,y:t.y,owner:p.owner,stage});
 }
 function resetSparkyCharge(g,u,delayUntil=g.time){
   if(!u.sparkUnit)return;
   u.sparkCharged=false;u.sparkChargeProgress=0;u.sparkChargeStartAt=delayUntil;
 }
 function applyStun(g,t,duration,owner){
-  const until=Math.max(t.stunUntil||0,g.time+(duration||0));t.stunUntil=until;t.target=null;
-  if(t.laserTower)resetLaserTower(t);
+  const until=Math.max(t.stunUntil||0,g.time+(duration||0));t.stunUntil=until;t.target=null;t.targetLock=null;
+  if(t.laserTower||t.laserUnit)resetLaserTower(t);
   if(t.sparkUnit)resetSparkyCharge(g,t,until);
   if(t.dashState){t.dashState=null;t.dashTarget=null;t.dashEnd=null;t.invulnerableUntil=0;t.dashReadyAt=Math.max(t.dashReadyAt||0,until+.35);}
   event(g,'stun',{x:t.x,y:t.y,owner,targetOwner:t.owner,duration});
@@ -948,9 +1037,9 @@ function updatePoisonZones(g,dt){
     z.remaining=Math.max(0,z.remaining-dt);
     while(z.remaining>0&&z.nextTick<=g.time+1e-8){
       for(const t of entities){
-        if(t.owner===z.owner||t.hp<=0||distance(z,t)>z.radius+(t.radius||12)*.25)continue;
-        damage(g,t,(t.kind||t.building)?z.buildingDamage:z.damage,z.owner);
-        if(!t.kind&&!t.building&&t.hp>0){
+        if(t.owner===z.owner||t.hp<=0||t.targetable===false||distance(z,t)>z.radius+(t.radius||12)*.25)continue;
+        const dealt=damage(g,t,(t.kind||t.building)?z.buildingDamage:z.damage,z.owner);
+        if(dealt>0&&!t.kind&&!t.building&&t.hp>0){
           t.poisonOwner=z.owner;t.poisonUntil=Math.max(t.poisonUntil||0,g.time+z.lingerDuration);
           t.poisonDamage=Math.max(t.poisonDamage||0,z.lingerDamage);t.poisonTickEvery=z.tickEvery;
           t.poisonNextAt=Math.max(t.poisonNextAt||0,g.time+z.tickEvery);
@@ -979,7 +1068,7 @@ function createMudZone(g,p){
 function updateMudZones(g){
   const zones=(g.zones||[]).filter(z=>z.kind==='mud'&&z.remaining>0);if(!zones.length)return;
   for(const t of alive(g)){
-    if(t.hp<=0||t.kind||t.building||t.air||t.burrowState==='burrow')continue;
+    if(t.hp<=0||t.kind||t.building||t.air||t.targetable===false||t.burrowState==='burrow')continue;
     const z=zones.find(q=>q.owner!==t.owner&&distance(q,t)<=q.radius+(t.radius||12)*.25);if(!z)continue;
     t.mudUntil=Math.max(t.mudUntil||0,g.time+Math.min(.55,z.remaining));t.mudSlowFactor=Math.min(t.mudSlowFactor||1,z.slow||.7);
     if((t.mudNextAt??-Infinity)<=g.time+1e-8){damage(g,t,z.damage||30,z.owner);t.mudNextAt=g.time+(z.tickEvery||.5);}
@@ -990,7 +1079,8 @@ function impact(g,p,entities){
   if(p.chainCount&&target&&targetable(p,target)){
     const points=[];let current=target,amount=p.damage;const hit=new Set();
     for(let i=0;i<p.chainCount&&current;i++){
-      hit.add(current.id);damage(g,current,Math.round(amount),p.owner);points.push({x:current.x,y:current.y});
+      const hitDamage=Array.isArray(p.chainDamages)&&Number.isFinite(p.chainDamages[i])?p.chainDamages[i]:Math.round(amount);
+      hit.add(current.id);damage(g,current,hitDamage,p.owner);if(p.stunDuration&&current.hp>0)applyStun(g,current,p.stunDuration,p.owner);points.push({x:current.x,y:current.y,damage:hitDamage});
       amount*=p.chainFalloff||.8;
       const candidates=entities.filter(t=>!hit.has(t.id)&&targetable(p,t)&&!t.kind&&!t.building&&distance(current,t)<=p.chainRange+t.radius)
         .sort((a,b)=>distance(current,a)-distance(current,b)||String(a.id).localeCompare(String(b.id)));
@@ -999,15 +1089,17 @@ function impact(g,p,entities){
     event(g,'chain',{x:p.x,y:p.y,owner:p.owner,points});
   }else if(p.splash){
     event(g,'blast',{x:p.x,y:p.y,owner:p.owner,radius:p.splash,color:p.kind});
-    for(const t of entities)if(targetable(p,t)&&distance(t,p)<=p.splash+t.radius*.35)damage(g,t,p.damage,p.owner);
+    for(const t of entities)if(targetable(p,t)&&distance(t,p)<=p.splash+t.radius*.35){damage(g,t,p.damage,p.owner);if(t.hp>0&&p.slowDuration)applySlow(g,t,p);if(t.hp>0&&p.stunDuration&&(!p.stunUnitsOnly||(!t.kind&&!t.building)))applyStun(g,t,p.stunDuration,p.owner);}
     createMudZone(g,p);
   }else if(target&&targetable(p,target)){damage(g,target,p.damage,p.owner);applySlow(g,target,p);}
 }
 function attack(g,u,t){
   if(u.sparkUnit&&!u.sparkCharged)return;
+  // First actual attack commits ordinary mobile units to this target.
+  commitMobileTarget(u,t);
   const attackFactor=(u.slowUntil||0)>g.time?(u.slowAttackFactor||1):1;
   u.cd=u.cooldown/Math.max(.15,attackFactor);u.anim=.35;faceToward(u,t.x,t.y);u.target=t.id;
-  let amount=u.damage;
+  let amount=(t.kind||t.building)&&Number.isFinite(u.structureDamage)?u.structureDamage:u.damage;
   if(u.sparkUnit){u.sparkCharged=false;u.sparkChargeProgress=0;u.sparkChargeStartAt=g.time;event(g,'sparky-fire',{x:u.x,y:u.y,tx:t.x,ty:t.y,owner:u.owner,radius:u.splash||90});}
   if(u.chargeMultiplier&&u.charged&&(t.kind||t.building)){
     amount=Math.round(amount*u.chargeMultiplier);u.charged=false;u.chargeRun=0;
@@ -1015,9 +1107,9 @@ function attack(g,u,t){
   }
   if(u.projectile){
     g.projectiles.push({id:`p${g.nextId++}`,owner:u.owner,x:u.x,y:u.y-6,sx:u.x,sy:u.y,tx:t.x,ty:t.y,target:t.id,
-    kind:u.projectile,speed:u.projectile==='bomb'?220:(u.projectile==='lightning'?520:(u.projectile==='dart'?560:(u.projectile==='mud'?300:(u.projectile==='royal_arrow'?470:(u.projectile==='sparkblast'?340:390))))),damage:amount,splash:u.splash||0,
-    targetsAir:u.targetsAir,life:3,slowMove:u.slowMove,slowAttack:u.slowAttack,slowDuration:u.slowDuration,
-    chainCount:u.chainCount,chainRange:u.chainRange,chainFalloff:u.chainFalloff,mudRadius:u.mudRadius,mudDuration:u.mudDuration,mudTickEvery:u.mudTickEvery,mudDamage:u.mudDamage,mudSlow:u.mudSlow});
+    kind:u.projectile,speed:u.projectile==='bomb'?220:(u.projectile==='lightning'?520:(u.projectile==='electro'?450:(u.projectile==='thrown_spear'?480:(u.projectile==='dart'?560:(u.projectile==='mud'?300:(u.projectile==='royal_arrow'?470:(u.projectile==='sparkblast'?340:390))))))),damage:amount,splash:u.splash||0,
+    targetsAir:u.targetsAir,life:3,slowMove:u.slowMove,slowAttack:u.slowAttack,slowMoveStages:u.slowMoveStages,slowAttackStages:u.slowAttackStages,slowDuration:u.slowDuration,
+    chainCount:u.chainCount,chainRange:u.chainRange,chainFalloff:u.chainFalloff,chainDamages:Array.isArray(u.chainDamages)?u.chainDamages.map(v=>u.damage?Math.round(v*(amount/u.damage)):0):u.chainDamages,stunDuration:u.stunDuration,stunUnitsOnly:u.stunUnitsOnly,mudRadius:u.mudRadius,mudDuration:u.mudDuration,mudTickEvery:u.mudTickEvery,mudDamage:u.mudDamage,mudSlow:u.mudSlow});
   }else{
     damage(g,t,amount,u.owner);event(g,'slash',{x:t.x,y:t.y,owner:u.owner,angle:Math.atan2(t.y-u.y,t.x-u.x),kind:u.type});
   }
@@ -1026,9 +1118,10 @@ function resetLaserTower(u){
   u.laserTarget=null;u.laserLockTime=0;u.laserStage=0;u.laserDps=u.laserBaseDps||20;
 }
 function updateLaserTower(g,u,t,dt){
-  if(!u.laserTower)return false;
+  if(!u.laserTower&&!u.laserUnit)return false;
   if(!t){resetLaserTower(u);u.target=null;return true;}
   if(u.laserTarget!==t.id){
+    if(u.laserUnit)commitMobileTarget(u,t);
     u.laserTarget=t.id;u.laserLockTime=0;u.laserStage=0;u.laserDps=u.laserBaseDps||20;
     event(g,'laser-lock',{x:u.x,y:u.y,tx:t.x,ty:t.y,owner:u.owner});
   }else u.laserLockTime=(u.laserLockTime||0)+dt;
@@ -1119,26 +1212,29 @@ function tick(g,dt=ARENA.tick){
   for(const u of entities){
     if(u.hp<=0)continue;
     u.moving=false;
-    u.hit=Math.max(0,(u.hit||0)-dt);u.anim=Math.max(0,(u.anim||0)-dt);u.cd=Math.max(0,u.cd-dt);u.healCd=Math.max(0,(u.healCd||0)-dt);
+    const stunnedNow=(u.stunUntil||0)>g.time;
+    u.hit=Math.max(0,(u.hit||0)-dt);u.anim=Math.max(0,(u.anim||0)-dt);if(!stunnedNow)u.cd=Math.max(0,u.cd-dt);u.healCd=Math.max(0,(u.healCd||0)-dt);
     updateLingeringPoison(g,u);if(u.hp<=0)continue;
     if(u.kind==='core'&&!u.awake){u.target=null;continue;}
     if(!u.kind){
       u.age+=dt;
-      if(u.sparkUnit)updateSparkyCharge(g,u);
       if(updateBurrow(g,u,dt))continue;
+      if(updateDeployment(g,u,dt))continue;
+      if(u.sparkUnit)updateSparkyCharge(g,u);
       if(u.spawn>0){u.spawn=Math.max(0,u.spawn-dt);continue;}
       if(u.decayPerSecond){decayStructure(g,u,u.decayPerSecond*dt);if(u.hp<=0)continue;}
     }
-    if((u.stunUntil||0)>g.time){u.target=null;if(u.laserTower)resetLaserTower(u);continue;}
-    if(!u.kind)updateSummoner(g,u);
+    if((u.stunUntil||0)>g.time){u.target=null;if(u.laserTower||u.laserUnit)resetLaserTower(u);continue;}
+    if(!u.kind&&updateSummoner(g,u)){u.target=null;if(u.laserTower||u.laserUnit)resetLaserTower(u);continue;}
     if(updateShadowRush(g,u,entities,dt))continue;
     healingPulse(g,u,entities);
     const target=getTarget(g,u,entities);
-    if(!target){if(u.laserTower)resetLaserTower(u);u.target=null;continue;}
+    if(!target){if(u.laserTower||u.laserUnit)resetLaserTower(u);u.target=null;continue;}
     u.target=target.id;
     const reach=u.range+target.radius;
-    if(u.laserTower){
-      if(distance(u,target)<=reach)updateLaserTower(g,u,target,dt);else resetLaserTower(u);
+    if(u.laserTower||u.laserUnit){
+      if(distance(u,target)<=reach)updateLaserTower(g,u,target,dt);
+      else {resetLaserTower(u);if(u.laserUnit&&!u.kind&&!u.building)move(g,u,target,dt);}
       continue;
     }
     if(canShadowRush(g,u,target)){beginShadowWindup(g,u,target);continue;}
@@ -1169,7 +1265,7 @@ function viewMatch(g,seat=0){
   const p=g.players[seat];
   return {physicsVersion:PHYSICS_VERSION,phase:g.phase,countdown:g.countdown,time:rnd(g.time),overtime:g.overtime,winner:g.winner,reason:g.reason,
     scores:[towerScore(g,0),towerScore(g,1)],energy:rnd(p.energy),hand:[...p.hand],next:p.queue[0],deck:[...p.deck],
-    units:g.units.map(u=>({id:u.id,type:u.type,owner:u.owner,x:rnd(u.x),y:rnd(u.y),hp:u.hp,maxHp:u.maxHp,radius:u.radius,air:u.air,building:!!u.building,anim:u.anim,hit:u.hit,walk:u.walk,spawn:u.spawn,face:u.face,facing:u.facing,moving:!!u.moving,mass:u.mass,age:u.age,target:u.target||null,laserStage:u.laserStage||0,laserDps:rnd(u.laserDps||0),laserLockTime:rnd(u.laserLockTime||0),charged:!!u.charged,chargeRun:rnd(u.chargeRun||0),sparkCharged:!!u.sparkCharged,sparkChargeProgress:rnd(u.sparkChargeProgress||0),stunned:(u.stunUntil||0)>g.time,stunRemaining:rnd(Math.max(0,(u.stunUntil||0)-g.time)),slowed:(u.slowUntil||0)>g.time,slowRemaining:rnd(Math.max(0,(u.slowUntil||0)-g.time)),poisoned:(u.poisonUntil||0)>g.time,poisonOwner:Number.isFinite(u.poisonOwner)?u.poisonOwner:null,poisonRemaining:rnd(Math.max(0,(u.poisonUntil||0)-g.time)),mudded:(u.mudUntil||0)>g.time,mudRemaining:rnd(Math.max(0,(u.mudUntil||0)-g.time)),burrowState:u.burrowState||null,burrowProgress:rnd(u.burrowProgress||0),summonType:u.summonType||null,summonCount:u.summonCount||0,summonRemaining:u.summonInterval?rnd(Math.max(0,(u.summonNextAt||g.time)-g.time)):0,dashState:u.dashState||null,dashWindupRemaining:rnd(Math.max(0,(u.dashWindupUntil||0)-g.time)),dashCooldownRemaining:rnd(Math.max(0,(u.dashReadyAt||0)-g.time)),invulnerable:(u.invulnerableUntil||0)>g.time})),
+    units:g.units.map(u=>({id:u.id,type:u.type,owner:u.owner,x:rnd(u.x),y:rnd(u.y),hp:u.hp,maxHp:u.maxHp,radius:u.radius,air:u.air,building:!!u.building,anim:u.anim,hit:u.hit,walk:u.walk,spawn:u.spawn,face:u.face,facing:u.facing,moving:!!u.moving,mass:u.mass,age:u.age,target:u.target||null,targetable:u.targetable!==false,deploying:!!u.deploying,deployTotal:rnd(u.deployTotal||0),deployRemaining:rnd(u.deployRemaining||0),collisionDisabled:!!u.collisionDisabled,laserStage:u.laserStage||0,laserDps:rnd(u.laserDps||0),laserLockTime:rnd(u.laserLockTime||0),charged:!!u.charged,chargeRun:rnd(u.chargeRun||0),sparkCharged:!!u.sparkCharged,sparkChargeProgress:rnd(u.sparkChargeProgress||0),stunned:(u.stunUntil||0)>g.time,stunRemaining:rnd(Math.max(0,(u.stunUntil||0)-g.time)),slowed:(u.slowUntil||0)>g.time,slowStage:(u.slowUntil||0)>g.time?(u.slowStage||1):0,slowRemaining:rnd(Math.max(0,(u.slowUntil||0)-g.time)),poisoned:(u.poisonUntil||0)>g.time,poisonOwner:Number.isFinite(u.poisonOwner)?u.poisonOwner:null,poisonRemaining:rnd(Math.max(0,(u.poisonUntil||0)-g.time)),mudded:(u.mudUntil||0)>g.time,mudRemaining:rnd(Math.max(0,(u.mudUntil||0)-g.time)),burrowState:u.burrowState||null,burrowProgress:rnd(u.burrowProgress||0),summonType:u.summonType||null,summonCount:u.summonCount||0,summonRemaining:u.summonInterval?rnd(Math.max(0,(u.summonNextAt||g.time)-g.time)):0,summonCasting:(u.summonCastingUntil||0)>g.time,summonWindupRemaining:rnd(Math.max(0,(u.summonCastingUntil||0)-g.time)),dashState:u.dashState||null,dashWindupRemaining:rnd(Math.max(0,(u.dashWindupUntil||0)-g.time)),dashCooldownRemaining:rnd(Math.max(0,(u.dashReadyAt||0)-g.time)),invulnerable:(u.invulnerableUntil||0)>g.time})),
     towers:g.towers.map(t=>({id:t.id,kind:t.kind,owner:t.owner,x:t.x,y:t.y,hp:t.hp,maxHp:t.maxHp,radius:t.radius,anim:t.anim,hit:t.hit,facing:t.facing,awake:t.kind==='core'?!!t.awake:true,stunned:(t.stunUntil||0)>g.time,stunRemaining:rnd(Math.max(0,(t.stunUntil||0)-g.time))})),
     projectiles:g.projectiles.map(p=>({id:p.id,owner:p.owner,x:rnd(p.x),y:rnd(p.y),tx:rnd(p.tx),ty:rnd(p.ty),kind:p.kind,spell:p.spell||null,progress:rnd(p.progress||0),radius:p.splash||0})),
     zones:(g.zones||[]).map(z=>({id:z.id,owner:z.owner,kind:z.kind,spell:z.spell,x:rnd(z.x),y:rnd(z.y),radius:z.radius,remaining:rnd(z.remaining),total:z.total})),
@@ -1359,6 +1455,25 @@ function drawMudDragon(c,opts={}){
   rr(c,-12,-24,24,6,3,team,ink);if(opts.hit){c.globalAlpha*=.4;ellipse(c,0,-24,25,34,'#fff0ba');}c.restore();
 }
 
+function drawLaserDragon(c,opts={}){
+  const t=opts.time||0,walk=opts.walk||0,back=!!opts.back,team=TEAM_COLORS[opts.owner||0];
+  const ink='#203744',body='#477fb7',body2='#86b9dc',belly='#d8e6ea',wing='#546e9c',wing2='#8da7cf',horn='#d8d9ef',core='#d7b9ff';
+  const flap=Math.sin(t*7+walk)*.34,bob=Math.sin(t*3.2)*1.7,stage=opts.laserStage||0,pulse=.5+.5*Math.sin(t*10);
+  c.save();c.translate(0,-19+bob);
+  for(const side of [-1,1]){c.save();c.scale(side,1);c.rotate(flap);path(c,[[5,-27],[21,-48],[40,-43],[31,-25],[44,-12],[25,-15],[18,1],[8,-7]],wing,ink,1.5);path(c,[[12,-28],[27,-39],[20,-18]],wing2,null);c.restore();}
+  path(c,[[-13,-32],[-8,-52],[0,-61],[9,-52],[14,-31],[10,3],[0,13],[-10,3]],body2,ink,1.6);ellipse(c,0,-13,11,18,belly);
+  if(back){for(const y of [-46,-35,-24,-13])path(c,[[-4,y],[0,y-7],[4,y]],core,ink,.8);}
+  else{
+    path(c,[[-12,-48],[-6,-62],[0,-55],[7,-62],[13,-47]],body,ink,1.3);ellipse(c,-5,-44,2.2,2.2,'#f4f0a7');ellipse(c,5,-44,2.2,2.2,'#f4f0a7');
+    for(const side of [-1,1])path(c,[[side*8,-53],[side*15,-64],[side*13,-48]],horn,ink,1);
+    ellipse(c,0,-37,6+Math.min(5,stage),4+Math.min(3,stage*.5),stage>=3?'#ffc7ef':core,ink,1);
+    c.save();c.globalAlpha=.25+.25*pulse;ellipse(c,0,-37,11+stage*2,7+stage,'#dcbaff');c.restore();
+  }
+  path(c,[[-5,6],[0,26],[5,6]],body,ink,1.2);rr(c,-12,-25,24,5,2,team,ink);
+  if(opts.hit){c.globalAlpha*=.42;ellipse(c,0,-25,25,35,'#fff0d2');}
+  c.restore();
+}
+
 function drawBlowdartGoblin(c,opts={}){
   const t=opts.time||0,walk=opts.walk||0,attack=opts.anim||0,moving=opts.moving??walk!==0,back=!!opts.back;
   const ink='#263738',skin='#77a953',skin2='#a8cf70',cloth='#4c5f43',wood='#b78c5e',team=TEAM_COLORS[opts.owner||0];
@@ -1413,19 +1528,30 @@ function drawNightshade(c,opts={}){
   if(opts.hit){c.globalAlpha*=.5;ellipse(c,0,-31,19,28,'#eee5ff');}c.restore();
 }
 
-function drawMossling(c,opts={}){
+function drawGoblinTrooper(c,opts={},spear=false){
   const t=opts.time||0,walk=opts.walk||0,attack=opts.anim||0,moving=opts.moving??walk!==0,back=!!opts.back;
-  const ink='#2c443a',body='#72915a',body2='#9cb96e',leaf='#496f4d',flower='#f2d39a',team=TEAM_COLORS[opts.owner||0];
-  const hop=(moving?Math.abs(Math.sin(walk*1.4))*3:Math.sin(t*3)*.45),jab=attack?Math.sin((1-attack/.35)*Math.PI):0;
+  const ink='#294238',skin='#7fae5e',skin2='#a4c97a',cloth='#6c573e',cloth2='#9a774d',metal='#d9d4b8',team=TEAM_COLORS[opts.owner||0];
+  const hop=(moving?Math.abs(Math.sin(walk*1.35))*2.4:Math.sin(t*3)*.35),jab=attack?Math.sin((1-attack/.35)*Math.PI):0;
   c.save();c.translate(0,-hop);
-  for(const side of [-1,1]){line(c,side*4,-4,side*6,8,ink,4);ellipse(c,side*7,9,5,3,'#465b43');}
-  ellipse(c,0,-13,12,14,body);path(c,[[-10,-20],[-17,-30],[-5,-27],[0,-38],[6,-27],[17,-31],[11,-19]],leaf,ink,1.2);
-  rr(c,-10,-16,20,6,3,team);
-  for(const side of [-1,1]){c.save();c.translate(side*11,-14);c.rotate(side*(.3+jab*.7));line(c,0,0,side*8,8,body2,5);ellipse(c,side*8,8,3,3,leaf);c.restore();}
-  if(back){path(c,[[-8,-19],[0,-25],[8,-19],[6,-8],[0,-4],[-6,-8]],'#5c7d50',ink,1);line(c,0,-25,0,-5,'#b1cb7b',1.3);}
-  else{ellipse(c,-4,-16,2,2,'#fff0b0');ellipse(c,4,-16,2,2,'#fff0b0');path(c,[[-4,-9],[0,-6],[4,-9]],null,ink,1.2);ellipse(c,8,-28,2.5,2.5,flower);}
-  if(opts.hit){c.globalAlpha*=.55;ellipse(c,0,-14,13,17,'#f7f1c1');}c.restore();
+  for(const side of [-1,1]){line(c,side*4,-3,side*6,9,cloth,4);ellipse(c,side*7,10,5,3,'#3c503d');}
+  path(c,[[-10,-27],[-17,-34],[-9,-34],[-5,-39],[0,-35],[5,-39],[9,-34],[17,-34],[10,-27]],skin,ink,1.1);
+  ellipse(c,0,-23,11,10,skin);ellipse(c,-4,-25,2,2,'#fff0a7');ellipse(c,4,-25,2,2,'#fff0a7');
+  if(!back){path(c,[[-4,-19],[0,-16],[4,-19]],null,ink,1.2);}
+  rr(c,-10,-16,20,15,4,cloth2,ink);rr(c,-10,-15,20,5,2,team,ink);
+  c.save();c.translate(-10,-12);c.rotate(.18+jab*.35);line(c,0,0,-5,10,skin2,5);ellipse(c,-5,10,3,3,skin);c.restore();
+  c.save();c.translate(10,-12);c.rotate(-.18-jab*(spear?.5:.9));line(c,0,0,5,10,skin2,5);ellipse(c,5,10,3,3,skin);
+  if(spear){
+    const ext=8+jab*8;line(c,6,10,6,-31-ext,'#79583b',3);path(c,[[2,-31-ext],[6,-41-ext],[10,-31-ext]],metal,ink,1);
+  }else{
+    c.translate(5,10);c.rotate(-.4-jab*.7);line(c,0,0,1,-14,'#765237',3);path(c,[[-3,-18],[2,-14],[5,-21]],metal,ink,1);
+  }
+  c.restore();
+  if(back){line(c,-7,-25,7,-25,'#587846',1.4);}
+  if(opts.hit){c.globalAlpha*=.55;ellipse(c,0,-15,13,18,'#f8f0b9');}
+  c.restore();
 }
+function drawMossling(c,opts={}){drawGoblinTrooper(c,opts,false);}
+function drawGoblinSpear(c,opts={}){drawGoblinTrooper(c,opts,true);}
 
 
 function drawBoneSwarm(c,opts={}){
@@ -1550,6 +1676,26 @@ function drawStormHarpy(c,opts={}){
   if(opts.hit){c.globalAlpha*=.5;ellipse(c,0,-32,19,31,'#e9eeff');}c.restore();
 }
 
+
+function drawElekitelWizard(c,opts={}){
+  const t=opts.time||0,walk=opts.walk||0,attack=opts.anim||0,moving=opts.moving??walk!==0,back=!!opts.back;
+  const ink='#253a47',robe='#3f6f8e',robe2='#6ea7bf',electric='#ffe36d',electric2='#bdf3ff',metal='#8f9aa1',skin='#e0b48f',team=TEAM_COLORS[opts.owner||0];
+  const bob=Math.sin(walk)*.8+(moving?0:Math.sin(t*2.5)*.35),cast=attack?Math.sin((1-attack/.35)*Math.PI):0;
+  c.save();c.translate(0,bob);
+  for(const side of [-1,1]){c.save();c.translate(side*6,-7);c.rotate(Math.sin(walk+(side>0?Math.PI:0))*(moving?.25:0));line(c,0,0,0,14,'#3e5260',7);rr(c,-5,10,10,6,2,ink);c.restore();}
+  path(c,[[-17,-42],[17,-42],[21,-5],[5,-14],[0,0],[-6,-14],[-21,-5]],robe,ink,1.5);rr(c,-15,-39,30,7,3,team);
+  if(back){path(c,[[-10,-35],[0,-43],[10,-35],[7,-17],[0,-12],[-7,-17]],robe2,ink,1);line(c,-8,-29,8,-18,electric2,1.5);}
+  else{path(c,[[-8,-34],[0,-40],[8,-34],[5,-21],[0,-16],[-5,-21]],robe2,ink,1);ellipse(c,0,-27,3,3,electric);}
+  // coil staff and casting hand
+  c.save();c.translate(15,-31);c.rotate(-.12-cast*.55);line(c,0,0,2,16,robe2,8);ellipse(c,2,16,3.5,3.5,skin);line(c,2,16,3,-33,'#746151',4);ellipse(c,3,-38,8,8,metal);ellipse(c,3,-38,4,4,electric2);c.strokeStyle=electric;c.lineWidth=2;c.beginPath();c.arc(3,-38,12+cast*5,0,TAU);c.stroke();c.restore();
+  c.save();c.translate(-15,-31);c.rotate(.12+cast*.5);line(c,0,0,-3,15,robe2,8);ellipse(c,-3,15,3.5,3.5,skin);if(!back){line(c,-3,15,-11,7,electric,2);line(c,-11,7,-6,1,electric2,2);}c.restore();
+  const hy=-55;path(c,[[-14,hy+7],[-12,hy-10],[0,hy-20],[13,hy-10],[14,hy+7],[8,hy+13],[-8,hy+13]],robe2,ink,1.4);
+  if(back){path(c,[[-9,hy-6],[0,hy-15],[9,hy-6],[7,hy+9],[-7,hy+9]],robe,ink,1);}else{ellipse(c,0,hy,10,10,skin);ellipse(c,-4,hy-1,1.6,1.8,electric);ellipse(c,4,hy-1,1.6,1.8,electric);}
+  // small electrical arcs around the silhouette
+  for(let i=0;i<4;i++){const a=t*2.8+i*TAU/4,r=24+3*Math.sin(t*4+i);const x=Math.cos(a)*r,y=-34+Math.sin(a)*r*.65;line(c,x,y,x+Math.cos(a+.7)*6,y+Math.sin(a+.7)*5,i%2?electric:electric2,1.4);}
+  if(opts.hit){c.globalAlpha*=.48;ellipse(c,0,-33,20,31,'#e6fbff');}c.restore();
+}
+
 function drawStoneGolem(c,opts={}){
   const t=opts.time||0,walk=opts.walk||0,attack=opts.anim||0,moving=opts.moving??walk!==0;
   const ink='#263d41',stone='#8c9484',stoneLight='#b7b8a2',stoneDark='#636f66',moss='#71885a',moss2='#93a96d',rune='#70d8ff';
@@ -1665,6 +1811,108 @@ function drawSparky(c,opts={}){
   if(opts.hit){c.globalAlpha*=.42;ellipse(c,0,-24,29,31,'#fff6c6');}c.restore();
 }
 
+function drawDosranboss(c,opts={}){
+  const t=opts.time||0,walk=opts.walk||0,attack=opts.anim||0,moving=opts.moving??walk!==0,back=!!opts.back,team=TEAM_COLORS[opts.owner||0];
+  const ink='#203744',body='#2d68a1',body2='#6ea3cf',body3='#9ec4df',belly='#eadfc6',crest='#e56e34',crest2='#ffd27c',claw='#141c23',clawHi='#efe6cf';
+  const bob=(moving?Math.sin(walk)*1.0:Math.sin(t*2)*0.35),stride=moving?Math.sin(walk)*5.5:0,tailSwing=moving?Math.sin(walk*.8)*5:Math.sin(t*2.1)*2.2;
+  const bite=attack?Math.sin((1-attack/.35)*Math.PI):0;
+  const pix=(x,y,w,h,fill,stroke=ink,lw=1.1)=>rr(c,x,y,w,h,1,fill,stroke,lw);
+  c.save();c.translate(0,bob);
+  if(opts.summonCasting){
+    const pulse=.55+.45*Math.sin(t*9);
+    c.save();c.globalAlpha=.18+.18*pulse;
+    ellipse(c,0,11,26+pulse*7,9+pulse*3,team+'55');
+    ellipse(c,0,11,34+pulse*8,12+pulse*4,team+'22');
+    for(let i=0;i<6;i++){
+      const a=t*3.2+i*TAU/6;
+      pix(Math.cos(a)*22-3,1+Math.sin(a)*9,6,6,i%2?crest2:team,null,0);
+    }
+    c.restore();
+  }
+  // tail - curled downward so the sprite reads vertically from top-down and side views
+  pix(12,-2,10,6,body2);pix(21,2,9,6,body);pix(29,7,8,6,body2);pix(35,12+tailSwing*.08,8,6,body);pix(40,18+tailSwing*.12,7,6,body2);pix(44,24+tailSwing*.15,6,6,crest2,ink,.8);
+  // hind legs
+  for(const side of [-1,1]){
+    const s=side<0?stride:-stride;
+    c.save();c.translate(side*11,0);
+    pix(-5,-7-s*.12,10,16,body2);
+    pix(-6,8+s*.08,11,10,body3);
+    pix(-8,18+s*.05,14,7,clawHi);
+    pix(-8,24+s*.03,4,4,crest);pix(-1,25-s*.02,4,4,crest);pix(5,24+s*.01,4,4,crest);
+    c.restore();
+  }
+  // torso / chest (upright silhouette)
+  pix(-17,-38,34,30,body);
+  pix(-14,-34,28,22,body2,null,0);
+  pix(-9,-17,18,15,belly,null,0);
+  pix(-17,-39,8,5,crest2,null,0);pix(-3,-41,10,5,crest2,null,0);pix(11,-39,8,5,crest2,null,0);
+  pix(-13,-29,6,6,body3,null,0);pix(-1,-26,6,6,body3,null,0);pix(9,-31,5,6,body3,null,0);
+  // chest spikes
+  pix(-13,-12,5,4,body3,null,0);pix(-4,-11,5,4,body3,null,0);pix(5,-12,5,4,body3,null,0);
+  // small forearms
+  for(const side of [-1,1]){
+    const jab=(side<0?1:-1)*bite*4;
+    c.save();c.translate(side*15,-19);
+    pix(-4,-2,7,13,body2);
+    pix(-5+jab,10,9,4,clawHi);
+    pix(-6+jab,13,3,5,claw);pix(-1+jab,13,3,5,claw);pix(4+jab,13,3,5,claw);
+    c.restore();
+  }
+  // neck and head rise upward
+  pix(-8,-56,12,18,body2);
+  pix(-10,-70,16,17,body3);
+  pix(-18,-80-bite*4,32,12,body);
+  pix(-23,-82-bite*4,7,6,crest);pix(-16,-88-bite*4,7,6,crest2);pix(-8,-93-bite*4,8,6,crest);pix(0,-90-bite*4,8,6,crest2);pix(8,-85-bite*4,7,6,crest);
+  if(back){
+    pix(-10,-74,10,8,body2);pix(-3,-74,8,8,body2);pix(-12,-69,14,4,belly,null,0);
+  }else{
+    pix(-12,-74,19,7,belly,null,0);
+    pix(-14,-77,3,3,'#101920',null,0);pix(-7,-78,3,3,'#101920',null,0);
+    pix(-14,-67-bite*1.5,20,3,clawHi,null,0);
+    pix(5,-68-bite*1.5,10,3,crest2,null,0);
+  }
+  // chin + vertical highlight for the 3D-derived silhouette
+  pix(-4,-50,8,9,belly,null,0);
+  if(opts.hit){c.globalAlpha*=.42;ellipse(c,0,-24,33,28,'#fff2cc');}
+  c.restore();
+}
+
+
+function drawRanbos(c,opts={}){
+  const t=opts.time||0,walk=opts.walk||0,moving=opts.moving??walk!==0,back=!!opts.back,team=TEAM_COLORS[opts.owner||0];
+  const ink='#223742',body='#5a8fc3',body2='#9fc0da',belly='#e8deca',crest='#ef9550',crest2='#ffd18c',claw='#182028',clawHi='#f5ecd6';
+  const bob=(moving?Math.sin(walk)*.8:Math.sin(t*2.2)*.22),stride=moving?Math.sin(walk)*3.2:0;
+  const pix=(x,y,w,h,fill,stroke=ink,lw=1)=>rr(c,x,y,w,h,1,fill,stroke,lw);
+  c.save();c.translate(0,bob);
+  // tail tucked down for a more upright readable 2D profile
+  pix(7,-1,7,5,body2);pix(13,3,6,5,body);pix(18,7,6,5,body2);pix(22,11,5,4,crest2,ink,.8);
+  for(const side of [-1,1]){
+    const s=side<0?stride:-stride;
+    c.save();c.translate(side*7,1);
+    pix(-3,-4-s*.1,6,11,body2);
+    pix(-4,7+s*.06,8,5,clawHi);
+    pix(-4,11,3,3,crest);pix(1,11,3,3,crest);
+    c.restore();
+  }
+  pix(-11,-24,22,18,body);
+  pix(-8,-21,16,12,body2,null,0);
+  pix(-4,-11,9,8,belly,null,0);
+  pix(-3,-35,8,12,body2);
+  pix(-4,-45,12,12,body2);
+  pix(-10,-51,6,5,crest);pix(-4,-56,6,5,crest2);pix(2,-53,6,5,crest);
+  if(back){
+    pix(-4,-40,7,6,body2);
+  }else{
+    pix(-6,-40,12,5,belly,null,0);
+    pix(-7,-43,2,2,'#112028',null,0);pix(-2,-44,2,2,'#112028',null,0);
+    pix(-7,-34,12,2,clawHi,null,0);
+  }
+  pix(-9,-17,4,8,body2);pix(4,-17,4,8,body2);
+  if(opts.hit){c.globalAlpha*=.38;ellipse(c,0,-15,18,14,'#fff3d3');}
+  if(opts.owner!=null){c.save();c.globalAlpha=.18;ellipse(c,0,-9,14,6,team);c.restore();}
+  c.restore();
+}
+
 function drawAshSquadCard(c,opts={}){
   const owner=opts.owner||0,time=opts.time||0;
   drawUnit(c,'blade',0,-10,.60,{...opts,time,owner,noShadow:true,idle:true,back:opts.back});
@@ -1678,24 +1926,29 @@ function drawUnit(c,type,x,y,scale=1,opts={}){
   const moving=opts.moving??walk!==0,bob=Math.sin(walk)*1.5+(opts.idle?Math.sin(t*2)*.65:0);
   c.save();c.translate(x,y);c.scale(scale,scale);
   if(opts.alpha!=null)c.globalAlpha=opts.alpha;
-  if(!opts.noShadow){const sr=type==='golem'?32:type==='mini_golem'?20:type==='berserker'?27:type==='boar'?25:type==='knight'?23:type==='mossling'?12:type==='boneswarm'?9:type==='tigger'?18:type==='muddragon'?26:type==='harpy'?20:type==='ashsquad'?30:type==='necromancer'||type==='darknecro'?21:type==='sparky'?28:type==='princess'?19:18;ellipse(c,0,5,sr,type==='golem'?9:type==='mini_golem'?6:type==='boar'?8:6,'#172f3435');}
+  if(!opts.noShadow){const sr=type==='golem'?32:type==='mini_golem'?20:type==='berserker'?27:type==='boar'?25:type==='knight'?23:type==='mossling'||type==='goblin_melee'||type==='goblin_spear'?12:type==='boneswarm'?9:type==='tigger'?18:type==='muddragon'?26:type==='laserdragon'?25:type==='harpy'?20:type==='electrowizard'?20:type==='ashsquad'?30:type==='necromancer'||type==='darknecro'?21:type==='dosranboss'?31:type==='ranbos'?16:type==='sparky'?28:type==='princess'?19:18;ellipse(c,0,5,sr,type==='golem'?9:type==='mini_golem'?6:type==='boar'?8:type==='dosranboss'?9:6,'#172f3435');}
   if(opts.mirror)c.scale(-1,1);
   if(type==='golem'){drawStoneGolem(c,opts);c.restore();return;}
   if(type==='mini_golem'){c.scale(.62,.62);drawStoneGolem(c,opts);c.restore();return;}
   if(type==='boar'){drawIronBoar(c,opts);c.restore();return;}
   if(type==='tigger'){drawTigger(c,opts);c.restore();return;}
   if(type==='muddragon'){drawMudDragon(c,opts);c.restore();return;}
+  if(type==='laserdragon'){drawLaserDragon(c,opts);c.restore();return;}
   if(type==='blowdart'){drawBlowdartGoblin(c,opts);c.restore();return;}
   if(type==='lasertower'){drawLaserTower(c,opts);c.restore();return;}
   if(type==='nightshade'){drawNightshade(c,opts);c.restore();return;}
-  if(type==='mossling'){drawMossling(c,opts);c.restore();return;}
+  if(type==='mossling'||type==='goblin_melee'){drawMossling(c,opts);c.restore();return;}
+  if(type==='goblin_spear'){drawGoblinSpear(c,opts);c.restore();return;}
   if(type==='boneswarm'){drawBoneSwarm(c,opts);c.restore();return;}
   if(type==='berserker'){drawKraggBerserker(c,opts);c.restore();return;}
   if(type==='lumina'){drawLumina(c,opts);c.restore();return;}
   if(type==='frost'){drawFrostShaman(c,opts);c.restore();return;}
   if(type==='harpy'){drawStormHarpy(c,opts);c.restore();return;}
+  if(type==='electrowizard'){drawElekitelWizard(c,opts);c.restore();return;}
   if(type==='necromancer'){drawNecromancer(c,opts,false);c.restore();return;}
   if(type==='darknecro'){drawNecromancer(c,opts,true);c.restore();return;}
+  if(type==='dosranboss'){drawDosranboss(c,opts);c.restore();return;}
+  if(type==='ranbos'){drawRanbos(c,opts);c.restore();return;}
   if(type==='ashsquad'){drawAshSquadCard(c,opts);c.restore();return;}
   if(type==='princess'){drawPrincessArcher(c,opts);c.restore();return;}
   if(type==='sparky'){drawSparky(c,opts);c.restore();return;}
@@ -1925,11 +2178,11 @@ function drawArena(canvas,snapshot,options={}){
   }
   // Continuous laser beams are drawn beneath units so the locked target remains readable.
   for(const u of g.units||[]){
-    if(u.type!=='lasertower'||u.hp<=0||!u.target)continue;
+    if(!['lasertower','laserdragon'].includes(u.type)||u.hp<=0||!u.target)continue;
     const target=[...(g.units||[]),...(g.towers||[])].find(e=>e.id===u.target&&e.hp>0);if(!target)continue;
     const p=orient(u,seat),q=orient(target,seat),stage=u.laserStage||0,pulse=.75+.2*Math.sin(time*18);
-    c.save();c.globalAlpha=.7+.18*pulse;c.strokeStyle=stage>=4?'#ff9bd5':stage>=2?'#e8b4ff':'#c8d5ff';c.lineWidth=Math.min(8,2+stage*.85);c.beginPath();c.moveTo(p.x,p.y-32);c.lineTo(q.x,q.y-(target.air?20:12));c.stroke();
-    c.globalAlpha=.9;c.strokeStyle='#fff3ff';c.lineWidth=1.2;c.beginPath();c.moveTo(p.x,p.y-32);c.lineTo(q.x,q.y-(target.air?20:12));c.stroke();c.restore();
+    c.save();c.globalAlpha=.7+.18*pulse;c.strokeStyle=stage>=4?'#ff9bd5':stage>=2?'#e8b4ff':'#c8d5ff';c.lineWidth=Math.min(8,2+stage*.85);c.beginPath();c.moveTo(p.x,p.y-(u.type==='laserdragon'?39:32));c.lineTo(q.x,q.y-(target.air?20:12));c.stroke();
+    c.globalAlpha=.9;c.strokeStyle='#fff3ff';c.lineWidth=1.2;c.beginPath();c.moveTo(p.x,p.y-(u.type==='laserdragon'?39:32));c.lineTo(q.x,q.y-(target.air?20:12));c.stroke();c.restore();
   }
   const markerUnits=[];
   for(const item of renderOrder(g,seat)){
@@ -1938,13 +2191,27 @@ function drawArena(canvas,snapshot,options={}){
     if(u.burrowState==='burrow'){
       c.save();c.globalAlpha=.7;ellipse(c,p.x,p.y+2,17,7,'#806548');ellipse(c,p.x-8,p.y-2,5,3,'#a58a62');ellipse(c,p.x+7,p.y-3,4,2,'#b19970');c.strokeStyle=TEAM_COLORS[owner]+'99';c.lineWidth=1.5;c.setLineDash([3,5]);c.beginPath();c.ellipse(p.x,p.y,20,9,0,0,TAU);c.stroke();c.setLineDash([]);c.restore();continue;
     }
+    if(u.deploying){
+      const total=Math.max(.01,u.deployTotal||1),remaining=Math.max(0,u.deployRemaining||0),progress=clamp(1-remaining/total,0,1),team=TEAM_COLORS[owner];
+      c.save();
+      c.globalAlpha=.14+.10*Math.sin(time*8)*Math.sin(time*8);ellipse(c,p.x,p.y+5,u.radius+14,(u.radius+14)*.42,team);
+      c.globalAlpha=.9;c.strokeStyle=team;c.lineWidth=2.4;c.setLineDash([5,4]);c.beginPath();c.ellipse(p.x,p.y+5,u.radius+10,(u.radius+10)*.38,0,0,TAU);c.stroke();c.setLineDash([]);
+      c.lineWidth=3.2;c.strokeStyle='#f2f7df';c.beginPath();c.arc(p.x,p.y+5,u.radius+16,-Math.PI/2,-Math.PI/2+TAU*progress);c.stroke();
+      for(let i=0;i<5;i++){const a=time*2.8+i*TAU/5,r=u.radius+11+4*Math.sin(time*3+i);ellipse(c,p.x+Math.cos(a)*r,p.y-7+Math.sin(a)*r*.42,2.5,2.5,i%2?team:'#f4edbe');}
+      c.restore();
+      drawUnit(c,u.type,p.x,p.y,(u.type==='mossling'||u.type==='goblin_melee'||u.type==='goblin_spear')? .9:u.type==='boneswarm'?.78:u.type==='tigger'?1.0:u.type==='muddragon'?.92:u.type==='laserdragon'?.92:u.type==='blowdart'?.9:u.type==='lasertower'?.92:u.type==='bat'?.93:u.type==='golem'?.92:u.type==='mini_golem'?.72:u.type==='berserker'?.94:u.type==='harpy'?.9:u.type==='electrowizard'?.95:u.type==='dosranboss'?.88:u.type==='ranbos'?.84:.95,{time,walk:0,moving:false,owner,anim:0,hit:0,charged:false,sparkCharged:false,sparkChargeProgress:0,stunned:false,laserStage:u.laserStage||0,summonCasting:false,dashWindup:false,dashing:false,invulnerable:true,alpha:.16+.34*progress,back:facing.back,mirror:u.building?false:facing.mirror,facing:facing.angle});
+      const w=Math.max(34,Math.min(62,u.radius*2+22)),barY=p.y-(u.air?50:88);
+      rr(c,p.x-w/2,barY,w,7,3,'#172f34cc');rr(c,p.x-w/2+1,barY+1,(w-2)*progress,5,2,team);
+      c.save();c.fillStyle='#f3f6e7';c.font='bold 9px sans-serif';c.textAlign='center';c.fillText(`${u.building?'建設':'召喚'} ${remaining.toFixed(1)}s`,p.x,barY-5);c.restore();
+      continue;
+    }
     c.strokeStyle=TEAM_COLORS[owner]+'b0';c.lineWidth=2;c.beginPath();c.ellipse(p.x,p.y+4,u.radius+4,(u.radius+4)*.34,0,0,TAU);c.stroke();
-    drawUnit(c,u.type,p.x,p.y,u.type==='mossling'?.9:u.type==='boneswarm'?.78:u.type==='tigger'?1.0:u.type==='muddragon'?.92:u.type==='blowdart'?.9:u.type==='lasertower'?.92:u.type==='bat'?.93:u.type==='golem'?.92:u.type==='mini_golem'?.72:u.type==='berserker'?.94:u.type==='harpy'?.9:.95,{time,walk:u.walk,moving:u.moving,owner,anim:u.anim,hit:u.hit,charged:u.charged,sparkCharged:u.sparkCharged,sparkChargeProgress:u.sparkChargeProgress,stunned:u.stunned,dashWindup:u.dashState==='windup',dashing:u.dashState==='rush',invulnerable:!!u.invulnerable,alpha:u.spawn>0?.5:1,back:facing.back,mirror:u.building?false:facing.mirror,facing:facing.angle});
-    if(u.slowed){c.save();c.strokeStyle='#a9ebffcc';c.lineWidth=2;c.setLineDash([3,4]);c.beginPath();c.ellipse(p.x,p.y+3,u.radius+8,(u.radius+8)*.42,0,0,TAU);c.stroke();c.restore();}
+    drawUnit(c,u.type,p.x,p.y,(u.type==='mossling'||u.type==='goblin_melee'||u.type==='goblin_spear')? .9:u.type==='boneswarm'?.78:u.type==='tigger'?1.0:u.type==='muddragon'?.92:u.type==='laserdragon'?.92:u.type==='blowdart'?.9:u.type==='lasertower'?.92:u.type==='bat'?.93:u.type==='golem'?.92:u.type==='mini_golem'?.72:u.type==='berserker'?.94:u.type==='harpy'?.9:u.type==='electrowizard'?.95:u.type==='dosranboss'?.88:u.type==='ranbos'?.84:.95,{time,walk:u.walk,moving:u.moving,owner,anim:u.anim,hit:u.hit,charged:u.charged,sparkCharged:u.sparkCharged,sparkChargeProgress:u.sparkChargeProgress,stunned:u.stunned,laserStage:u.laserStage||0,summonCasting:u.summonCasting,summonWindupRemaining:u.summonWindupRemaining,dashWindup:u.dashState==='windup',dashing:u.dashState==='rush',invulnerable:!!u.invulnerable,alpha:u.spawn>0?.5:1,back:facing.back,mirror:u.building?false:facing.mirror,facing:facing.angle});
+    if(u.slowed){const stage=Math.max(1,Math.min(3,u.slowStage||1));c.save();c.strokeStyle='#a9ebffdd';c.lineWidth=1.5+stage*.55;c.setLineDash([3,4]);for(let k=0;k<stage;k++){const r=u.radius+7+k*4;c.beginPath();c.ellipse(p.x,p.y+3,r,r*.42,0,0,TAU);c.stroke();}c.setLineDash([]);c.fillStyle='#dffaff';c.font='bold 8px sans-serif';c.textAlign='center';c.fillText(`ICE ${stage}`,p.x,p.y-(u.air?48:78));c.restore();}
     if(u.poisoned){const ps=spellTeamStyle(u.poisonOwner,seat);c.save();c.strokeStyle=ps.bright+'dd';c.lineWidth=2;spellRing(c,ps);c.beginPath();c.ellipse(p.x,p.y+3,u.radius+7,(u.radius+7)*.48,0,0,TAU);c.stroke();c.restore();}
     if(u.mudded){c.save();c.strokeStyle='#b59c6dcc';c.lineWidth=2;c.setLineDash([5,3]);c.beginPath();c.ellipse(p.x,p.y+4,u.radius+9,(u.radius+9)*.42,0,0,TAU);c.stroke();c.restore();}
     if(u.stunned){c.save();c.strokeStyle='#bcefff';c.lineWidth=2.4;c.beginPath();c.arc(p.x,p.y-30,u.radius+10,0,TAU);c.stroke();for(let i=0;i<4;i++){const a=i*TAU/4+time*5,r=u.radius+9;line(c,p.x+Math.cos(a)*r,p.y-30+Math.sin(a)*r,p.x+Math.cos(a+.65)*(r+8),p.y-30+Math.sin(a+.65)*(r+8),'#fff2a3',1.8);}c.restore();}
-    const hp=u.hp/u.maxHp,w=u.type==='golem'?50:u.type==='mini_golem'?32:u.type==='berserker'?42:u.type==='boar'?38:u.type==='knight'?38:u.type==='mossling'?20:u.type==='boneswarm'?16:28;
+    const hp=u.hp/u.maxHp,w=u.type==='golem'?50:u.type==='mini_golem'?32:u.type==='berserker'?42:u.type==='boar'?38:u.type==='knight'?38:(u.type==='mossling'||u.type==='goblin_melee'||u.type==='goblin_spear')?20:u.type==='boneswarm'?16:28;
     if(hp<.999){rr(c,p.x-w/2,p.y-(u.air?48:82),w,5,2,'#25363eaa');rr(c,p.x-w/2+1,p.y-(u.air?47:81),(w-2)*hp,3,1,TEAM_COLORS[owner]);}
     if(owner===0&&!u.air&&!u.building&&g.towers.some(t=>{const q=orient(t,seat);return t.hp>0&&q.y>p.y&&q.y-p.y<90&&Math.abs(q.x-p.x)<t.radius+8;}))markerUnits.push(p);
   }
@@ -1952,7 +2219,7 @@ function drawArena(canvas,snapshot,options={}){
   for(const p of markerUnits){c.save();c.globalAlpha=.8;path(c,[[p.x,p.y-7],[p.x+4,p.y],[p.x,p.y+7],[p.x-4,p.y]],null,'#dcf5bf',1.5);c.restore();}
   if(options.physics){
     c.save();c.lineWidth=1.5;c.setLineDash([4,3]);
-    for(const e of [...g.towers,...g.units])if(e.hp>0){const p=orient(e,seat);c.strokeStyle=e.air?'#e1c3ff':(e.kind||e.building)?'#ffe0a0':'#d6f7df';c.beginPath();c.arc(p.x,p.y,e.radius,0,TAU);c.stroke();}
+    for(const e of [...g.towers,...g.units])if(e.hp>0&&!e.collisionDisabled){const p=orient(e,seat);c.strokeStyle=e.air?'#e1c3ff':(e.kind||e.building)?'#ffe0a0':'#d6f7df';c.beginPath();c.arc(p.x,p.y,e.radius,0,TAU);c.stroke();}
     c.restore();
   }
   for(const p of g.projectiles){
@@ -1982,6 +2249,8 @@ function drawArena(canvas,snapshot,options={}){
       else if(p.kind==='bomb'){ellipse(c,0,0,8,8,'#2a3941');line(c,0,-7,4,-11,'#fbd078',2);}
       else if(p.kind==='frost'){path(c,[[-9,0],[0,-8],[10,0],[0,8]],'#a8edff','#4c8297',1);ellipse(c,0,0,3,3,'#effdff');}
       else if(p.kind==='lightning'){line(c,-10,0,-2,-5,'#ffe074',3);line(c,-2,-5,3,4,'#fff1a4',3);line(c,3,4,12,0,'#ffe074',3);}
+      else if(p.kind==='electro'){ellipse(c,0,0,8,8,'#bdf3ff');ellipse(c,0,0,4,4,'#fff6a8');line(c,-12,1,-5,-5,'#ffe36d',2.4);line(c,5,5,12,-2,'#dffcff',2.4);}
+      else if(p.kind==='thrown_spear'){line(c,-16,0,10,0,'#76583c',2.6);path(c,[[8,-4],[18,0],[8,4]],'#ddd8bd','#2b4038',.8);}
       else if(p.kind==='light'){ellipse(c,0,0,7,7,'#ffe7a3');ellipse(c,0,0,3,3,'#e6ffff');}
       else if(p.kind==='mud'){ellipse(c,0,0,9,7,'#806847');ellipse(c,-4,-2,4,3,'#b09a6e');ellipse(c,4,1,3,2,'#5f513b');}
       else if(p.kind==='necro'){ellipse(c,0,0,9,9,'#7ecf9b');ellipse(c,0,0,5,5,'#d9f4c9');ellipse(c,-5,-2,2,2,'#806b9d');}
@@ -2021,7 +2290,7 @@ function drawArena(canvas,snapshot,options={}){
     }else if(e.type==='heal'){
       c.strokeStyle='#dff6bd';c.lineWidth=3;c.beginPath();c.arc(p.x,p.y-18,10+(1-fade)*24,0,TAU);c.stroke();line(c,p.x-6,p.y-18,p.x+6,p.y-18,'#f6e9a9',3);line(c,p.x,p.y-24,p.x,p.y-12,'#f6e9a9',3);
     }else if(e.type==='slow'){
-      c.strokeStyle='#a7ebff';c.lineWidth=2;c.beginPath();c.arc(p.x,p.y-15,12+(1-fade)*18,0,TAU);c.stroke();for(let i=0;i<6;i++){const a=i*TAU/6;line(c,p.x+Math.cos(a)*12,p.y-15+Math.sin(a)*12,p.x+Math.cos(a)*18,p.y-15+Math.sin(a)*18,'#dffaff',1.5);}
+      const stage=Math.max(1,Math.min(3,e.stage||1));c.strokeStyle='#a7ebff';c.lineWidth=1.6+stage*.5;c.beginPath();c.arc(p.x,p.y-15,12+(1-fade)*18+stage*2,0,TAU);c.stroke();for(let i=0;i<4+stage*2;i++){const a=i*TAU/(4+stage*2);line(c,p.x+Math.cos(a)*12,p.y-15+Math.sin(a)*12,p.x+Math.cos(a)*(18+stage*2),p.y-15+Math.sin(a)*(18+stage*2),'#dffaff',1.5);}
     }else if(e.type==='chain'){
       if(e.points?.length){let a=orient({x:e.x,y:e.y},seat);for(const q0 of e.points){const q=orient(q0,seat),mx=(a.x+q.x)/2+((String(e.id).length%2)?5:-5);line(c,a.x,a.y-10,mx,(a.y+q.y)/2-16,'#ffe16e',3);line(c,mx,(a.y+q.y)/2-16,q.x,q.y-10,'#fff3b1',2);a=q;}}
     }else if(e.type==='laser-lock'||e.type==='laser-ramp'){
@@ -2053,7 +2322,7 @@ function drawArena(canvas,snapshot,options={}){
     }else if(e.type==='death'||e.type==='blast'){
       for(let i=0;i<8;i++){
         const a=i*TAU/8+e.id,len=(1-fade)*(e.type==='blast'?e.radius:35);
-        ellipse(c,p.x+Math.cos(a)*len,p.y-12+Math.sin(a)*len*.7,4+fade*9,4+fade*8,e.type==='blast'?'#f2cf8c':'#ece2c6');
+        ellipse(c,p.x+Math.cos(a)*len,p.y-12+Math.sin(a)*len*.7,4+fade*9,4+fade*8,e.type==='blast'?(e.color==='electro'?'#bdf3ff':'#f2cf8c'):'#ece2c6');
       }
     }
     c.restore();
@@ -2107,8 +2376,13 @@ function drawPortrait(canvas,type,time=0,owner=0,selected=false,back=false){
     c.fillStyle='#fff6db';c.font='bold 10px sans-serif';c.textAlign='center';c.fillText('SPELL',60,111);c.restore();return;
   }
   ellipse(c,60,105,40,8,'#1f39451b');
-  const scale=type==='golem'?.92:type==='mini_golem'?1.15:type==='berserker'?1.18:type==='boar'?1.28:type==='tigger'?1.35:type==='muddragon'?1.34:type==='blowdart'?1.42:type==='lasertower'?1.35:type==='mossling'?2.05:type==='boneswarm'?1.8:type==='harpy'?1.45:type==='necromancer'?1.26:type==='darknecro'?1.28:type==='ashsquad'?1.25:type==='princess'?1.28:type==='sparky'?1.18:type==='bat'?1.6:type==='cannon'?1.5:type==='mage'?1.12:type==='nightshade'?1.28:type==='lumina'?1.22:type==='frost'?1.2:1.32;
-  const py=type==='golem'?112:type==='mini_golem'?104:type==='berserker'?108:type==='boar'?96:type==='tigger'?101:type==='muddragon'?94:type==='blowdart'?102:type==='lasertower'?96:type==='mossling'?91:type==='boneswarm'?96:type==='harpy'?91:type==='necromancer'?104:type==='darknecro'?104:type==='ashsquad'?101:type==='princess'?105:type==='sparky'?105:type==='bat'?83:type==='cannon'?(back?94:80):104;
+  if(type==='mossling'){
+    const group=[['goblin_melee',60,76,.72],['goblin_melee',42,88,.68],['goblin_melee',78,88,.68],['goblin_spear',49,104,.62],['goblin_spear',71,104,.62]];
+    for(const [unit,x,y,sc] of group)drawUnit(c,unit,x,y,sc,{time,owner,idle:true,noShadow:true,anim:0,back:false,facing:Math.PI/2});
+    c.restore();return;
+  }
+  const scale=type==='golem'?.92:type==='mini_golem'?1.15:type==='berserker'?1.18:type==='boar'?1.28:type==='tigger'?1.35:type==='muddragon'?1.34:type==='laserdragon'?1.32:type==='blowdart'?1.42:type==='lasertower'?1.35:type==='boneswarm'?1.8:type==='harpy'?1.45:type==='necromancer'?1.26:type==='darknecro'?1.28:type==='ashsquad'?1.25:type==='princess'?1.28:type==='sparky'?1.18:type==='bat'?1.6:type==='cannon'?1.5:type==='mage'?1.12:type==='nightshade'?1.28:type==='lumina'?1.22:type==='frost'?1.2:1.32;
+  const py=type==='golem'?112:type==='mini_golem'?104:type==='berserker'?108:type==='boar'?96:type==='tigger'?101:type==='muddragon'?94:type==='laserdragon'?94:type==='blowdart'?102:type==='lasertower'?96:type==='boneswarm'?96:type==='harpy'?91:type==='necromancer'?104:type==='darknecro'?104:type==='ashsquad'?101:type==='princess'?105:type==='sparky'?105:type==='bat'?83:type==='cannon'?(back?94:80):104;
   drawUnit(c,type,60,py,scale,{time,owner,idle:true,noShadow:true,anim:0,back,facing:back?-Math.PI/2:Math.PI/2});c.restore();
 }
 
@@ -2117,6 +2391,74 @@ function drawPortrait(canvas,type,time=0,owner=0,selected=false,back=false){
 
 const $=s=>document.querySelector(s);
 const PATCH_NOTES = Object.freeze([
+  {version:'21.0.0',date:'2026-09-11',title:'LASER DRAGON UPDATE',items:[
+    '新ユニット「レーザードラゴン」を追加。5コスト・HP1300・飛行・地上/空中攻撃・移動速度46・中距離射程145です。',
+    'レーザードラゴンはレーザー塔と同じ増幅方式を採用。初期20 DPSから同じ対象へ1.5秒照射するごとに火力が倍化し、対象変更・射程外・スタンで初期値へ戻ります。',
+    'スタン中は通常攻撃クールタイムが進行しないよう変更。スタン前の残り攻撃待ち時間を保持し、解除後に残り時間から再開します。ユニット・タワー・設置物に共通です。',
+    'スタンによる攻撃クールタイムの完全リセットは行いません。スパーキー充電・レーザー増幅・ナイトシェイド突進など既存の特殊リセットは維持します。',
+    'アップデート説明は UPDATE-HISTORY.html の1枚へ統合したまま維持し、physicsVersion を26へ更新しました。'
+  ]},
+  {version:'20.0.0',date:'2026-09-11',title:'ELECTRIC FORMATION UPDATE',items:[
+    '新ユニット「エレキテルウィザード」を追加。4コスト・HP650・攻撃135・射程185・攻撃間隔2.4秒。地上から地上/空中へ狭い半径35の範囲雷を放ち、範囲内の敵ユニット全員を1秒スタンします。',
+    'ゴブリン槍兵を投げ槍の遠距離兵へ変更。射程21→160となり、リーフ弓兵185より少し短く、マッドドラゴン78より長い位置から地上/空中へ攻撃します。',
+    'ストームハーピーの攻撃間隔を1.25秒→2.0秒へ変更。一撃を強化し、連鎖ダメージを1体目180→2体目130→3体目90の固定減衰へ変更しました。各命中先への1秒スタンは維持します。',
+    'アップデート説明は引き続き UPDATE-HISTORY.html の1枚へ統合し、バージョンごとのHTMLは増やしません。',
+    '新ユニットと戦闘ロジック更新に伴い physicsVersion を25へ更新しました。'
+  ]},
+  {version:'19.4.0',date:'2026-09-11',title:'CONTROL & GOBLIN UPDATE',items:[
+    '穴掘りティガーの対ユニット攻撃を120へ強化。タワー・ボルト砲台・レーザー塔など建物への1回ダメージは70に制限し、奇襲暗殺向けへ役割を明確化しました。',
+    'フロストシャーマンを4コストから3コストへ変更し、氷弾を半径38の小範囲攻撃へ拡張。鈍足は3段階重複制になり、効果中の再被弾でLv1→Lv2→Lv3へ上昇、命中ごとに3秒へ更新します。',
+    'フロスト鈍足はLv1/2/3で移動速度を80%/65%/50%へ低下。攻撃速度も90%/80%/70%へ段階的に低下します。',
+    'ストームハーピーの連鎖雷に1秒スタンを追加。命中した最大3体それぞれへ、ザップと同じターゲット解除・レーザー増幅/スパーキー充電などのリセットを適用します。',
+    'モスリング隊を「ゴブリン部隊」へ改名。前衛ゴブリン3体＋ゴブリン槍兵2体の5体混成編成へ変更しました。',
+    '前衛ゴブリンの攻撃力は45→65。槍兵2体は旧モスリング相当のHP155・攻撃45・速度72・攻撃間隔0.8秒を維持し、地上と空中の両方を攻撃できます。',
+    'アップデート説明HTMLをバージョンごとに増やす方式を廃止し、今後は UPDATE-HISTORY.html の1枚へ追記していく運用へ変更しました。',
+    '戦闘ロジック更新に伴い physicsVersion を24へ更新しました。'
+  ]},
+  {version:'19.3.0',date:'2026-09-11',title:'SUMMON DELAY SYSTEM',items:[
+    'ユニットカードに召喚準備時間を追加。低コストほど短く、高コストほど長くなり、1コスト0.4秒・2コスト0.5秒・3コスト0.7秒・4コスト0.9秒・5コスト1.2秒・6コスト1.5秒・7コスト1.8秒を基準にしました。',
+    'ストーンゴーレムは重量級の特別枠として2.5秒、スパーキーは1.8秒。穴掘りティガーは地下移動そのものを召喚時間として扱い、新しい待機時間は追加しません。',
+    '召喚中は移動・攻撃・索敵をせず、敵からターゲットにされず、スペルや範囲攻撃も含めて無敵です。当たり判定も無効なので無敵の壁としては使えません。',
+    '召喚地点には陣営色の円・半透明シルエット・進行ゲージを表示。相手からも完成までの位置と残り時間を確認できます。',
+    'ネクロマンサー、ダークネクロマンサー、ドスランボスの配置時召喚は、本体の召喚完了と同時に発動。能力で呼ばれた子分やゴーレム分裂体には追加の召喚待ち時間を付けません。',
+    'ボルト砲台・レーザー塔も1タップで位置確定後に建設ゲージを開始。配置確認の追加タップは復活させず、操作テンポはv19.2のままです。',
+    '召喚完了直後の密集でも重なりが残りにくいよう、衝突解決パスを6回から8回へ強化しました。',
+    '召喚・当たり判定・オンライン同期ロジック更新に伴い physicsVersion を23へ更新しました。'
+  ]},
+  {version:'19.2.0',date:'2026-09-11',title:'PACK BALANCE & QUICK PLACE',items:[
+    'ドスランボスを約14%小さくし、移動速度を66から40へ低下。配置直後にランボス3体を即召喚し、その後は10秒ごとに3秒停止して3体を追加召喚します。',
+    'アイアンボアの攻撃力を178から160へ少し低下。建物特攻・チャージ・押しのけ性能は維持しています。',
+    'ネクロマンサーの通常攻撃の範囲半径を54から45へ縮小。射程・攻撃力・ボーン召喚は変更ありません。',
+    '穴掘りティガーの攻撃力を20から40へ強化し、攻撃間隔を0.82秒から1.1秒へ変更しました。',
+    'ボルト砲台・レーザー塔など設置物のスマホ操作を2タップ確認式から1タップ即設置へ変更しました。',
+    'バランスと対戦ロジック更新に伴い physicsVersion を22へ更新しました。'
+  ]},
+  {version:'19.1.0',date:'2026-09-11',title:'2D RAPTOR MODEL UPDATE',items:[
+    'ドスランボスを3D由来の縦シルエットを持つ2Dスプライトへ描き直しました。頭・トサカ・尻尾が上からでも判別しやすくなっています。',
+    '子分のランボスも同じ造形ルールで再設計し、ドスランボスと並べたときに親分子分の関係が見えるドット風モデルへ更新しました。',
+    'ドスランボスの性能を案に合わせて調整。6コスト・HP1100・攻撃170・やや速い移動・やや遅い攻撃速度へ変更しました。',
+    'ランボスは本体の約3分の1性能へ再調整し、HP360・攻撃58の軽量前衛として群れの圧力を担当します。',
+    '見た目と性能の更新に合わせて physicsVersion を21へ更新しました。'
+  ]},
+  {version:'19.0.0',date:'2026-09-11',title:'RAPTOR PACK UPDATE',items:[
+    '新ユニット「ドスランボス」を追加。7コスト・HP2100・攻撃210・移動68。地上のみを攻撃する高速前衛です。',
+    'ドスランボスは10秒ごとに3秒足を止め、周囲へ「ランボス」3体を召喚します。召喚中は移動も攻撃も行いません。',
+    'ランボスは隠し召喚ユニットで、HP700・攻撃70。見た目はドット風の青いラプターとして追加しました。',
+    'カード総数を31枚（27ユニット＋4呪文）へ更新し、初期デッキにもドスランボスを採用しました。',
+    '新ユニット追加に伴い physicsVersion を20へ更新しました。'
+  ]},  {version:'18.3.0',date:'2026-09-11',title:'FIRST ATTACK LOCK',items:[
+    '通常ユニットのターゲットロック開始タイミングを「索敵した瞬間」から「実際に最初の攻撃を行った瞬間」へ変更しました。',
+    'まだ攻撃していない間は、その時点で索敵範囲内にいる最も近い攻撃可能な敵を毎フレーム再判定します。遠くの敵を追跡中でも、より近い敵が現れればそちらへ向き直ります。',
+    '一度攻撃した後はv18.2と同じハードロックへ移行し、対象が撃破・攻撃対象外・ザップなどでリセットされるまで同じ相手を追跡します。',
+    'ストーンゴーレム・ちびゴーレム・アイアンボアは従来どおり例外で、攻撃後もロックせず常に最寄りの敵建物を再判定します。タワー・防衛建物のロック方式も変更ありません。',
+    '新しい追跡切替で密集時の経路が変わるため、衝突解決を1パス強化して敵同士の重なりを抑えています。'
+  ]},
+  {version:'18.2.0',date:'2026-09-11',title:'TARGET LOCK TACTICS',items:[
+    '通常ユニットをターゲットロック式へ変更。一度索敵範囲で敵を捕捉すると、より近い敵が現れても同じ対象を追い続けます。',
+    '通常ユニットのロックは対象撃破・攻撃対象外化・ザップなどの強制リセットで解除。攻撃射程や索敵範囲から離れただけでは解除せず、その対象を追跡します。',
+    'ストーンゴーレム・ちびゴーレム・アイアンボアなど建物特攻ユニットは例外で、敵兵を無視しながら常に現在地から最も近い敵建物を再判定します。位置関係によってサイドタワー、防衛建物、中央本拠地へ誘導できます。',
+    'タワー・ボルト砲台・レーザー塔の既存ターゲットロック仕様は維持。ザップは通常ユニットのロックも解除して、スタン終了後に新しい対象を選ばせます。'
+  ]},
   {version:'18.1.0',date:'2026-09-10',title:'DETAIL DEMO RENDER FIX',items:[
     'スパーキーのLIVE BATTLE DEMOで初回砲撃後に描画が崩れ、戦場が斜めに重なって表示される不具合を修正しました。',
     'スパーキー弾の電撃エフェクトが未定義の時間変数を参照していたため、drawArenaのtimeへ統一しました。',
@@ -2239,10 +2581,10 @@ function migrateDeck(raw){
   return normalizeDeck(out);
 }
 function loadDeck(){
-  try{const raw=JSON.parse(safeStorage('local','tiny-deck-v18')||safeStorage('local','tiny-deck-v17')||safeStorage('local','tiny-deck-v16')||safeStorage('local','tiny-deck-v15')||safeStorage('local','tiny-deck-v14')||safeStorage('local','tiny-deck-v13')||safeStorage('local','tiny-deck-v12')||safeStorage('local','tiny-deck-v11')||safeStorage('local','tiny-deck-v10')||safeStorage('local','tiny-deck-v9')||safeStorage('local','tiny-deck-v8')||safeStorage('local','tiny-deck-v7')||safeStorage('local','tiny-deck-v6')||safeStorage('local','tiny-deck-v5')||safeStorage('local','tiny-deck-v4')||safeStorage('local','tiny-deck-v3')||'null');return migrateDeck(raw);}catch{return [...DEFAULT_DECK];}
+  try{const raw=JSON.parse(safeStorage('local','tiny-deck-v21')||safeStorage('local','tiny-deck-v20')||safeStorage('local','tiny-deck-v19')||safeStorage('local','tiny-deck-v18')||safeStorage('local','tiny-deck-v17')||safeStorage('local','tiny-deck-v16')||safeStorage('local','tiny-deck-v15')||safeStorage('local','tiny-deck-v14')||safeStorage('local','tiny-deck-v13')||safeStorage('local','tiny-deck-v12')||safeStorage('local','tiny-deck-v11')||safeStorage('local','tiny-deck-v10')||safeStorage('local','tiny-deck-v9')||safeStorage('local','tiny-deck-v8')||safeStorage('local','tiny-deck-v7')||safeStorage('local','tiny-deck-v6')||safeStorage('local','tiny-deck-v5')||safeStorage('local','tiny-deck-v4')||safeStorage('local','tiny-deck-v3')||'null');return migrateDeck(raw);}catch{return [...DEFAULT_DECK];}
 }
 let playerDeck=loadDeck();
-const MYLIST_KEY='tiny-deck-presets-v18',LEGACY_MYLIST_KEYS=['tiny-deck-presets-v17','tiny-deck-presets-v16'],MAX_MYLIST=10;
+const MYLIST_KEY='tiny-deck-presets-v21',LEGACY_MYLIST_KEYS=['tiny-deck-presets-v20','tiny-deck-presets-v19','tiny-deck-presets-v18','tiny-deck-presets-v17','tiny-deck-presets-v16'],MAX_MYLIST=10;
 function storageFor(store='local'){return store==='session'?window.sessionStorage:window.localStorage;}
 function verifiedStorageWrite(store,key,value){
   try{const storage=storageFor(store);storage.setItem(key,value);return storage.getItem(key)===value;}catch{return false;}
@@ -2267,7 +2609,7 @@ function persistDeckPresets(){
 function nextPresetName(){
   const used=new Set(deckPresets.map(p=>p.name));for(let i=1;i<=MAX_MYLIST+1;i++){const name=`マイデッキ ${i}`;if(!used.has(name))return name;}return `マイデッキ ${deckPresets.length+1}`;
 }
-function persistDeck(){safeStorage('local','tiny-deck-v18',JSON.stringify(playerDeck));renderDeckSummaries();}
+function persistDeck(){safeStorage('local','tiny-deck-v21',JSON.stringify(playerDeck));renderDeckSummaries();}
 function averageDeckCost(deck){if(!Array.isArray(deck)||!deck.length)return 0;return deck.reduce((sum,id)=>sum+(UNITS[id]?.cost||0),0)/deck.length;}
 function formatAverage(deck){return `◆ ${averageDeckCost(deck).toFixed(1)}`;}
 function deckReady(deck=playerDeck){return Array.isArray(deck)&&deck.length===MAX_DECK&&new Set(deck).size===MAX_DECK&&deck.every(id=>DECK.includes(id));}
@@ -2488,7 +2830,7 @@ function updateHUD(){
     el('rematchBtn').textContent=gameMode==='cpu'?'もう一度対戦':seat===room?.host?'再戦の待機ルームへ':'ホストの再戦操作を待っています';
     el('rematchBtn').disabled=gameMode==='online'&&seat!==room?.host;
   }
-  el('battleHint').textContent=selected?(()=>{const d=UNITS[selected];if(!d.spell){if(d.tunnelAnywhere)return `${d.name}：戦場の好きな地上地点を指定 / コスト ${d.cost}。自軍本拠地から地下移動し、遠いほど到着が遅れます。`;if(d.building)return `${d.name}を配置 / 必要エナジー ${d.cost}。配置前に攻撃射程を表示します。スマホは1回目で位置と射程を固定し、指を離しても候補を保持。2回目で設置。`;return `${d.name}を配置 / 必要エナジー ${d.cost}`;}if(d.spell==='poison')return `${d.name}：地点を指定すると即展開 / コスト ${d.cost}。範囲外へ出ても毒が残ります。`;if(d.spell==='arrowrain')return `${d.name}：広い着弾地点を指定 / コスト ${d.cost}。ファイヤーボールより速く届きます。`;return `${d.name}：着弾地点を指定 / コスト ${d.cost}。遠いほど着弾が遅れます。`;})():'カードを選択。片塔破壊はそのレーン＋中央細帯、両塔破壊後は敵陣前半を横いっぱい使えます。';
+  el('battleHint').textContent=selected?(()=>{const d=UNITS[selected];if(!d.spell){if(d.tunnelAnywhere)return `${d.name}：戦場の好きな地上地点を指定 / コスト ${d.cost}。自軍本拠地から地下移動し、遠いほど到着が遅れます。`;if(d.building)return `${d.name}を配置 / 必要エナジー ${d.cost}。置きたい場所を1回タップすると即設置します。`;return `${d.name}を配置 / 必要エナジー ${d.cost}`;}if(d.spell==='poison')return `${d.name}：地点を指定すると即展開 / コスト ${d.cost}。範囲外へ出ても毒が残ります。`;if(d.spell==='arrowrain')return `${d.name}：広い着弾地点を指定 / コスト ${d.cost}。ファイヤーボールより速く届きます。`;return `${d.name}：着弾地点を指定 / コスト ${d.cost}。遠いほど着弾が遅れます。`;})():'カードを選択。片塔破壊はそのレーン＋中央細帯、両塔破壊後は敵陣前半を横いっぱい使えます。';
 }
 for(let i=0;i<10;i++){const seg=document.createElement('i'),fill=document.createElement('b');seg.append(fill);el('energyTrack').append(seg);}
 function choose(id){
@@ -2551,20 +2893,7 @@ el('arenaCanvas').addEventListener('pointermove',e=>{if(selected)hover=pointFrom
 el('arenaCanvas').addEventListener('pointerleave',()=>hover=null);
 el('arenaCanvas').addEventListener('pointerdown',e=>{
   if(!selected){toast('下のカードを1枚選んでください。');return;}
-  e.preventDefault();const p=pointFromEvent(e),d=UNITS[selected];
-  const touchLike=e.pointerType==='touch'||(e.pointerType!=='mouse'&&window.matchMedia?.('(pointer: coarse)').matches);
-  if(touchLike&&d?.building){
-    const pending=pendingBuildingPlacement;
-    const same=pending&&pending.card===selected&&Math.hypot(pending.x-p.x,pending.y-p.y)<=24;
-    if(!same){
-      pendingBuildingPlacement={card:selected,x:p.x,y:p.y,valid:p.valid};
-      hover=p;
-      toast(p.valid?'設置位置と攻撃射程を保持しました。もう一度同じ場所をタップして設置。':'この位置には置けません。別の場所をタップしてください。');
-      return;
-    }
-    const confirm={x:pending.x,y:pending.y,valid:pending.valid};
-    hover=confirm;place(confirm);return;
-  }
+  e.preventDefault();const p=pointFromEvent(e);
   pendingBuildingPlacement=null;place(p);
 });
 function place(p){
@@ -2683,12 +3012,20 @@ function toggleDeckCard(id,{fromDetail=false}={}){
   if(addToEditingDeck(id)){if(fromDetail)refreshDetailToggle();else closeDeckCardActions();return;}
   if(fromDetail){closeCardDetail();openDeckCardActions(id);}renderReplacementChoices(id);
 }
-function targetLabel(d){return d.targetsAir?'地上＋空中':'地上のみ';}
+function targetLabel(d){if(d.id==='mossling')return '地上＋空中（槍兵2）';return d.targetsAir?'地上＋空中':'地上のみ';}
 function detailStatsFor(d){
   if(d.spell){const stats=[['COST',d.cost],['TYPE','SPELL'],['範囲',`R${d.radius}`],['兵ダメージ',d.damage],['建物ダメージ',d.buildingDamage]];if(d.stunDuration)stats.push(['スタン',`${d.stunDuration}秒`]);return stats;}
-  const dmg=d.laserTower?`${d.laserBaseDps} DPS〜`:d.damage;const interval=d.laserTower?'継続':d.sparkUnit?`${d.sparkChargeTime}秒チャージ`:d.cooldown?`${d.cooldown.toFixed(2).replace(/0+$/,'').replace(/\.$/,'')}秒`:'—';
-  const stats=[['COST',d.cost],['HP',`${d.hp}${d.count>1?` ×${d.count}`:''}`],['攻撃',dmg],['攻撃間隔',interval],['射程',d.range],['対象',targetLabel(d)],['移動',d.building?'固定':d.air?`飛行 ${d.speed}`:`地上 ${d.speed}`]];
-  if(d.summonType)stats.push(['召喚',`配置時＋${d.summonInterval}秒ごと ×${d.summonCount}`]);
+  const dmg=d.id==='mossling'?'地上65 / 槍45':(d.laserTower||d.laserUnit)?`${d.laserBaseDps} DPS〜`:d.damage;const interval=(d.laserTower||d.laserUnit)?'継続':d.sparkUnit?`${d.sparkChargeTime}秒チャージ`:d.cooldown?`${d.cooldown.toFixed(2).replace(/0+$/,'').replace(/\.$/,'')}秒`:'—';
+  const deployTime=d.tunnelAnywhere?'地下移動（追加待機なし）':`${summonDelayFor(d).toFixed(1)}秒`;
+  const stats=[['COST',d.cost],[d.building?'建設時間':'召喚時間',deployTime],['HP',`${d.hp}${d.count>1?` ×${d.count}`:''}`],['攻撃',dmg],['攻撃間隔',interval],['射程',d.range],['対象',targetLabel(d)],['移動',d.building?'固定':d.air?`飛行 ${d.speed}`:`地上 ${d.speed}`]];
+  if(d.structureDamage!=null)stats.push(['対タワー・設置物',d.structureDamage]);
+  if(d.splash)stats.push(['範囲',`R${d.splash}`]);
+  if(d.id==='frost')stats.push(['鈍足','3段階：80% → 65% → 50%']);
+  if(d.id==='harpy'){stats.push(['連鎖ダメージ','180 → 130 → 90']);stats.push(['スタン','各命中先 1.0秒']);}
+  if(d.id==='mossling'){stats.push(['編成','前衛3（攻撃65）＋槍2（対空可）']);stats.push(['槍兵射程','160（投げ槍）']);}
+  if(d.id==='electrowizard')stats.push(['スタン','範囲内の敵ユニット全員 1.0秒']);
+  if(d.id==='laserdragon')stats.push(['レーザー増幅','1.5秒ごとに ×2・対象変更/射程外/スタンでリセット']);
+  if(d.summonType){const summonLabel=(d.summonOnDeploy?`配置時＋${d.summonInterval}秒ごと`:`${d.summonInterval}秒ごと`)+(d.summonWindup?`（準備${d.summonWindup}秒）`:'')+` ×${d.summonCount}`;stats.push(['召喚',summonLabel]);}
   if(d.spawnType==='blade')stats.push(['編成','前1・後2の3体']);
   if(d.sparkUnit)stats.push(['充電','敵不在でも常時・ザップで0へ']);
   return stats;
@@ -2744,7 +3081,13 @@ function createDetailDemo(id){
     const deployed=own(id,lane,650),summoner=deployed.find(u=>u.type==='darknecro');demoStageUnit(summoner,lane,610);if(summoner)summoner.summonNextAt=6.5;
     const [guard]=enemy('knight',lane,420);demoStageUnit(guard,lane,500,{cd:1.2});if(guard)guard.damage=0;const bats=enemy('bat',485,420);bats.forEach((u,i)=>{demoStageUnit(u,475+(i%2)*26,485+Math.floor(i/2)*24,{cd:1.2});u.damage=0;});
     label='配置直後にムーンバット2体 → 本体は地上近接攻撃 → 6.5秒後にバット2体を追加召喚';scenarioKey='darknecro-bat-summon';duration=11;
-  }else if(id==='ashsquad'){
+}else if(id==='dosranboss'){
+    g.towers.forEach(t=>t.range=0);
+    const deployed=own(id,lane,650),boss=deployed.find(u=>u.type==='dosranboss');demoStageUnit(boss,lane,615);
+    const [guard]=enemy('knight',lane,420);demoStageUnit(guard,lane,500,{cd:1.1});if(guard)guard.damage=0;
+    const archers=enemy('archer',485,420);archers.forEach((u,i)=>demoStageUnit(u,470+i*28,465,{cd:1.2}));
+    label='1.5秒の本体召喚完了と同時にランボス3体 → 本体は遅めに進軍 → 10秒後に3秒停止してさらに3体を追加';scenarioKey='dosranboss-pack-summon';duration=16;
+    }else if(id==='ashsquad'){
     const blades=own(id,lane,650);const deployed=enemy('necromancer',lane,420),summoner=deployed.find(u=>u.type==='necromancer');demoStageUnit(summoner,lane,525,{hp:800,cd:1.5});
     blades.forEach((u,i)=>demoStageUnit(u,lane+(i===0?0:(i===1?-28:28)),i===0?605:635,{spawn:0,cd:.4}));
     label='アッシュ剣士3体を前1・後2の三角陣形で展開 → 召喚系の後衛へ一斉に接近して処理';scenarioKey='ash-squad-triangle-counter';duration=8.5;
@@ -2753,10 +3096,14 @@ function createDetailDemo(id){
   }else if(id==='sparky'){
     g.towers.forEach(t=>t.range=0);const [spark]=own(id,lane,650);demoStageUnit(spark,lane,625);const swarm=enemy('mossling',lane,420);const spots=[[500,500],[530,505],[557,510],[515,530],[548,535]];swarm.forEach((u,i)=>{demoStageUnit(u,...spots[i%spots.length]);u.damage=0;u.speed=0;});label='敵がいなくても配置直後から3.5秒充電 → 満充電エフェクト → 地上群体へ1200範囲砲撃';scenarioKey='sparky-always-charge';duration=9;
   }else if(id==='tigger'){
-    demoDeploy(g,0,id,lane,325);label='自軍本拠地から地下潜行 → 敵タワー横へ出現 → 奇襲攻撃';scenarioKey='tigger-burrow';duration=9;
+    demoDeploy(g,0,id,lane,325);label='地下潜行で後衛へ奇襲。敵ユニットへ120ダメージ、タワー・設置物には70ダメージ';scenarioKey='tigger-burrow';duration=9;
   }else if(id==='lasertower'){
     const [laser]=own(id,lane,650),[golem]=enemy('golem',lane,390);demoStageUnit(laser,lane,650);demoStageUnit(golem,lane,500);
     label='高HPゴーレムを同じ対象のまま照射 → 1.5秒ごとにレーザー火力が倍化';scenarioKey='laser-ramp';duration=11;
+  }else if(id==='laserdragon'){
+    g.towers.forEach(t=>t.range=0);
+    const [dragon]=own(id,lane,650),[golem]=enemy('golem',lane,390);demoStageUnit(dragon,lane,635);demoStageUnit(golem,lane,500);if(golem){golem.speed=0;golem.damage=0;}
+    label='飛行しながら中距離へ接近 → 同じ敵へ照射し続けて1.5秒ごとに20→40→80…と増幅';scenarioKey='laserdragon-mobile-ramp';duration=11;
   }else if(id==='cannon'){
     const [cannon]=own(id,lane,650),[guard]=enemy('knight',lane,420);demoStageUnit(cannon,lane,650);demoStageUnit(guard,lane,515);
     label='アイアン衛士をロックして防衛。設置後は耐久も毎秒30ずつ自然減衰';scenarioKey='cannon-lock-decay';duration=9;
@@ -2765,18 +3112,25 @@ function createDetailDemo(id){
     label='瀕死に近い味方衛士を実際の回復AIで115ずつ回復';scenarioKey='lumina-heal';duration=8.5;
   }else if(id==='harpy'){
     own(id,lane,650);const swarm=enemy('mossling',lane,420);swarm.forEach((u,i)=>demoStageUnit(u,490+(i%3)*42,455+Math.floor(i/3)*34));
-    label='複数の敵を近くに配置 → 雷が最大3体まで連鎖して威力減衰';scenarioKey='harpy-chain';duration=8;
+    label='2秒ごとの連鎖雷 → 1体目180 / 2体目130 / 3体目90ダメージ＋各1秒スタン';scenarioKey='harpy-chain-falloff-stun';duration=9;
+  }else if(id==='electrowizard'){
+    g.towers.forEach(t=>t.range=0);
+    const [wiz]=own(id,lane,650);demoStageUnit(wiz,lane,625);
+    const [guard]=enemy('knight',lane,420);demoStageUnit(guard,lane,515,{cd:1.2});if(guard)guard.damage=0;
+    const archers=enemy('archer',500,420);archers.forEach((u,i)=>{demoStageUnit(u,500+i*22,525,{cd:1.2});u.damage=0;});
+    const bats=enemy('bat',550,420);bats.forEach((u,i)=>{demoStageUnit(u,535+(i%2)*18,515+Math.floor(i/2)*18,{cd:1.2});u.damage=0;});
+    label='射程185の電撃弾が密集へ着弾 → 半径35の地上/空中をまとめて135ダメージ＋1秒スタン';scenarioKey='electrowizard-splash-stun';duration=9;
   }else if(id==='frost'){
     const [shaman]=own(id,lane,650),[guard]=enemy('knight',lane,420);demoStageUnit(shaman,lane,650);demoStageUnit(guard,lane,515);
-    label='アイアン衛士へ氷弾 → 移動速度62%・攻撃速度72%へ低下';scenarioKey='frost-dual-slow';duration=8.5;
+    label='半径38の氷弾を連続命中 → 鈍足Lv1(80%) → Lv2(65%) → Lv3(50%)へ重複・3秒更新';scenarioKey='frost-three-stage-slow';duration=8.5;
   }else if(id==='nightshade'){
     const [shade]=own(id,lane,650),[guard]=enemy('knight',lane,420);demoStageUnit(shade,lane,650);demoStageUnit(guard,lane,550);
     label='敵を感知 → 0.6秒溜め → 無敵ダッシュ → 2倍の初撃';scenarioKey='nightshade-rush';duration=8;
   }else if(id==='boar'){
     const [boar]=own(id,lane,650);demoStageUnit(boar,lane,700);const swarm=enemy('mossling',lane,420);const spots=[[512,575],[548,555],[528,535],[550,515],[512,495]];swarm.forEach((u,i)=>demoStageUnit(u,...spots[i%spots.length]));
-    label='建物へ105px走ってチャージ → 軽量モスリングを押しのけながらタワーへ突撃';scenarioKey='boar-charge-shove';duration=10;
+    label='建物へ105px走ってチャージ → 軽量ゴブリンを押しのけながらタワーへ突撃';scenarioKey='boar-charge-shove';duration=10;
   }else if(id==='mage'||id==='bomber'){
-    own(id,lane,650);enemy('mossling',lane,420);label='密集したモスリング隊へ実際の範囲攻撃';scenarioKey=`${id}-splash`;duration=8;
+    own(id,lane,650);enemy('mossling',lane,420);label='密集したゴブリン部隊へ実際の範囲攻撃';scenarioKey=`${id}-splash`;duration=8;
   }else if(id==='blowdart'||id==='archer'){
     own(id,lane,650);enemy('bat',lane,420);label='ムーンバットを相手に実際の射程・攻撃速度・対空攻撃';scenarioKey=`${id}-anti-air`;
   }else if(id==='bat'){
