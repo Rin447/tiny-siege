@@ -4,6 +4,59 @@ import {drawArena,drawPortrait,orient} from './game/art.js';
 
 const $=s=>document.querySelector(s);
 const PATCH_NOTES = Object.freeze([
+  {version:'23.5.0',date:'2026-09-14',title:'ARCHER / BERSERKER ART REBUILD',items:[
+    'リーフ弓兵とクラッグバーサーカーのスプライトを、今回作成した高精細ピクセルアートを元に作り直しました。',
+    'リーフ弓兵は緑のフード・矢筒・木弓を持つ姿へ刷新。クラッグバーサーカーは赤髪・毛皮・双斧を持つ重量戦士の姿へ刷新しました。',
+    '両キャラとも前姿 / 後姿に対応し、静止・移動・攻撃の3状態を各4フレームでアニメーションします。',
+    '戦場の進行方向に応じて前後を自動切替し、横方向は左右反転。カード詳細とLIVE BATTLE DEMOでも同じ新スプライトを使用します。',
+    '見た目のみの更新で、HP・攻撃力・コスト・射程・physicsVersion 28は変更ありません。'
+  ]},
+  {version:'23.4.0',date:'2026-09-14',title:'RUNE / FROST SPRITE UPDATE',items:[
+    'ルーン術師とフロストシャーマンの2体をピクセルスプライト方式へ移行しました。',
+    '2体とも前姿 / 後姿の2方向に対応し、静止・移動・攻撃の3状態を各4フレームでアニメーションします。',
+    '戦場の進行方向に応じて前後を自動切替し、横方向は左右反転を使用。カード詳細とLIVE BATTLE DEMOでも同じスプライトを描画します。',
+    'スカイボマー / クラッシャーオーガ / リーフ弓兵 / クラッグバーサーカーを含め、方向対応ピクセルスプライト採用ユニットは合計6体になりました。',
+    '見た目のみの更新のため戦闘性能・カード総数44枚・physicsVersion 28は変更ありません。'
+  ]},
+  {version:'23.3.0',date:'2026-09-14',title:'ARCHER / BERSERKER SPRITE UPDATE',items:[
+    'リーフ弓兵とクラッグバーサーカーの2体をピクセルスプライト方式へ移行しました。',
+    '2体とも前姿 / 後姿の2方向に対応し、静止・移動・攻撃の3状態を各4フレームでアニメーションします。',
+    '戦場の進行方向に応じて前後を自動切替し、横方向は左右反転を使用。カード詳細とLIVE BATTLE DEMOでも同じスプライトを描画します。',
+    'スカイボマー / クラッシャーオーガを含め、方向対応ピクセルスプライト採用ユニットは合計4体になりました。',
+    '見た目のみの更新のため戦闘性能・カード総数44枚・physicsVersion 28は変更ありません。'
+  ]},
+  {version:'23.2.0',date:'2026-09-14',title:'FRONT / BACK SPRITE UPDATE',items:[
+    'スカイボマーとクラッシャーオーガのピクセルスプライトを前姿 / 後姿の2方向へ拡張しました。',
+    '静止・移動・攻撃の3状態それぞれに前後4フレームを用意し、戦場の進行方向に応じて自動で切り替えます。',
+    'スカイボマーの後姿は骸骨の後頭部と背面ハーネス、クラッシャーオーガの後姿は背中・肩鎧・腰布・大槌が見える専用アートです。',
+    '横方向は従来どおり左右反転を使用。戦闘性能・カード総数44枚・physicsVersion 28は変更ありません。'
+  ]},
+  {version:'23.1.0',date:'2026-09-14',title:'SPRITE ANIMATION UPDATE',items:[
+    'スカイボマーの見た目を刷新。骸骨パイロットが気球に乗り、建物へ爆弾を落とすピクセルアートへ変更しました。',
+    'クラッシャーオーガを人型の重量戦士へ刷新。赤い鬼面と大槌を持つピクセルアートへ変更しました。',
+    '2体とも静止・移動・攻撃の3状態を持つスプライトシート方式へ移行。各状態は4フレームで描画します。',
+    'ゲーム内・カード詳細・LIVE BATTLE DEMOで同じスプライト描画を使用。画像未読込時は従来のプロシージャル描画へ自動フォールバックします。',
+    '戦闘性能と physicsVersion 28 は変更ありません。アップデート履歴HTMLも引き続き1枚だけです。'
+  ]},
+  {version:'23.0.0',date:'2026-09-14',title:'SIEGE SPECIALISTS UPDATE',items:[
+    '建物だけを狙う新ユニット5体を追加：スカイボマー、スクラップドリル、クラッシャーオーガ、シージタートル、ボムキャリア。',
+    'スカイボマーは4コスト・HP720の飛行建物特攻。速度58で接近し、射程75から1.6秒ごとに175ダメージの爆弾を投下します。',
+    'スクラップドリルは4コスト・HP900。建物へ張り付くと90 DPSから始まり、1.5秒ごとに135→180→240 DPSへ上昇。離される・対象変更・スタンで初期化します。',
+    'クラッシャーオーガは6コスト・HP2200・攻撃間隔3秒。同じ建物への一撃が230→310→390→470へ強化され、射程外・対象変更・スタンでリセットします。',
+    'シージタートルは5コスト・HP2050。建物へ移動中は通常の遠距離攻撃・タワー射撃・レーザーを40%軽減し、攻撃中は甲羅を開いて軽減を失います。',
+    'ボムキャリアは3コスト・HP430・速度88。建物へ到達すると480ダメージで自爆。途中で倒されても周囲の敵ユニットへ80ダメージの小爆発を残します。',
+    'カード総数は44枚（39ユニット＋5呪文）。攻城ユニットの増幅・装甲・自爆状態同期に伴い physicsVersion を28へ更新しました。'
+  ]},
+  {version:'22.0.0',date:'2026-09-14',title:'TACTICAL FORCES UPDATE',items:[
+    '新ユニット5体を追加：シールドナイト、ウィンドメイジ、フェニックス、グラビティオーブ、ミラージュアサシン。',
+    'シールドナイトは4コスト・HP1400・盾耐久650。正面約120度からの通常攻撃の65%を盾で受け、35%だけ本体へ通します。スペル・継続ダメージ・横/背後攻撃は盾を無視します。',
+    'ウィンドメイジは4コスト・HP570・攻撃95・射程175。地上/空中へ風弾を放ち、軽量な敵ほど大きく押し戻します。',
+    'フェニックスは5コスト・HP900・攻撃130の飛行ユニット。最初に倒されるとHP600の卵を残し、4秒守ればHP450で一度だけ復活します。',
+    'グラビティオーブは4コスト・HP540・攻撃60・射程165。半径60の重力弾で敵を着弾中心へ引き寄せます。',
+    'ミラージュアサシンは3コスト・HP500・攻撃190。召喚完了後最大3秒ステルスし、初撃は1.4倍。範囲攻撃やスペルには巻き込まれます。',
+    '新スペル「サイクロン」を追加。3コスト・半径130・3秒間。敵ユニットを中心へ吸い寄せ続け、外周10 / 中間20 / 中心35 DPSの少量ダメージを与えます。建物・タワーは吸引しません。',
+    'カード総数は39枚（34ユニット＋5呪文）。位置操作・復活・ステルス・正面防御の同期追加に伴い physicsVersion を27へ更新しました。'
+  ]},
   {version:'21.0.0',date:'2026-09-11',title:'LASER DRAGON UPDATE',items:[
     '新ユニット「レーザードラゴン」を追加。5コスト・HP1300・飛行・地上/空中攻撃・移動速度46・中距離射程145です。',
     'レーザードラゴンはレーザー塔と同じ増幅方式を採用。初期20 DPSから同じ対象へ1.5秒照射するごとに火力が倍化し、対象変更・射程外・スタンで初期値へ戻ります。',
@@ -197,7 +250,7 @@ function loadDeck(){
   try{const raw=JSON.parse(safeStorage('local','tiny-deck-v21')||safeStorage('local','tiny-deck-v20')||safeStorage('local','tiny-deck-v19')||safeStorage('local','tiny-deck-v18')||safeStorage('local','tiny-deck-v17')||safeStorage('local','tiny-deck-v16')||safeStorage('local','tiny-deck-v15')||safeStorage('local','tiny-deck-v14')||safeStorage('local','tiny-deck-v13')||safeStorage('local','tiny-deck-v12')||safeStorage('local','tiny-deck-v11')||safeStorage('local','tiny-deck-v10')||safeStorage('local','tiny-deck-v9')||safeStorage('local','tiny-deck-v8')||safeStorage('local','tiny-deck-v7')||safeStorage('local','tiny-deck-v6')||safeStorage('local','tiny-deck-v5')||safeStorage('local','tiny-deck-v4')||safeStorage('local','tiny-deck-v3')||'null');return migrateDeck(raw);}catch{return [...DEFAULT_DECK];}
 }
 let playerDeck=loadDeck();
-const MYLIST_KEY='tiny-deck-presets-v21',LEGACY_MYLIST_KEYS=['tiny-deck-presets-v20','tiny-deck-presets-v19','tiny-deck-presets-v18','tiny-deck-presets-v17','tiny-deck-presets-v16'],MAX_MYLIST=10;
+const MYLIST_KEY='tiny-deck-presets-v23',LEGACY_MYLIST_KEYS=['tiny-deck-presets-v22','tiny-deck-presets-v21','tiny-deck-presets-v20','tiny-deck-presets-v19','tiny-deck-presets-v18','tiny-deck-presets-v17','tiny-deck-presets-v16'],MAX_MYLIST=10;
 function storageFor(store='local'){return store==='session'?window.sessionStorage:window.localStorage;}
 function verifiedStorageWrite(store,key,value){
   try{const storage=storageFor(store);storage.setItem(key,value);return storage.getItem(key)===value;}catch{return false;}
@@ -443,7 +496,7 @@ function updateHUD(){
     el('rematchBtn').textContent=gameMode==='cpu'?'もう一度対戦':seat===room?.host?'再戦の待機ルームへ':'ホストの再戦操作を待っています';
     el('rematchBtn').disabled=gameMode==='online'&&seat!==room?.host;
   }
-  el('battleHint').textContent=selected?(()=>{const d=UNITS[selected];if(!d.spell){if(d.tunnelAnywhere)return `${d.name}：戦場の好きな地上地点を指定 / コスト ${d.cost}。自軍本拠地から地下移動し、遠いほど到着が遅れます。`;if(d.building)return `${d.name}を配置 / 必要エナジー ${d.cost}。置きたい場所を1回タップすると即設置します。`;return `${d.name}を配置 / 必要エナジー ${d.cost}`;}if(d.spell==='poison')return `${d.name}：地点を指定すると即展開 / コスト ${d.cost}。範囲外へ出ても毒が残ります。`;if(d.spell==='arrowrain')return `${d.name}：広い着弾地点を指定 / コスト ${d.cost}。ファイヤーボールより速く届きます。`;return `${d.name}：着弾地点を指定 / コスト ${d.cost}。遠いほど着弾が遅れます。`;})():'カードを選択。片塔破壊はそのレーン＋中央細帯、両塔破壊後は敵陣前半を横いっぱい使えます。';
+  el('battleHint').textContent=selected?(()=>{const d=UNITS[selected];if(!d.spell){if(d.tunnelAnywhere)return `${d.name}：戦場の好きな地上地点を指定 / コスト ${d.cost}。自軍本拠地から地下移動し、遠いほど到着が遅れます。`;if(d.building)return `${d.name}を配置 / 必要エナジー ${d.cost}。置きたい場所を1回タップすると即設置します。`;return `${d.name}を配置 / 必要エナジー ${d.cost}`;}if(d.spell==='poison')return `${d.name}：地点を指定すると即展開 / コスト ${d.cost}。範囲外へ出ても毒が残ります。`;if(d.spell==='cyclone')return `${d.name}：地点を指定すると半径${d.radius}の渦を${d.zoneDuration}秒展開 / コスト ${d.cost}。敵を中心へ吸い寄せます。`;if(d.spell==='arrowrain')return `${d.name}：広い着弾地点を指定 / コスト ${d.cost}。ファイヤーボールより速く届きます。`;return `${d.name}：着弾地点を指定 / コスト ${d.cost}。遠いほど着弾が遅れます。`;})():'カードを選択。片塔破壊はそのレーン＋中央細帯、両塔破壊後は敵陣前半を横いっぱい使えます。';
 }
 for(let i=0;i<10;i++){const seg=document.createElement('i'),fill=document.createElement('b');seg.append(fill);el('energyTrack').append(seg);}
 function choose(id){
@@ -625,10 +678,10 @@ function toggleDeckCard(id,{fromDetail=false}={}){
   if(addToEditingDeck(id)){if(fromDetail)refreshDetailToggle();else closeDeckCardActions();return;}
   if(fromDetail){closeCardDetail();openDeckCardActions(id);}renderReplacementChoices(id);
 }
-function targetLabel(d){if(d.id==='mossling')return '地上＋空中（槍兵2）';return d.targetsAir?'地上＋空中':'地上のみ';}
+function targetLabel(d){if(d.buildingOnly)return '建物のみ';if(d.id==='mossling')return '地上＋空中（槍兵2）';return d.targetsAir?'地上＋空中':'地上のみ';}
 function detailStatsFor(d){
-  if(d.spell){const stats=[['COST',d.cost],['TYPE','SPELL'],['範囲',`R${d.radius}`],['兵ダメージ',d.damage],['建物ダメージ',d.buildingDamage]];if(d.stunDuration)stats.push(['スタン',`${d.stunDuration}秒`]);return stats;}
-  const dmg=d.id==='mossling'?'地上65 / 槍45':(d.laserTower||d.laserUnit)?`${d.laserBaseDps} DPS〜`:d.damage;const interval=(d.laserTower||d.laserUnit)?'継続':d.sparkUnit?`${d.sparkChargeTime}秒チャージ`:d.cooldown?`${d.cooldown.toFixed(2).replace(/0+$/,'').replace(/\.$/,'')}秒`:'—';
+  if(d.spell){const stats=[['COST',d.cost],['TYPE','SPELL'],['範囲',`R${d.radius}`]];if(d.spell==='cyclone'){stats.push(['効果時間',`${d.zoneDuration}秒`],['吸引','継続・軽量ほど強い'],['ダメージ',`外${d.outerDps} / 中${d.midDps} / 中心${d.innerDps} DPS`],['建物','吸引・ダメージなし']);return stats;}stats.push(['兵ダメージ',d.damage],['建物ダメージ',d.buildingDamage]);if(d.stunDuration)stats.push(['スタン',`${d.stunDuration}秒`]);return stats;}
+  const dmg=d.id==='mossling'?'地上65 / 槍45':d.drillUnit?`${d.drillBaseDps} DPS〜`:(d.laserTower||d.laserUnit)?`${d.laserBaseDps} DPS〜`:d.damage;const interval=d.drillUnit?'継続':(d.laserTower||d.laserUnit)?'継続':d.suicideUnit?'到達時に自爆':d.sparkUnit?`${d.sparkChargeTime}秒チャージ`:d.cooldown?`${d.cooldown.toFixed(2).replace(/0+$/,'').replace(/\.$/,'')}秒`:'—';
   const deployTime=d.tunnelAnywhere?'地下移動（追加待機なし）':`${summonDelayFor(d).toFixed(1)}秒`;
   const stats=[['COST',d.cost],[d.building?'建設時間':'召喚時間',deployTime],['HP',`${d.hp}${d.count>1?` ×${d.count}`:''}`],['攻撃',dmg],['攻撃間隔',interval],['射程',d.range],['対象',targetLabel(d)],['移動',d.building?'固定':d.air?`飛行 ${d.speed}`:`地上 ${d.speed}`]];
   if(d.structureDamage!=null)stats.push(['対タワー・設置物',d.structureDamage]);
@@ -638,6 +691,16 @@ function detailStatsFor(d){
   if(d.id==='mossling'){stats.push(['編成','前衛3（攻撃65）＋槍2（対空可）']);stats.push(['槍兵射程','160（投げ槍）']);}
   if(d.id==='electrowizard')stats.push(['スタン','範囲内の敵ユニット全員 1.0秒']);
   if(d.id==='laserdragon')stats.push(['レーザー増幅','1.5秒ごとに ×2・対象変更/射程外/スタンでリセット']);
+  if(d.id==='shieldknight'){stats.push(['盾耐久',d.shieldMax],['正面軽減','65%を盾へ / 35%を本体へ'],['盾角度',`正面 ${d.shieldArcDeg}°`]);}
+  if(d.id==='windmage')stats.push(['ノックバック','小型34 / 中型20 / 大型8 / 超重量0 px']);
+  if(d.id==='phoenix')stats.push(['復活','卵HP600を4秒守る → HP450で1回のみ']);
+  if(d.id==='gravityorb')stats.push(['重力範囲','R60・軽量ほど強く中心へ吸引']);
+  if(d.id==='mirage')stats.push(['ステルス','最大3秒・攻撃/被弾/時間切れで解除'],['ステルス初撃','×1.4']);
+  if(d.id==='skybomber')stats.push(['特性','飛行・敵ユニット無視・建物のみ攻撃'],['爆弾','175 / 1.6秒']);
+  if(d.id==='scrapdrill')stats.push(['ドリルDPS','90 → 135 → 180 → 240'],['増幅','同一建物へ1.5秒ごと'],['リセット','射程外 / 対象変更 / スタン']);
+  if(d.id==='crusherogre')stats.push(['連続打撃','230 → 310 → 390 → 470'],['攻撃間隔','3.0秒'],['リセット','射程外 / 対象変更 / スタン']);
+  if(d.id==='siegeturtle')stats.push(['移動中装甲','遠距離ダメージ40%軽減'],['対象外','近接 / スペル / 継続ダメージ']);
+  if(d.id==='bombcarrier')stats.push(['建物自爆','480'],['死亡時','周囲の敵ユニットへ80'],['移動速度','88']);
   if(d.summonType){const summonLabel=(d.summonOnDeploy?`配置時＋${d.summonInterval}秒ごと`:`${d.summonInterval}秒ごと`)+(d.summonWindup?`（準備${d.summonWindup}秒）`:'')+` ×${d.summonCount}`;stats.push(['召喚',summonLabel]);}
   if(d.spawnType==='blade')stats.push(['編成','前1・後2の3体']);
   if(d.sparkUnit)stats.push(['充電','敵不在でも常時・ザップで0へ']);
@@ -670,6 +733,9 @@ function createDetailDemo(id){
     }else if(id==='arrowrain'){
       enemy('mossling',lane,420);enemy('boneswarm',470,410);demoDeploy(g,0,id,lane,455);
       label='密集した小型群体へ着弾予告 → 広範囲一斉ダメージ';scenarioKey='arrowrain-wide-swarm';duration=7;
+    }else if(id==='cyclone'){
+      g.towers.forEach(t=>t.range=0);const pack=enemy('mossling',lane,420);pack.forEach((u,i)=>{demoStageUnit(u,475+(i%3)*55,455+Math.floor(i/3)*48);u.damage=0;u.speed=35;});demoDeploy(g,0,id,lane,500);
+      label='半径130の渦を3秒展開 → 敵を中心へ継続吸引。中心ほど少量ダメージが上昇';scenarioKey='cyclone-pull-field';duration=7;
     }else{
       enemy('knight',lane,420);enemy('archer',485,405);demoDeploy(g,0,id,lane,475);
       label='地上兵＋後衛へ実際の飛翔 → 着弾 → 範囲ダメージ';scenarioKey='fireball-splash';duration=7;
@@ -717,6 +783,32 @@ function createDetailDemo(id){
     g.towers.forEach(t=>t.range=0);
     const [dragon]=own(id,lane,650),[golem]=enemy('golem',lane,390);demoStageUnit(dragon,lane,635);demoStageUnit(golem,lane,500);if(golem){golem.speed=0;golem.damage=0;}
     label='飛行しながら中距離へ接近 → 同じ敵へ照射し続けて1.5秒ごとに20→40→80…と増幅';scenarioKey='laserdragon-mobile-ramp';duration=11;
+  }else if(id==='shieldknight'){
+    g.towers.forEach(t=>t.range=0);const [shield]=own(id,lane,650),[archer]=enemy('archer',lane,420);demoStageUnit(shield,lane,585);demoStageUnit(archer,lane,430);if(archer){archer.speed=0;archer.damage=100;}
+    label='正面からの矢を大盾で受け、65%を盾耐久へ・35%を本体へ分散。盾が割れると通常ダメージ';scenarioKey='shield-front-block';duration=10;
+  }else if(id==='windmage'){
+    g.towers.forEach(t=>t.range=0);const [mage]=own(id,lane,650);demoStageUnit(mage,lane,620);const pack=enemy('mossling',lane,420);pack.forEach((u,i)=>{demoStageUnit(u,500+i*20,505+i*5);u.speed=0;u.damage=0;});
+    label='射程175の風弾が軽量ゴブリンへ命中 → 攻撃方向へ大きくノックバック';scenarioKey='wind-knockback';duration=9;
+  }else if(id==='phoenix'){
+    g.towers.forEach(t=>t.range=0);const [bird]=own(id,lane,650);demoStageUnit(bird,lane,555,{hp:120});const [archer]=enemy('archer',lane,420);demoStageUnit(archer,lane,430);if(archer){archer.damage=180;archer.cooldown=.55;archer.speed=0;}
+    label='フェニックス撃破 → HP600の卵が地上へ落下 → 4秒守ればHP450で一度だけ復活';scenarioKey='phoenix-egg-revive';duration=10;
+  }else if(id==='gravityorb'){
+    g.towers.forEach(t=>t.range=0);const [orb]=own(id,lane,650);demoStageUnit(orb,lane,620);const pack=enemy('mossling',lane,420);pack.forEach((u,i)=>{demoStageUnit(u,485+(i%3)*45,495+Math.floor(i/3)*38);u.speed=0;u.damage=0;});
+    label='半径60の重力弾 → 周囲の敵へ60ダメージ＋着弾中心へ吸引';scenarioKey='gravity-orb-pull';duration=9;
+  }else if(id==='mirage'){
+    g.towers.forEach(t=>t.range=0);const [assassin]=own(id,lane,650);demoStageUnit(assassin,lane,610);const [archer]=enemy('archer',lane,420);demoStageUnit(archer,lane,500);if(archer){archer.speed=0;archer.damage=0;}
+    label='召喚完了後に最大3秒ステルス → 直接狙われず接近 → 初撃1.4倍で姿を現す';scenarioKey='mirage-stealth-strike';duration=8;
+  }else if(id==='skybomber'){
+    g.towers.forEach(t=>t.damage=0);const [bomber]=own(id,lane,650);demoStageUnit(bomber,lane,365);label='飛行で敵ユニットを無視して建物へ直行 → 射程75から1.6秒ごとに175ダメージの爆弾投下';scenarioKey='skybomber-building-run';duration=8;
+  }else if(id==='scrapdrill'){
+    g.towers.forEach(t=>t.damage=0);const [drill]=own(id,lane,650);demoStageUnit(drill,lane,310);label='建物へ張り付き → 90 DPSから1.5秒ごとに135→180→240 DPSまでドリル火力上昇';scenarioKey='scrapdrill-ramp';duration=9;
+  }else if(id==='crusherogre'){
+    g.towers.forEach(t=>t.damage=0);const [ogre]=own(id,lane,650);demoStageUnit(ogre,lane,315);label='超低速3秒攻撃 → 同じ建物を殴るたび230→310→390→470へ強化';scenarioKey='crusher-ogre-ramp';duration=14;
+  }else if(id==='siegeturtle'){
+    g.towers.forEach(t=>t.damage=0);const [turtle]=own(id,lane,650);demoStageUnit(turtle,lane,620);const [archer]=enemy('archer',lane,420);demoStageUnit(archer,500,500);if(archer){archer.speed=0;archer.damage=120;archer.range=240;}
+    label='甲羅にこもって建物へ進軍中は遠距離ダメージ40%軽減 → 建物へ到着して攻撃すると軽減解除';scenarioKey='siege-turtle-shell';duration=12;
+  }else if(id==='bombcarrier'){
+    g.towers.forEach(t=>t.damage=0);const [carrier]=own(id,lane,650);demoStageUnit(carrier,lane,350);label='速度88で建物へ突進 → 到達すると480ダメージで自爆。途中撃破時は周囲へ80の小爆発';scenarioKey='bomb-carrier-suicide';duration=6;
   }else if(id==='cannon'){
     const [cannon]=own(id,lane,650),[guard]=enemy('knight',lane,420);demoStageUnit(cannon,lane,650);demoStageUnit(guard,lane,515);
     label='アイアン衛士をロックして防衛。設置後は耐久も毎秒30ずつ自然減衰';scenarioKey='cannon-lock-decay';duration=9;
@@ -833,7 +925,7 @@ for(const id of DECK){
   const role=document.createElement('small');role.textContent=d.role;
   const h=document.createElement('h3');h.textContent=d.name;
   const p=document.createElement('p');p.textContent=d.desc;
-  const stat=document.createElement('div');stat.className='library-stat';stat.textContent=d.spell?`範囲 R${d.radius}　兵 ${d.damage} / 建物 ${d.buildingDamage}`:`HP ${d.hp}${d.count>1?` ×${d.count}`:''}　攻撃 ${d.damage}`;
+  const stat=document.createElement('div');stat.className='library-stat';stat.textContent=d.spell?(d.spell==='cyclone'?`範囲 R${d.radius}　${d.zoneDuration}秒吸引`:`範囲 R${d.radius}　兵 ${d.damage} / 建物 ${d.buildingDamage}`):`HP ${d.hp}${d.count>1?` ×${d.count}`:''}　攻撃 ${d.damage}`;
   card.append(badge,can,role,h,p,stat);el('libraryGrid').append(card);
 }
 function interpolate(g,now){

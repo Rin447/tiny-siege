@@ -1,0 +1,18 @@
+PASS 1 Offline bundle identifies V23.5.0
+PASS 2 Archer and Berserker use directional pixel sprite definitions
+PASS 3 New Archer and Berserker sheets are embedded at 640x960
+PASS 4 Patch Notes exposes the V23.5 art rebuild
+PASS 5 V23.5 self-contained HTML starts a playable CPU battle
+PASS 6 No uncaught JavaScript errors during V23.5 smoke flow
+{
+  "passed": 6,
+  "checks": [
+    "Offline bundle identifies V23.5.0",
+    "Archer and Berserker use directional pixel sprite definitions",
+    "New Archer and Berserker sheets are embedded at 640x960",
+    "Patch Notes exposes the V23.5 art rebuild",
+    "V23.5 self-contained HTML starts a playable CPU battle",
+    "No uncaught JavaScript errors during V23.5 smoke flow"
+  ],
+  "errors": []
+}

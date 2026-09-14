@@ -1,35 +1,21 @@
-# TINY SIEGE v21.0.0 Test Report
+# TINY SIEGE v23.5.0 テストレポート
 
-## Build
+## 対象
+- リーフ弓兵: 新しい緑フード / 矢筒 / 木弓の高精細ピクセルスプライト
+- クラッグバーサーカー: 新しい赤髪 / 毛皮 / 双斧の高精細ピクセルスプライト
+- 前姿 / 後姿 × 静止 / 移動 / 攻撃
+- 戦闘ロジック・ステータスは変更なし、physicsVersion 28を維持
 
-- Version: **21.0.0**
-- Cards: **33** (29 selectable unit cards + 4 spells)
-- Deck size: **8**
-- Physics version: **26**
-- Update pages: **1 cumulative HTML** (`UPDATE-HISTORY.html`)
+## 結果
+- `npm run check`: PASS（JavaScript 17ファイル解析 + Cloudflare設定確認）
+- `npm test`: **222 / 222 PASS**
+- `npm run test:network`: **14 / 14 PASS**
+- `tests/browser-v23-5.py`: **6 / 6 PASS**
+- `tests/stress.mjs`: 完走、NaN/停止なし
+- `npm run build:offline`: PASS。単一HTMLへ6枚の方向対応スプライトをData URLで内包
 
-## Automated tests
-
-- JavaScript/config check: **PASS** (17 JavaScript files parsed)
-- Node test suite: **194 / 194 PASS**
-- Network/WebSocket suite: **14 / 14 PASS**
-- Browser flow: **14 / 14 PASS**, no uncaught JavaScript errors
-- Offline self-contained HTML build: **PASS**
-- Synthetic congestion stress test: **PASS**
-
-## v21.0 coverage
-
-- New **Laser Dragon**: 5 cost / HP1300 / flying / ground+air targeting / speed46 / range145 / normal cost-5 1.2-second summon delay.
-- Laser Dragon uses the Laser Tower ramp rule: **20 DPS base**, doubling every **1.5 seconds** while continuously attacking the same target.
-- The mobile laser commits its target when the beam actually starts, follows the first-attack-lock rule, resets ramp when out of range, and can move back into medium range.
-- Stun resets Laser Dragon ramp and target lock just like the existing Laser Tower reset path.
-- **Ordinary attack cooldowns are frozen during stun without being reset.** After stun, units, towers and placed structures resume from the remaining cooldown they had before the stun.
-- Existing special stun effects remain: Sparky charge reset, laser ramp reset, and Nightshade rush cancellation.
-- Browser tests verify the Laser Dragon card/detail/live demo, current deck count, My List v21 storage, Patch Notes and CPU-practice startup.
-- Network snapshots identify **v21.0 / physicsVersion 26** and remain synchronized between both seats.
-
-## Stress result
-
-Synthetic local Node congestion run: **48 units**, 300 steps / 30 simulated seconds, mean ~24.32 ms, p95 ~39.06 ms, max frame ~122.91 ms, max enemy overlap ~0.02323. This is a local synthetic test, not a Cloudflare CPU/quota benchmark.
-
-`/api/config` is verified as **v21.0.0 / 33 cards / 29 selectable unit cards / 4 spells / physicsVersion 26 / maxDeck 8**.
+## V23.5固有確認
+- Archer / Berserker のPNGは各640x960、160pxセル、4列x6行。
+- 行順は front idle / front move / front attack / back idle / back move / back attack。
+- 生成元が3フレームの行は中間フレームを再利用して既存4フレーム周期に合わせています。
+- キャラの向き判定・ターゲット・攻撃タイミング・HP/攻撃力/コストには変更を入れていません。

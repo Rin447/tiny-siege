@@ -1,7 +1,7 @@
 {
-  "version": "21.0.0",
-  "physicsVersion": 26,
-  "fileCountExcludingManifest": 81,
+  "version": "23.5.0",
+  "physicsVersion": 28,
+  "fileCountExcludingManifest": 97,
   "files": [
     {
       "path": ".gitignore",
@@ -25,18 +25,18 @@
     },
     {
       "path": "DEPLOY-GUIDE.html",
-      "sha256": "a9f64cc7e6b72ad2fc4601d129dc936fc18936a12472cfead269c79a00a5ac31",
-      "bytes": 1240
+      "sha256": "6ba379b82c1d9d105ae497d64bd285ca8973fcd016426ad58b160b7979ce89df",
+      "bytes": 1098
     },
     {
       "path": "PLAY-OFFLINE.html",
-      "sha256": "8c2072e128f382567b255be63f180111a292f75847ec4c4a8ac0bb457c23beff",
-      "bytes": 303807
+      "sha256": "2293545c1639603ad04fe77f1721209f4afb2406ff26a4f59d7d4c9101abb8a7",
+      "bytes": 3420168
     },
     {
       "path": "README.md",
-      "sha256": "ce8e2a078a8eadb9f624f81a76ca48918471c32cb38b7634e140c313786110ed",
-      "bytes": 3769
+      "sha256": "aa156a0b0cc0202697b3e75e9af676fe1b225dd3b0e869da24eda44f2c2573c9",
+      "bytes": 2390
     },
     {
       "path": "START-LOCAL-WINDOWS.bat",
@@ -50,23 +50,28 @@
     },
     {
       "path": "START_HERE.txt",
-      "sha256": "a05f001ea6753c9e96fadb080e54192630f59f0ffd0e79d3d9ba2fe1aaaae6bc",
-      "bytes": 1202
+      "sha256": "7f84831f9fdc6a89141da09144cf8a7b8a88723cd7b300353e517b02850f2b51",
+      "bytes": 753
     },
     {
       "path": "UPDATE-HISTORY.html",
-      "sha256": "3fb70781d3d1946fff135faa8d11a277ece029e09098ef588591083b7e859301",
-      "bytes": 13484
+      "sha256": "cabd81ed42aa8f657dd4570f05fcd1a15e4f1aff964b4acfc5f8b80f9a3fcd0b",
+      "bytes": 20576
     },
     {
       "path": "docs/ARCHITECTURE.md",
-      "sha256": "277d159201518328841023a7109213bc2d5f25c93fe104f0e2984543f77ed9de",
-      "bytes": 14670
+      "sha256": "b3023f73a2497bafee2929684a19de30e4537501f6fded14c3ff793f2110d864",
+      "bytes": 4609
     },
     {
       "path": "docs/ASSETS.md",
-      "sha256": "f61f20f2d6667c1f505469a4105838cd6813ee0f686845aceee8a2741aaddf47",
-      "bytes": 2587
+      "sha256": "c8600a7c0ad6631219f79e385b40dc51231ba527c36188899f43dee27e7e51fd",
+      "bytes": 4932
+    },
+    {
+      "path": "docs/BROWSER_TEST_RESULTS.txt",
+      "sha256": "2e4f32dfa6c0595990b38c32e677a54a16604bec45569589178bbb56a07c84e1",
+      "bytes": 287
     },
     {
       "path": "docs/BROWSER_V16_1_OUTPUT.txt",
@@ -140,37 +145,67 @@
     },
     {
       "path": "docs/BROWSER_V18_OUTPUT.txt",
-      "sha256": "8b27c54af51d24c4a66d914b86ca880f76684bd8a4d5c7eb7836a4e9542e9647",
-      "bytes": 2674
+      "sha256": "06b981b0887e9237499deb4211e27ec022ec825be145f179b2ae210a5745fa9c",
+      "bytes": 3056
     },
     {
       "path": "docs/BROWSER_V18_RESULTS.json",
-      "sha256": "42b39c094aae4226dbe3d0b3f98bbacac34241c1d8781ba006b81e2b20ce1997",
-      "bytes": 1360
+      "sha256": "041b6cb4ff75f007308e70a7b6ef56dfc166c1cf478b1431aa33d13449717a82",
+      "bytes": 1637
+    },
+    {
+      "path": "docs/BROWSER_V23_2_OUTPUT.txt",
+      "sha256": "3c2acdc34a9d4586dcf9c105aa450ed513a5b6f95303bb6f29c3690c5700a87a",
+      "bytes": 678
+    },
+    {
+      "path": "docs/BROWSER_V23_2_RESULTS.json",
+      "sha256": "d6338fa230252793b3c77b6870a130d4e92187d20d331502227e084e46647a01",
+      "bytes": 364
+    },
+    {
+      "path": "docs/BROWSER_V23_3_OUTPUT.txt",
+      "sha256": "30d8ecfe7ae2ca1bab0e4aa37adae36f26af28e325655e2ee7bd47484796c609",
+      "bytes": 672
+    },
+    {
+      "path": "docs/BROWSER_V23_3_RESULTS.json",
+      "sha256": "cbf45e58fe9ec6268b5f218d4d0b5b95d757703704afc0122c214d2207547aa7",
+      "bytes": 361
+    },
+    {
+      "path": "docs/BROWSER_V23_5_OUTPUT.txt",
+      "sha256": "5348f34f91c30883c9ec784f4d10c19c588beb76bf90d1b6470cde689632331d",
+      "bytes": 742
+    },
+    {
+      "path": "docs/BROWSER_V23_5_RESULTS.json",
+      "sha256": "f34c31b98b993b804d5d85bbe05a0c61e5bb7740478fe5d1b571d59bcdb92d27",
+      "bytes": 396
     },
     {
       "path": "docs/CHANGELOG.md",
-      "sha256": "6c7dc5340c3bad754260bf9d26d259a9e0accf7bf51b72ef579be037a81a77b9",
-      "bytes": 10319
+      "sha256": "393dd6a25e04f088e4d8cde7bd87b26e50dcf91bf7f632b6694015b00353c38b",
+      "bytes": 15422
     },
     {
       "path": "docs/CHECK_RESULTS.txt",
-      "sha256": "a355cad0a651cdb7a2bcf3465a2532427d10a066a218be31fae4c5fd4efce107",
+      "sha256": "52c9090c19a7949d75200f6e73dd05a74c3eaeeadf65a2dbbc20e8f2328c0b53",
       "bytes": 145
     },
     {
       "path": "docs/DEPLOY_CLOUDFLARE.md",
-      "sha256": "17ecfefd148051658ab539de1e65de29cb716d9e5f5859b949cc4e5c80db189a",
-      "bytes": 1097
+      "sha256": "5f032d971a232a4146a911e25f6ca05eeee0efaf120c999700995e3de66b151b",
+      "bytes": 1799
     },
     {
       "path": "docs/NETWORK_TEST_RESULTS.txt",
-      "sha256": "6c27dae31f0aaf9b21ab8fa382de0dbd827b952f194b66eb3c764af0fe7ea84c",
+      "sha256": "6660042a86a750f4e193581e855661203212b64808ee6848400ac67fe7be566c",
       "bytes": 1824
     },
     {
       "path": "docs/OFFLINE_BUILD_RESULTS.txt",
-      "sha256": "547e83e4cfa89048346116ba55b69a84f9e4124c13c021be88fe336911271505",
+      "sha256": "9c98223daf6c199d233f6d06026422327bfe3d43c119105deeaa851a32edcbfd",
       "bytes": 124
     },
     {
@@ -195,23 +230,23 @@
     },
     {
       "path": "docs/STRESS_RESULTS.json",
-      "sha256": "e173aaae4609b474bc34436e12c4e74b573cb1d96b5a0c047f2f5a88ad3dff7d",
+      "sha256": "f6ea3525ffa707a29fbd2b3c2cb7383b6ac4c4d32776cdff28a10d5d087e55bc",
       "bytes": 393
     },
     {
       "path": "docs/STRESS_RESULTS.txt",
-      "sha256": "6d75330f9cbc1fd7d2e96e32bf051ae74921a60b9b46d2fefc1c8d7c2dfa70bb",
+      "sha256": "7f179745a41d3064aaa163ddaff8e606c3b91f5b7dec3319753ccc77f6072598",
       "bytes": 394
     },
     {
       "path": "docs/TEST_REPORT.md",
-      "sha256": "8b677546ffe63129e1733603ca4358ea8f62d7ff76a5aeb609899aa7ef449082",
-      "bytes": 2035
+      "sha256": "23fae092a7fb76795be22049c68e996cdcb701679635eb97218c68e2c380dff6",
+      "bytes": 1196
     },
     {
       "path": "docs/UNIT_TEST_RESULTS.txt",
-      "sha256": "cd0481569c8d9b169d278e66f489c33833b467048aec1b70b07d90f5a3a5dfc5",
-      "bytes": 38399
+      "sha256": "13a016e3ceb7b6e845be5c719726b03b283b0676dfe33199e2cd46d99a116b86",
+      "bytes": 44412
     },
     {
       "path": "docs/concepts/stone-golem-concept.png",
@@ -265,8 +300,8 @@
     },
     {
       "path": "package.json",
-      "sha256": "52ad13dc8beb83651dd21e401b6067dd8003f7e7b49189fa6f41fec68317e24a",
-      "bytes": 775
+      "sha256": "39821611783b69703b1303a3503688c19896131714846777729e9bb6eeeb936c",
+      "bytes": 730
     },
     {
       "path": "public/_headers",
@@ -275,8 +310,38 @@
     },
     {
       "path": "public/app.js",
-      "sha256": "6a758506926e9b7432c1a3d628ff63538221adec9aff8485eb8026068876b649",
-      "bytes": 83354
+      "sha256": "acee786ac8b50d172c62f68ccf3cc6deb6ab8ecdeee68685513572e340c569c3",
+      "bytes": 96630
+    },
+    {
+      "path": "public/assets/sprites/archer.png",
+      "sha256": "39987e880525abf5e5d320e1f76957236e190c27192a3d77f885820c98057cc5",
+      "bytes": 781175
+    },
+    {
+      "path": "public/assets/sprites/berserker.png",
+      "sha256": "d19f68f23c6f232ca44b9611ea0b25ee9b2092b729b35323ca02130d63f806b6",
+      "bytes": 704077
+    },
+    {
+      "path": "public/assets/sprites/crusherogre.png",
+      "sha256": "0f51df62539be68666a008b9bbe3bd91418fe93542a15b543eebaf69cbe147ac",
+      "bytes": 362379
+    },
+    {
+      "path": "public/assets/sprites/frost.png",
+      "sha256": "2508b36ca34dfa084204bc3e414dfbb4440e5620740e859ab033cc840909926a",
+      "bytes": 109690
+    },
+    {
+      "path": "public/assets/sprites/mage.png",
+      "sha256": "5827f51705c66d12e36a810a9920d512fadbc80c487666e8dc6070739381b9b0",
+      "bytes": 92717
+    },
+    {
+      "path": "public/assets/sprites/skybomber.png",
+      "sha256": "9507defb30ca1f9697e7fc47b2dc18fde2b4e0bd208fe5ae8c3a995734c15954",
+      "bytes": 251227
     },
     {
       "path": "public/favicon.svg",
@@ -285,28 +350,28 @@
     },
     {
       "path": "public/game/art.js",
-      "sha256": "aa79861efd786d7789d199a1b0d5214279b763942c409160b046641396431b3b",
-      "bytes": 88345
+      "sha256": "182b9fd7b663b4d3ddb9612d9e6ca7d5079b52d10772e740aa25af29c5145e81",
+      "bytes": 106324
     },
     {
       "path": "public/game/engine.js",
-      "sha256": "e9caaf26c85bf7619f5bc2d60b23b3bc65f171ca3c32a9add3d2650e49157ccb",
-      "bytes": 41990
+      "sha256": "87e1fa3f4e5ee0be9160e011d92562e28eae31bf8973b5a678887c90f247e154",
+      "bytes": 51566
     },
     {
       "path": "public/game/physics.js",
-      "sha256": "9fbfb2776a22994c728b0fafc0691b57297f20c074bfbc83169752807d026c7c",
-      "bytes": 14740
+      "sha256": "d5c29a2f44bc5fcfc07a878d4c6b702b7a10b257930faacfe362328c6089ef1b",
+      "bytes": 15050
     },
     {
       "path": "public/game/units.js",
-      "sha256": "88ff3e4d5ea6401fb580cb55614f06ab49e2f93358d627e5908f4a1d9e95e742",
-      "bytes": 19510
+      "sha256": "14eba936e9e417f6c62904dfd9f8d6d7162d240643f0254d720f684766971771",
+      "bytes": 26136
     },
     {
       "path": "public/index.html",
-      "sha256": "25f8fc98656cabfdca50cbcbc39a255e3975e4a7ce412af3c03987b2fcd32ba1",
-      "bytes": 20235
+      "sha256": "a23045842f72db9c2027f05cb6082aef079cafb5ccb297a291a2a61cb155c96e",
+      "bytes": 20247
     },
     {
       "path": "public/styles.css",
@@ -315,8 +380,8 @@
     },
     {
       "path": "scripts/build-offline.mjs",
-      "sha256": "ba5adbc753dcc15df24ba1ead76402165edd6fd51f74f7c922fcb36b16e64e8f",
-      "bytes": 926
+      "sha256": "cde23610c09b31c80ac3e1fe3b9f91179fa46559721c2b10fc3a83c6c95a134d",
+      "bytes": 1458
     },
     {
       "path": "scripts/check.mjs",
@@ -335,13 +400,13 @@
     },
     {
       "path": "src/worker.js",
-      "sha256": "203c3fb6a2c00e218d5762366ecefdf4233c3760a0178530c14e658db0c5e223",
-      "bytes": 10383
+      "sha256": "e35e246670cd438d99c68210d861d1cedf56d1e8206a0abb60d53dea041b04ea",
+      "bytes": 10778
     },
     {
       "path": "tests/art.test.mjs",
-      "sha256": "1a291cd1327d2517e7ef6dd60a39580b96a7da6176c1af84b0ced878c2d0c291",
-      "bytes": 2331
+      "sha256": "ff19b7b8ba50951da2569173e4683e48a637d7d5b629d5bf21a08a59de132656",
+      "bytes": 5553
     },
     {
       "path": "tests/browser-v16-1.py",
@@ -365,22 +430,37 @@
     },
     {
       "path": "tests/browser-v18.py",
-      "sha256": "1d0bf8f29f61ef12e6d1ad286bfcbe3be130d108a5920b0ad63594d03191ccce",
-      "bytes": 11298
+      "sha256": "42ed83163852321258bb1a4b44723cac3b4c63efe00159f57d91d637da8ea0d4",
+      "bytes": 15861
+    },
+    {
+      "path": "tests/browser-v23-2.py",
+      "sha256": "64d0f1c840a03de83bb26cafaae35535e9344721a3fb19db4a6c56489e037e3d",
+      "bytes": 2954
+    },
+    {
+      "path": "tests/browser-v23-3.py",
+      "sha256": "fbd53047e3199fe698f97eab3813ce840a659a7eae58c1d988ef1a579efa3485",
+      "bytes": 2976
+    },
+    {
+      "path": "tests/browser-v23-5.py",
+      "sha256": "9d55a402f4cc7a4e1c03f66faefd0487c4508dccfc881f8e538d402450d0f2a2",
+      "bytes": 2864
     },
     {
       "path": "tests/engine.test.mjs",
-      "sha256": "d6b8c1004b4f7a5a28b6fb8f737e1c09653916694b93f2ca7aefd06d6d3d7d4e",
-      "bytes": 58442
+      "sha256": "bb3123e82db11f29feb0d2b3b6e1abd2c680585156d386f61b2e6cb3c1d8d3b7",
+      "bytes": 72640
     },
     {
       "path": "tests/network.mjs",
-      "sha256": "1a69d98e0b258983b4760984f6ff7fe1589341b521926ea9ca363e53d365ef04",
-      "bytes": 6801
+      "sha256": "01255796dba691e74dba97a6a4c28c3b7ad484daa8eb43692a3e95881d886b8f",
+      "bytes": 7422
     },
     {
       "path": "tests/physics.test.mjs",
-      "sha256": "980a549f8085a2005092b12b0460cd409d4492308f7582e56989ed4055019b32",
+      "sha256": "a05b728a584fce97179a7bc5dc2f7aceb38e9a078e03ccbf012c8d6b399193af",
       "bytes": 11748
     },
     {
@@ -400,8 +480,8 @@
     },
     {
       "path": "tests/worker.test.mjs",
-      "sha256": "39fb6dcf1fd026f62da0a25b02fba6f6bbe403385efef8cea1c497c652c185c5",
-      "bytes": 5460
+      "sha256": "c47ef56e2eff0f6e59f72bd20345d3f8adc7b54c3bd45e2e93ac55650ef89406",
+      "bytes": 5767
     },
     {
       "path": "wrangler.jsonc",

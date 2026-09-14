@@ -48,10 +48,20 @@ async def main():
         await page.click('#deckBtn')
         await page.wait_for_timeout(150)
         cards=page.locator('#deckPool .deck-choice')
-        assert await cards.count()==33, await cards.count()
-        for cid in ['necromancer','darknecro','ashsquad','princess','sparky','zap','electrowizard','laserdragon']:
+        assert await cards.count()==44, await cards.count()
+        for cid in ['necromancer','darknecro','ashsquad','princess','sparky','zap','electrowizard','laserdragon','shieldknight','windmage','phoenix','gravityorb','mirage','cyclone','skybomber','scrapdrill','crusherogre','siegeturtle','bombcarrier']:
             assert await page.locator(f'#deckPool .deck-choice[data-card="{cid}"]').count()==1
-        await ok('Deck builder exposes all 33 selectable cards, including Laser Dragon, Elekitel Wizard, Princess Archer, Zap and Sparky')
+        await ok('Deck builder exposes all 44 selectable cards, including the five V23 siege specialists')
+        sprite_info=await page.evaluate("""() => Object.fromEntries(
+          ['skybomber','crusherogre','archer','berserker','mage','frost'].map(k=>[k,window.TINY_SPRITE_DATA?.[k]||''])
+        )""")
+        assert all(v.startswith('data:image/png;base64,') for v in sprite_info.values()),sprite_info
+        dims=await page.evaluate("""async () => {
+          const load = src => new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve([i.naturalWidth,i.naturalHeight]);i.onerror=reject;i.src=src;});
+          const out={}; for(const k of ['skybomber','crusherogre','archer','berserker','mage','frost']) out[k]=await load(window.TINY_SPRITE_DATA[k]); return out;
+        }""")
+        assert all(v==[640,960] for v in dims.values()),dims
+        await ok('V23.3 offline build embeds 640x960 front/back sprite sheets for six pixel units')
 
         # New unit: Princess Archer
         await open_detail(page,'princess')
@@ -132,6 +142,46 @@ async def main():
         await ok('Laser Dragon detail shows 5 cost, HP1300, flying speed46, range145 and ramping laser')
         await close_detail(page)
 
+        # V22 tactical cards: five units plus Cyclone spell.
+        for cid,scenario in [
+            ('shieldknight','shield-front-block'),('windmage','wind-knockback'),('phoenix','phoenix-egg-revive'),
+            ('gravityorb','gravity-orb-pull'),('mirage','mirage-stealth-strike'),('cyclone','cyclone-pull-field')]:
+            await open_detail(page,cid)
+            assert await page.locator('#cardDetailDemo').get_attribute('data-demo-scenario')==scenario
+            await close_detail(page)
+        await open_detail(page,'cyclone')
+        cstats=await page.locator('#cardDetailStats').inner_text()
+        cdesc=await page.locator('#cardDetailDesc').inner_text()
+        assert 'R130' in cstats and '3秒' in cstats and '外10 / 中20 / 中心35 DPS' in cstats,cstats
+        assert '吸い寄せ' in cdesc and '建物・タワー' in cdesc,cdesc
+        await ok('V22 detail demos expose Shield, Wind, Phoenix, Gravity, Mirage and the three-second Cyclone field')
+        await close_detail(page)
+
+        # V23 siege specialists: five building-only units with distinct mechanics.
+        for cid,scenario in [
+            ('skybomber','skybomber-building-run'),('scrapdrill','scrapdrill-ramp'),('crusherogre','crusher-ogre-ramp'),
+            ('siegeturtle','siege-turtle-shell'),('bombcarrier','bomb-carrier-suicide')]:
+            await open_detail(page,cid)
+            assert await page.locator('#cardDetailDemo').get_attribute('data-demo-scenario')==scenario
+            assert '建物のみ' in await page.locator('#cardDetailStats').inner_text()
+            await close_detail(page)
+        await open_detail(page,'skybomber')
+        sstats=await page.locator('#cardDetailStats').inner_text();assert '720' in sstats and '175' in sstats and '75' in sstats and '飛行 58' in sstats,sstats
+        await close_detail(page)
+        await open_detail(page,'scrapdrill')
+        dstats=await page.locator('#cardDetailStats').inner_text();assert '90 → 135 → 180 → 240' in dstats and '1.5秒ごと' in dstats,dstats
+        await close_detail(page)
+        await open_detail(page,'crusherogre')
+        ostats=await page.locator('#cardDetailStats').inner_text();assert '230 → 310 → 390 → 470' in ostats and '3.0秒' in ostats,ostats
+        await close_detail(page)
+        await open_detail(page,'siegeturtle')
+        tstats=await page.locator('#cardDetailStats').inner_text();assert '2050' in tstats and '遠距離ダメージ40%軽減' in tstats,tstats
+        await close_detail(page)
+        await open_detail(page,'bombcarrier')
+        bstats=await page.locator('#cardDetailStats').inner_text();assert '480' in bstats and '周囲の敵ユニットへ80' in bstats and '88' in bstats,bstats
+        await ok('V23 detail demos expose Sky Bomber, Scrap Drill, Crusher Ogre, Siege Turtle and Bomb Carrier mechanics')
+        await close_detail(page)
+
         # Summon delay details and existing balance changes remain intact.
         await open_detail(page,'golem')
         stats=await page.locator('#cardDetailStats').inner_text()
@@ -157,7 +207,7 @@ async def main():
         # My List persistence remains intact.
         await page.click('#saveMyListBtn')
         await page.wait_for_timeout(140)
-        stored=await page.evaluate("window.__v18Store['tiny-deck-presets-v21'] || null")
+        stored=await page.evaluate("window.__v18Store['tiny-deck-presets-v23'] || null")
         assert stored and len(json.loads(stored).get('presets',[]))==1,stored
         assert await page.locator('#myListGrid .mylist-card').count()==1
         await ok('My List persists the current eight-card deck under the current storage key')
@@ -167,7 +217,10 @@ async def main():
         await page.evaluate("document.getElementById('updatesBtn').click()")
         await page.wait_for_timeout(130)
         text=await page.locator('#patchNotes').inner_text()
-        assert 'v21.0.0' in text and 'LASER DRAGON UPDATE' in text, text
+        assert 'v23.3.0' in text and 'CORE UNIT SPRITE UPDATE' in text and 'v23.2.0' in text and 'FRONT / BACK SPRITE UPDATE' in text and 'v23.1.0' in text and 'SPRITE ANIMATION UPDATE' in text and 'SIEGE SPECIALISTS UPDATE' in text, text
+        assert all(name in text for name in ['スカイボマー','スクラップドリル','クラッシャーオーガ','シージタートル','ボムキャリア']), text
+        assert '44枚（39ユニット＋5呪文）' in text and 'physicsVersion を28' in text, text
+        assert 'v22.0.0' in text and 'TACTICAL FORCES UPDATE' in text and all(name in text for name in ['シールドナイト','ウィンドメイジ','フェニックス','グラビティオーブ','ミラージュアサシン','サイクロン']), text
         assert 'エレキテルウィザード' in text and '180' in text and '160' in text and '1秒スタン' in text, text
         assert 'v19.3.0' in text and 'SUMMON DELAY SYSTEM' in text, text
         assert '1コスト0.4秒' in text and '7コスト1.8秒' in text, text
@@ -179,7 +232,7 @@ async def main():
         assert 'v18.0.0' in text and 'LONGSHOT & VOLTAGE' in text, text
         assert 'プリンセスアーチャー' in text and 'ザップ' in text and 'スパーキー' in text, text
         assert 'v17 UPDATE SERIES' in text and 'v17.1.0' in text, text
-        await ok('Patch Notes shows v21 laser dragon rules plus retained v20/v19/v18/v17 history')
+        await ok('Patch Notes shows v23.3 core sprites plus retained v23.2/v23.1/v23/v22/v21/v20/v19/v18/v17 history')
 
         await page.click('#updatesModal .close-modal')
         await page.fill('#nickname','Rin')
@@ -191,7 +244,7 @@ async def main():
         await ok('Self-contained HTML starts a playable CPU battle with a four-card hand and visible arena')
 
         assert not errors,errors
-        await ok('No uncaught JavaScript errors in the v21 deck, detail demos, Patch Notes or CPU battle flow')
+        await ok('No uncaught JavaScript errors in the v23 deck, detail demos, Patch Notes or CPU battle flow')
         await browser.close()
 
     result={'passed':len(CHECKS),'checks':CHECKS,'errors':errors}

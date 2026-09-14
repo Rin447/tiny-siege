@@ -24,10 +24,10 @@ async function wait(fn,message){
 let a,b,c,room,other;
 try{
  await check('health and game config identify the correct game',async()=>{
-  const r=await fetch(base+'/api/config'),j=await r.json();assert.equal(j.version,'21.0.0');assert.equal(j.physicsVersion,26);assert.equal(j.cards,33);assert.equal(j.units,29);assert.equal(j.spells,4);assert.equal(j.maxDeck,8);assert.equal(j.game,'tiny-siege');
+  const r=await fetch(base+'/api/config'),j=await r.json();assert.equal(j.version,'23.5.0');assert.equal(j.physicsVersion,28);assert.equal(j.cards,44);assert.equal(j.units,39);assert.equal(j.spells,5);assert.equal(j.maxDeck,8);assert.equal(j.game,'tiny-siege');
  });
  await check('HTML, style and module assets load',async()=>{
-  for(const url of ['/','/app.js','/styles.css','/game/engine.js','/game/art.js','/game/physics.js']){
+  for(const url of ['/','/app.js','/styles.css','/game/engine.js','/game/art.js','/game/physics.js','/assets/sprites/skybomber.png','/assets/sprites/crusherogre.png','/assets/sprites/archer.png','/assets/sprites/berserker.png']){
    const r=await fetch(base+url);assert.equal(r.status,200);
   }
  });
@@ -59,8 +59,8 @@ try{
   await wait(()=>a.last().game.units.some(u=>u.owner===0)&&b.last().game.units.some(u=>u.owner===0),'deployment synchronization');
   const ua=a.last().game.units.find(u=>u.owner===0),ub=b.last().game.units.find(u=>u.id===ua.id);assert.ok(ub);assert.equal(ua.type,ub.type);
  });
- await check('server sends v21 / physics-v26 deployment, facing, summon, stun, charge, mud, burrow, poison, dash, laser and collision metadata identically to both seats',async()=>{
-  const ga=a.last().game,u=ga.units[0];assert.equal(ga.physicsVersion,26);assert.equal(typeof u.facing,'number');assert.equal(typeof u.mass,'number');assert.equal(typeof u.deploying,'boolean');assert.equal(typeof u.targetable,'boolean');assert.equal(typeof u.deployRemaining,'number');
+ await check('server sends v23 / physics-v28 deployment, facing, summon, stun, charge, mud, burrow, poison, dash, laser and collision metadata identically to both seats',async()=>{
+  const ga=a.last().game,u=ga.units[0];assert.equal(ga.physicsVersion,28);assert.equal(typeof u.facing,'number');assert.equal(typeof u.mass,'number');assert.equal(typeof u.deploying,'boolean');assert.equal(typeof u.targetable,'boolean');assert.equal(typeof u.deployRemaining,'number');assert.equal(typeof u.shieldHp,'number');assert.equal(typeof u.maxShieldHp,'number');assert.equal(typeof u.stealthed,'boolean');assert.equal(typeof u.stealthRemaining,'number');assert.equal(typeof u.eggHatchRemaining,'number');assert.equal(typeof u.revived,'boolean');assert.equal(typeof u.drillStage,'number');assert.equal(typeof u.drillDps,'number');assert.equal(typeof u.drillLockTime,'number');assert.equal(typeof u.crusherStage,'number');assert.equal(typeof u.turtleShellActive,'boolean');
   assert.equal(Object.hasOwn(u,'_nav'),false);assert.equal(Object.hasOwn(u,'_stuck'),false);
   const matching=[...b.messages].reverse().find(m=>m.type==='state'&&m.game?.time===ga.time&&m.game.units.some(v=>v.id===u.id));
   assert.ok(matching);assert.deepEqual(matching.game.units.find(v=>v.id===u.id),u);

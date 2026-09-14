@@ -1,5 +1,64 @@
 # Changelog
 
+## 23.5.0 - ARCHER / BERSERKER ART REBUILD (2026-09-14)
+- リーフ弓兵を、今回作成した緑フード・矢筒・木弓の高精細ピクセルアートへ再構築。
+- クラッグバーサーカーを、赤髪・毛皮・双斧の高精細ピクセルアートへ再構築。
+- 両キャラとも IDLE / MOVE / ATTACK × FRONT / BACK × 4フレーム。
+- 元の生成シートからゲーム用640x960・160pxセルの1キャラ1PNGへ整形。
+- 戦闘ロジック・ステータス変更なし。physicsVersion 28を維持。
+
+## 23.4.0 - RUNE / FROST SPRITE UPDATE (2026-09-14)
+- ルーン術師 / フロストシャーマンを前後2方向のピクセルスプライトへ移行。
+- 各キャラに IDLE / MOVE / ATTACK × FRONT / BACK × 4フレームを実装。
+- 既存のスカイボマー / クラッシャーオーガ / リーフ弓兵 / クラッグバーサーカーと同じスプライト描画パイプラインを使用。
+- オフライン単一HTMLへ全6スプライトをData URL埋め込み。
+- 戦闘ロジック変更なし。physicsVersion 28を維持。
+
+## 23.3.0 - ARCHER / BERSERKER SPRITE UPDATE (2026-09-14)
+- リーフ弓兵 / クラッグバーサーカーを前後2方向のピクセルスプライトへ移行。
+- 各キャラに IDLE / MOVE / ATTACK × FRONT / BACK × 4フレームを実装。
+- 既存のスカイボマー / クラッシャーオーガと同じスプライト描画パイプラインを使用。
+- オフライン単一HTMLへ4スプライトをData URL埋め込み。
+- 戦闘ロジック変更なし。physicsVersion 28を維持。
+
+# TINY SIEGE changelog
+
+## 23.2.0 - FRONT / BACK SPRITE UPDATE (2026-09-14)
+- Sky Bomber and Crusher Ogre sprite sheets now include distinct front and rear views.
+- Each direction retains idle, move and attack states with four cells per state; sprite PNGs are now 640x960 while remaining one file per character.
+- Rendering selects front/rear rows from the existing viewer-relative `back` facing flag; horizontal facing still uses mirroring.
+- Sky Bomber rear art shows the skeleton pilot from behind with rear harness detail. Crusher Ogre rear art shows back musculature, shoulder armor, waist cloth and hammer poses.
+- Combat stats, card count and `physicsVersion=28` are unchanged.
+
+## 23.1.0 - SPRITE ANIMATION UPDATE (2026-09-14)
+- Sky Bomber now uses a pixel-art balloon bomber sprite with a skeleton pilot.
+- Crusher Ogre now uses a more humanoid pixel-art heavy warrior with an oni-style mask and hammer.
+- Both units use 3-state sprite sheets: idle, move and attack, with four animation cells per state.
+- Online builds load PNG sprite sheets from `public/assets/sprites/`; the offline single-file build embeds the same PNGs as Data URLs.
+- Procedural drawings remain as automatic fallback while an image is unavailable.
+- Gameplay stats and physicsVersion remain unchanged at 28.
+
+## 23.0.0 - SIEGE SPECIALISTS UPDATE (2026-09-14)
+- Added Sky Bomber: 4 cost, HP720, speed58, range75, 175 damage every 1.6s; flying and building-only.
+- Added Scrap Drill: 4 cost, HP900; attached structure DPS ramps 90 -> 135 -> 180 -> 240 every 1.5s and resets on displacement, retarget or stun.
+- Added Crusher Ogre: 6 cost, HP2200, very slow 3.0s attack interval; consecutive hits on one structure ramp 230 -> 310 -> 390 -> 470 and reset on range loss, retarget or stun.
+- Added Siege Turtle: 5 cost, HP2050, damage220; while moving toward a structure it reduces ordinary ranged/tower/laser damage by 40%, but melee, spells and DoT bypass the shell reduction.
+- Added Bomb Carrier: 3 cost, HP430, speed88; reaching a structure self-destructs for 480. If killed en route it blasts nearby enemy troops for 80, never buildings.
+- Card pool is now 44 cards (39 units + 5 spells); physicsVersion 28.
+- My List writes `tiny-deck-presets-v23` with v22 and older migration fallback.
+- Per-version update pages remain retired; release notes continue in the single `UPDATE-HISTORY.html`.
+
+## 22.0.0 - TACTICAL FORCES UPDATE (2026-09-14)
+- Added Shield Knight: 4 cost, HP1400, attack110, 650 shield durability. Frontal ordinary hits split 65% to shield / 35% to HP; flank/rear/spells/DoT bypass the shield.
+- Added Wind Mage: 4 cost, HP570, attack95, range175, ground/air targeting, mass-scaled knockback.
+- Added Phoenix: 5 cost, HP900, attack130, flying ground/air attacker. Its first death leaves a 600 HP egg that revives once after four seconds at 450 HP.
+- Added Gravity Orb: 4 cost, HP540, attack60, range165, radius60 impact pull with mass scaling.
+- Added Mirage Assassin: 3 cost, HP500, attack190, up to three seconds of post-deploy stealth and a 1.4x first strike; area damage/spells can reveal it.
+- Added Cyclone spell: 3 cost, radius130, three-second continuous pull, 10/20/35 DPS from rim to centre; enemy units only, no building/tower effect.
+- Card pool is now 39 cards (34 units + 5 spells); physicsVersion 27.
+- My List writes `tiny-deck-presets-v22` with v21 and older migration fallback.
+- Per-version update pages remain retired; release notes continue in the single `UPDATE-HISTORY.html`.
+
 ## 21.0.0 - LASER DRAGON UPDATE (2026-09-11)
 - Added レーザードラゴン: cost 5, HP 1300, flying, ground/air targeting, speed 46, range 145.
 - Mobile laser uses the Laser Tower ramp rule: 20 DPS base and doubles every 1.5 seconds on the same target; retarget, range loss, and stun reset the ramp.

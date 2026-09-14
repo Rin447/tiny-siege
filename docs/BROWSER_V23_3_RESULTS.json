@@ -1,0 +1,11 @@
+{
+  "passed": 5,
+  "checks": [
+    "Offline bundle contains V23.3 core sprite definitions",
+    "All six directional sprite sheets are embedded at 640x960",
+    "Patch Notes exposes the V23.3 four-unit sprite update",
+    "V23.3 self-contained HTML starts a playable CPU battle",
+    "No uncaught JavaScript errors during V23.3 smoke flow"
+  ],
+  "errors": []
+}

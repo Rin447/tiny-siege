@@ -1,7 +1,8 @@
 {
-  "passed": 14,
+  "passed": 17,
   "checks": [
-    "Deck builder exposes all 33 selectable cards, including Laser Dragon, Elekitel Wizard, Princess Archer, Zap and Sparky",
+    "Deck builder exposes all 44 selectable cards, including the five V23 siege specialists",
+    "V23.1 offline build embeds Sky Bomber and Crusher Ogre pixel sprite sheets",
     "Princess Archer detail shows cost 3, HP 300, attack 275, 3-second fire rate and cross-river range 350",
     "Sparky detail shows its 1.8s summon delay, then renders through charged-shot replay safely",
     "Card detail canvas remains healthy after switching away from Sparky",
@@ -9,12 +10,14 @@
     "Elekitel Wizard detail shows 4 cost, 135 splash, range 185 and 1-second area stun",
     "Harpy and Goblin Squad details expose fixed chain damage and thrown-spear range 160",
     "Laser Dragon detail shows 5 cost, HP1300, flying speed46, range145 and ramping laser",
+    "V22 detail demos expose Shield, Wind, Phoenix, Gravity, Mirage and the three-second Cyclone field",
+    "V23 detail demos expose Sky Bomber, Scrap Drill, Crusher Ogre, Siege Turtle and Bomb Carrier mechanics",
     "Detail UI exposes Golem 2.5s summon delay and Tigger no-extra-delay exception",
     "Summoner details show 1.5s/1.2s parent delays while retaining 7.5s/6.5s intervals",
     "My List persists the current eight-card deck under the current storage key",
-    "Patch Notes shows v21 laser dragon rules plus retained v20/v19/v18/v17 history",
+    "Patch Notes shows v23.1 sprite animation plus retained v23/v22/v21/v20/v19/v18/v17 history",
     "Self-contained HTML starts a playable CPU battle with a four-card hand and visible arena",
-    "No uncaught JavaScript errors in the v21 deck, detail demos, Patch Notes or CPU battle flow"
+    "No uncaught JavaScript errors in the v23 deck, detail demos, Patch Notes or CPU battle flow"
   ],
   "errors": []
 }

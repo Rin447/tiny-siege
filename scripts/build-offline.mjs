@@ -3,7 +3,13 @@ const base=new URL('../',import.meta.url);
 let html=await fs.readFile(new URL('public/index.html',base),'utf8');
 const css=await fs.readFile(new URL('public/styles.css',base),'utf8');
 const paths=['public/game/units.js','public/game/physics.js','public/game/engine.js','public/game/art.js','public/app.js'];
-let js='window.TINY_OFFLINE=true;\n';
+const spriteFiles={skybomber:'public/assets/sprites/skybomber.png',crusherogre:'public/assets/sprites/crusherogre.png',archer:'public/assets/sprites/archer.png',berserker:'public/assets/sprites/berserker.png',mage:'public/assets/sprites/mage.png',frost:'public/assets/sprites/frost.png'};
+const spriteData={};
+for(const [key,p] of Object.entries(spriteFiles)){
+  const b=await fs.readFile(new URL(p,base));
+  spriteData[key]=`data:image/png;base64,${b.toString('base64')}`;
+}
+let js=`window.TINY_OFFLINE=true;\nwindow.TINY_SPRITE_DATA=${JSON.stringify(spriteData)};\n`;
 for(const p of paths){
   let s=await fs.readFile(new URL(p,base),'utf8');
   s=s.replace(/^import .*?;\s*$/gm,'').replace(/^export /gm,'');

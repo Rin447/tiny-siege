@@ -1,17 +1,12 @@
-TINY SIEGE v21.0.0 - LASER DRAGON UPDATE
+TINY SIEGE v23.5.0 - ARCHER / BERSERKER ART REBUILD
 
-1. このフォルダの中身をGitHubリポジトリへ上書きアップロードします。
-2. main へ Commit します。例: Update Tiny Siege laser dragon to v21.0.0
-3. Cloudflareの自動Build/Deployを待ちます。
-4. /api/config で version 21.0.0 / cards 33 / units 29 / spells 4 / physicsVersion 26 / maxDeck 8 を確認します。
+1. GitHub へZIPの中身をアップロードします。
+2. main へ Commit します。例: Update Tiny Siege archer and berserker art to v23.5.0
+3. Cloudflare Pages / Workers の既存手順でデプロイします。
+4. /api/config で version 23.5.0 / cards 44 / units 39 / spells 5 / physicsVersion 28 / maxDeck 8 を確認します。
 
-v21.0.0確認ポイント
-- 新ユニット「レーザードラゴン」: 5コスト / HP1300 / 飛行 / 地上・空中 / 速度46 / 射程145。
-- レーザー塔と同じく20 DPS開始。同じ対象へ1.5秒照射ごとに火力が倍化。
-- 対象変更・射程外・スタンでレーザー増幅は初期化。
-- スタン中は通常攻撃クールタイムを減算しない。解除後はスタン前の残り時間から再開。
-- 上記クールタイム停止は通常ユニット、タワー、設置物に共通。
-- スパーキー充電、レーザー増幅、ナイトシェイド突進など既存のスタン特殊リセットは維持。
-
-オフライン確認は PLAY-OFFLINE.html を直接開いてください。
-更新履歴は UPDATE-HISTORY.html 1枚に統合しています。
+v23.5.0確認ポイント
+- リーフ弓兵が緑フード・矢筒・木弓の新ピクセルアートになっている。
+- クラッグバーサーカーが赤髪・毛皮・双斧の新ピクセルアートになっている。
+- 2体とも前姿 / 後姿、静止 / 移動 / 攻撃を切り替える。
+- 戦闘性能はv23.4から変更しない。

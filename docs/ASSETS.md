@@ -31,3 +31,36 @@ No external character art, images, GIFs, videos, or third-party game assets were
 - Zap: original procedural electric spell portrait, impact ring and stun lightning effects.
 - Sparky: original procedural heavy electric cannon. Charge intensity increases visually with progress; full charge has a stronger glow/electric state and `sparkblast` projectile.
 - Stunned units/buildings receive synchronized electric status effects from battle snapshot metadata.
+
+## v23.0 siege specialist art
+No external images or third-party character assets were added. Sky Bomber, Scrap Drill, Crusher Ogre, Siege Turtle and Bomb Carrier use original procedural Canvas drawings in `public/game/art.js`, including their bomb, drill-ramp, heavy-hit, shell and self-destruct effects.
+
+## v23.1 pixel sprite sheets
+
+- `public/assets/sprites/skybomber.png`: 640x480 PNG, 160px cells, 4 columns x 3 rows (idle / move / attack).
+- `public/assets/sprites/crusherogre.png`: 640x480 PNG, 160px cells, 4 columns x 3 rows (idle / move / attack).
+- Both are drawn with nearest-neighbour sampling in Canvas to preserve crisp pixel edges.
+- `scripts/build-offline.mjs` embeds both sheets as Data URLs so `PLAY-OFFLINE.html` stays self-contained.
+- The old procedural art remains in `art.js` as a load-failure fallback.
+
+
+## v23.2 front/back sprite sheets
+- `public/assets/sprites/skybomber.png`: 640x960, 4 columns x 6 rows (front idle/move/attack + back idle/move/attack).
+- `public/assets/sprites/crusherogre.png`: 640x960, same row layout.
+- One PNG per character is retained to avoid file-count growth.
+- Offline build embeds both sheets through `window.TINY_SPRITE_DATA`.
+
+## v23.3 core unit sprite sheets
+- `public/assets/sprites/archer.png` - リーフ弓兵
+- `public/assets/sprites/berserker.png` - クラッグバーサーカー
+- `public/assets/sprites/mage.png` - ルーン術師
+- `public/assets/sprites/frost.png` - フロストシャーマン
+- 各640x960 PNG、160pxセル、前後×静止/移動/攻撃×4フレーム。
+- 既存 `skybomber.png` / `crusherogre.png` と同じ方向対応スプライト方式。
+
+## v23.5 Archer / Berserker generated-art rebuild
+- `public/assets/sprites/archer.png`: 今回作成した緑フード弓兵の画像をゲーム用640x960（160pxセル、4列x6行）へ整形。
+- `public/assets/sprites/berserker.png`: 今回作成した赤髪・毛皮・双斧バーサーカーの画像を同じ640x960形式へ整形。
+- 行構成は front idle / front move / front attack / back idle / back move / back attack。
+- 生成画像で3フレームだった行は中央フレームを再利用して4フレーム周期へ揃え、既存アニメーション描画パイプラインとの互換性を維持。
+- nearest-neighbour描画を維持し、戦闘中のドット感を保持。

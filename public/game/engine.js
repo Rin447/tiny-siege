@@ -1,5 +1,5 @@
 import {ARENA, UNITS, DECK, DEFAULT_DECK, MAX_DECK, normalizeDeck, summonDelayFor} from './units.js';
-import {PHYSICS_VERSION, staticFree, staticLineFree, spawnPositions, navigationWaypoint, moveBody, resolveBodies, faceToward, deploymentAllowed} from './physics.js';
+import {PHYSICS_VERSION, staticFree, staticLineFree, spawnPositions, navigationWaypoint, moveBody, displaceBody, resolveBodies, faceToward, deploymentAllowed} from './physics.js';
 
 export function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
 export function distance(a,b){return Math.hypot(a.x-b.x,a.y-b.y);}
@@ -66,7 +66,10 @@ function makeUnit(g,owner,type,x,y){
   return {...d,id:`u${g.nextId++}`,type,owner,x,y,hp:d.hp,maxHp:d.hp,cd:0,spawn:0.5,anim:0,hit:0,walk:0,target:null,targetLock:null,targetable:true,collisionDisabled:false,deploying:false,deployTotal:0,deployRemaining:0,face:owner===0?-1:1,
     lane:x<360?190:530,age:0,facing:owner===0?-Math.PI/2:Math.PI/2,moving:false,
     summonNextAt:d.summonInterval?g.time+d.summonInterval:null,summonCastingUntil:0,
-    stunUntil:0,sparkCharged:false,sparkChargeStartAt:d.sparkChargeTime?g.time:null,sparkChargeProgress:0};
+    stunUntil:0,sparkCharged:false,sparkChargeStartAt:d.sparkChargeTime?g.time:null,sparkChargeProgress:0,
+    shieldHp:d.shieldMax||0,maxShieldHp:d.shieldMax||0,stealthed:false,stealthUntil:0,revived:false,
+    drillTarget:null,drillLockTime:0,drillStage:0,drillDps:d.drillBaseDps||0,crusherTarget:null,crusherStage:0,
+    eggHatchAt:d.eggUnit?g.time+(d.eggHatchTime||4):null};
 }
 function startDeployment(g,u,cardData){
   const total=summonDelayFor(cardData);
@@ -81,6 +84,7 @@ function completeDeployment(g,u){
   u.deploying=false;u.deployRemaining=0;u.targetable=true;u.collisionDisabled=false;u.target=null;u.targetLock=null;
   if(u.sparkUnit)u.sparkChargeStartAt=g.time;
   if(u.summonInterval)u.summonNextAt=g.time+u.summonInterval;
+  if(u.stealthDuration){u.stealthed=true;u.stealthUntil=g.time+u.stealthDuration;event(g,'stealth-start',{x:u.x,y:u.y,owner:u.owner,duration:u.stealthDuration});}
   event(g,'deploy-ready',{x:u.x,y:u.y,owner:u.owner,unitType:u.type,building:!!u.building});
   if(u.summonOnDeploy&&u.summonType&&u.summonCount)summonMinions(g,u,true);
 }
@@ -103,6 +107,13 @@ function castSpell(g,owner,id,x,y){
     g.zones.push({id:`z${g.nextId++}`,owner,kind:'poison',spell:'poison',x,y,radius:d.radius,remaining:d.zoneDuration,total:d.zoneDuration,
       tickEvery:d.tickEvery,nextTick:g.time,damage:d.damage,buildingDamage:d.buildingDamage,lingerDuration:d.lingerDuration,lingerDamage:d.lingerDamage});
     event(g,'poison-deploy',{x,y,owner,radius:d.radius});
+    return {ok:true,spell:true,travelTime:0};
+  }
+  if(d.spell==='cyclone'){
+    g.zones??=[];
+    g.zones.push({id:`z${g.nextId++}`,owner,kind:'cyclone',spell:'cyclone',x,y,radius:d.radius,remaining:d.zoneDuration,total:d.zoneDuration,
+      pullSpeed:d.pullSpeed||70,outerDps:d.outerDps||10,midDps:d.midDps||20,innerDps:d.innerDps||35});
+    event(g,'cyclone-deploy',{x,y,owner,radius:d.radius,duration:d.zoneDuration});
     return {ok:true,spell:true,travelTime:0};
   }
   if(d.spell==='zap'){
@@ -140,7 +151,8 @@ export function deploy(g,owner,id,x,y){
   return {ok:true};
 }
 function alive(g){return [...g.units,...g.towers].filter(v=>v.hp>0);}
-function targetable(source,target){return target.owner!==source.owner&&target.hp>0&&target.targetable!==false&&(!target.air||source.targetsAir);}
+function targetable(source,target){return target.owner!==source.owner&&target.hp>0&&target.targetable!==false&&!target.stealthed&&(!target.air||source.targetsAir);}
+function areaTargetable(source,target){return target.owner!==source.owner&&target.hp>0&&target.targetable!==false&&target.burrowState!=='burrow'&&(!target.air||source.targetsAir);}
 function lockedStructureTarget(u,entities){
   if(!(u.kind||u.building)||!u.target)return null;
   const t=entities.find(e=>e.id===u.target);
@@ -365,6 +377,49 @@ function summonMiniGolems(g,parent){
   // Crowded bridge/tower fights can leave no perfect free point. ResolveBodies will safely separate this fallback.
   while(made<count){const side=made?1:-1,u=makeUnit(g,parent.owner,d.id,clamp(parent.x+side*18,50,670),clamp(parent.y+10*f,60,980));u.spawn=.35;u.lane=parent.lane;g.units.push(u);event(g,'split-spawn',{x:u.x,y:u.y,owner:u.owner});made++;}
 }
+function revealStealth(g,u,reason='reveal'){
+  if(!u.stealthed)return false;u.stealthed=false;u.stealthUntil=0;u.target=null;u.targetLock=null;event(g,'stealth-reveal',{x:u.x,y:u.y,owner:u.owner,reason});return true;
+}
+function updateStealth(g,u){if(u.stealthed&&g.time+1e-8>=(u.stealthUntil||0))revealStealth(g,u,'timeout');}
+function frontShieldHit(t,x,y){
+  if(!Number.isFinite(x)||!Number.isFinite(y)||!(t.shieldHp>0))return false;
+  const dx=x-t.x,dy=y-t.y,len=Math.hypot(dx,dy);if(len<.001)return true;
+  const facing=Number.isFinite(t.facing)?t.facing:(t.owner===0?-Math.PI/2:Math.PI/2),dot=(dx/len)*Math.cos(facing)+(dy/len)*Math.sin(facing);
+  return dot>=Math.cos(((t.shieldArcDeg||120)/2)*Math.PI/180);
+}
+function knockbackAmountFor(t){const m=t.mass||1;if(m>=12)return 0;if(m<=1.5)return 34;if(m<=5)return 20;return 8;}
+function gravityAmountFor(t){const m=t.mass||1;if(m>=12)return 0;if(m<=1.5)return 28;if(m<=5)return 16;return 6;}
+function forceToward(g,t,x,y,amount){
+  if(!amount||t.kind||t.building||t.eggUnit||t.hp<=0)return 0;const dx=x-t.x,dy=y-t.y,len=Math.hypot(dx,dy);if(len<.001)return 0;return displaceBody(g,t,dx/len*amount,dy/len*amount);
+}
+function forceAway(g,t,x,y,amount){
+  if(!amount||t.kind||t.building||t.eggUnit||t.hp<=0)return 0;const dx=t.x-x,dy=t.y-y,len=Math.hypot(dx,dy);if(len<.001)return 0;return displaceBody(g,t,dx/len*amount,dy/len*amount);
+}
+function findPhoenixEggPoint(g,t){
+  const d=UNITS[t.eggType||'phoenix_egg'],base={x:clamp(t.x,55,665),y:clamp(t.y,55,985)};
+  if(staticFree(g,d,base,0))return base;
+  for(const r of [20,40,60,80,110,140,180])for(let i=0;i<16;i++){const a=i*Math.PI*2/16,p={x:clamp(base.x+Math.cos(a)*r,55,665),y:clamp(base.y+Math.sin(a)*r,55,985)};if(staticFree(g,d,p,0))return p;}
+  return {x:t.x<360?190:530,y:t.owner===0?ARENA.riverBottom+40:ARENA.riverTop-40};
+}
+function spawnPhoenixEgg(g,t){
+  const type=t.eggType||'phoenix_egg',d=UNITS[type];if(!d)return null;const p=findPhoenixEggPoint(g,t),egg=makeUnit(g,t.owner,type,p.x,p.y);egg.spawn=.2;egg.lane=t.lane;egg.eggHatchAt=g.time+(egg.eggHatchTime||4);g.units.push(egg);event(g,'phoenix-egg',{x:egg.x,y:egg.y,owner:egg.owner,duration:egg.eggHatchTime||4});return egg;
+}
+function hatchEgg(g,egg){
+  const d=UNITS[egg.hatchType||'phoenix'];if(!d||egg.hp<=0)return false;const u=makeUnit(g,egg.owner,d.id,egg.x,egg.y);u.hp=Math.round(d.hp*.5);u.maxHp=d.hp;u.spawn=.35;u.revived=true;u.lane=egg.lane;egg._hatched=true;egg.hp=0;g.units.push(u);event(g,'phoenix-revive',{x:u.x,y:u.y,owner:u.owner,hp:u.hp});return true;
+}
+function updateCycloneZones(g,dt){
+  g.zones??=[];const units=g.units.filter(u=>u.hp>0&&!u.kind&&!u.building&&!u.eggUnit&&u.targetable!==false&&u.burrowState!=='burrow');
+  for(const z of g.zones){
+    if(z.kind!=='cyclone'||z.remaining<=0)continue;
+    z.remaining=Math.max(0,z.remaining-dt);
+    for(const t of units){
+      if(t.owner===z.owner||t.hp<=0)continue;const d=distance(z,t);if(d>z.radius+(t.radius||12)*.25)continue;
+      const m=t.mass||1,factor=m>=12?.1:m<=1.5?1:m<=5?.65:.3,step=(z.pullSpeed||70)*factor*dt;forceToward(g,t,z.x,z.y,Math.min(step,Math.max(0,d-2)));
+      const ratio=Math.min(1,d/Math.max(1,z.radius)),dps=ratio<=.33?(z.innerDps||35):ratio<=.66?(z.midDps||20):(z.outerDps||10);damage(g,t,dps*dt,z.owner,{spell:true,zone:'cyclone'});
+    }
+  }
+  g.zones=g.zones.filter(z=>z.remaining>1e-8);
+}
 function handleUnitDeath(g,t){
   if(t._deathHandled)return;t._deathHandled=true;
   event(g,'death',{x:t.x,y:t.y,owner:t.owner,large:t.type==='golem'});
@@ -374,17 +429,33 @@ function handleUnitDeath(g,t){
     for(const v of victims)if(v.id!==t.id&&v.owner!==t.owner&&v.hp>0&&distance(t,v)<=t.deathRadius+(v.radius||12)*.35)damage(g,v,t.deathDamage,t.owner);
   }
   if(t.splitType&&t.splitCount)summonMiniGolems(g,t);
+  if(t.phoenixRevive&&!t.revived)spawnPhoenixEgg(g,t);
+  if(t.carrierDeathDamage&&t.carrierDeathRadius&&!t._carrierReachedTarget){
+    event(g,'carrier-blast',{x:t.x,y:t.y,owner:t.owner,radius:t.carrierDeathRadius,damage:t.carrierDeathDamage});
+    const victims=[...alive(g)];
+    for(const v of victims)if(v.id!==t.id&&v.owner!==t.owner&&v.hp>0&&!v.kind&&!v.building&&distance(t,v)<=t.carrierDeathRadius+(v.radius||12)*.35)damage(g,v,t.carrierDeathDamage,t.owner);
+  }
 }
-function damage(g,t,amount,owner){
+function damage(g,t,amount,owner,meta={}){
   if(t.hp<=0||t.burrowState==='burrow'||t.targetable===false)return 0;
   if((t.invulnerableUntil||0)>g.time){if(t.type==='nightshade')event(g,'shadow-evade',{x:t.x,y:t.y,owner:t.owner});return 0;}
-  const before=t.hp;t.hp=Math.max(0,t.hp-amount);t.hit=.18;
+  if(t.stealthed&&amount>0)revealStealth(g,t,'damage');
+  let hpAmount=amount,absorbed=0;
+  if(t.siegeTurtle&&t.moving&&meta.ranged&&!meta.spell&&hpAmount>0){
+    const reduction=clamp(t.movingRangedReduction||.40,0,.9);hpAmount*=1-reduction;
+    event(g,'turtle-shell',{x:t.x,y:t.y,owner:t.owner,reduction});
+  }
+  if(meta.shieldable&&!meta.spell&&t.shieldHp>0&&frontShieldHit(t,meta.sourceX,meta.sourceY)){
+    const wanted=amount*(t.shieldAbsorb||.65);absorbed=Math.min(t.shieldHp,wanted);t.shieldHp=Math.max(0,t.shieldHp-absorbed);hpAmount=Math.max(0,amount-absorbed);
+    event(g,'shield-hit',{x:t.x,y:t.y,owner:t.owner,absorbed,shieldHp:t.shieldHp,maxShieldHp:t.maxShieldHp||t.shieldMax||0});if(t.shieldHp<=1e-8)event(g,'shield-break',{x:t.x,y:t.y,owner:t.owner});
+  }
+  const before=t.hp;t.hp=Math.max(0,t.hp-hpAmount);t.hit=.18;
   if(t.kind==='core'&&t.hp<before)wakeCore(g,t.owner,'core-hit');
   if(t.hp===0){
     if(t.kind){event(g,'death',{x:t.x,y:t.y,owner:t.owner,large:true});if(t.kind==='tower')wakeCore(g,t.owner,'side-down');}
     else handleUnitDeath(g,t);
   }
-  return before-t.hp;
+  return absorbed+(before-t.hp);
 }
 function decayStructure(g,t,amount){
   if(t.hp<=0||amount<=0)return;
@@ -423,6 +494,8 @@ function resetSparkyCharge(g,u,delayUntil=g.time){
 function applyStun(g,t,duration,owner){
   const until=Math.max(t.stunUntil||0,g.time+(duration||0));t.stunUntil=until;t.target=null;t.targetLock=null;
   if(t.laserTower||t.laserUnit)resetLaserTower(t);
+  if(t.drillUnit)resetDrill(t);
+  if(t.crusherRamp)resetCrusher(t);
   if(t.sparkUnit)resetSparkyCharge(g,t,until);
   if(t.dashState){t.dashState=null;t.dashTarget=null;t.dashEnd=null;t.invulnerableUntil=0;t.dashReadyAt=Math.max(t.dashReadyAt||0,until+.35);}
   event(g,'stun',{x:t.x,y:t.y,owner,targetOwner:t.owner,duration});
@@ -494,11 +567,11 @@ function updateMudZones(g){
 function impact(g,p,entities){
   const target=entities.find(t=>t.id===p.target);
   if(p.chainCount&&target&&targetable(p,target)){
-    const points=[];let current=target,amount=p.damage;const hit=new Set();
+    const points=[];let current=target,amount=p.damage,source={x:p.sx,y:p.sy};const hit=new Set();
     for(let i=0;i<p.chainCount&&current;i++){
       const hitDamage=Array.isArray(p.chainDamages)&&Number.isFinite(p.chainDamages[i])?p.chainDamages[i]:Math.round(amount);
-      hit.add(current.id);damage(g,current,hitDamage,p.owner);if(p.stunDuration&&current.hp>0)applyStun(g,current,p.stunDuration,p.owner);points.push({x:current.x,y:current.y,damage:hitDamage});
-      amount*=p.chainFalloff||.8;
+      hit.add(current.id);damage(g,current,hitDamage,p.owner,{shieldable:true,ranged:true,sourceX:source.x,sourceY:source.y});if(p.stunDuration&&current.hp>0)applyStun(g,current,p.stunDuration,p.owner);points.push({x:current.x,y:current.y,damage:hitDamage});
+      source={x:current.x,y:current.y};amount*=p.chainFalloff||.8;
       const candidates=entities.filter(t=>!hit.has(t.id)&&targetable(p,t)&&!t.kind&&!t.building&&distance(current,t)<=p.chainRange+t.radius)
         .sort((a,b)=>distance(current,a)-distance(current,b)||String(a.id).localeCompare(String(b.id)));
       current=candidates[0]||null;
@@ -506,9 +579,20 @@ function impact(g,p,entities){
     event(g,'chain',{x:p.x,y:p.y,owner:p.owner,points});
   }else if(p.splash){
     event(g,'blast',{x:p.x,y:p.y,owner:p.owner,radius:p.splash,color:p.kind});
-    for(const t of entities)if(targetable(p,t)&&distance(t,p)<=p.splash+t.radius*.35){damage(g,t,p.damage,p.owner);if(t.hp>0&&p.slowDuration)applySlow(g,t,p);if(t.hp>0&&p.stunDuration&&(!p.stunUnitsOnly||(!t.kind&&!t.building)))applyStun(g,t,p.stunDuration,p.owner);}
+    for(const t of entities)if(areaTargetable(p,t)&&distance(t,p)<=p.splash+t.radius*.35){
+      damage(g,t,p.damage,p.owner,{shieldable:true,ranged:true,sourceX:p.sx,sourceY:p.sy});
+      if(t.hp>0&&p.gravityPull){const moved=forceToward(g,t,p.x,p.y,gravityAmountFor(t));if(moved>0)event(g,'gravity-pull',{x:t.x,y:t.y,owner:p.owner,amount:moved});}
+      if(t.hp>0&&p.slowDuration)applySlow(g,t,p);if(t.hp>0&&p.stunDuration&&(!p.stunUnitsOnly||(!t.kind&&!t.building)))applyStun(g,t,p.stunDuration,p.owner);
+    }
     createMudZone(g,p);
-  }else if(target&&targetable(p,target)){damage(g,target,p.damage,p.owner);applySlow(g,target,p);}
+  }else if(target&&targetable(p,target)){
+    damage(g,target,p.damage,p.owner,{shieldable:true,ranged:true,sourceX:p.sx,sourceY:p.sy});
+    if(target.hp>0&&p.knockback){const moved=forceAway(g,target,p.sx,p.sy,knockbackAmountFor(target));if(moved>0)event(g,'wind-push',{x:target.x,y:target.y,owner:p.owner,amount:moved});}
+    applySlow(g,target,p);
+  }
+}
+function projectileSpeed(kind){
+  return ({bomb:220,sky_bomb:260,lightning:520,electro:450,wind:430,gravity:360,phoenix_fire:420,thrown_spear:480,dart:560,mud:300,royal_arrow:470,sparkblast:340})[kind]||390;
 }
 function attack(g,u,t){
   if(u.sparkUnit&&!u.sparkCharged)return;
@@ -516,7 +600,17 @@ function attack(g,u,t){
   commitMobileTarget(u,t);
   const attackFactor=(u.slowUntil||0)>g.time?(u.slowAttackFactor||1):1;
   u.cd=u.cooldown/Math.max(.15,attackFactor);u.anim=.35;faceToward(u,t.x,t.y);u.target=t.id;
+  if(u.suicideUnit&&(t.kind||t.building)){
+    const amount=u.suicideDamage||u.damage;damage(g,t,amount,u.owner,{shieldable:false,sourceX:u.x,sourceY:u.y});
+    event(g,'suicide-hit',{x:t.x,y:t.y,owner:u.owner,amount});u._carrierReachedTarget=true;u.hp=0;handleUnitDeath(g,u);return;
+  }
   let amount=(t.kind||t.building)&&Number.isFinite(u.structureDamage)?u.structureDamage:u.damage;
+  if(u.crusherRamp&&(t.kind||t.building)){
+    if(u.crusherTarget!==t.id){u.crusherTarget=t.id;u.crusherStage=0;}
+    const stages=Array.isArray(u.crusherDamages)?u.crusherDamages:[u.damage];
+    amount=stages[Math.min(u.crusherStage||0,stages.length-1)];
+  }
+  if(u.stealthed){amount=Math.round(amount*(u.stealthFirstMultiplier||1));revealStealth(g,u,'attack');}
   if(u.sparkUnit){u.sparkCharged=false;u.sparkChargeProgress=0;u.sparkChargeStartAt=g.time;event(g,'sparky-fire',{x:u.x,y:u.y,tx:t.x,ty:t.y,owner:u.owner,radius:u.splash||90});}
   if(u.chargeMultiplier&&u.charged&&(t.kind||t.building)){
     amount=Math.round(amount*u.chargeMultiplier);u.charged=false;u.chargeRun=0;
@@ -524,13 +618,29 @@ function attack(g,u,t){
   }
   if(u.projectile){
     g.projectiles.push({id:`p${g.nextId++}`,owner:u.owner,x:u.x,y:u.y-6,sx:u.x,sy:u.y,tx:t.x,ty:t.y,target:t.id,
-    kind:u.projectile,speed:u.projectile==='bomb'?220:(u.projectile==='lightning'?520:(u.projectile==='electro'?450:(u.projectile==='thrown_spear'?480:(u.projectile==='dart'?560:(u.projectile==='mud'?300:(u.projectile==='royal_arrow'?470:(u.projectile==='sparkblast'?340:390))))))),damage:amount,splash:u.splash||0,
+    kind:u.projectile,speed:projectileSpeed(u.projectile),damage:amount,splash:u.splash||0,
     targetsAir:u.targetsAir,life:3,slowMove:u.slowMove,slowAttack:u.slowAttack,slowMoveStages:u.slowMoveStages,slowAttackStages:u.slowAttackStages,slowDuration:u.slowDuration,
-    chainCount:u.chainCount,chainRange:u.chainRange,chainFalloff:u.chainFalloff,chainDamages:Array.isArray(u.chainDamages)?u.chainDamages.map(v=>u.damage?Math.round(v*(amount/u.damage)):0):u.chainDamages,stunDuration:u.stunDuration,stunUnitsOnly:u.stunUnitsOnly,mudRadius:u.mudRadius,mudDuration:u.mudDuration,mudTickEvery:u.mudTickEvery,mudDamage:u.mudDamage,mudSlow:u.mudSlow});
+    chainCount:u.chainCount,chainRange:u.chainRange,chainFalloff:u.chainFalloff,chainDamages:Array.isArray(u.chainDamages)?u.chainDamages.map(v=>u.damage?Math.round(v*(amount/u.damage)):0):u.chainDamages,stunDuration:u.stunDuration,stunUnitsOnly:u.stunUnitsOnly,mudRadius:u.mudRadius,mudDuration:u.mudDuration,mudTickEvery:u.mudTickEvery,mudDamage:u.mudDamage,mudSlow:u.mudSlow,knockback:!!u.knockback,gravityPull:!!u.gravityPull});
   }else{
-    damage(g,t,amount,u.owner);event(g,'slash',{x:t.x,y:t.y,owner:u.owner,angle:Math.atan2(t.y-u.y,t.x-u.x),kind:u.type});
+    damage(g,t,amount,u.owner,{shieldable:true,sourceX:u.x,sourceY:u.y});event(g,'slash',{x:t.x,y:t.y,owner:u.owner,angle:Math.atan2(t.y-u.y,t.x-u.x),kind:u.type});
+    if(u.crusherRamp){
+      const stages=Array.isArray(u.crusherDamages)?u.crusherDamages:[u.damage];u.crusherStage=Math.min((u.crusherStage||0)+1,stages.length-1);
+      event(g,'crusher-hit',{x:t.x,y:t.y,owner:u.owner,amount,stage:u.crusherStage});
+    }
   }
 }
+function resetDrill(u){u.drillTarget=null;u.drillLockTime=0;u.drillStage=0;u.drillDps=u.drillBaseDps||90;}
+function updateDrill(g,u,t,dt){
+  if(!u.drillUnit)return false;
+  if(!t){resetDrill(u);u.target=null;return true;}
+  if(u.drillTarget!==t.id){u.drillTarget=t.id;u.drillLockTime=0;u.drillStage=0;u.drillDps=u.drillBaseDps||90;event(g,'drill-lock',{x:u.x,y:u.y,tx:t.x,ty:t.y,owner:u.owner});}
+  else u.drillLockTime=(u.drillLockTime||0)+dt;
+  const stages=Array.isArray(u.drillDpsStages)&&u.drillDpsStages.length?u.drillDpsStages:[u.drillBaseDps||90];
+  const stage=Math.min(stages.length-1,Math.max(0,Math.floor((u.drillLockTime+1e-9)/(u.drillRampEvery||1.5))));
+  if(stage!==(u.drillStage||0))event(g,'drill-ramp',{x:u.x,y:u.y,tx:t.x,ty:t.y,owner:u.owner,stage,dps:stages[stage]});
+  u.drillStage=stage;u.drillDps=stages[stage];u.target=t.id;u.anim=.12;faceToward(u,t.x,t.y);damage(g,t,u.drillDps*dt,u.owner,{shieldable:false,sourceX:u.x,sourceY:u.y});return true;
+}
+function resetCrusher(u){u.crusherTarget=null;u.crusherStage=0;}
 function resetLaserTower(u){
   u.laserTarget=null;u.laserLockTime=0;u.laserStage=0;u.laserDps=u.laserBaseDps||20;
 }
@@ -545,7 +655,7 @@ function updateLaserTower(g,u,t,dt){
   const every=u.laserRampEvery||1.5,mult=u.laserMultiplier||2,stage=Math.max(0,Math.floor((u.laserLockTime+1e-9)/every));
   if(stage!==(u.laserStage||0))event(g,'laser-ramp',{x:u.x,y:u.y,tx:t.x,ty:t.y,owner:u.owner,stage});
   u.laserStage=stage;u.laserDps=(u.laserBaseDps||20)*Math.pow(mult,stage);u.target=t.id;u.anim=.12;faceToward(u,t.x,t.y);
-  damage(g,t,u.laserDps*dt,u.owner);
+  damage(g,t,u.laserDps*dt,u.owner,{shieldable:true,ranged:true,sourceX:u.x,sourceY:u.y});
   return true;
 }
 function healingPulse(g,u,entities){
@@ -585,12 +695,13 @@ export function runBot(g,owner=1){
     const arrowCluster=enemies.filter(u=>distance(u,threat)<=UNITS.arrowrain.radius+u.radius).length;
     if(aff.includes('zap')&&(threat.type==='sparky'||threat.type==='lasertower'||fireCluster>=4)){deploy(g,owner,'zap',threat.x,threat.y);return;}
     if(aff.includes('poison')&&(threat.type==='boneswarm'||fireCluster>=4)){deploy(g,owner,'poison',threat.x,threat.y);return;}
+    if(aff.includes('cyclone')&&arrowCluster>=3){deploy(g,owner,'cyclone',threat.x,threat.y);return;}
     if(aff.includes('arrowrain')&&arrowCluster>=3){deploy(g,owner,'arrowrain',threat.x,threat.y);return;}
     if(aff.includes('fireball')&&(fireCluster>=2||threat.type==='frost'||threat.type==='lumina')){deploy(g,owner,'fireball',threat.x,threat.y);return;}
   }
   let choices=aff.filter(id=>!UNITS[id].spell);if(!choices.length){
     const target=threat||g.towers.find(t=>t.owner!==owner&&t.kind==='tower'&&t.hp>0)||g.towers.find(t=>t.owner!==owner&&t.kind==='core'&&t.hp>0);
-    const spell=aff.includes('zap')?'zap':aff.includes('arrowrain')?'arrowrain':aff.includes('fireball')?'fireball':aff.includes('poison')?'poison':null;
+    const spell=aff.includes('zap')?'zap':aff.includes('cyclone')?'cyclone':aff.includes('arrowrain')?'arrowrain':aff.includes('fireball')?'fireball':aff.includes('poison')?'poison':null;
     if(target&&spell)deploy(g,owner,spell,target.x,target.y);return;
   }
   if(threat?.air&&choices.some(id=>UNITS[id].targetsAir))choices=choices.filter(id=>UNITS[id].targetsAir);
@@ -619,7 +730,7 @@ export function tick(g,dt=ARENA.tick){
   g.time+=dt;g.step++;
   for(const p of g.players)p.energy=Math.min(10,p.energy+dt*(g.time>=120?1.25:.625));
   g.events=g.events.map(e=>({...e,life:e.life-dt})).filter(e=>e.life>0);
-  g.zones??=[];updatePoisonZones(g,dt);decayMudZones(g,dt);updateMudZones(g);
+  g.zones??=[];updatePoisonZones(g,dt);decayMudZones(g,dt);updateMudZones(g);updateCycloneZones(g,dt);
   refreshCoreWake(g);
   if(g.bot&&g.time>=g.botNext){
     runBot(g,1);g.botNext=g.time+(g.difficulty==='easy'?2.6:g.difficulty==='hard'?.65:1.3)+random(g)*.7;
@@ -629,6 +740,8 @@ export function tick(g,dt=ARENA.tick){
   for(const u of entities){
     if(u.hp<=0)continue;
     u.moving=false;
+    if(u.eggUnit){if(Number.isFinite(u.eggHatchAt)&&g.time+1e-8>=u.eggHatchAt)hatchEgg(g,u);continue;}
+    updateStealth(g,u);
     const stunnedNow=(u.stunUntil||0)>g.time;
     u.hit=Math.max(0,(u.hit||0)-dt);u.anim=Math.max(0,(u.anim||0)-dt);if(!stunnedNow)u.cd=Math.max(0,u.cd-dt);u.healCd=Math.max(0,(u.healCd||0)-dt);
     updateLingeringPoison(g,u);if(u.hp<=0)continue;
@@ -641,14 +754,20 @@ export function tick(g,dt=ARENA.tick){
       if(u.spawn>0){u.spawn=Math.max(0,u.spawn-dt);continue;}
       if(u.decayPerSecond){decayStructure(g,u,u.decayPerSecond*dt);if(u.hp<=0)continue;}
     }
-    if((u.stunUntil||0)>g.time){u.target=null;if(u.laserTower||u.laserUnit)resetLaserTower(u);continue;}
+    if((u.stunUntil||0)>g.time){u.target=null;if(u.laserTower||u.laserUnit)resetLaserTower(u);if(u.drillUnit)resetDrill(u);if(u.crusherRamp)resetCrusher(u);continue;}
     if(!u.kind&&updateSummoner(g,u)){u.target=null;if(u.laserTower||u.laserUnit)resetLaserTower(u);continue;}
     if(updateShadowRush(g,u,entities,dt))continue;
     healingPulse(g,u,entities);
     const target=getTarget(g,u,entities);
-    if(!target){if(u.laserTower||u.laserUnit)resetLaserTower(u);u.target=null;continue;}
+    if(!target){if(u.laserTower||u.laserUnit)resetLaserTower(u);if(u.drillUnit)resetDrill(u);if(u.crusherRamp)resetCrusher(u);u.target=null;continue;}
     u.target=target.id;
     const reach=u.range+target.radius;
+    if(u.crusherRamp&&u.crusherTarget&&(u.crusherTarget!==target.id||distance(u,target)>reach))resetCrusher(u);
+    if(u.drillUnit){
+      if(distance(u,target)<=reach)updateDrill(g,u,target,dt);
+      else {resetDrill(u);move(g,u,target,dt);}
+      continue;
+    }
     if(u.laserTower||u.laserUnit){
       if(distance(u,target)<=reach)updateLaserTower(g,u,target,dt);
       else {resetLaserTower(u);if(u.laserUnit&&!u.kind&&!u.building)move(g,u,target,dt);}
@@ -682,7 +801,7 @@ export function viewMatch(g,seat=0){
   const p=g.players[seat];
   return {physicsVersion:PHYSICS_VERSION,phase:g.phase,countdown:g.countdown,time:rnd(g.time),overtime:g.overtime,winner:g.winner,reason:g.reason,
     scores:[towerScore(g,0),towerScore(g,1)],energy:rnd(p.energy),hand:[...p.hand],next:p.queue[0],deck:[...p.deck],
-    units:g.units.map(u=>({id:u.id,type:u.type,owner:u.owner,x:rnd(u.x),y:rnd(u.y),hp:u.hp,maxHp:u.maxHp,radius:u.radius,air:u.air,building:!!u.building,anim:u.anim,hit:u.hit,walk:u.walk,spawn:u.spawn,face:u.face,facing:u.facing,moving:!!u.moving,mass:u.mass,age:u.age,target:u.target||null,targetable:u.targetable!==false,deploying:!!u.deploying,deployTotal:rnd(u.deployTotal||0),deployRemaining:rnd(u.deployRemaining||0),collisionDisabled:!!u.collisionDisabled,laserStage:u.laserStage||0,laserDps:rnd(u.laserDps||0),laserLockTime:rnd(u.laserLockTime||0),charged:!!u.charged,chargeRun:rnd(u.chargeRun||0),sparkCharged:!!u.sparkCharged,sparkChargeProgress:rnd(u.sparkChargeProgress||0),stunned:(u.stunUntil||0)>g.time,stunRemaining:rnd(Math.max(0,(u.stunUntil||0)-g.time)),slowed:(u.slowUntil||0)>g.time,slowStage:(u.slowUntil||0)>g.time?(u.slowStage||1):0,slowRemaining:rnd(Math.max(0,(u.slowUntil||0)-g.time)),poisoned:(u.poisonUntil||0)>g.time,poisonOwner:Number.isFinite(u.poisonOwner)?u.poisonOwner:null,poisonRemaining:rnd(Math.max(0,(u.poisonUntil||0)-g.time)),mudded:(u.mudUntil||0)>g.time,mudRemaining:rnd(Math.max(0,(u.mudUntil||0)-g.time)),burrowState:u.burrowState||null,burrowProgress:rnd(u.burrowProgress||0),summonType:u.summonType||null,summonCount:u.summonCount||0,summonRemaining:u.summonInterval?rnd(Math.max(0,(u.summonNextAt||g.time)-g.time)):0,summonCasting:(u.summonCastingUntil||0)>g.time,summonWindupRemaining:rnd(Math.max(0,(u.summonCastingUntil||0)-g.time)),dashState:u.dashState||null,dashWindupRemaining:rnd(Math.max(0,(u.dashWindupUntil||0)-g.time)),dashCooldownRemaining:rnd(Math.max(0,(u.dashReadyAt||0)-g.time)),invulnerable:(u.invulnerableUntil||0)>g.time})),
+    units:g.units.map(u=>({id:u.id,type:u.type,owner:u.owner,x:rnd(u.x),y:rnd(u.y),hp:u.hp,maxHp:u.maxHp,radius:u.radius,air:u.air,building:!!u.building,anim:u.anim,hit:u.hit,walk:u.walk,spawn:u.spawn,face:u.face,facing:u.facing,moving:!!u.moving,mass:u.mass,age:u.age,target:u.target||null,targetable:u.targetable!==false,deploying:!!u.deploying,deployTotal:rnd(u.deployTotal||0),deployRemaining:rnd(u.deployRemaining||0),collisionDisabled:!!u.collisionDisabled,laserStage:u.laserStage||0,laserDps:rnd(u.laserDps||0),laserLockTime:rnd(u.laserLockTime||0),charged:!!u.charged,chargeRun:rnd(u.chargeRun||0),sparkCharged:!!u.sparkCharged,sparkChargeProgress:rnd(u.sparkChargeProgress||0),stunned:(u.stunUntil||0)>g.time,stunRemaining:rnd(Math.max(0,(u.stunUntil||0)-g.time)),slowed:(u.slowUntil||0)>g.time,slowStage:(u.slowUntil||0)>g.time?(u.slowStage||1):0,slowRemaining:rnd(Math.max(0,(u.slowUntil||0)-g.time)),poisoned:(u.poisonUntil||0)>g.time,poisonOwner:Number.isFinite(u.poisonOwner)?u.poisonOwner:null,poisonRemaining:rnd(Math.max(0,(u.poisonUntil||0)-g.time)),mudded:(u.mudUntil||0)>g.time,mudRemaining:rnd(Math.max(0,(u.mudUntil||0)-g.time)),burrowState:u.burrowState||null,burrowProgress:rnd(u.burrowProgress||0),summonType:u.summonType||null,summonCount:u.summonCount||0,summonRemaining:u.summonInterval?rnd(Math.max(0,(u.summonNextAt||g.time)-g.time)):0,summonCasting:(u.summonCastingUntil||0)>g.time,summonWindupRemaining:rnd(Math.max(0,(u.summonCastingUntil||0)-g.time)),dashState:u.dashState||null,dashWindupRemaining:rnd(Math.max(0,(u.dashWindupUntil||0)-g.time)),dashCooldownRemaining:rnd(Math.max(0,(u.dashReadyAt||0)-g.time)),invulnerable:(u.invulnerableUntil||0)>g.time,shieldHp:rnd(u.shieldHp||0),maxShieldHp:rnd(u.maxShieldHp||0),stealthed:!!u.stealthed,stealthRemaining:rnd(Math.max(0,(u.stealthUntil||0)-g.time)),eggHatchRemaining:u.eggUnit?rnd(Math.max(0,(u.eggHatchAt||g.time)-g.time)):0,revived:!!u.revived,drillStage:u.drillStage||0,drillDps:rnd(u.drillDps||0),drillLockTime:rnd(u.drillLockTime||0),crusherStage:u.crusherStage||0,turtleShellActive:!!(u.siegeTurtle&&u.moving)})),
     towers:g.towers.map(t=>({id:t.id,kind:t.kind,owner:t.owner,x:t.x,y:t.y,hp:t.hp,maxHp:t.maxHp,radius:t.radius,anim:t.anim,hit:t.hit,facing:t.facing,awake:t.kind==='core'?!!t.awake:true,stunned:(t.stunUntil||0)>g.time,stunRemaining:rnd(Math.max(0,(t.stunUntil||0)-g.time))})),
     projectiles:g.projectiles.map(p=>({id:p.id,owner:p.owner,x:rnd(p.x),y:rnd(p.y),tx:rnd(p.tx),ty:rnd(p.ty),kind:p.kind,spell:p.spell||null,progress:rnd(p.progress||0),radius:p.splash||0})),
     zones:(g.zones||[]).map(z=>({id:z.id,owner:z.owner,kind:z.kind,spell:z.spell,x:rnd(z.x),y:rnd(z.y),radius:z.radius,remaining:rnd(z.remaining),total:z.total})),

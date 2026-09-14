@@ -1,0 +1,16 @@
+PASS 1 Offline bundle contains front/back row selection logic
+PASS 2 Both self-contained sprite sheets are embedded at 640x960
+PASS 3 Patch Notes exposes the V23.2 directional sprite update
+PASS 4 V23.2 self-contained HTML starts a playable CPU battle
+PASS 5 No uncaught JavaScript errors during V23.2 smoke flow
+{
+  "passed": 5,
+  "checks": [
+    "Offline bundle contains front/back row selection logic",
+    "Both self-contained sprite sheets are embedded at 640x960",
+    "Patch Notes exposes the V23.2 directional sprite update",
+    "V23.2 self-contained HTML starts a playable CPU battle",
+    "No uncaught JavaScript errors during V23.2 smoke flow"
+  ],
+  "errors": []
+}

@@ -4,7 +4,7 @@ import {ARENA} from './units.js';
  * Ground bodies live on the lawn/bridges. Air bodies share a separate layer.
  * Buildings are static circles; tree/grass artwork is decorative only.
  */
-export const PHYSICS_VERSION=26;
+export const PHYSICS_VERSION=28;
 export const FIELD={left:34,right:686,top:28,bottom:1012};
 const EPS=0.001,GRID=20,COLS=33,ROWS=49;
 const worldCaches=new WeakMap();
@@ -190,6 +190,11 @@ export function moveBody(g,u,dest,dt){
   u.x+=best.x;u.y+=best.y;if(best.side)u._avoidSide=best.side;
   const moved=Math.hypot(best.x,best.y);u._stuck=moved<step*.08?(u._stuck||0)+dt:0;
   return moved;
+}
+export function displaceBody(g,u,dx,dy){
+  if(!Number.isFinite(dx)||!Number.isFinite(dy)||(!dx&&!dy)||u.hp<=0||u.collisionDisabled||isStructure(u))return 0;
+  const f=allowableFraction(g,u,dx,dy,{allies:false,soft:false});
+  const mx=dx*f,my=dy*f;u.x+=mx;u.y+=my;projectStatic(g,u);return Math.hypot(mx,my);
 }
 export function faceToward(u,x,y){
   const dx=x-u.x,dy=y-u.y;if(Math.hypot(dx,dy)<.01)return;

@@ -1,0 +1,8 @@
+TINY SIEGE v23.5.0 browser smoke
+PASS 6/6
+- Offline bundle identifies V23.5.0
+- Archer and Berserker directional sprite definitions present
+- Both new sheets embedded at 640x960
+- Patch Notes exposes V23.5 art rebuild
+- Self-contained CPU practice starts
+- No uncaught JavaScript errors
