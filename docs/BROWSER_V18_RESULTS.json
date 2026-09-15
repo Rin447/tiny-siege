@@ -1,8 +1,11 @@
 {
-  "passed": 17,
+  "passed": 20,
   "checks": [
-    "Deck builder exposes all 44 selectable cards, including the five V23 siege specialists",
-    "V23.1 offline build embeds Sky Bomber and Crusher Ogre pixel sprite sheets",
+    "Deck builder exposes all 48 selectable cards, including the V25 Iron Eye and Tracker",
+    "Mini Berserker detail shows 4 cost, HP1300, attack270 and 1.45-second high-speed melee role",
+    "Mega Knight detail exposes drop 420, 2-second jump windup, 80-160 jump range and renders its live demo",
+    "Iron Eye detail shows mark amplification, 500-to-300 burst and one-use piercing spin",
+    "Tracker detail shows 4-second hook cooldown plus ground, air and building hook behavior",
     "Princess Archer detail shows cost 3, HP 300, attack 275, 3-second fire rate and cross-river range 350",
     "Sparky detail shows its 1.8s summon delay, then renders through charged-shot replay safely",
     "Card detail canvas remains healthy after switching away from Sparky",
@@ -15,9 +18,9 @@
     "Detail UI exposes Golem 2.5s summon delay and Tigger no-extra-delay exception",
     "Summoner details show 1.5s/1.2s parent delays while retaining 7.5s/6.5s intervals",
     "My List persists the current eight-card deck under the current storage key",
-    "Patch Notes shows v23.1 sprite animation plus retained v23/v22/v21/v20/v19/v18/v17 history",
+    "Patch Notes shows v25 Hunter mark update plus retained v24-v17 history",
     "Self-contained HTML starts a playable CPU battle with a four-card hand and visible arena",
-    "No uncaught JavaScript errors in the v23 deck, detail demos, Patch Notes or CPU battle flow"
+    "No uncaught JavaScript errors in the v25 deck, detail demos, Patch Notes or CPU battle flow"
   ],
   "errors": []
 }

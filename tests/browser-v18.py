@@ -48,20 +48,67 @@ async def main():
         await page.click('#deckBtn')
         await page.wait_for_timeout(150)
         cards=page.locator('#deckPool .deck-choice')
-        assert await cards.count()==44, await cards.count()
-        for cid in ['necromancer','darknecro','ashsquad','princess','sparky','zap','electrowizard','laserdragon','shieldknight','windmage','phoenix','gravityorb','mirage','cyclone','skybomber','scrapdrill','crusherogre','siegeturtle','bombcarrier']:
+        assert await cards.count()==48, await cards.count()
+        for cid in ['necromancer','darknecro','ashsquad','princess','sparky','zap','electrowizard','laserdragon','shieldknight','windmage','phoenix','gravityorb','mirage','cyclone','skybomber','scrapdrill','crusherogre','siegeturtle','bombcarrier','miniberserker','megaknight','ironeye','tracker']:
             assert await page.locator(f'#deckPool .deck-choice[data-card="{cid}"]').count()==1
-        await ok('Deck builder exposes all 44 selectable cards, including the five V23 siege specialists')
-        sprite_info=await page.evaluate("""() => Object.fromEntries(
-          ['skybomber','crusherogre','archer','berserker','mage','frost'].map(k=>[k,window.TINY_SPRITE_DATA?.[k]||''])
-        )""")
-        assert all(v.startswith('data:image/png;base64,') for v in sprite_info.values()),sprite_info
-        dims=await page.evaluate("""async () => {
-          const load = src => new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve([i.naturalWidth,i.naturalHeight]);i.onerror=reject;i.src=src;});
-          const out={}; for(const k of ['skybomber','crusherogre','archer','berserker','mage','frost']) out[k]=await load(window.TINY_SPRITE_DATA[k]); return out;
-        }""")
-        assert all(v==[640,960] for v in dims.values()),dims
-        await ok('V23.3 offline build embeds 640x960 front/back sprite sheets for six pixel units')
+        await ok('Deck builder exposes all 48 selectable cards, including the V25 Iron Eye and Tracker')
+
+        # V25.1 direct drag deck editing: pool -> slot replacement, slot -> slot reorder, and ordinary click coexistence.
+        pool=page.locator('#deckPool .deck-choice[data-card="blade"]');await pool.scroll_into_view_if_needed();await page.wait_for_timeout(40)
+        slot0=page.locator('#deckSlots .deck-slot').nth(0);pb=await pool.bounding_box();sb=await slot0.bounding_box();assert pb and sb
+        await page.mouse.move(pb['x']+pb['width']/2,pb['y']+pb['height']/2);await page.mouse.down();await page.mouse.move(pb['x']+pb['width']/2+14,pb['y']+pb['height']/2,steps=3)
+        assert await page.locator('.deck-drag-ghost').count()==1
+        await page.mouse.move(sb['x']+sb['width']/2,sb['y']+sb['height']/2,steps=10);await page.mouse.up();await page.wait_for_timeout(130)
+        assert await page.locator('#deckSlots .deck-slot').nth(0).get_attribute('data-card')=='blade'
+        assert await page.locator('#deckCardActions').is_hidden()
+        await ok('Pool card drag directly replaces a chosen deck slot without opening the tap action sheet')
+
+        a=page.locator('#deckSlots .deck-slot').nth(0);b=page.locator('#deckSlots .deck-slot').nth(1);ab=await a.bounding_box();bb=await b.bounding_box();assert ab and bb
+        ca=await a.get_attribute('data-card');cb=await b.get_attribute('data-card')
+        await page.mouse.move(ab['x']+ab['width']/2,ab['y']+ab['height']/2);await page.mouse.down();await page.mouse.move(ab['x']+ab['width']/2+13,ab['y']+ab['height']/2,steps=2);await page.mouse.move(bb['x']+bb['width']/2,bb['y']+bb['height']/2,steps=8);await page.mouse.up();await page.wait_for_timeout(130)
+        assert await page.locator('#deckSlots .deck-slot').nth(0).get_attribute('data-card')==cb
+        assert await page.locator('#deckSlots .deck-slot').nth(1).get_attribute('data-card')==ca
+        await ok('Deck slots can be dragged onto each other to reorder the eight cards')
+
+        tap=page.locator('#deckPool .deck-choice[data-card="spear"]');await tap.scroll_into_view_if_needed();await tap.click();await page.wait_for_timeout(80)
+        assert await page.locator('#deckCardActions').is_visible();await page.click('#deckActionClose')
+        await ok('Normal click still opens the existing card action sheet after drag support is enabled')
+        await page.click('#deckDefaultBtn');await page.wait_for_timeout(80)
+
+        # V24 units
+        await open_detail(page,'miniberserker')
+        stats=await page.locator('#cardDetailStats').inner_text()
+        desc=await page.locator('#cardDetailDesc').inner_text()
+        assert '4' in stats and '1300' in stats and '270' in stats and '1.45' in stats and '大剣' in desc
+        await close_detail(page)
+        await ok('Mini Berserker detail shows 4 cost, HP1300, attack270 and 1.45-second high-speed melee role')
+
+        await open_detail(page,'megaknight')
+        stats=await page.locator('#cardDetailStats').inner_text()
+        desc=await page.locator('#cardDetailDesc').inner_text()
+        assert '7' in stats and '2400' in stats and '280' in stats and '420' in stats and '80〜160' in stats and '2秒' in stats and '黒い鉄球' in desc
+        await page.wait_for_timeout(2300)
+        await close_detail(page)
+        await ok('Mega Knight detail exposes drop 420, 2-second jump windup, 80-160 jump range and renders its live demo')
+
+        # V25 units
+        await open_detail(page,'ironeye')
+        stats=await page.locator('#cardDetailStats').inner_text()
+        desc=await page.locator('#cardDetailDesc').inner_text()
+        assert '4' in stats and '750' in stats and '125' in stats and '160' in stats,stats
+        assert '被ダメージ+20%' in stats and '累計500 → 追加300' in stats and '1体につき1回' in stats and '2.5秒間30%鈍足' in stats,stats
+        assert '顔を深いフードで隠した' in desc and '貫通突進' in desc,desc
+        await close_detail(page)
+        await ok('Iron Eye detail shows mark amplification, 500-to-300 burst and one-use piercing spin')
+
+        await open_detail(page,'tracker')
+        stats=await page.locator('#cardDetailStats').inner_text()
+        desc=await page.locator('#cardDetailDesc').inner_text()
+        assert '6' in stats and '1900' in stats and '220' in stats,stats
+        assert '射程180 / 構え0.6秒 / CT4秒' in stats and '対象だけ2秒攻撃可' in stats and '自分が建物へ引き寄せられる' in stats,stats
+        assert '細身の長身鎧騎士' in desc and '右手に片手剣' in desc and '左手に小盾' in desc,desc
+        await close_detail(page)
+        await ok('Tracker detail shows 4-second hook cooldown plus ground, air and building hook behavior')
 
         # New unit: Princess Archer
         await open_detail(page,'princess')
@@ -207,7 +254,7 @@ async def main():
         # My List persistence remains intact.
         await page.click('#saveMyListBtn')
         await page.wait_for_timeout(140)
-        stored=await page.evaluate("window.__v18Store['tiny-deck-presets-v23'] || null")
+        stored=await page.evaluate("window.__v18Store['tiny-deck-presets-v25'] || null")
         assert stored and len(json.loads(stored).get('presets',[]))==1,stored
         assert await page.locator('#myListGrid .mylist-card').count()==1
         await ok('My List persists the current eight-card deck under the current storage key')
@@ -217,9 +264,9 @@ async def main():
         await page.evaluate("document.getElementById('updatesBtn').click()")
         await page.wait_for_timeout(130)
         text=await page.locator('#patchNotes').inner_text()
-        assert 'v23.3.0' in text and 'CORE UNIT SPRITE UPDATE' in text and 'v23.2.0' in text and 'FRONT / BACK SPRITE UPDATE' in text and 'v23.1.0' in text and 'SPRITE ANIMATION UPDATE' in text and 'SIEGE SPECIALISTS UPDATE' in text, text
+        assert 'v25.1.0' in text and 'DRAG DECK UPDATE' in text and 'v25.0.0' in text and "HUNTER'S MARK UPDATE" in text, text
         assert all(name in text for name in ['スカイボマー','スクラップドリル','クラッシャーオーガ','シージタートル','ボムキャリア']), text
-        assert '44枚（39ユニット＋5呪文）' in text and 'physicsVersion を28' in text, text
+        assert '48枚（43ユニット＋5呪文）' in text and 'physicsVersion を31' in text, text
         assert 'v22.0.0' in text and 'TACTICAL FORCES UPDATE' in text and all(name in text for name in ['シールドナイト','ウィンドメイジ','フェニックス','グラビティオーブ','ミラージュアサシン','サイクロン']), text
         assert 'エレキテルウィザード' in text and '180' in text and '160' in text and '1秒スタン' in text, text
         assert 'v19.3.0' in text and 'SUMMON DELAY SYSTEM' in text, text
@@ -232,7 +279,7 @@ async def main():
         assert 'v18.0.0' in text and 'LONGSHOT & VOLTAGE' in text, text
         assert 'プリンセスアーチャー' in text and 'ザップ' in text and 'スパーキー' in text, text
         assert 'v17 UPDATE SERIES' in text and 'v17.1.0' in text, text
-        await ok('Patch Notes shows v23.3 core sprites plus retained v23.2/v23.1/v23/v22/v21/v20/v19/v18/v17 history')
+        await ok('Patch Notes shows v25.1 drag-deck update, v25 Hunter mark update and retained v24-v17 history')
 
         await page.click('#updatesModal .close-modal')
         await page.fill('#nickname','Rin')
@@ -244,7 +291,7 @@ async def main():
         await ok('Self-contained HTML starts a playable CPU battle with a four-card hand and visible arena')
 
         assert not errors,errors
-        await ok('No uncaught JavaScript errors in the v23 deck, detail demos, Patch Notes or CPU battle flow')
+        await ok('No uncaught JavaScript errors in the v25.1 drag deck, detail demos, Patch Notes or CPU battle flow')
         await browser.close()
 
     result={'passed':len(CHECKS),'checks':CHECKS,'errors':errors}

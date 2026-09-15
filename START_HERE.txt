@@ -1,12 +1,17 @@
-TINY SIEGE v23.5.0 - ARCHER / BERSERKER ART REBUILD
+TINY SIEGE v25.1.0 - DRAG DECK UPDATE
 
-1. GitHub へZIPの中身をアップロードします。
-2. main へ Commit します。例: Update Tiny Siege archer and berserker art to v23.5.0
-3. Cloudflare Pages / Workers の既存手順でデプロイします。
-4. /api/config で version 23.5.0 / cards 44 / units 39 / spells 5 / physicsVersion 28 / maxDeck 8 を確認します。
+1. このフォルダの中身をGitHubリポジトリへ上書きアップロードします。
+2. main へ Commit します。例: Update Tiny Siege Drag Deck to v25.1.0
+3. Cloudflareの自動Build/Deployを待ちます。
+4. /api/config で version 25.1.0 / cards 48 / units 43 / spells 5 / physicsVersion 31 / maxDeck 8 を確認します。
 
-v23.5.0確認ポイント
-- リーフ弓兵が緑フード・矢筒・木弓の新ピクセルアートになっている。
-- クラッグバーサーカーが赤髪・毛皮・双斧の新ピクセルアートになっている。
-- 2体とも前姿 / 後姿、静止 / 移動 / 攻撃を切り替える。
-- 戦闘性能はv23.4から変更しない。
+v25.1.0確認ポイント
+- カード一覧からデッキ8枠へドラッグして、追加またはその枠との入れ替えができます。
+- デッキ枠同士をドラッグすると順番を入れ替えられます。
+- タップ/クリックは従来どおりカード操作を開きます。
+- PCは約10px移動でドラッグ、スマホは約0.18秒長押ししてから動かすとドラッグになります。
+- ドラッグ中はカード追従表示とドロップ可能枠の強調が出ます。
+- 戦闘ロジックはV25.0のままで physicsVersion 31 を維持します。
+
+オフライン確認は PLAY-OFFLINE.html を直接開いてください。
+更新履歴は UPDATE-HISTORY.html 1枚に統合しています。

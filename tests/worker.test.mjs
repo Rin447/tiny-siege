@@ -22,8 +22,8 @@ function env(){
 function req(url,method='GET',data=null,origin='https://test.invalid'){
  return new Request('https://test.invalid'+url,{method,headers:{'Content-Type':'application/json','Origin':origin},body:data?JSON.stringify(data):undefined});
 }
-test('worker health and config identify thirty-nine units plus five spells custom-deck game',async()=>{
- const r=await worker.fetch(req('/api/config'),env());const b=await r.json();assert.equal(b.version,'23.5.0');assert.equal(b.cards,44);assert.equal(b.units,39);assert.equal(b.spells,5);assert.equal(b.physicsVersion,28);assert.equal(b.maxDeck,8);assert.equal(b.game,'tiny-siege');for(const feature of ['shield-front-absorb','wind-knockback','phoenix-egg-revive','gravity-pull','mirage-stealth','cyclone-field-pull','sky-bomber-building-only','scrap-drill-ramping','crusher-ogre-ramping','siege-turtle-ranged-armor','bomb-carrier-suicide'])assert.ok(b.features.includes(feature),feature);
+test('worker health and config identify forty-three units plus five spells custom-deck game',async()=>{
+ const r=await worker.fetch(req('/api/config'),env());const b=await r.json();assert.equal(b.version,'25.1.0');assert.equal(b.cards,48);assert.equal(b.units,43);assert.equal(b.spells,5);assert.equal(b.physicsVersion,31);assert.equal(b.maxDeck,8);assert.equal(b.game,'tiny-siege');for(const feature of ['shield-front-absorb','wind-knockback','phoenix-egg-revive','gravity-pull','mirage-stealth','cyclone-field-pull','sky-bomber-building-only','scrap-drill-ramping','crusher-ogre-ramping','siege-turtle-ranged-armor','bomb-carrier-suicide','iron-eye-mark-spin','tracker-hook'])assert.ok(b.features.includes(feature),feature);
 });
 test('worker static assets use ASSETS binding',async()=>{
  const r=await worker.fetch(req('/'),env());assert.equal(await r.text(),'asset');

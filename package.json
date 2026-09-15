@@ -1,9 +1,9 @@
 {
   "name": "tiny-siege",
-  "version": "23.5.0",
+  "version": "25.1.0",
   "private": true,
   "type": "module",
-  "description": "Original 2D lane battler with directional pixel-sprite units, tactical control, 44 selectable cards, CPU practice and private 1v1 on Cloudflare Workers.",
+  "description": "Original 2D lane battler with mark-and-hook specialists, siege tactics, 48 selectable cards, CPU practice and private 1v1 on Cloudflare Workers.",
   "engines": {
     "node": ">=22"
   },

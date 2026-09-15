@@ -1,44 +1,37 @@
-# Changelog
+## 25.1.0 - DRAG DECK UPDATE (2026-09-15)
+- Added direct drag-and-drop deck editing while preserving the existing click/tap action sheet.
+- Pool cards can be dropped on deck slots to add or replace; deck slots can be dragged onto each other to reorder the eight-card deck.
+- Drag feedback includes a floating card ghost, valid-slot highlighting and a stronger current drop target.
+- Mouse drag begins after about 10px movement. Touch drag requires about 0.18s hold before movement so ordinary scrolling/taps remain distinct.
+- Gameplay and authoritative combat are unchanged; physicsVersion remains 31.
 
-## 23.5.0 - ARCHER / BERSERKER ART REBUILD (2026-09-14)
-- リーフ弓兵を、今回作成した緑フード・矢筒・木弓の高精細ピクセルアートへ再構築。
-- クラッグバーサーカーを、赤髪・毛皮・双斧の高精細ピクセルアートへ再構築。
-- 両キャラとも IDLE / MOVE / ATTACK × FRONT / BACK × 4フレーム。
-- 元の生成シートからゲーム用640x960・160pxセルの1キャラ1PNGへ整形。
-- 戦闘ロジック・ステータス変更なし。physicsVersion 28を維持。
+## 25.0.0 - HUNTER'S MARK UPDATE (2026-09-15)
+- Added Iron Eye: 4 cost / HP750 / damage125 / range160, with a +20% incoming-damage mark that bursts for 300 after 500 accumulated real damage.
+- Iron Eye has one piercing hidden-blade spin per deployed unit: 180 damage, mark application and 2.5s 30% ground slow to every enemy crossed.
+- Added Tracker: 6 cost / HP1900 / damage220, with a 180-range hook, 0.6s windup and 4s cooldown. Ground enemies are pulled in, air enemies grant a 2s target-only attack window, and structures pull Tracker toward them.
+- Card pool: 48 selectable cards = 43 units + 5 spells. physicsVersion 31.
 
-## 23.4.0 - RUNE / FROST SPRITE UPDATE (2026-09-14)
-- ルーン術師 / フロストシャーマンを前後2方向のピクセルスプライトへ移行。
-- 各キャラに IDLE / MOVE / ATTACK × FRONT / BACK × 4フレームを実装。
-- 既存のスカイボマー / クラッシャーオーガ / リーフ弓兵 / クラッグバーサーカーと同じスプライト描画パイプラインを使用。
-- オフライン単一HTMLへ全6スプライトをData URL埋め込み。
-- 戦闘ロジック変更なし。physicsVersion 28を維持。
+## 24.1.0 - MEGA FLIGHT UPDATE (2026-09-15)
+- Mega Knight leap travel now always takes exactly 1.5 seconds regardless of jump distance.
+- Leap movement uses a fixed takeoff point and fixed landing point captured at takeoff; the landing point no longer chases a moving target after takeoff.
+- Mega Knight's leap sprite now rises much higher, retains a moving ground shadow, adds wind streaks, keeps the landing ring visible and shows a curved flight path for clearer airborne readability.
+- physicsVersion 30 for the new deterministic leap travel state.
 
-## 23.3.0 - ARCHER / BERSERKER SPRITE UPDATE (2026-09-14)
-- リーフ弓兵 / クラッグバーサーカーを前後2方向のピクセルスプライトへ移行。
-- 各キャラに IDLE / MOVE / ATTACK × FRONT / BACK × 4フレームを実装。
-- 既存のスカイボマー / クラッシャーオーガと同じスプライト描画パイプラインを使用。
-- オフライン単一HTMLへ4スプライトをData URL埋め込み。
-- 戦闘ロジック変更なし。physicsVersion 28を維持。
+## 24.0.0 - HEAVY DROP UPDATE (2026-09-15)
+- Added Mini Berserker: cost 4, HP 1300, damage 270, speed 52 and 1.45-second attacks. Its procedural sprite uses a roughly 1:1 head/body silhouette and carries an oversized raised sword.
+- Added Mega Knight: cost 7, HP 2400, damage 280, speed 40 and 1.6-second attacks with a small radius-48 melee splash.
+- Mega Knight deploys with a 1.5-second landing telegraph and deals 420 damage in radius 48 on landing.
+- Mega Knight jumps when its target is 80-160 away. The jump has no cooldown; instead it uses a 2-second stationary windup. Before the first engagement, a newly spawned closer enemy can take over the jump target without restarting the timer. Once takeoff begins, the target is locked and is pursued until defeated.
+- Jump landing damage is 420 in the same radius 48 as the deployment landing zone.
+- Card pool is now 46 cards (41 units + 5 spells); physicsVersion 29.
 
 # TINY SIEGE changelog
 
-## 23.2.0 - FRONT / BACK SPRITE UPDATE (2026-09-14)
-- Sky Bomber and Crusher Ogre sprite sheets now include distinct front and rear views.
-- Each direction retains idle, move and attack states with four cells per state; sprite PNGs are now 640x960 while remaining one file per character.
-- Rendering selects front/rear rows from the existing viewer-relative `back` facing flag; horizontal facing still uses mirroring.
-- Sky Bomber rear art shows the skeleton pilot from behind with rear harness detail. Crusher Ogre rear art shows back musculature, shoulder armor, waist cloth and hammer poses.
-- Combat stats, card count and `physicsVersion=28` are unchanged.
-
-## 23.1.0 - SPRITE ANIMATION UPDATE (2026-09-14)
-- Sky Bomber now uses a pixel-art balloon bomber sprite with a skeleton pilot.
-- Crusher Ogre now uses a more humanoid pixel-art heavy warrior with an oni-style mask and hammer.
-- Both units use 3-state sprite sheets: idle, move and attack, with four animation cells per state.
-- Online builds load PNG sprite sheets from `public/assets/sprites/`; the offline single-file build embeds the same PNGs as Data URLs.
-- Procedural drawings remain as automatic fallback while an image is unavailable.
-- Gameplay stats and physicsVersion remain unchanged at 28.
-
 ## 23.0.0 - SIEGE SPECIALISTS UPDATE (2026-09-14)
+- Visual readability refresh: redesigned Mud Dragon, Storm Harpy, Laser Dragon and Sky Bomber using the existing procedural Canvas art system.
+- Mud Dragon now uses a broad swamp-crocodile silhouette with torn wings and visible mud drips; Storm Harpy uses lightning-bolt wings, thunder crest and stronger talons.
+- Laser Dragon now uses a slim mechanical silhouette, straight plated wings, forehead crystal and chest reactor; Sky Bomber now reads as a goggled humanoid pilot with twin rotors and an oversized bomb.
+- Unit stats, targeting, hitboxes and combat behavior are unchanged by this visual-only refresh.
 - Added Sky Bomber: 4 cost, HP720, speed58, range75, 175 damage every 1.6s; flying and building-only.
 - Added Scrap Drill: 4 cost, HP900; attached structure DPS ramps 90 -> 135 -> 180 -> 240 every 1.5s and resets on displacement, retarget or stun.
 - Added Crusher Ogre: 6 cost, HP2200, very slow 3.0s attack interval; consecutive hits on one structure ramp 230 -> 310 -> 390 -> 470 and reset on range loss, retarget or stun.
@@ -191,3 +184,49 @@
 
 ## 16.0.0
 - Mud Dragon/Blowdart balance and persistent mobile building placement.
+
+## v23.0 redesign-02
+- Reworked Dosranboss into a larger king-lizard silhouette with a dominant crest, broader jaw and boss ornaments.
+- Reworked Scrap Drill into a boxy scrap-built tracked machine with an oversized drill, hazard plate, exhaust pipe and warning lamp.
+- Reworked Crusher Ogre into a top-heavy brute with a giant hammer, single shoulder armor, tusks and chain-belt details.
+- Reworked Siege Turtle into a mobile fortress with a larger shell, plated armor and a shell-mounted ballista/cannon silhouette.
+
+## v23.0 redesign-03
+- Reworked Blowdart Goblin into a clearer poison skirmisher with a longer blowpipe, leaf hood and visible poison-dart quiver.
+- Reworked Bomb Carrier into a more dangerous kamikaze silhouette with an oversized carried bomb and backup bombs on the belt.
+- Refined Dosranboss into a slimmer blue dinosaur silhouette with a more obvious orange crest, matching the requested look more closely.
+
+## v23.0 redesign-04
+- Added a deck-builder-only portrait layout system: every unit now uses the same 120x120 composition frame in deck editing, with per-unit scale and vertical-offset tuning.
+- Reduced oversized flying portraits such as Storm Harpy and the dragons so wings, crests and heads stay inside the composition frame.
+- Slightly enlarged compact units and tuned heavyweight units so the deck screen has a more consistent visual size across the roster.
+- Battle rendering and the library/normal portrait presentation remain unchanged.
+
+## v23.0 redesign-05
+- Team ownership bands remain visible during battle for blue/red side readability.
+- Deck builder portraits, deck summaries and card library portraits now hide the team ownership band so character art reads cleanly outside combat.
+- Added regression coverage for portrait-only team-band suppression.
+
+## v23.0 redesign-06
+- Refined Crusher Ogre face into a hannya-inspired demon mask look with taller horns, sharper eyes, cheek spikes and stronger tusks while keeping the giant hammer silhouette.
+
+## v23.0 redesign-07
+- Refined Dosranboss head to better match the provided reference: a slimmer raptor-like blue head with a longer snout, yellowish lower jaw and a longer orange crest.
+- Updated Ranbos to share the same family look with a leaner blue raptor head and orange crest, so the unit and boss read as related creatures.
+
+## v23.0 redesign-08
+- Adjusted Dosranboss and Ranbos again so their faces are slimmer and their head crests are reduced to a single long crest, matching the latest requested look more closely.
+
+## v23.0 redesign-09
+- Restyled Dosranboss and Ranbos again toward the newly provided visual reference: a more simplified blocky blue dinosaur look with a white lower jaw, a single orange crest and a cleaner cartoon silhouette.
+
+## v23.0 redesign-10
+- Adjusted Dosranboss and Ranbos again to remove the white jaw and replace it with a yellow beak-like mouth piece.
+- Extended the single orange crest further backward to better match the latest provided sketch.
+
+## v23.0 redesign-11
+- Refined Dosranboss and Ranbos again so the yellow mouth part reads as a beak attached to the front of the face, instead of a lower jaw.
+
+## v23.0 redesign-12
+- Raised the beak position on Dosranboss and Ranbos so the yellow beak sits slightly higher on the face, closer to the latest sketch.
+- Added a new Siege Turtle passive: when it takes melee/contact damage, it retaliates around itself for 1/3 of the actual damage taken. This retaliation does not trigger from ranged attacks, spells, or damage-over-time.

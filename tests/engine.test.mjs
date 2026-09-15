@@ -13,8 +13,8 @@ function forceReady(g,u){
 }
 function spawn(g,o,id,x=190,y=o===0?650:390){ready(g,o,id);const before=g.units.length,r=deploy(g,o,id,x,y);assert.ok(r.ok,r.error);const created=g.units.slice(before);created.forEach(u=>forceReady(g,u));return created.at(-1);}
 function advance(g,seconds){for(let i=0;i<Math.round(seconds*10);i++)tick(g,.1);}
-test('forty-four selectable cards, thirty-nine unit cards plus five spells, and eight-card deck rule',()=>{
- assert.equal(DECK.length,44);assert.equal(new Set(DECK).size,44);assert.equal(UNIT_IDS.length,39);assert.deepEqual(SPELL_IDS,['fireball','poison','arrowrain','zap','cyclone']);
+test('forty-eight selectable cards, forty-three unit cards plus five spells, and eight-card deck rule',()=>{
+ assert.equal(DECK.length,48);assert.equal(new Set(DECK).size,48);assert.equal(UNIT_IDS.length,43);assert.deepEqual(SPELL_IDS,['fireball','poison','arrowrain','zap','cyclone']);
  assert.equal(MAX_DECK,8);assert.equal(DEFAULT_DECK.length,8);assert.deepEqual(normalizeDeck(DEFAULT_DECK),[...DEFAULT_DECK]);
  for(const id of DECK){const d=UNITS[id];assert.ok(d.cost>=1&&d.damage>0);if(!d.spell)assert.ok(d.hp>0);assert.notEqual(d.hidden,true);}
  assert.equal(DECK.includes('mini_golem'),false);assert.equal(UNITS.mini_golem.hidden,true);
@@ -29,6 +29,10 @@ test('forty-four selectable cards, thirty-nine unit cards plus five spells, and 
  assert.equal(UNITS.blade.cost,2);assert.equal(UNITS.blade.hp,780);assert.equal(UNITS.blade.damage,112);
  assert.equal(UNITS.knight.cost,3);assert.equal(UNITS.knight.hp,1850);assert.equal(UNITS.knight.damage,98);
  assert.equal(UNITS.berserker.cost,7);assert.equal(UNITS.berserker.hp,2450);assert.equal(UNITS.berserker.damage,465);assert.equal(UNITS.berserker.targetsAir,false);assert.ok(UNITS.berserker.mass>UNITS.knight.mass);
+ assert.equal(UNITS.miniberserker.cost,4);assert.equal(UNITS.miniberserker.hp,1300);assert.equal(UNITS.miniberserker.damage,270);assert.equal(UNITS.miniberserker.speed,52);assert.equal(UNITS.miniberserker.cooldown,1.45);
+ assert.equal(UNITS.megaknight.cost,7);assert.equal(UNITS.megaknight.hp,2400);assert.equal(UNITS.megaknight.damage,280);assert.equal(UNITS.megaknight.meleeSplash,48);assert.equal(UNITS.megaknight.dropDamage,420);assert.equal(UNITS.megaknight.jumpDamage,420);assert.equal(UNITS.megaknight.jumpWindup,2);assert.equal(UNITS.megaknight.jumpMinRange,80);assert.equal(UNITS.megaknight.jumpMaxRange,160);assert.equal(UNITS.megaknight.jumpTravelTime,1.5);
+ assert.equal(UNITS.ironeye.cost,4);assert.equal(UNITS.ironeye.hp,750);assert.equal(UNITS.ironeye.damage,125);assert.equal(UNITS.ironeye.range,160);assert.equal(UNITS.ironeye.markDamageBonus,.20);assert.equal(UNITS.ironeye.markThreshold,500);assert.equal(UNITS.ironeye.markBurstDamage,300);assert.equal(UNITS.ironeye.spinDamage,180);assert.equal(UNITS.ironeye.spinSlowMove,.70);assert.equal(UNITS.ironeye.spinSlowDuration,2.5);
+ assert.equal(UNITS.tracker.cost,6);assert.equal(UNITS.tracker.hp,1900);assert.equal(UNITS.tracker.damage,220);assert.equal(UNITS.tracker.hookRange,180);assert.equal(UNITS.tracker.hookWindup,.6);assert.equal(UNITS.tracker.hookCooldown,4);assert.equal(UNITS.tracker.hookAirAttackDuration,2);
  assert.equal(UNITS.cannon.cost,3);assert.equal(UNITS.cannon.hp,1080);assert.equal(UNITS.cannon.decayPerSecond,30);assert.equal('lifetime' in UNITS.cannon,false);
  assert.equal(UNITS.tigger.cost,3);assert.equal(UNITS.tigger.hp,1100);assert.equal(UNITS.tigger.damage,120);assert.equal(UNITS.tigger.structureDamage,70);assert.equal(UNITS.tigger.cooldown,1.1);assert.equal(UNITS.tigger.tunnelAnywhere,true);assert.equal(UNITS.tigger.burrowMin,.9);assert.equal(UNITS.tigger.burrowMax,2.8);
  assert.equal(UNITS.muddragon.cost,5);assert.equal(UNITS.muddragon.hp,1600);assert.equal(UNITS.muddragon.damage,200);assert.equal(UNITS.muddragon.range,78);assert.equal(UNITS.muddragon.splash,45);assert.equal(UNITS.muddragon.mudDuration,2);assert.equal(UNITS.muddragon.mudDamage,30);
@@ -754,10 +758,112 @@ test('bomb carrier deals 480 only on structure contact, while an en-route death 
  const killerHp=killer.hp,tower2Hp=tower2.hp;tick(g2,.1);assert.equal(runner.hp,0);assert.equal(killerHp-killer.hp,80);assert.equal(tower2.hp,tower2Hp,'carrier death blast must not damage buildings');
 });
 
-test('v23 snapshots expose drill, crusher and moving siege-turtle state',()=>{
+test('mega knight drops after 1.5 seconds and deals 420 area damage on landing',()=>{
+ const g=battle();g.towers.forEach(t=>{t.range=0;t.damage=0;});
+ const victim=spawn(g,1,'knight',190,390);Object.assign(victim,{x:190,y:594,speed:0,damage:0,cd:99});
+ ready(g,0,'megaknight');const before=victim.hp,r=deploy(g,0,'megaknight',190,650);assert.ok(r.ok,r.error);
+ const mega=g.units.find(u=>u.type==='megaknight'&&u.owner===0);assert.ok(mega);assert.equal(mega.deployRemaining,1.5);
+ advance(g,1.4);assert.equal(victim.hp,before,'landing damage must wait for the deployment timer');
+ advance(g,.2);assert.equal(before-victim.hp,420);assert.equal(mega.deploying,false);
+});
+
+test('mega knight jump uses a two second windup, retargets to a newly closer enemy during windup, and has no cooldown',()=>{
+ const g=battle();g.towers.forEach(t=>{t.range=0;t.damage=0;});
+ const mega=spawn(g,0,'megaknight',190,650),a=spawn(g,1,'knight',190,390),b=spawn(g,1,'blade',530,390);
+ Object.assign(mega,{x:190,y:650,speed:0,cd:99});Object.assign(a,{x:190,y:520,speed:0,damage:0,cd:99});Object.assign(b,{x:530,y:520,speed:0,damage:0,cd:99});
+ tick(g,.1);assert.equal(mega.megaJumpState,'windup');assert.equal(mega.megaJumpTarget,a.id);
+ advance(g,1);Object.assign(b,{x:190,y:590});tick(g,.1);assert.equal(mega.megaJumpState,'windup');assert.equal(mega.megaJumpTarget,b.id,'new closer enemy should replace the pre-jump target without cancelling windup');
+ const bhp=b.hp;advance(g,1.1);assert.equal(mega.megaJumpState,'leap');assert.equal(b.hp,bhp,'the leap must stay airborne for 1.5 seconds rather than landing almost immediately');
+ advance(g,1.4);assert.ok(bhp-b.hp>=420,'jump landing should deal the same 420 damage as deployment landing');
+ assert.equal(mega.targetLock,b.id,'takeoff/landing should commit the chosen enemy');
+ // No cooldown field is used: once the locked target is moved back into jump distance, a fresh 2s windup can start immediately.
+ Object.assign(b,{x:mega.x,y:mega.y-120});mega.cd=0;tick(g,.1);assert.equal(mega.megaJumpState,'windup');assert.equal(mega.megaJumpTarget,b.id);
+});
+
+test('mega knight does not jump to a nearby target, and takeoff locks the chosen target even if another enemy appears closer',()=>{
+ const g=battle();g.towers.forEach(t=>{t.range=0;t.damage=0;});
+ const mega=spawn(g,0,'megaknight',190,650),a=spawn(g,1,'knight',190,390),b=spawn(g,1,'blade',530,390);
+ Object.assign(mega,{x:190,y:650,speed:0,cd:99,jumpSpeed:40});Object.assign(a,{x:190,y:585,speed:0,damage:0,cd:99});Object.assign(b,{x:530,y:585,speed:0,damage:0,cd:99});
+ tick(g,.1);assert.equal(mega.megaJumpState,null,'65px target should be approached normally, not jumped to');
+ a.y=520;tick(g,.1);assert.equal(mega.megaJumpState,'windup');assert.equal(mega.megaJumpTarget,a.id);
+ advance(g,2);assert.equal(mega.megaJumpState,'leap');assert.equal(mega.targetLock,a.id);
+ Object.assign(b,{x:190,y:630});tick(g,.1);assert.equal(mega.megaJumpTarget,a.id);assert.equal(mega.targetLock,a.id,'a closer spawn after takeoff must not steal the jump target');
+});
+
+test('mega knight keeps its committed enemy target through stun until that target dies',()=>{
+ const g=battle();g.towers.forEach(t=>{t.range=0;t.damage=0;});
+ const mega=spawn(g,0,'megaknight',190,650),a=spawn(g,1,'knight',190,390),b=spawn(g,1,'blade',530,390);
+ Object.assign(mega,{x:190,y:650,speed:0,cd:99,jumpSpeed:600});Object.assign(a,{x:190,y:520,speed:0,damage:0,cd:99});Object.assign(b,{x:530,y:520,speed:0,damage:0,cd:99});
+ tick(g,.1);advance(g,2.1);assert.equal(mega.targetLock,a.id);
+ ready(g,1,'zap');const zr=deploy(g,1,'zap',mega.x,mega.y);assert.ok(zr.ok,zr.error);tick(g,.1);
+ assert.equal(mega.targetLock,a.id,'stun must not make an engaged Mega Knight switch to another enemy');
+});
+
+test('mega knight leap always takes 1.5 seconds regardless of jump distance and keeps the takeoff landing point fixed',()=>{
+ const g=battle();g.towers.forEach(t=>{t.range=0;t.damage=0;});
+ const mega=spawn(g,0,'megaknight',190,650),a=spawn(g,1,'knight',190,390);
+ Object.assign(mega,{x:190,y:650,speed:0,cd:99});Object.assign(a,{x:190,y:540,speed:0,damage:0,cd:99});
+ tick(g,.1);advance(g,2);assert.equal(mega.megaJumpState,'leap');
+ const endY=mega.megaJumpEndY,startY=mega.megaJumpStartY;assert.ok(Number.isFinite(endY)&&Number.isFinite(startY));
+ const hp=a.hp;advance(g,1.35);assert.equal(mega.megaJumpState,'leap');assert.equal(a.hp,hp);
+ a.y=400; // target moving after takeoff must not move the committed landing point
+ advance(g,.2);assert.equal(mega.megaJumpState,null);assert.ok(Math.abs(mega.y-endY)<.01);
+});
+
+test('mega knight normal attack is a small 280 damage area smash',()=>{
+ const g=battle();g.towers.forEach(t=>{t.range=0;t.damage=0;});
+ const mega=spawn(g,0,'megaknight',190,650),a=spawn(g,1,'knight',190,390),b=spawn(g,1,'blade',530,390);
+ Object.assign(mega,{x:190,y:600,speed:0,cd:0});Object.assign(a,{x:190,y:555,speed:0,damage:0,cd:99});Object.assign(b,{x:225,y:555,speed:0,damage:0,cd:99});
+ // Both are close enough to skip jumping; the first melee smash should hit both.
+ const ah=a.hp,bh=b.hp;tick(g,.1);assert.equal(ah-a.hp,280);assert.equal(bh-b.hp,280);
+});
+
+test('iron eye arrows apply a 20 percent damage mark that breaks at 500 accumulated damage for a 300 burst',()=>{
+ const g=battle(),iron=spawn(g,0,'ironeye',190,650),victim=spawn(g,1,'knight',190,390),ally=spawn(g,0,'blade',530,650);
+ Object.assign(iron,{x:190,y:620,speed:0,cd:0});Object.assign(victim,{x:190,y:490,speed:0,damage:0,cd:99});Object.assign(ally,{x:205,y:490,speed:0,damage:112,cooldown:.1,cd:99});
+ const before=victim.hp;tick(g,.1);advance(g,.4);assert.equal(before-victim.hp,125);assert.equal(victim.ironMarked,true);assert.equal(victim.ironMarkOwner,0);assert.equal(victim.ironMarkDamage,0);
+ iron.cd=99;ally.cd=0;const markedHp=victim.hp;advance(g,.4);
+ assert.ok(markedHp-victim.hp>800&&markedHp-victim.hp<850,`expected four amplified blade hits plus 300 burst, got ${markedHp-victim.hp}`);
+ assert.equal(victim.ironMarked,false);assert.equal(victim.ironMarkDamage,0);
+});
+
+test('iron eye uses its piercing spin only once, marking and slowing every ground enemy crossed',()=>{
+ const g=battle(),iron=spawn(g,0,'ironeye',190,650),a=spawn(g,1,'knight',190,390),b=spawn(g,1,'knight',530,390);
+ for(const tower of g.towers.filter(t=>t.owner===0)){tower.damage=0;tower.cd=99;}
+ Object.assign(iron,{x:190,y:650,speed:0,cd:99});Object.assign(a,{x:190,y:590,speed:0,damage:0,cd:99});Object.assign(b,{x:190,y:550,speed:0,damage:0,cd:99});
+ const ah=a.hp,bh=b.hp;tick(g,.1);assert.equal(iron.ironSpinState,'rush');advance(g,.5);
+ assert.equal(iron.ironSpinUsed,true);assert.equal(iron.ironSpinState,null);assert.equal(ah-a.hp,180);assert.equal(bh-b.hp,180);assert.equal(a.ironMarked,true);assert.equal(b.ironMarked,true);assert.ok(a.slowUntil>g.time);assert.equal(a.slowMoveFactor,.7);
+ a.x=iron.x;a.y=iron.y-45;tick(g,.1);assert.equal(iron.ironSpinState,null,'the once-only spin must not recharge');
+});
+
+test('tracker hooks a ground unit into melee range and starts a four second hook cooldown',()=>{
+ const g=battle(),hunter=spawn(g,0,'tracker',190,650),victim=spawn(g,1,'knight',190,390);
+ Object.assign(hunter,{x:190,y:650,speed:0,cd:99});Object.assign(victim,{x:190,y:520,speed:0,damage:0,cd:99});
+ tick(g,.1);assert.equal(hunter.hookState,'windup');advance(g,.7);assert.equal(hunter.hookState,'pull-target');advance(g,.5);
+ assert.equal(hunter.hookState,null);assert.ok(distance(hunter,victim)<=hunter.radius+victim.radius+2);assert.equal(hunter.targetLock,victim.id);assert.ok(hunter.hookReadyAt-g.time>3&&hunter.hookReadyAt-g.time<=4);
+});
+
+test('tracker can hook an air target and attack only that target for two seconds',()=>{
+ const g=battle(),hunter=spawn(g,0,'tracker',190,650),air=spawn(g,1,'muddragon',190,390);
+ Object.assign(hunter,{x:190,y:650,speed:0,cd:99});Object.assign(air,{x:190,y:520,speed:0,damage:0,cd:99});
+ tick(g,.1);advance(g,1.3);assert.equal(hunter.hookState,null);assert.equal(hunter.hookAirTarget,air.id);assert.ok(hunter.hookAirAttackUntil>g.time);
+ hunter.cd=0;const before=air.hp;tick(g,.1);assert.equal(before-air.hp,220);
+ advance(g,2.1);const afterWindow=air.hp;hunter.cd=0;advance(g,.5);assert.equal(air.hp,afterWindow,'tracker must stop attacking air after the two second special window');
+});
+
+test('tracker hooks buildings by pulling itself to the structure instead of moving the building',()=>{
+ const g=battle(),hunter=spawn(g,0,'tracker',190,650),building=spawn(g,1,'cannon',190,390);
+ Object.assign(hunter,{x:190,y:650,speed:0,cd:99});Object.assign(building,{x:190,y:520,damage:0,cd:99});const by=building.y;
+ tick(g,.1);advance(g,.7);assert.equal(hunter.hookState,'pull-self');advance(g,.5);
+ assert.equal(hunter.hookState,null);assert.equal(building.y,by);assert.ok(hunter.y<600);assert.equal(hunter.targetLock,building.id);
+});
+
+test('v24 snapshots expose drill, crusher, moving siege-turtle and mega jump state',()=>{
  const g=battle();g.towers.forEach(t=>{t.range=0;t.damage=0;});
  const drill=spawn(g,0,'scrapdrill',190,650),ogre=spawn(g,0,'crusherogre',530,650),turtle=spawn(g,0,'siegeturtle',190,700);
  Object.assign(drill,{drillStage:2,drillDps:180,drillLockTime:3.2});Object.assign(ogre,{crusherStage:3});Object.assign(turtle,{moving:true});
  const snap=viewMatch(g,0),ds=snap.units.find(u=>u.id===drill.id),os=snap.units.find(u=>u.id===ogre.id),ts=snap.units.find(u=>u.id===turtle.id);
  assert.equal(ds.drillStage,2);assert.equal(ds.drillDps,180);assert.equal(ds.drillLockTime,3.2);assert.equal(os.crusherStage,3);assert.equal(ts.turtleShellActive,true);
+ const mega=spawn(g,0,'megaknight',530,700);Object.assign(mega,{megaJumpState:'windup',megaJumpProgress:.5,megaJumpWindupUntil:g.time+1,megaJumpTargetX:530,megaJumpTargetY:580});
+ const ms=viewMatch(g,0).units.find(u=>u.id===mega.id);assert.equal(ms.megaJumpState,'windup');assert.equal(ms.megaJumpProgress,.5);assert.equal(ms.megaJumpWindupRemaining,1);assert.equal(ms.megaJumpTargetY,580);
 });

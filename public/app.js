@@ -4,39 +4,31 @@ import {drawArena,drawPortrait,orient} from './game/art.js';
 
 const $=s=>document.querySelector(s);
 const PATCH_NOTES = Object.freeze([
-  {version:'23.5.0',date:'2026-09-14',title:'ARCHER / BERSERKER ART REBUILD',items:[
-    'リーフ弓兵とクラッグバーサーカーのスプライトを、今回作成した高精細ピクセルアートを元に作り直しました。',
-    'リーフ弓兵は緑のフード・矢筒・木弓を持つ姿へ刷新。クラッグバーサーカーは赤髪・毛皮・双斧を持つ重量戦士の姿へ刷新しました。',
-    '両キャラとも前姿 / 後姿に対応し、静止・移動・攻撃の3状態を各4フレームでアニメーションします。',
-    '戦場の進行方向に応じて前後を自動切替し、横方向は左右反転。カード詳細とLIVE BATTLE DEMOでも同じ新スプライトを使用します。',
-    '見た目のみの更新で、HP・攻撃力・コスト・射程・physicsVersion 28は変更ありません。'
+  {version:'25.1.0',date:'2026-09-15',title:'DRAG DECK UPDATE',items:[
+    'デッキ編集にドラッグ＆ドロップ編成を追加。カード一覧から8枠へ直接ドラッグすると、満杯時はその枠と入れ替え、空きがある場合は追加できます。',
+    'デッキ8枠同士もドラッグで順番を入れ替え可能。ドラッグ中はカードが指・マウスへ追従し、置ける枠と現在のドロップ先を強調表示します。',
+    '従来のタップ/クリック操作は維持。PCは約10pxの移動でドラッグへ切り替わり、スマホは約0.18秒長押ししてから動かした場合だけドラッグとして扱います。',
+    '戦闘ロジックは変更していないため physicsVersion は31のままです。'
   ]},
-  {version:'23.4.0',date:'2026-09-14',title:'RUNE / FROST SPRITE UPDATE',items:[
-    'ルーン術師とフロストシャーマンの2体をピクセルスプライト方式へ移行しました。',
-    '2体とも前姿 / 後姿の2方向に対応し、静止・移動・攻撃の3状態を各4フレームでアニメーションします。',
-    '戦場の進行方向に応じて前後を自動切替し、横方向は左右反転を使用。カード詳細とLIVE BATTLE DEMOでも同じスプライトを描画します。',
-    'スカイボマー / クラッシャーオーガ / リーフ弓兵 / クラッグバーサーカーを含め、方向対応ピクセルスプライト採用ユニットは合計6体になりました。',
-    '見た目のみの更新のため戦闘性能・カード総数44枚・physicsVersion 28は変更ありません。'
+  {version:'25.0.0',date:'2026-09-15',title:"HUNTER'S MARK UPDATE",items:[
+    '新ユニット「鉄の目」を追加。4コスト・HP750・攻撃125・射程160。通常矢で敵ユニットへマークを付け、マーク中は味方から受けるダメージが20%増加します。',
+    '鉄の目マークは実ダメージ累計500で砕け、追加300ダメージ。接近された鉄の目は1体につき一度だけ隠し刃で貫通回転突進し、命中した地上敵全員へ180ダメージ・マーク・2.5秒の30%鈍足を与えます。',
+    '新ユニット「追跡者」を追加。6コスト・HP1900・攻撃220。4秒ごとに射程180のフックを使用します。',
+    '追跡者のフックは地上敵を自分へ引き寄せ、空中敵を引いた場合はその相手だけ2秒間攻撃可能。建物へ刺した場合は追跡者自身が建物の近接位置へ引き寄せられます。',
+    'カード総数は48枚（43ユニット＋5呪文）。マーク・回転突進・フック状態同期に伴い physicsVersion を31へ更新しました。'
   ]},
-  {version:'23.3.0',date:'2026-09-14',title:'ARCHER / BERSERKER SPRITE UPDATE',items:[
-    'リーフ弓兵とクラッグバーサーカーの2体をピクセルスプライト方式へ移行しました。',
-    '2体とも前姿 / 後姿の2方向に対応し、静止・移動・攻撃の3状態を各4フレームでアニメーションします。',
-    '戦場の進行方向に応じて前後を自動切替し、横方向は左右反転を使用。カード詳細とLIVE BATTLE DEMOでも同じスプライトを描画します。',
-    'スカイボマー / クラッシャーオーガを含め、方向対応ピクセルスプライト採用ユニットは合計4体になりました。',
-    '見た目のみの更新のため戦闘性能・カード総数44枚・physicsVersion 28は変更ありません。'
+  {version:'24.1.0',date:'2026-09-15',title:'MEGA FLIGHT UPDATE',items:[
+    'メガナイトのジャンプ移動時間を距離に関係なく1.5秒へ統一。近距離側のジャンプでも一瞬で着地せず、空中移動がしっかり見えるようになりました。',
+    'ジャンプ中の浮き上がりを大きくし、地面の影・風線・弧を描く軌道・着地点リングを追加して、飛行中であることを視覚的に分かりやすくしました。',
+    '飛び始めた瞬間の着地点を固定し、ジャンプ中に対象が移動しても着地点が追従しない仕様へ整理しました。',
+    'オンライン同期変更に伴い physicsVersion を30へ更新しました。'
   ]},
-  {version:'23.2.0',date:'2026-09-14',title:'FRONT / BACK SPRITE UPDATE',items:[
-    'スカイボマーとクラッシャーオーガのピクセルスプライトを前姿 / 後姿の2方向へ拡張しました。',
-    '静止・移動・攻撃の3状態それぞれに前後4フレームを用意し、戦場の進行方向に応じて自動で切り替えます。',
-    'スカイボマーの後姿は骸骨の後頭部と背面ハーネス、クラッシャーオーガの後姿は背中・肩鎧・腰布・大槌が見える専用アートです。',
-    '横方向は従来どおり左右反転を使用。戦闘性能・カード総数44枚・physicsVersion 28は変更ありません。'
-  ]},
-  {version:'23.1.0',date:'2026-09-14',title:'SPRITE ANIMATION UPDATE',items:[
-    'スカイボマーの見た目を刷新。骸骨パイロットが気球に乗り、建物へ爆弾を落とすピクセルアートへ変更しました。',
-    'クラッシャーオーガを人型の重量戦士へ刷新。赤い鬼面と大槌を持つピクセルアートへ変更しました。',
-    '2体とも静止・移動・攻撃の3状態を持つスプライトシート方式へ移行。各状態は4フレームで描画します。',
-    'ゲーム内・カード詳細・LIVE BATTLE DEMOで同じスプライト描画を使用。画像未読込時は従来のプロシージャル描画へ自動フォールバックします。',
-    '戦闘性能と physicsVersion 28 は変更ありません。アップデート履歴HTMLも引き続き1枚だけです。'
+  {version:'24.0.0',date:'2026-09-15',title:'HEAVY DROP UPDATE',items:[
+    '新ユニット「ミニバーサーカー」を追加。4コスト・HP1300・攻撃270・速度52・攻撃間隔1.45秒。頭と体がほぼ1:1の小型バーサーカーで、大剣を掲げて素早く前線へ入ります。',
+    '新ユニット「メガナイト」を追加。7コスト・HP2400・攻撃280・速度40・攻撃間隔1.6秒。通常攻撃は半径48の小範囲攻撃です。',
+    'メガナイトは指定地点へ1.5秒後に上空から落下し、半径48へ420ダメージ。80～160の敵には2秒溜めてジャンプし、着地時も半径48へ420ダメージを与えます。',
+    'ジャンプにクールタイムはありません。最初の2秒溜め中は、より近い敵が出現すると対象を変更します。飛び始めた後は対象を固定し、一度交戦した相手が倒れるまで追跡します。',
+    'カード総数は46枚（41ユニット＋5呪文）。新しい落下・ジャンプ状態同期に伴い physicsVersion を29へ更新しました。'
   ]},
   {version:'23.0.0',date:'2026-09-14',title:'SIEGE SPECIALISTS UPDATE',items:[
     '建物だけを狙う新ユニット5体を追加：スカイボマー、スクラップドリル、クラッシャーオーガ、シージタートル、ボムキャリア。',
@@ -232,6 +224,7 @@ let demoGame=createMatch({seed:48164,bot:true}),demoLast=0,demoAutoAt=0,animatio
 let handSignature='',memberSignature='',lobbyCode='',previousPhase='',soundOn=false,audio=null,toastTimer;
 let serverAvailable=false,apiChecked=false,onlineBusy=false;
 let physicsOverlay=false,rosterBack=false,incompatibleVersion=false,editingDeck=[],deckPresets=[],deckActionId=null,detailCardId=null,detailDemoGame=null,detailDemoLast=0,detailDemoDuration=9,detailDemoScenarioKey='standard',detailDemoEvidence={};
+let deckDrag=null,deckDragClickBlockUntil=0;
 const standalone=!!window.TINY_OFFLINE||location.protocol==='file:';
 function safeStorage(store,key,value){
   try{const storage=store==='session'?window.sessionStorage:window.localStorage;
@@ -250,7 +243,7 @@ function loadDeck(){
   try{const raw=JSON.parse(safeStorage('local','tiny-deck-v21')||safeStorage('local','tiny-deck-v20')||safeStorage('local','tiny-deck-v19')||safeStorage('local','tiny-deck-v18')||safeStorage('local','tiny-deck-v17')||safeStorage('local','tiny-deck-v16')||safeStorage('local','tiny-deck-v15')||safeStorage('local','tiny-deck-v14')||safeStorage('local','tiny-deck-v13')||safeStorage('local','tiny-deck-v12')||safeStorage('local','tiny-deck-v11')||safeStorage('local','tiny-deck-v10')||safeStorage('local','tiny-deck-v9')||safeStorage('local','tiny-deck-v8')||safeStorage('local','tiny-deck-v7')||safeStorage('local','tiny-deck-v6')||safeStorage('local','tiny-deck-v5')||safeStorage('local','tiny-deck-v4')||safeStorage('local','tiny-deck-v3')||'null');return migrateDeck(raw);}catch{return [...DEFAULT_DECK];}
 }
 let playerDeck=loadDeck();
-const MYLIST_KEY='tiny-deck-presets-v23',LEGACY_MYLIST_KEYS=['tiny-deck-presets-v22','tiny-deck-presets-v21','tiny-deck-presets-v20','tiny-deck-presets-v19','tiny-deck-presets-v18','tiny-deck-presets-v17','tiny-deck-presets-v16'],MAX_MYLIST=10;
+const MYLIST_KEY='tiny-deck-presets-v25',LEGACY_MYLIST_KEYS=['tiny-deck-presets-v24','tiny-deck-presets-v23','tiny-deck-presets-v22','tiny-deck-presets-v21','tiny-deck-presets-v20','tiny-deck-presets-v19','tiny-deck-presets-v18','tiny-deck-presets-v17','tiny-deck-presets-v16'],MAX_MYLIST=10;
 function storageFor(store='local'){return store==='session'?window.sessionStorage:window.localStorage;}
 function verifiedStorageWrite(store,key,value){
   try{const storage=storageFor(store);storage.setItem(key,value);return storage.getItem(key)===value;}catch{return false;}
@@ -605,7 +598,7 @@ function makeMiniRoster(container,ids,interactive=false){
   container.replaceChildren();
   for(const id of ids){
     const d=UNITS[id],mini=document.createElement('button');mini.type='button';mini.title=d.name;
-    const mc=document.createElement('canvas');mc.width=120;mc.height=120;mc.dataset.portrait=id;
+    const mc=createPortraitCanvas(id);
     const mn=document.createElement('span');mn.textContent=d.short;mini.append(mc,mn);
     if(interactive)mini.onclick=openDeckEditor;container.append(mini);
   }
@@ -616,7 +609,7 @@ function renderDeckSummaries(){
   if(el('lobbyDeckAverage'))el('lobbyDeckAverage').textContent=`平均 ${formatAverage(playerDeck)}`;
 }
 function createPortraitCanvas(id,size=120){
-  const can=document.createElement('canvas');can.width=size;can.height=size;can.dataset.portrait=id;return can;
+  const can=document.createElement('canvas');can.width=size;can.height=size;can.dataset.portrait=id;can.dataset.portraitMode='deck';return can;
 }
 function setDeckError(text=''){el('deckError').textContent=text;el('deckError').hidden=!text;}
 function updateMyListStatus(text='',error=false){const node=el('myListStatus');if(!node)return;node.textContent=text;node.hidden=!text;node.classList.toggle('error',error);}
@@ -644,13 +637,90 @@ function saveCurrentToMyList(){
   const name=nextPresetName(),preset={id:`preset-${Date.now()}-${Math.random().toString(36).slice(2,7)}`,name,cards:[...editingDeck]};
   if(commitPresetMutation(()=>deckPresets.push(preset),`${name}としてマイリストに保存しました。`)){el('myListPanel').hidden=false;}
 }
+function clearDeckDragVisuals(){
+  document.body.classList.remove('deck-dragging');
+  el('deckSlots')?.classList.remove('drag-active');
+  for(const node of document.querySelectorAll('.deck-slot.drag-over,.deck-choice.drag-source,.deck-slot.drag-source,.deck-choice.drag-armed,.deck-slot.drag-armed'))node.classList.remove('drag-over','drag-source','drag-armed');
+  document.querySelector('.deck-drag-ghost')?.remove();
+}
+function cancelDeckDrag(){
+  if(deckDrag?.holdTimer)clearTimeout(deckDrag.holdTimer);
+  clearDeckDragVisuals();deckDrag=null;
+}
+function deckSlotAtPoint(x,y){
+  const node=document.elementFromPoint(x,y)?.closest?.('.deck-slot');
+  return node&&el('deckSlots')?.contains(node)?node:null;
+}
+function updateDeckDragTarget(x,y){
+  for(const node of el('deckSlots')?.querySelectorAll('.deck-slot.drag-over')||[])node.classList.remove('drag-over');
+  const slot=deckSlotAtPoint(x,y);if(slot)slot.classList.add('drag-over');return slot;
+}
+function moveDeckDragGhost(x,y){if(deckDrag?.ghost){deckDrag.ghost.style.left=`${x}px`;deckDrag.ghost.style.top=`${y}px`;}}
+function beginDeckDrag(){
+  if(!deckDrag||deckDrag.active)return;
+  deckDrag.active=true;deckDrag.source.classList.remove('drag-armed');deckDrag.source.classList.add('drag-source');
+  el('deckSlots')?.classList.add('drag-active');document.body.classList.add('deck-dragging');
+  const ghost=document.createElement('div');ghost.className='deck-drag-ghost';ghost.setAttribute('aria-hidden','true');
+  const can=createPortraitCanvas(deckDrag.cardId,92),label=document.createElement('strong'),cost=document.createElement('span');
+  label.textContent=UNITS[deckDrag.cardId].short;cost.textContent=UNITS[deckDrag.cardId].cost;ghost.append(can,cost,label);document.body.append(ghost);deckDrag.ghost=ghost;
+  moveDeckDragGhost(deckDrag.lastX,deckDrag.lastY);updateDeckDragTarget(deckDrag.lastX,deckDrag.lastY);
+}
+function installDeckDragSource(node,{kind,cardId,slotIndex=null}){
+  node.addEventListener('pointerdown',e=>{
+    if((e.pointerType==='mouse'&&e.button!==0)||deckDrag)return;
+    const touch=e.pointerType==='touch';deckDrag={pointerId:e.pointerId,source:node,kind,cardId,slotIndex,startX:e.clientX,startY:e.clientY,lastX:e.clientX,lastY:e.clientY,touch,armed:!touch,active:false,ghost:null,holdTimer:null};
+    if(touch){deckDrag.holdTimer=setTimeout(()=>{if(deckDrag&&deckDrag.pointerId===e.pointerId&&!deckDrag.active){deckDrag.armed=true;deckDrag.source.classList.add('drag-armed');navigator.vibrate?.(10);}},180);}
+  });
+}
+function swapDeckPositions(from,to){
+  if(from===to||from<0||from>=editingDeck.length)return false;
+  if(to>=editingDeck.length){const [id]=editingDeck.splice(from,1);editingDeck.push(id);return true;}
+  [editingDeck[from],editingDeck[to]]=[editingDeck[to],editingDeck[from]];return true;
+}
+function applyDeckDrop(targetSlot){
+  if(!deckDrag||!targetSlot)return false;const target=Number(targetSlot.dataset.slot);if(!Number.isInteger(target)||target<0||target>=MAX_DECK)return false;
+  const {kind,cardId,slotIndex}=deckDrag;
+  if(kind==='slot'){
+    if(!swapDeckPositions(slotIndex,target))return false;
+    renderDeckEditor();toast('デッキの順番を入れ替えました。');return true;
+  }
+  const existing=editingDeck.indexOf(cardId);
+  if(existing>=0){
+    if(!swapDeckPositions(existing,target))return false;
+    renderDeckEditor();toast(`${UNITS[cardId].short}を${target+1}番へ移動しました。`);return true;
+  }
+  if(target<editingDeck.length){
+    if(editingDeck.length>=MAX_DECK){const old=editingDeck[target];editingDeck[target]=cardId;renderDeckEditor();toast(`${UNITS[old].short} → ${UNITS[cardId].short} に入れ替えました。`);return true;}
+    editingDeck.splice(target,0,cardId);renderDeckEditor();toast(`${UNITS[cardId].short}をデッキに追加しました。`);return true;
+  }
+  if(editingDeck.length<MAX_DECK){editingDeck.push(cardId);renderDeckEditor();toast(`${UNITS[cardId].short}をデッキに追加しました。`);return true;}
+  return false;
+}
+document.addEventListener('pointermove',e=>{
+  if(!deckDrag||e.pointerId!==deckDrag.pointerId)return;deckDrag.lastX=e.clientX;deckDrag.lastY=e.clientY;
+  const dist=Math.hypot(e.clientX-deckDrag.startX,e.clientY-deckDrag.startY);
+  if(!deckDrag.active){
+    if(deckDrag.touch&&!deckDrag.armed){if(dist>9){if(deckDrag.holdTimer)clearTimeout(deckDrag.holdTimer);deckDrag=null;}return;}
+    if(dist>=10)beginDeckDrag();
+  }
+  if(deckDrag?.active){e.preventDefault();moveDeckDragGhost(e.clientX,e.clientY);updateDeckDragTarget(e.clientX,e.clientY);}
+},{passive:false});
+document.addEventListener('pointerup',e=>{
+  if(!deckDrag||e.pointerId!==deckDrag.pointerId)return;
+  if(deckDrag.holdTimer)clearTimeout(deckDrag.holdTimer);
+  if(!deckDrag.active){deckDrag?.source?.classList.remove('drag-armed');deckDrag=null;return;}
+  e.preventDefault();const target=deckSlotAtPoint(e.clientX,e.clientY),state=deckDrag;deckDragClickBlockUntil=performance.now()+100;clearDeckDragVisuals();deckDrag=state;applyDeckDrop(target);deckDrag=null;
+},{passive:false});
+document.addEventListener('pointercancel',e=>{if(deckDrag&&e.pointerId===deckDrag.pointerId)cancelDeckDrag();});
+function deckCardClick(e,id){if(performance.now()<deckDragClickBlockUntil){e.preventDefault();e.stopPropagation();return;}openDeckCardActions(id);}
+
 function renderDeckEditor(){
   el('deckCount').textContent=`${editingDeck.length} / ${MAX_DECK}`;setDeckError('');if(el('deckAverage'))el('deckAverage').textContent=formatAverage(editingDeck);el('deckSaveBtn').disabled=editingDeck.length!==MAX_DECK;
   el('deckSlots').replaceChildren();
   for(let i=0;i<MAX_DECK;i++){
     const id=editingDeck[i],slot=document.createElement('button');slot.type='button';slot.className='deck-slot '+(id?'filled':'empty');slot.dataset.slot=String(i);
     const n=document.createElement('em');n.textContent=String(i+1);slot.append(n);
-    if(id){slot.dataset.card=id;const can=createPortraitCanvas(id);const name=document.createElement('strong');name.textContent=UNITS[id].short;slot.append(can,name);slot.onclick=()=>openDeckCardActions(id);}
+    if(id){slot.dataset.card=id;const can=createPortraitCanvas(id);const name=document.createElement('strong');name.textContent=UNITS[id].short;slot.append(can,name);slot.onclick=e=>deckCardClick(e,id);installDeckDragSource(slot,{kind:'slot',cardId:id,slotIndex:i});}
     el('deckSlots').append(slot);
   }
   el('deckPool').replaceChildren();
@@ -658,13 +728,13 @@ function renderDeckEditor(){
     const d=UNITS[id],selected=editingDeck.includes(id),b=document.createElement('button');b.type='button';b.dataset.card=id;b.className='deck-choice'+(selected?' selected':'');
     const can=createPortraitCanvas(id);const cost=document.createElement('span');cost.className='deck-cost';cost.textContent=d.cost;
     const copy=document.createElement('div');copy.className='deck-copy';const h=document.createElement('h3');h.textContent=d.name;const sm=document.createElement('small');sm.textContent=d.role;copy.append(h,sm);b.append(can,cost,copy);
-    if(selected){const chk=document.createElement('span');chk.className='deck-check';chk.textContent='DECK';b.append(chk);}b.onclick=()=>openDeckCardActions(id);el('deckPool').append(b);
+    if(selected){const chk=document.createElement('span');chk.className='deck-check';chk.textContent='DECK';b.append(chk);}b.onclick=e=>deckCardClick(e,id);installDeckDragSource(b,{kind:'pool',cardId:id});el('deckPool').append(b);
   }
   renderMyList();
 }
 function closeDeckCardActions(){el('deckCardActions').hidden=true;el('deckReplacePanel').hidden=true;deckActionId=null;}
 function refreshDeckAction(id){
-  const d=UNITS[id],inDeck=editingDeck.includes(id);deckActionId=id;el('deckActionName').textContent=d.name;el('deckActionRole').textContent=d.role;el('deckActionCost').textContent=d.cost;drawPortrait(el('deckActionPortrait'),id,performance.now()/1000);
+  const d=UNITS[id],inDeck=editingDeck.includes(id),portrait=el('deckActionPortrait');deckActionId=id;el('deckActionName').textContent=d.name;el('deckActionRole').textContent=d.role;el('deckActionCost').textContent=d.cost;portrait.dataset.portraitMode='deck';drawPortrait(portrait,id,performance.now()/1000);
   el('deckCardToggleBtn').textContent=inDeck?'デッキから外す':editingDeck.length>=MAX_DECK?'入れ替えて追加':'デッキに入れる';el('deckReplacePanel').hidden=true;
 }
 function openDeckCardActions(id){refreshDeckAction(id);el('deckCardActions').hidden=false;}
@@ -699,7 +769,11 @@ function detailStatsFor(d){
   if(d.id==='skybomber')stats.push(['特性','飛行・敵ユニット無視・建物のみ攻撃'],['爆弾','175 / 1.6秒']);
   if(d.id==='scrapdrill')stats.push(['ドリルDPS','90 → 135 → 180 → 240'],['増幅','同一建物へ1.5秒ごと'],['リセット','射程外 / 対象変更 / スタン']);
   if(d.id==='crusherogre')stats.push(['連続打撃','230 → 310 → 390 → 470'],['攻撃間隔','3.0秒'],['リセット','射程外 / 対象変更 / スタン']);
-  if(d.id==='siegeturtle')stats.push(['移動中装甲','遠距離ダメージ40%軽減'],['対象外','近接 / スペル / 継続ダメージ']);
+  if(d.id==='miniberserker')stats.push(['特徴','頭と体が約1:1・大剣を掲げて高速進軍'],['役割','4コストの高火力単体近接']);
+  if(d.id==='megaknight')stats.push(['通常範囲','R48 / 280'],['落下召喚','1.5秒後・R48へ420'],['ジャンプ','距離80〜160 / 準備2秒 / R48へ420'],['対象固定','飛び始めた相手を倒すまで追跡']);
+  if(d.id==='ironeye')stats.push(['マーク','被ダメージ+20%'],['破裂','累計500 → 追加300'],['回転突進','1体につき1回 / 180 / 貫通'],['突進命中','マーク＋2.5秒間30%鈍足']);
+  if(d.id==='tracker')stats.push(['フック','射程180 / 構え0.6秒 / CT4秒'],['地上','敵を近接距離へ引き寄せ'],['空中','引き寄せた対象だけ2秒攻撃可'],['建物','自分が建物へ引き寄せられる']);
+  if(d.id==='siegeturtle')stats.push(['移動中装甲','遠距離ダメージ40%軽減'],['近接反撃','受けた実ダメージの1/3・R54'],['反撃対象外','遠距離 / スペル / 継続ダメージ']);
   if(d.id==='bombcarrier')stats.push(['建物自爆','480'],['死亡時','周囲の敵ユニットへ80'],['移動速度','88']);
   if(d.summonType){const summonLabel=(d.summonOnDeploy?`配置時＋${d.summonInterval}秒ごと`:`${d.summonInterval}秒ごと`)+(d.summonWindup?`（準備${d.summonWindup}秒）`:'')+` ×${d.summonCount}`;stats.push(['召喚',summonLabel]);}
   if(d.spawnType==='blade')stats.push(['編成','前1・後2の3体']);
@@ -783,6 +857,12 @@ function createDetailDemo(id){
     g.towers.forEach(t=>t.range=0);
     const [dragon]=own(id,lane,650),[golem]=enemy('golem',lane,390);demoStageUnit(dragon,lane,635);demoStageUnit(golem,lane,500);if(golem){golem.speed=0;golem.damage=0;}
     label='飛行しながら中距離へ接近 → 同じ敵へ照射し続けて1.5秒ごとに20→40→80…と増幅';scenarioKey='laserdragon-mobile-ramp';duration=11;
+  }else if(id==='ironeye'){
+    g.towers.forEach(t=>t.range=0);const [eye]=own(id,lane,650);demoStageUnit(eye,lane,610);const [guard]=enemy('knight',lane,420);demoStageUnit(guard,lane,500,{cd:99});if(guard){guard.damage=0;guard.speed=0;}const [blade]=enemy('blade',500,420);demoStageUnit(blade,lane,555,{cd:99});if(blade){blade.damage=0;blade.speed=0;}
+    label='通常矢で弱点マーク → 接近した地上敵へ一度きりの隠し刃回転突進 → 貫通した敵へマーク＋鈍足';scenarioKey='iron-eye-mark-spin';duration=9;
+  }else if(id==='tracker'){
+    g.towers.forEach(t=>t.range=0);const [hunter]=own(id,lane,650);demoStageUnit(hunter,lane,620);const [guard]=enemy('knight',lane,420);demoStageUnit(guard,lane,490,{cd:99});if(guard){guard.damage=0;guard.speed=0;}const bats=enemy('bat',485,420);bats.forEach((u,i)=>{demoStageUnit(u,485+i*18,505+i*8,{cd:99});u.damage=0;u.speed=0;});
+    label='射程180のフック → 地上敵を引き寄せ。空中敵を捕まえた場合はその対象だけ2秒間近接攻撃可能';scenarioKey='tracker-hook-control';duration=10;
   }else if(id==='shieldknight'){
     g.towers.forEach(t=>t.range=0);const [shield]=own(id,lane,650),[archer]=enemy('archer',lane,420);demoStageUnit(shield,lane,585);demoStageUnit(archer,lane,430);if(archer){archer.speed=0;archer.damage=100;}
     label='正面からの矢を大盾で受け、65%を盾耐久へ・35%を本体へ分散。盾が割れると通常ダメージ';scenarioKey='shield-front-block';duration=10;
@@ -920,7 +1000,7 @@ for(const dlg of document.querySelectorAll('dialog'))dlg.addEventListener('close
 for(const dlg of document.querySelectorAll('dialog'))dlg.addEventListener('click',e=>{const r=dlg.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dlg.close();});
 for(const id of DECK){
   const d=UNITS[id],card=document.createElement('article');card.className='library-card';
-  const can=document.createElement('canvas');can.width=200;can.height=200;can.dataset.portrait=id;
+  const can=document.createElement('canvas');can.width=200;can.height=200;can.dataset.portrait=id;can.dataset.portraitMode='library';
   const badge=document.createElement('span');badge.className='badge';badge.textContent=d.cost;
   const role=document.createElement('small');role.textContent=d.role;
   const h=document.createElement('h3');h.textContent=d.name;

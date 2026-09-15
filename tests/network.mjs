@@ -24,10 +24,10 @@ async function wait(fn,message){
 let a,b,c,room,other;
 try{
  await check('health and game config identify the correct game',async()=>{
-  const r=await fetch(base+'/api/config'),j=await r.json();assert.equal(j.version,'23.5.0');assert.equal(j.physicsVersion,28);assert.equal(j.cards,44);assert.equal(j.units,39);assert.equal(j.spells,5);assert.equal(j.maxDeck,8);assert.equal(j.game,'tiny-siege');
+  const r=await fetch(base+'/api/config'),j=await r.json();assert.equal(j.version,'25.1.0');assert.equal(j.physicsVersion,31);assert.equal(j.cards,48);assert.equal(j.units,43);assert.equal(j.spells,5);assert.equal(j.maxDeck,8);assert.equal(j.game,'tiny-siege');
  });
  await check('HTML, style and module assets load',async()=>{
-  for(const url of ['/','/app.js','/styles.css','/game/engine.js','/game/art.js','/game/physics.js','/assets/sprites/skybomber.png','/assets/sprites/crusherogre.png','/assets/sprites/archer.png','/assets/sprites/berserker.png']){
+  for(const url of ['/','/app.js','/styles.css','/game/engine.js','/game/art.js','/game/physics.js']){
    const r=await fetch(base+url);assert.equal(r.status,200);
   }
  });
@@ -59,8 +59,8 @@ try{
   await wait(()=>a.last().game.units.some(u=>u.owner===0)&&b.last().game.units.some(u=>u.owner===0),'deployment synchronization');
   const ua=a.last().game.units.find(u=>u.owner===0),ub=b.last().game.units.find(u=>u.id===ua.id);assert.ok(ub);assert.equal(ua.type,ub.type);
  });
- await check('server sends v23 / physics-v28 deployment, facing, summon, stun, charge, mud, burrow, poison, dash, laser and collision metadata identically to both seats',async()=>{
-  const ga=a.last().game,u=ga.units[0];assert.equal(ga.physicsVersion,28);assert.equal(typeof u.facing,'number');assert.equal(typeof u.mass,'number');assert.equal(typeof u.deploying,'boolean');assert.equal(typeof u.targetable,'boolean');assert.equal(typeof u.deployRemaining,'number');assert.equal(typeof u.shieldHp,'number');assert.equal(typeof u.maxShieldHp,'number');assert.equal(typeof u.stealthed,'boolean');assert.equal(typeof u.stealthRemaining,'number');assert.equal(typeof u.eggHatchRemaining,'number');assert.equal(typeof u.revived,'boolean');assert.equal(typeof u.drillStage,'number');assert.equal(typeof u.drillDps,'number');assert.equal(typeof u.drillLockTime,'number');assert.equal(typeof u.crusherStage,'number');assert.equal(typeof u.turtleShellActive,'boolean');
+ await check('server sends v25 / physics-v31 deployment, mark, hook, mega jump, summon, stun, charge, mud, burrow, poison, dash, laser and collision metadata identically to both seats',async()=>{
+  const ga=a.last().game,u=ga.units[0];assert.equal(ga.physicsVersion,31);assert.equal(typeof u.facing,'number');assert.equal(typeof u.mass,'number');assert.equal(typeof u.deploying,'boolean');assert.equal(typeof u.targetable,'boolean');assert.equal(typeof u.deployRemaining,'number');assert.equal(typeof u.shieldHp,'number');assert.equal(typeof u.maxShieldHp,'number');assert.equal(typeof u.stealthed,'boolean');assert.equal(typeof u.stealthRemaining,'number');assert.equal(typeof u.eggHatchRemaining,'number');assert.equal(typeof u.revived,'boolean');assert.equal(typeof u.drillStage,'number');assert.equal(typeof u.drillDps,'number');assert.equal(typeof u.drillLockTime,'number');assert.equal(typeof u.crusherStage,'number');assert.equal(typeof u.turtleShellActive,'boolean');assert.ok(Object.hasOwn(u,'megaJumpState'));assert.equal(typeof u.megaJumpProgress,'number');assert.equal(typeof u.ironSpinUsed,'boolean');assert.ok(Object.hasOwn(u,'ironSpinState'));assert.equal(typeof u.ironMarkProgress,'number');assert.ok(Object.hasOwn(u,'hookState'));assert.equal(typeof u.hookProgress,'number');assert.equal(typeof u.hookCooldownRemaining,'number');assert.equal(typeof u.hookAirAttackRemaining,'number');
   assert.equal(Object.hasOwn(u,'_nav'),false);assert.equal(Object.hasOwn(u,'_stuck'),false);
   const matching=[...b.messages].reverse().find(m=>m.type==='state'&&m.game?.time===ga.time&&m.game.units.some(v=>v.id===u.id));
   assert.ok(matching);assert.deepEqual(matching.game.units.find(v=>v.id===u.id),u);
