@@ -1,17 +1,15 @@
-TINY SIEGE v25.1.0 - DRAG DECK UPDATE
+TINY SIEGE v29.0.0 - LIGHTNING & NECRO UPDATE
 
-1. このフォルダの中身をGitHubリポジトリへ上書きアップロードします。
-2. main へ Commit します。例: Update Tiny Siege Drag Deck to v25.1.0
-3. Cloudflareの自動Build/Deployを待ちます。
-4. /api/config で version 25.1.0 / cards 48 / units 43 / spells 5 / physicsVersion 31 / maxDeck 8 を確認します。
+1. このフォルダをGitHubへ上書きします。
+2. main へ Commit します。例: Update Tiny Siege Lightning Necro to v29.0.0
+3. Cloudflare のデプロイ完了を待ちます。
+4. /api/config で version 29.0.0 / cards 56 / units 50 / spells 6 / physicsVersion 45 / maxDeck 8 を確認します。
 
-v25.1.0確認ポイント
-- カード一覧からデッキ8枠へドラッグして、追加またはその枠との入れ替えができます。
-- デッキ枠同士をドラッグすると順番を入れ替えられます。
-- タップ/クリックは従来どおりカード操作を開きます。
-- PCは約10px移動でドラッグ、スマホは約0.18秒長押ししてから動かすとドラッグになります。
-- ドラッグ中はカード追従表示とドロップ可能枠の強調が出ます。
-- 戦闘ロジックはV25.0のままで physicsVersion 31 を維持します。
-
-オフライン確認は PLAY-OFFLINE.html を直接開いてください。
-更新履歴は UPDATE-HISTORY.html 1枚に統合しています。
+v29.0.0確認ポイント
+- ネクロマンサー: 5コスト / HP839 / 攻撃125 / 攻撃間隔1.1秒。
+- ダークネクロマンサー: 4コスト / HP907 / 攻撃304。
+- ポイズン: 8秒間、ユニット91/秒・建物21/秒。
+- ファイヤーボール: 689 / 159。矢の雨: 366 / 75。
+- ライトニング: 6コスト / R105 / HP上位4体 / ユニット1056 / 建物265。
+- エリクサーゴーレム詳細映像はタワーの実ダメージを受け、分裂時にピンクの破裂演出を表示。
+- physicsVersion 45。

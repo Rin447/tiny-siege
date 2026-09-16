@@ -1,0 +1,31 @@
+{
+  "passed": 25,
+  "checks": [
+    "Deck builder exposes all 56 selectable cards, including Lightning, Healer, Elixir Golem and Royal Giant",
+    "Pool card drag directly replaces a chosen deck slot without opening the tap action sheet",
+    "Deck slots can be dragged onto each other to reorder the eight cards",
+    "Normal click still opens the existing card action sheet after drag support is enabled",
+    "Mini Berserker detail shows 4 cost, HP1390, attack755 and 1.6-second high-power melee role",
+    "Mega Knight detail exposes HP3993, damage263, drop420, jump537 and renders its live demo",
+    "Iron Eye detail shows mark amplification, 500-to-300 burst and one-use piercing spin",
+    "Tracker detail shows 4-second hook cooldown plus ground, air and building hook behavior",
+    "Princess Archer detail shows cost 3, HP 300, attack 275, 3-second fire rate and cross-river range 350",
+    "Sparky detail shows its 1.8s summon delay, then renders through charged-shot replay safely",
+    "Card detail canvas remains healthy after switching away from Sparky",
+    "Zap detail shows cost 2, 225 damage, radius 78, 1.5-second stun and reset mechanics",
+    "V29 Lightning and Poison details expose the new damage, target count and duration",
+    "Elixir Golem detail demo takes real tower damage and exposes the visible split event",
+    "Elekitel Wizard detail shows 4 cost, 135 splash, range 185 and 1-second area stun",
+    "Harpy and Goblin Squad details expose fixed chain damage and thrown-spear range 160",
+    "Laser Dragon detail shows 5 cost, HP1300, flying speed41, range145 and ramping laser",
+    "V22 detail demos expose Shield, Wind, Phoenix, Gravity, Mirage and the three-second Cyclone field",
+    "V23 detail demos expose Sky Bomber, Scrap Drill, Crusher Ogre, Siege Turtle and Bomb Carrier mechanics",
+    "Detail UI exposes Golem 2.5s summon delay and Tigger no-extra-delay exception",
+    "Summoner details show v29 balance and 1.2s/0.9s parent delays while retaining summon intervals",
+    "My List persists the current eight-card deck under the current storage key",
+    "Patch Notes shows v26 Wild Wings update and retained v25-v17 history",
+    "Self-contained HTML starts a playable CPU battle with a four-card hand and visible arena",
+    "No uncaught JavaScript errors in the v26 deck, detail demos, Patch Notes or CPU battle flow"
+  ],
+  "errors": []
+}
