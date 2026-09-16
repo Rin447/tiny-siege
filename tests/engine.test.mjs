@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {ARENA,UNITS,DECK,UNIT_IDS,SPELL_IDS,DEFAULT_DECK,MAX_DECK,normalizeDeck,summonDelayFor} from '../public/game/units.js';
+import {ARENA,UNITS,DECK,UNIT_IDS,SPELL_IDS,DEFAULT_DECK,MAX_DECK,normalizeDeck,summonDelayFor,cardDamageInfo} from '../public/game/units.js';
 import {createMatch,tick,deploy,canPlace,viewMatch,runBot,inRiver,finish,distance} from '../public/game/engine.js';
 function battle(seed=12){const g=createMatch({seed});g.phase='battle';return g;}
 function deckWith(id){return [id,...DECK.filter(k=>k!==id)].slice(0,MAX_DECK);}
@@ -13,59 +13,81 @@ function forceReady(g,u){
 }
 function spawn(g,o,id,x=190,y=o===0?650:390){ready(g,o,id);const before=g.units.length,r=deploy(g,o,id,x,y);assert.ok(r.ok,r.error);const created=g.units.slice(before);created.forEach(u=>forceReady(g,u));return created.at(-1);}
 function advance(g,seconds){for(let i=0;i<Math.round(seconds*10);i++)tick(g,.1);}
-test('forty-eight selectable cards, forty-three unit cards plus five spells, and eight-card deck rule',()=>{
- assert.equal(DECK.length,48);assert.equal(new Set(DECK).size,48);assert.equal(UNIT_IDS.length,43);assert.deepEqual(SPELL_IDS,['fireball','poison','arrowrain','zap','cyclone']);
+test('fifty-six selectable cards, fifty unit cards plus six spells, and eight-card deck rule',()=>{
+ assert.equal(DECK.length,56);assert.equal(new Set(DECK).size,56);assert.equal(UNIT_IDS.length,50);assert.deepEqual(SPELL_IDS,['fireball','poison','arrowrain','lightning','zap','cyclone']);
  assert.equal(MAX_DECK,8);assert.equal(DEFAULT_DECK.length,8);assert.deepEqual(normalizeDeck(DEFAULT_DECK),[...DEFAULT_DECK]);
- for(const id of DECK){const d=UNITS[id];assert.ok(d.cost>=1&&d.damage>0);if(!d.spell)assert.ok(d.hp>0);assert.notEqual(d.hidden,true);}
+ for(const id of DECK){const d=UNITS[id];assert.ok(d.cost>=1);if(!d.spell){assert.ok(d.hp>0);if(id!=='tombstone')assert.ok(d.damage>0);}assert.notEqual(d.hidden,true);}
  assert.equal(DECK.includes('mini_golem'),false);assert.equal(UNITS.mini_golem.hidden,true);
- assert.equal(UNITS.golem.cost,8);assert.equal(UNITS.golem.hp,2850);assert.equal(UNITS.golem.damage,288);assert.equal(UNITS.golem.deathDamage,180);assert.equal(UNITS.golem.splitCount,2);
- assert.equal(UNITS.mini_golem.hp,1050);assert.equal(UNITS.mini_golem.damage,96);assert.equal(UNITS.mini_golem.deathDamage,60);
- assert.equal(UNITS.fireball.cost,4);assert.equal(UNITS.fireball.damage,560);assert.equal(UNITS.fireball.buildingDamage,140);assert.equal(UNITS.fireball.radius,90);
- assert.equal(UNITS.poison.cost,3);assert.equal(UNITS.poison.radius,90);assert.equal(UNITS.poison.zoneDuration,6);assert.equal(UNITS.poison.lingerDuration,3);
- assert.equal(UNITS.arrowrain.cost,3);assert.equal(UNITS.arrowrain.damage,330);assert.equal(UNITS.arrowrain.buildingDamage,80);assert.equal(UNITS.arrowrain.radius,130);
- assert.equal(UNITS.boneswarm.cost,4);assert.equal(UNITS.boneswarm.count,12);assert.equal(UNITS.boneswarm.hp,45);assert.equal(UNITS.boneswarm.damage,42);
- assert.equal(UNITS.bat.cost,2);assert.equal(UNITS.bat.count,4);assert.equal(UNITS.bat.hp,145);assert.equal(UNITS.bat.damage,46);
+ assert.equal(UNITS.golem.cost,8);assert.equal(UNITS.golem.hp,4256);assert.equal(UNITS.golem.damage,260);assert.equal(UNITS.golem.cooldown,2.5);assert.equal(UNITS.golem.deathDamage,260);assert.equal(UNITS.golem.splitCount,2);
+ assert.equal(UNITS.mini_golem.hp,851);assert.equal(UNITS.mini_golem.damage,52);assert.equal(UNITS.mini_golem.cooldown,2.5);assert.equal(UNITS.mini_golem.deathDamage,52);
+ assert.equal(UNITS.fireball.cost,4);assert.equal(UNITS.fireball.damage,689);assert.equal(UNITS.fireball.buildingDamage,159);assert.equal(UNITS.fireball.radius,90);
+ assert.equal(UNITS.poison.name,'ポイズン');assert.equal(UNITS.poison.cost,3);assert.equal(UNITS.poison.radius,90);assert.equal(UNITS.poison.damage,91);assert.equal(UNITS.poison.buildingDamage,21);assert.equal(UNITS.poison.zoneDuration,8);assert.equal(UNITS.poison.tickEvery,1);assert.equal(UNITS.poison.lingerDuration,0);
+ assert.equal(UNITS.arrowrain.cost,3);assert.equal(UNITS.arrowrain.damage,366);assert.equal(UNITS.arrowrain.buildingDamage,75);assert.equal(UNITS.arrowrain.radius,130);
+ assert.equal(UNITS.lightning.cost,6);assert.equal(UNITS.lightning.damage,1056);assert.equal(UNITS.lightning.buildingDamage,265);assert.equal(UNITS.lightning.radius,105);assert.equal(UNITS.lightning.maxTargets,4);
+ assert.equal(UNITS.skeleton.cost,1);assert.equal(UNITS.skeleton.count,3);assert.equal(UNITS.skeleton.hp,81);assert.equal(UNITS.skeleton.damage,81);
+ assert.equal(UNITS.boneswarm.name,'スケルトン部隊');assert.equal(UNITS.boneswarm.cost,4);assert.equal(UNITS.boneswarm.count,15);assert.equal(UNITS.boneswarm.hp,81);assert.equal(UNITS.boneswarm.damage,81);assert.equal(UNITS.boneswarm.spawnType,'skeleton');
+ assert.equal(UNITS.tombstone.cost,3);assert.equal(UNITS.tombstone.hp,530);assert.equal(UNITS.tombstone.damage,0);assert.equal(UNITS.tombstone.decayPerSecond,30);assert.equal(UNITS.tombstone.summonType,'skeleton');assert.equal(UNITS.tombstone.summonCount,2);assert.equal(UNITS.tombstone.summonInterval,4);assert.equal(UNITS.tombstone.summonOnDeploy,true);assert.equal(UNITS.tombstone.deathSummonType,'skeleton');assert.equal(UNITS.tombstone.deathSummonCount,4);
+ assert.equal(UNITS.lumina.name,'ヒーラー');assert.equal(UNITS.lumina.cost,4);assert.equal(UNITS.lumina.hp,1900);assert.equal(UNITS.lumina.damage,120);assert.equal(UNITS.lumina.cooldown,1.75);assert.equal(UNITS.lumina.range,120);assert.equal(UNITS.lumina.healOnHit,110);assert.equal(UNITS.lumina.healOnHitMaxAllies,3);
+ assert.equal(UNITS.elixirgolem.cost,3);assert.equal(UNITS.elixirgolem.hp,1568);assert.equal(UNITS.elixirgolem.damage,254);assert.equal(UNITS.elixirgolem.cooldown,2);assert.equal(UNITS.elixirgolem.buildingOnly,true);assert.equal(UNITS.elixirgolem.splitType,'elixir_golem_mid');assert.equal(UNITS.elixirgolem.enemyEnergyOnDeath,1);
+ assert.equal(UNITS.elixir_golem_mid.hidden,true);assert.equal(UNITS.elixir_golem_mid.hp,784);assert.equal(UNITS.elixir_golem_mid.damage,127);assert.equal(UNITS.elixir_golem_mid.splitType,'elixir_blob');assert.equal(UNITS.elixir_golem_mid.enemyEnergyOnDeath,1);
+ assert.equal(UNITS.elixir_blob.hidden,true);assert.equal(UNITS.elixir_blob.hp,392);assert.equal(UNITS.elixir_blob.damage,64);assert.equal(UNITS.elixir_blob.enemyEnergyOnDeath,.5);
+ assert.equal(UNITS.royalgiant.cost,6);assert.equal(UNITS.royalgiant.hp,3164);assert.equal(UNITS.royalgiant.damage,307);assert.equal(UNITS.royalgiant.cooldown,1.8);assert.equal(UNITS.royalgiant.range,165);assert.equal(UNITS.royalgiant.speed,27);assert.equal(UNITS.royalgiant.buildingOnly,true);assert.equal(UNITS.royalgiant.projectile,'royal_shell');
+ assert.equal(UNITS.bat.name,'コウモリの群れ');assert.equal(UNITS.bat.cost,2);assert.equal(UNITS.bat.count,5);assert.equal(UNITS.bat.hp,92);assert.equal(UNITS.bat.damage,82);assert.equal(UNITS.bat.cooldown,1.2);
  assert.equal(UNITS.nightshade.cost,3);assert.equal(UNITS.nightshade.hp,520);assert.equal(UNITS.nightshade.damage,228);assert.equal(UNITS.nightshade.dashMultiplier,2);assert.equal(UNITS.nightshade.aggroRange,105);assert.equal(UNITS.nightshade.dashAggroRange,105);
  assert.equal(UNITS.blade.cost,2);assert.equal(UNITS.blade.hp,780);assert.equal(UNITS.blade.damage,112);
- assert.equal(UNITS.knight.cost,3);assert.equal(UNITS.knight.hp,1850);assert.equal(UNITS.knight.damage,98);
- assert.equal(UNITS.berserker.cost,7);assert.equal(UNITS.berserker.hp,2450);assert.equal(UNITS.berserker.damage,465);assert.equal(UNITS.berserker.targetsAir,false);assert.ok(UNITS.berserker.mass>UNITS.knight.mass);
- assert.equal(UNITS.miniberserker.cost,4);assert.equal(UNITS.miniberserker.hp,1300);assert.equal(UNITS.miniberserker.damage,270);assert.equal(UNITS.miniberserker.speed,52);assert.equal(UNITS.miniberserker.cooldown,1.45);
- assert.equal(UNITS.megaknight.cost,7);assert.equal(UNITS.megaknight.hp,2400);assert.equal(UNITS.megaknight.damage,280);assert.equal(UNITS.megaknight.meleeSplash,48);assert.equal(UNITS.megaknight.dropDamage,420);assert.equal(UNITS.megaknight.jumpDamage,420);assert.equal(UNITS.megaknight.jumpWindup,2);assert.equal(UNITS.megaknight.jumpMinRange,80);assert.equal(UNITS.megaknight.jumpMaxRange,160);assert.equal(UNITS.megaknight.jumpTravelTime,1.5);
+ assert.equal(UNITS.knight.cost,3);assert.equal(UNITS.knight.hp,1850);assert.equal(UNITS.knight.damage,202);
+ assert.equal(UNITS.archer.cost,3);assert.equal(UNITS.archer.count,2);assert.equal(UNITS.archer.hp,304);assert.equal(UNITS.archer.damage,112);assert.equal(UNITS.archer.range,165);assert.equal(UNITS.archer.radius,12);assert.equal(UNITS.archer.targetsAir,true);
+ assert.equal(UNITS.berserker.cost,7);assert.equal(UNITS.berserker.hp,3760);assert.equal(UNITS.berserker.damage,842);assert.equal(UNITS.berserker.targetsAir,false);assert.ok(UNITS.berserker.mass>UNITS.knight.mass);
+ assert.equal(UNITS.miniberserker.cost,4);assert.equal(UNITS.miniberserker.hp,1390);assert.equal(UNITS.miniberserker.damage,755);assert.equal(UNITS.miniberserker.speed,46);assert.equal(UNITS.miniberserker.cooldown,1.6);
+ assert.equal(UNITS.megaknight.cost,7);assert.equal(UNITS.megaknight.hp,3993);assert.equal(UNITS.megaknight.damage,263);assert.equal(UNITS.megaknight.meleeSplash,48);assert.equal(UNITS.megaknight.dropDamage,420);assert.equal(UNITS.megaknight.jumpDamage,537);assert.equal(UNITS.megaknight.jumpWindup,2);assert.equal(UNITS.megaknight.jumpMinRange,80);assert.equal(UNITS.megaknight.jumpMaxRange,160);assert.equal(UNITS.megaknight.jumpTravelTime,1.5);
  assert.equal(UNITS.ironeye.cost,4);assert.equal(UNITS.ironeye.hp,750);assert.equal(UNITS.ironeye.damage,125);assert.equal(UNITS.ironeye.range,160);assert.equal(UNITS.ironeye.markDamageBonus,.20);assert.equal(UNITS.ironeye.markThreshold,500);assert.equal(UNITS.ironeye.markBurstDamage,300);assert.equal(UNITS.ironeye.spinDamage,180);assert.equal(UNITS.ironeye.spinSlowMove,.70);assert.equal(UNITS.ironeye.spinSlowDuration,2.5);
  assert.equal(UNITS.tracker.cost,6);assert.equal(UNITS.tracker.hp,1900);assert.equal(UNITS.tracker.damage,220);assert.equal(UNITS.tracker.hookRange,180);assert.equal(UNITS.tracker.hookWindup,.6);assert.equal(UNITS.tracker.hookCooldown,4);assert.equal(UNITS.tracker.hookAirAttackDuration,2);
- assert.equal(UNITS.cannon.cost,3);assert.equal(UNITS.cannon.hp,1080);assert.equal(UNITS.cannon.decayPerSecond,30);assert.equal('lifetime' in UNITS.cannon,false);
+ assert.equal(UNITS.valkyrie.cost,4);assert.equal(UNITS.valkyrie.hp,2200);assert.equal(UNITS.valkyrie.damage,260);assert.equal(UNITS.valkyrie.speed,34);assert.equal(UNITS.valkyrie.cooldown,1.45);assert.equal(UNITS.valkyrie.meleeSplash,50);assert.equal(UNITS.valkyrie.valkyrieSpin,true);
+ assert.equal(UNITS.gargoyle.cost,3);assert.equal(UNITS.gargoyle.count,3);assert.equal(UNITS.gargoyle.hp,230);assert.equal(UNITS.gargoyle.damage,102);assert.equal(UNITS.gargoyle.speed,69);assert.equal(UNITS.gargoyle.range,45);assert.equal(UNITS.gargoyle.air,true);assert.equal(UNITS.gargoyle.targetsAir,true);
+ assert.equal(UNITS.gargoyleswarm.cost,5);assert.equal(UNITS.gargoyleswarm.count,6);assert.equal(UNITS.gargoyleswarm.spawnType,'gargoyle');
+ assert.equal(UNITS.cannon.name,'大砲');assert.equal(UNITS.cannon.cost,3);assert.equal(UNITS.cannon.hp,1000);assert.equal(UNITS.cannon.damage,200);assert.equal(UNITS.cannon.cooldown,1);assert.equal(UNITS.cannon.decayPerSecond,30);assert.equal('lifetime' in UNITS.cannon,false);
+ assert.equal(UNITS.bomber.name,'ボンバー');assert.equal(UNITS.bomber.cost,2);assert.equal(UNITS.bomber.damage,174);assert.equal(UNITS.bomber.projectile,'bomb');assert.equal(UNITS.bomber.splash,66);
  assert.equal(UNITS.tigger.cost,3);assert.equal(UNITS.tigger.hp,1100);assert.equal(UNITS.tigger.damage,120);assert.equal(UNITS.tigger.structureDamage,70);assert.equal(UNITS.tigger.cooldown,1.1);assert.equal(UNITS.tigger.tunnelAnywhere,true);assert.equal(UNITS.tigger.burrowMin,.9);assert.equal(UNITS.tigger.burrowMax,2.8);
  assert.equal(UNITS.muddragon.cost,5);assert.equal(UNITS.muddragon.hp,1600);assert.equal(UNITS.muddragon.damage,200);assert.equal(UNITS.muddragon.range,78);assert.equal(UNITS.muddragon.splash,45);assert.equal(UNITS.muddragon.mudDuration,2);assert.equal(UNITS.muddragon.mudDamage,30);
  assert.equal(UNITS.blowdart.cost,3);assert.equal(UNITS.blowdart.hp,240);assert.equal(UNITS.blowdart.damage,110);assert.equal(UNITS.blowdart.cooldown,.5);assert.equal(UNITS.blowdart.range,195);assert.equal(UNITS.blowdart.targetsAir,true);
  assert.equal(UNITS.lasertower.cost,5);assert.equal(UNITS.lasertower.hp,2000);assert.equal(UNITS.lasertower.laserTower,true);assert.equal(UNITS.lasertower.laserBaseDps,20);assert.equal(UNITS.lasertower.laserRampEvery,1.5);assert.equal(UNITS.lasertower.targetsAir,true);
- assert.equal(UNITS.laserdragon.cost,5);assert.equal(UNITS.laserdragon.hp,1300);assert.equal(UNITS.laserdragon.air,true);assert.equal(UNITS.laserdragon.targetsAir,true);assert.equal(UNITS.laserdragon.speed,46);assert.equal(UNITS.laserdragon.range,145);assert.equal(UNITS.laserdragon.laserUnit,true);assert.equal(UNITS.laserdragon.laserBaseDps,20);assert.equal(UNITS.laserdragon.laserRampEvery,1.5);
+ assert.equal(UNITS.laserdragon.cost,5);assert.equal(UNITS.laserdragon.hp,1300);assert.equal(UNITS.laserdragon.air,true);assert.equal(UNITS.laserdragon.targetsAir,true);assert.equal(UNITS.laserdragon.speed,41);assert.equal(UNITS.laserdragon.range,145);assert.equal(UNITS.laserdragon.laserUnit,true);assert.equal(UNITS.laserdragon.laserBaseDps,20);assert.equal(UNITS.laserdragon.laserRampEvery,1.5);
  assert.equal(UNITS.shieldknight.cost,4);assert.equal(UNITS.shieldknight.hp,1400);assert.equal(UNITS.shieldknight.shieldMax,650);assert.equal(UNITS.shieldknight.shieldAbsorb,.65);assert.equal(UNITS.shieldknight.shieldArcDeg,120);
  assert.equal(UNITS.windmage.cost,4);assert.equal(UNITS.windmage.damage,95);assert.equal(UNITS.windmage.range,175);assert.equal(UNITS.windmage.knockback,true);assert.equal(UNITS.windmage.targetsAir,true);
  assert.equal(UNITS.phoenix.cost,5);assert.equal(UNITS.phoenix.hp,900);assert.equal(UNITS.phoenix.phoenixRevive,true);assert.equal(UNITS.phoenix_egg.hidden,true);assert.equal(UNITS.phoenix_egg.hp,600);assert.equal(UNITS.phoenix_egg.eggHatchTime,4);
  assert.equal(UNITS.gravityorb.cost,4);assert.equal(UNITS.gravityorb.damage,60);assert.equal(UNITS.gravityorb.splash,60);assert.equal(UNITS.gravityorb.gravityPull,true);
  assert.equal(UNITS.mirage.cost,3);assert.equal(UNITS.mirage.hp,500);assert.equal(UNITS.mirage.damage,190);assert.equal(UNITS.mirage.stealthDuration,3);assert.equal(UNITS.mirage.stealthFirstMultiplier,1.4);
  assert.equal(UNITS.cyclone.cost,3);assert.equal(UNITS.cyclone.radius,130);assert.equal(UNITS.cyclone.zoneDuration,3);assert.equal(UNITS.cyclone.outerDps,10);assert.equal(UNITS.cyclone.midDps,20);assert.equal(UNITS.cyclone.innerDps,35);
- assert.equal(UNITS.skybomber.cost,4);assert.equal(UNITS.skybomber.hp,720);assert.equal(UNITS.skybomber.damage,175);assert.equal(UNITS.skybomber.speed,58);assert.equal(UNITS.skybomber.range,75);assert.equal(UNITS.skybomber.cooldown,1.6);assert.equal(UNITS.skybomber.air,true);assert.equal(UNITS.skybomber.buildingOnly,true);
+ assert.equal(UNITS.skybomber.cost,4);assert.equal(UNITS.skybomber.hp,650);assert.equal(UNITS.skybomber.damage,175);assert.equal(UNITS.skybomber.speed,51);assert.equal(UNITS.skybomber.range,75);assert.equal(UNITS.skybomber.cooldown,1.6);assert.equal(UNITS.skybomber.air,true);assert.equal(UNITS.skybomber.targetsAir,true);assert.equal(UNITS.skybomber.buildingOnly,undefined);
  assert.equal(UNITS.scrapdrill.cost,4);assert.equal(UNITS.scrapdrill.hp,900);assert.equal(UNITS.scrapdrill.drillUnit,true);assert.deepEqual(UNITS.scrapdrill.drillDpsStages,[90,135,180,240]);assert.equal(UNITS.scrapdrill.drillRampEvery,1.5);
  assert.equal(UNITS.crusherogre.cost,6);assert.equal(UNITS.crusherogre.hp,2200);assert.equal(UNITS.crusherogre.cooldown,3);assert.equal(UNITS.crusherogre.crusherRamp,true);assert.deepEqual(UNITS.crusherogre.crusherDamages,[230,310,390,470]);
  assert.equal(UNITS.siegeturtle.cost,5);assert.equal(UNITS.siegeturtle.hp,2050);assert.equal(UNITS.siegeturtle.damage,220);assert.equal(UNITS.siegeturtle.siegeTurtle,true);assert.equal(UNITS.siegeturtle.movingRangedReduction,.40);
- assert.equal(UNITS.bombcarrier.cost,3);assert.equal(UNITS.bombcarrier.hp,430);assert.equal(UNITS.bombcarrier.speed,88);assert.equal(UNITS.bombcarrier.suicideUnit,true);assert.equal(UNITS.bombcarrier.suicideDamage,480);assert.equal(UNITS.bombcarrier.carrierDeathDamage,80);
- assert.equal(UNITS.necromancer.cost,6);assert.equal(UNITS.necromancer.hp,1350);assert.equal(UNITS.necromancer.damage,125);assert.equal(UNITS.necromancer.targetsAir,true);assert.equal(UNITS.necromancer.splash,45);assert.equal(UNITS.necromancer.summonType,'boneswarm');assert.equal(UNITS.necromancer.summonCount,3);assert.equal(UNITS.necromancer.summonInterval,7.5);assert.equal(UNITS.necromancer.summonOnDeploy,true);
- assert.equal(UNITS.darknecro.cost,5);assert.equal(UNITS.darknecro.hp,1150);assert.equal(UNITS.darknecro.damage,165);assert.equal(UNITS.darknecro.targetsAir,false);assert.equal(UNITS.darknecro.summonType,'bat');assert.equal(UNITS.darknecro.summonCount,2);assert.equal(UNITS.darknecro.summonInterval,6.5);assert.equal(UNITS.darknecro.range,34);assert.equal(UNITS.darknecro.projectile,undefined);assert.equal(UNITS.darknecro.summonOnDeploy,true);
+ assert.equal(UNITS.bombcarrier.cost,3);assert.equal(UNITS.bombcarrier.hp,430);assert.equal(UNITS.bombcarrier.speed,79);assert.equal(UNITS.bombcarrier.suicideUnit,true);assert.equal(UNITS.bombcarrier.suicideDamage,480);assert.equal(UNITS.bombcarrier.carrierDeathDamage,80);
+ assert.equal(UNITS.necromancer.cost,5);assert.equal(UNITS.necromancer.hp,839);assert.equal(UNITS.necromancer.damage,125);assert.equal(UNITS.necromancer.cooldown,1.1);assert.equal(UNITS.necromancer.targetsAir,true);assert.equal(UNITS.necromancer.splash,45);assert.equal(UNITS.necromancer.summonType,'skeleton');assert.equal(UNITS.necromancer.summonCount,3);assert.equal(UNITS.necromancer.summonInterval,7.5);assert.equal(UNITS.necromancer.summonOnDeploy,true);
+ assert.equal(UNITS.darknecro.cost,4);assert.equal(UNITS.darknecro.hp,907);assert.equal(UNITS.darknecro.damage,304);assert.equal(UNITS.darknecro.targetsAir,false);assert.equal(UNITS.darknecro.summonType,'bat');assert.equal(UNITS.darknecro.summonCount,2);assert.equal(UNITS.darknecro.summonInterval,6.5);assert.equal(UNITS.darknecro.range,34);assert.equal(UNITS.darknecro.projectile,undefined);assert.equal(UNITS.darknecro.summonOnDeploy,true);
  assert.equal(UNITS.ashsquad.cost,5);assert.equal(UNITS.ashsquad.count,3);assert.equal(UNITS.ashsquad.spawnType,'blade');
- assert.equal(UNITS.archer.cost,2);assert.equal(UNITS.mage.cost,3);assert.equal(UNITS.berserker.cooldown,1.8);
+ assert.equal(UNITS.archer.cost,3);assert.equal(UNITS.mage.cost,3);assert.equal(UNITS.berserker.cooldown,1.8);
  assert.equal(UNITS.princess.cost,3);assert.equal(UNITS.princess.hp,300);assert.equal(UNITS.princess.damage,275);assert.equal(UNITS.princess.cooldown,3);assert.equal(UNITS.princess.range,350);assert.equal(UNITS.princess.splash,70);assert.equal(UNITS.princess.targetsAir,true);
  assert.equal(UNITS.zap.cost,2);assert.equal(UNITS.zap.damage,225);assert.equal(UNITS.zap.stunDuration,1.5);assert.equal(UNITS.zap.radius,78);
- assert.equal(UNITS.boar.damage,160);
+ assert.equal(UNITS.boar.hp,1696);assert.equal(UNITS.boar.damage,318);assert.equal(UNITS.boar.cooldown,1.6);assert.equal(UNITS.boar.riverJumper,true);assert.equal(UNITS.boar.riverJumpTravelTime,.85);
  assert.equal(UNITS.frost.cost,3);assert.equal(UNITS.frost.splash,38);assert.deepEqual(UNITS.frost.slowMoveStages,[.8,.65,.5]);assert.deepEqual(UNITS.frost.slowAttackStages,[.9,.8,.7]);
  assert.equal(UNITS.harpy.damage,180);assert.equal(UNITS.harpy.cooldown,2);assert.deepEqual(UNITS.harpy.chainDamages,[180,130,90]);assert.equal(UNITS.harpy.stunDuration,1);
  assert.equal(UNITS.mossling.name,'ゴブリン部隊');assert.deepEqual(UNITS.mossling.spawnTypes,['goblin_melee','goblin_melee','goblin_melee','goblin_spear','goblin_spear']);
  assert.equal(UNITS.goblin_melee.hidden,true);assert.equal(UNITS.goblin_melee.damage,65);assert.equal(UNITS.goblin_melee.targetsAir,false);
- assert.equal(UNITS.goblin_spear.hidden,true);assert.equal(UNITS.goblin_spear.hp,155);assert.equal(UNITS.goblin_spear.damage,45);assert.equal(UNITS.goblin_spear.speed,72);assert.equal(UNITS.goblin_spear.cooldown,.8);assert.equal(UNITS.goblin_spear.range,160);assert.equal(UNITS.goblin_spear.projectile,'thrown_spear');assert.equal(UNITS.goblin_spear.targetsAir,true);assert.ok(UNITS.goblin_spear.range<UNITS.archer.range&&UNITS.goblin_spear.range>UNITS.muddragon.range);
+ assert.equal(UNITS.goblin_spear.hidden,true);assert.equal(UNITS.goblin_spear.hp,155);assert.equal(UNITS.goblin_spear.damage,45);assert.equal(UNITS.goblin_spear.speed,64);assert.equal(UNITS.goblin_spear.cooldown,.8);assert.equal(UNITS.goblin_spear.range,160);assert.equal(UNITS.goblin_spear.projectile,'thrown_spear');assert.equal(UNITS.goblin_spear.targetsAir,true);assert.ok(UNITS.goblin_spear.range<UNITS.archer.range&&UNITS.goblin_spear.range>UNITS.muddragon.range);
  assert.equal(UNITS.electrowizard.cost,4);assert.equal(UNITS.electrowizard.hp,650);assert.equal(UNITS.electrowizard.damage,135);assert.equal(UNITS.electrowizard.range,185);assert.equal(UNITS.electrowizard.cooldown,2.4);assert.equal(UNITS.electrowizard.splash,35);assert.equal(UNITS.electrowizard.stunDuration,1);assert.equal(UNITS.electrowizard.targetsAir,true);
- assert.equal(UNITS.dosranboss.cost,6);assert.equal(UNITS.dosranboss.hp,1100);assert.equal(UNITS.dosranboss.damage,170);assert.equal(UNITS.dosranboss.speed,40);assert.equal(UNITS.dosranboss.summonOnDeploy,true);assert.equal(UNITS.dosranboss.summonCount,3);assert.equal(UNITS.dosranboss.summonInterval,10);assert.equal(UNITS.dosranboss.summonWindup,3);
+ assert.equal(UNITS.dosranboss.cost,6);assert.equal(UNITS.dosranboss.hp,1100);assert.equal(UNITS.dosranboss.damage,170);assert.equal(UNITS.dosranboss.speed,36);assert.equal(UNITS.dosranboss.summonOnDeploy,true);assert.equal(UNITS.dosranboss.summonCount,3);assert.equal(UNITS.dosranboss.summonInterval,10);assert.equal(UNITS.dosranboss.summonWindup,3);
  assert.equal(UNITS.ranbos.hidden,true);assert.equal(UNITS.ranbos.hp,360);assert.equal(UNITS.ranbos.damage,58);
  assert.equal(UNITS.sparky.cost,6);assert.equal(UNITS.sparky.hp,1500);assert.equal(UNITS.sparky.damage,1200);assert.equal(UNITS.sparky.range,145);assert.equal(UNITS.sparky.splash,90);assert.equal(UNITS.sparky.sparkChargeTime,3.5);assert.equal(UNITS.sparky.targetsAir,false);
+});
+test('battle-card damage info separates unit and tower damage',()=>{
+ assert.deepEqual(cardDamageInfo(UNITS.blade),{unit:'112',tower:'112'});
+ assert.deepEqual(cardDamageInfo(UNITS.tigger),{unit:'120',tower:'70'});
+ assert.deepEqual(cardDamageInfo(UNITS.fireball),{unit:'689',tower:'159'});
+ assert.deepEqual(cardDamageInfo(UNITS.arrowrain),{unit:'366',tower:'75'});
+ assert.deepEqual(cardDamageInfo(UNITS.poison),{unit:'91 / 1秒',tower:'21 / 1秒'});
+ assert.deepEqual(cardDamageInfo(UNITS.lightning),{unit:'1056',tower:'265'});
+ assert.deepEqual(cardDamageInfo(UNITS.cyclone),{unit:'10〜35 DPS',tower:'0'});
 });
 for(const id of DECK)test(`deploy ${id}: energy, count, card rotation`,()=>{
  const g=battle();ready(g,0,id);const next=g.players[0].queue[0],r=deploy(g,0,id,190,650);
@@ -73,21 +95,21 @@ for(const id of DECK)test(`deploy ${id}: energy, count, card rotation`,()=>{
  assert.equal(g.players[0].hand[0],next);assert.equal(g.players[0].queue.at(-1),id);
  assert.equal(new Set([...g.players[0].hand,...g.players[0].queue]).size,MAX_DECK);
 });
-test('necromancer summons three bones when its 1.5s deployment completes and three more every 7.5 seconds',()=>{
+test('necromancer summons three skeletons when its 1.2s deployment completes and three more every 7.5 seconds',()=>{
  const g=battle();ready(g,0,'necromancer');const r=deploy(g,0,'necromancer',190,650);assert.ok(r.ok,r.error);
- const necro=g.units.find(u=>u.type==='necromancer');assert.ok(necro);assert.equal(g.units.filter(u=>u.type==='boneswarm'&&u.owner===0).length,0);assert.equal(necro.deployRemaining,1.5);g.towers.forEach(t=>t.range=0);
- advance(g,1.4);assert.equal(g.units.filter(u=>u.type==='boneswarm'&&u.owner===0).length,0);
- advance(g,.2);assert.equal(g.units.filter(u=>u.type==='boneswarm'&&u.owner===0).length,3);assert.equal(necro.targetable,true);assert.ok(necro.summonNextAt>=9.0-1e-8);
- advance(g,7.4);assert.equal(g.units.filter(u=>u.type==='boneswarm'&&u.owner===0).length,6);
+ const necro=g.units.find(u=>u.type==='necromancer');assert.ok(necro);assert.equal(g.units.filter(u=>u.type==='skeleton'&&u.owner===0).length,0);assert.equal(necro.deployRemaining,1.2);g.towers.forEach(t=>t.range=0);
+ advance(g,1.1);assert.equal(g.units.filter(u=>u.type==='skeleton'&&u.owner===0).length,0);
+ advance(g,.2);assert.equal(g.units.filter(u=>u.type==='skeleton'&&u.owner===0).length,3);assert.equal(necro.targetable,true);assert.ok(necro.summonNextAt>=8.7-1e-8);
+ advance(g,7.5);assert.equal(g.units.filter(u=>u.type==='skeleton'&&u.owner===0).length,6);
 });
-test('dark necromancer summons two bats when its 1.2s deployment completes and then every 6.5 seconds',()=>{
+test('dark necromancer summons two bats when its 0.9s deployment completes and then every 6.5 seconds',()=>{
  const g=battle();ready(g,0,'darknecro');const r=deploy(g,0,'darknecro',190,650);assert.ok(r.ok,r.error);
- const dark=g.units.find(u=>u.type==='darknecro');assert.ok(dark);assert.equal(g.units.filter(u=>u.type==='bat'&&u.owner===0).length,0);assert.equal(dark.deployRemaining,1.2);
- g.towers.forEach(t=>t.range=0);advance(g,1.2);assert.equal(g.units.filter(u=>u.type==='bat'&&u.owner===0).length,2);advance(g,6.5);assert.equal(g.units.filter(u=>u.type==='bat'&&u.owner===0).length,4);
+ const dark=g.units.find(u=>u.type==='darknecro');assert.ok(dark);assert.equal(g.units.filter(u=>u.type==='bat'&&u.owner===0).length,0);assert.equal(dark.deployRemaining,.9);
+ g.towers.forEach(t=>t.range=0);advance(g,.9);assert.equal(g.units.filter(u=>u.type==='bat'&&u.owner===0).length,2);advance(g,6.5);assert.equal(g.units.filter(u=>u.type==='bat'&&u.owner===0).length,4);
 });
 test('dead summoners never create another periodic wave after their deployment summon',()=>{
- const g=battle();ready(g,0,'necromancer');deploy(g,0,'necromancer',190,650);g.towers.forEach(t=>t.range=0);const necro=g.units.find(u=>u.type==='necromancer');advance(g,1.6);assert.equal(g.units.filter(u=>u.type==='boneswarm'&&u.owner===0).length,3);necro.hp=0;advance(g,8);
- assert.equal(g.units.filter(u=>u.type==='boneswarm'&&u.owner===0).length,3);
+ const g=battle();ready(g,0,'necromancer');deploy(g,0,'necromancer',190,650);g.towers.forEach(t=>t.range=0);const necro=g.units.find(u=>u.type==='necromancer');advance(g,1.6);assert.equal(g.units.filter(u=>u.type==='skeleton'&&u.owner===0).length,3);necro.hp=0;advance(g,8);
+ assert.equal(g.units.filter(u=>u.type==='skeleton'&&u.owner===0).length,3);
 });
 test('summoner deployment reserves room for the full guaranteed first summon wave',()=>{
  const g=battle();ready(g,0,'necromancer');g.units=Array.from({length:ARENA.maxUnits-3},(_,i)=>({id:`dummy${i}`,hp:1,owner:1,air:false,radius:1,x:680,y:60}));
@@ -102,12 +124,18 @@ test('ash squad spends one card but creates three ordinary ash swordsmen in fron
  }
 });
 
+test('leaf archer deploys two smaller archers side-by-side',()=>{
+ const g=battle();ready(g,0,'archer');const before=g.units.length,r=deploy(g,0,'archer',300,650);assert.ok(r.ok,r.error);
+ const pair=g.units.slice(before);assert.equal(pair.length,2);assert.ok(pair.every(u=>u.type==='archer'&&u.hp===304&&u.damage===112&&u.radius===12));
+ assert.ok(Math.abs(pair[0].y-pair[1].y)<.01);assert.ok(Math.abs(pair[0].x-pair[1].x)>=pair[0].radius+pair[1].radius);
+});
+
 test('countdown blocks deployments and becomes battle after three seconds',()=>{
  const g=createMatch();assert.equal(deploy(g,0,g.players[0].hand[0],100,660).ok,false);advance(g,3);assert.equal(g.phase,'battle');
 });
-test('tower HP and dormant core rules remain unchanged in v16',()=>{
+test('v26.5 tower HP, damage and dormant core rules use the new balance',()=>{
  const g=battle();
- for(const t of g.towers){assert.equal(t.maxHp,t.kind==='core'?3240:1980);assert.equal(t.hp,t.maxHp);if(t.kind==='core')assert.equal(t.awake,false);}
+ for(const t of g.towers){assert.equal(t.maxHp,t.kind==='core'?4560:3200);assert.equal(t.hp,t.maxHp);assert.equal(t.damage,t.kind==='core'?85:105);if(t.kind==='core')assert.equal(t.awake,false);}
 });
 test('one destroyed side tower advances that lane plus a narrow centre connector',()=>{
  const g=battle();ready(g,0,'blade');
@@ -162,7 +190,7 @@ test('zap stuns and resets targets, laser ramp, and sparky charge',()=>{
 
 test('summon delay scales by cost, with golem and sparky overrides and tigger exception',()=>{
  assert.equal(summonDelayFor(UNITS.blade),.5);assert.equal(summonDelayFor(UNITS.knight),.7);assert.equal(summonDelayFor(UNITS.boar),.9);
- assert.equal(summonDelayFor(UNITS.muddragon),1.2);assert.equal(summonDelayFor(UNITS.necromancer),1.5);assert.equal(summonDelayFor(UNITS.berserker),1.8);
+ assert.equal(summonDelayFor(UNITS.muddragon),1.2);assert.equal(summonDelayFor(UNITS.necromancer),1.2);assert.equal(summonDelayFor(UNITS.berserker),1.8);
  assert.equal(summonDelayFor(UNITS.golem),2.5);assert.equal(summonDelayFor(UNITS.sparky),1.8);assert.equal(summonDelayFor(UNITS.tigger),0);
 });
 test('directly deployed units are untargetable, damage-immune and collision-disabled until summon completes',()=>{
@@ -208,7 +236,7 @@ test('flying bats are permitted over the river',()=>{
 });
 test('cannon stays fixed while its HP decays by 30 per second until it collapses',()=>{
  const g=battle();const u=spawn(g,0,'cannon',100,650),startHp=u.hp;advance(g,10);assert.equal(u.x,100);assert.equal(u.y,650);
- assert.ok(u.hp<startHp&&u.hp>0);assert.ok(Math.abs(u.hp-780)<4,`unexpected hp ${u.hp}`);
+ assert.ok(u.hp<startHp&&u.hp>0);assert.ok(Math.abs(u.hp-700)<4,`unexpected hp ${u.hp}`);
  advance(g,27);assert.equal(g.units.some(x=>x.id===u.id),false);
 });
 test('ground-only attacker cannot damage a bat',()=>{
@@ -232,7 +260,7 @@ test('kragg berserker is a slow heavy ground attacker with high single-target da
  const a=spawn(g,0,'berserker',190,650),b=spawn(g,1,'knight',190,390);a.spawn=b.spawn=0;a.x=190;a.y=600;b.x=190;b.y=555;b.speed=0;b.damage=0;
  g.units=g.units.filter(u=>u.id===a.id||u.id===b.id);const hp=b.hp;advance(g,1.7);
  assert.ok(b.hp<=hp-UNITS.berserker.damage,`expected at least ${UNITS.berserker.damage} damage, got ${hp-b.hp}`);
- assert.equal(a.speed,32);assert.equal(a.air,false);
+ assert.equal(a.speed,28);assert.equal(a.air,false);
 });
 
 test('stone golem ignores enemy troops and damages structures only',()=>{
@@ -258,6 +286,12 @@ test('iron boar earns charge by running toward a building',()=>{
  const g=battle();g.towers.forEach(t=>{t.damage=0;});const boar=spawn(g,0,'boar',190,650);boar.spawn=0;
  for(let i=0;i<40&&!boar.charged;i++)tick(g,.1);
  assert.equal(boar.charged,true);assert.ok(boar.chargeRun>=UNITS.boar.chargeDistance);
+});
+test('iron boar near the river jumps directly across away from bridge lanes',()=>{
+ const g=battle();g.towers.forEach(t=>{t.range=0;t.damage=0;});const boar=spawn(g,0,'boar',360,650);Object.assign(boar,{x:360,y:600,spawn:0,deploying:false,targetable:true,collisionDisabled:false});
+ tick(g,.1);assert.equal(boar.riverJumpState,'leap');assert.ok(Math.abs(boar.riverJumpEndX-360)<80,'jump should stay near the spawn x instead of detouring to a bridge');
+ advance(g,.9);assert.equal(boar.riverJumpState,null);assert.ok(boar.y<ARENA.riverTop,'boar should land on the far bank');assert.ok(Math.abs(boar.x-360)<100);
+ const snap=viewMatch(g,0).units.find(u=>u.id===boar.id);assert.ok(Object.hasOwn(snap,'riverJumpState'));assert.equal(typeof snap.riverJumpProgress,'number');
 });
 test('nightshade troop acquisition is about half the old 205px aggro radius',()=>{
  const g=battle();g.towers.forEach(t=>{t.damage=0;});
@@ -323,16 +357,44 @@ test('goblin squad card spawns three ground goblins in front and two anti-air sp
  const meleeY=Math.min(...pack.filter(u=>u.type==='goblin_melee').map(u=>u.y)),spearY=Math.min(...pack.filter(u=>u.type==='goblin_spear').map(u=>u.y));assert.ok(meleeY<spearY,'front goblin row should start ahead of spear row');
  for(let i=0;i<pack.length;i++)for(let j=i+1;j<pack.length;j++)assert.ok(distance(pack[i],pack[j])>=pack[i].radius+pack[j].radius-.01);
 });
-test('bone swarm spawns twelve ultra-fragile individual ground attackers',()=>{
+test('skeleton card spawns three HP81 / damage81 ground attackers',()=>{
+ const g=battle();ready(g,0,'skeleton');const r=deploy(g,0,'skeleton',300,680);assert.ok(r.ok,r.error);
+ const pack=g.units.filter(u=>u.type==='skeleton'&&u.owner===0);assert.equal(pack.length,3);assert.ok(pack.every(u=>u.maxHp===81&&u.damage===81&&!u.air));
+});
+test('skeleton squad spawns fifteen shared skeleton units',()=>{
  const g=battle();ready(g,0,'boneswarm');const r=deploy(g,0,'boneswarm',300,680);assert.ok(r.ok,r.error);
- const pack=g.units.filter(u=>u.type==='boneswarm');assert.equal(pack.length,12);assert.ok(pack.every(u=>u.maxHp===45&&u.damage===42&&!u.air));
+ const pack=g.units.filter(u=>u.type==='skeleton'&&u.owner===0);assert.equal(pack.length,15);assert.ok(pack.every(u=>u.maxHp===81&&u.damage===81&&!u.air));
+});
+test('tombstone spawns two skeletons on ready, two every four seconds, and four instantly on death',()=>{
+ const g=battle();g.towers.forEach(t=>{t.range=0;t.damage=0;});ready(g,0,'tombstone');const r=deploy(g,0,'tombstone',300,680);assert.ok(r.ok,r.error);
+ const tomb=g.units.find(u=>u.type==='tombstone'&&u.owner===0);assert.ok(tomb);advance(g,.8);
+ assert.equal(g.units.filter(u=>u.type==='skeleton'&&u.owner===0).length,2);const hp=tomb.hp;advance(g,4);assert.ok(tomb.hp<hp);assert.equal(g.units.filter(u=>u.type==='skeleton'&&u.owner===0).length,4);
+ tomb.hp=1;tick(g,.1);const spawned=g.units.filter(u=>u.type==='skeleton'&&u.owner===0);assert.equal(spawned.length,8);assert.ok(spawned.slice(-4).every(u=>u.spawn===0));
 });
 
-test('lumina priest heals a damaged nearby ally but never a building',()=>{
- const g=battle();g.towers.forEach(t=>{t.damage=0;});
- const priest=spawn(g,0,'lumina',300,650),tank=spawn(g,0,'knight',330,650);priest.spawn=tank.spawn=0;priest.damage=0;tank.speed=0;
- tank.hp-=500;const before=tank.hp, tower=g.towers.find(t=>t.owner===0&&t.kind==='tower');tower.hp-=300;const towerBefore=tower.hp;
- advance(g,1.4);assert.ok(tank.hp>before);assert.equal(tower.hp,towerBefore);
+test('elixir golem splits 1 -> 2 -> 4 and grants enemy energy on each defeated stage',()=>{
+ const g=battle();g.towers.forEach(t=>{t.range=0;t.damage=0;});
+ const base=spawn(g,0,'elixirgolem',300,650),killer=spawn(g,1,'blade',300,390);g.players[1].energy=0;base.x=300;base.y=600;base.speed=0;base.hp=1;killer.x=300;killer.y=555;killer.speed=0;killer.damage=9999;killer.cd=0;
+ tick(g,.1);assert.ok(Math.abs(g.players[1].energy-1.0625)<1e-8);assert.ok(g.events.some(e=>e.type==='elixir-split'&&e.fromType==='elixirgolem'&&e.toType==='elixir_golem_mid'));const mids=g.units.filter(u=>u.type==='elixir_golem_mid'&&u.owner===0);assert.equal(mids.length,2);assert.ok(mids.every(u=>u.maxHp===784&&u.damage===127&&u.cooldown===2));
+ killer.damage=9999;killer.cd=0;mids[0].spawn=0;mids[0].hp=1;mids[0].x=300;mids[0].y=600;mids[1].x=650;mids[1].y=900;const e1=g.players[1].energy;tick(g,.1);assert.ok(Math.abs(g.players[1].energy-e1-.0625-1)<1e-8);assert.ok(g.events.some(e=>e.type==='elixir-split'&&e.fromType==='elixir_golem_mid'&&e.toType==='elixir_blob'));const blobs=g.units.filter(u=>u.type==='elixir_blob'&&u.owner===0);assert.equal(blobs.length,2);assert.ok(blobs.every(u=>u.maxHp===392&&u.damage===64&&u.cooldown===2));
+ killer.cd=0;blobs[0].spawn=0;blobs[0].hp=1;blobs[0].x=300;blobs[0].y=600;blobs[1].x=650;blobs[1].y=920;const e2=g.players[1].energy;tick(g,.1);assert.ok(Math.abs(g.players[1].energy-e2-.0625-.5)<1e-8);
+});
+
+test('royal giant ignores troops and fires a cannonball only at buildings from archer-like range',()=>{
+ const g=battle();g.towers.forEach(t=>{t.range=0;t.damage=0;});const rg=spawn(g,0,'royalgiant',190,650),guard=spawn(g,1,'knight',190,390),tower=g.towers.find(t=>t.owner===1&&t.kind==='tower'&&t.x===190);
+ rg.x=190;rg.y=430;rg.speed=0;rg.cd=0;guard.x=240;guard.y=390;guard.speed=0;guard.damage=0;const gh=guard.hp,th=tower.hp;
+ tick(g,.1);const shot=g.projectiles.find(p=>p.kind==='royal_shell'&&p.owner===0);assert.ok(shot);assert.equal(shot.target,tower.id);assert.equal(guard.hp,gh);advance(g,.7);assert.equal(tower.hp,th-307);assert.equal(guard.hp,gh);
+});
+
+test('healer restores itself and at most three nearby allies only when its attack deals damage',()=>{
+ const g=battle();g.towers.forEach(t=>{t.damage=0;t.range=0;});
+ const healer=spawn(g,0,'lumina',300,650),enemy=spawn(g,1,'knight',300,390);
+ healer.x=300;healer.y=650;healer.speed=0;healer.cd=0;healer.hp-=400;enemy.x=300;enemy.y=525;enemy.speed=0;enemy.damage=0;
+ const allyIds=['knight','blade','spear','frost'],allies=allyIds.map((id,i)=>spawn(g,0,id,190,650));
+ allies.forEach((u,i)=>{u.x=260+i*25;u.y=690;u.speed=0;u.damage=0;u.hp-=500-i*100;});
+ const selfBefore=healer.hp,before=allies.map(u=>u.hp),tower=g.towers.find(t=>t.owner===0&&t.kind==='tower');tower.hp-=300;const towerBefore=tower.hp;
+ advance(g,.7);
+ assert.equal(healer.hp,selfBefore+110);assert.deepEqual(allies.slice(0,3).map((u,i)=>u.hp-before[i]),[110,110,110]);assert.equal(allies[3].hp,before[3]);assert.equal(tower.hp,towerBefore);
 });
 test('frost shaman slows ground movement and strips part of a boar charge',()=>{
  const g=battle();g.towers.forEach(t=>{t.damage=0;});
@@ -410,28 +472,26 @@ test('fireball can target anywhere and flight time grows with distance without t
  const far=battle();far.towers.forEach(t=>{t.damage=0;});ready(far,0,'fireball');const rf=deploy(far,0,'fireball',360,80);assert.ok(rf.ok);assert.ok(rf.travelTime>rn.travelTime);assert.ok(rf.travelTime<=2);
  const p=far.projectiles.find(p=>p.spell==='fireball'),tx=p.tx,ty=p.ty;advance(far,.5);assert.equal(p.tx,tx);assert.equal(p.ty,ty);
 });
-test('fireball hits ground and air units for 560, buildings for 140, and never friendly units',()=>{
+test('fireball hits ground and air units for 689, buildings for 159, and never friendly units',()=>{
  const g=battle();g.towers.forEach(t=>{t.damage=0;});
  const frost=spawn(g,1,'frost',190,390),harpy=spawn(g,1,'harpy',220,390),friend=spawn(g,0,'blade',170,650);
  frost.spawn=harpy.spawn=friend.spawn=0;frost.x=190;frost.y=250;harpy.x=220;harpy.y=245;friend.x=165;friend.y=250;
  frost.speed=harpy.speed=friend.speed=0;frost.damage=harpy.damage=friend.damage=0;
  const tower=g.towers.find(t=>t.owner===1&&t.kind==='tower'&&t.x===190),towerHp=tower.hp,friendHp=friend.hp;
  ready(g,0,'fireball');const r=deploy(g,0,'fireball',190,235);assert.ok(r.ok);advance(g,r.travelTime+.2);
- assert.equal(frost.hp,0);assert.equal(harpy.hp,0);assert.equal(friend.hp,friendHp);assert.equal(tower.hp,towerHp-140);
+ assert.equal(frost.hp,0);assert.equal(harpy.hp,0);assert.equal(friend.hp,friendHp);assert.equal(tower.hp,towerHp-159);
 });
 test('fireball damage wakes a dormant central core',()=>{
  const g=battle();g.towers.forEach(t=>{t.damage=0;});const core=g.towers.find(t=>t.owner===1&&t.kind==='core');assert.equal(core.awake,false);
- ready(g,0,'fireball');const r=deploy(g,0,'fireball',core.x,core.y);advance(g,r.travelTime+.2);assert.equal(core.hp,core.maxHp-140);assert.equal(core.awake,true);
+ ready(g,0,'fireball');const r=deploy(g,0,'fireball',core.x,core.y);advance(g,r.travelTime+.2);assert.equal(core.hp,core.maxHp-159);assert.equal(core.awake,true);
 });
-test('poison trap deploys instantly, wipes bone swarm quickly and leaves lingering poison',()=>{
- const g=battle();g.towers.forEach(t=>{t.damage=0;});ready(g,1,'boneswarm');assert.ok(deploy(g,1,'boneswarm',190,390).ok);
- const pack=g.units.filter(u=>u.type==='boneswarm');pack.forEach(u=>{forceReady(g,u);u.speed=0;u.damage=0;});
+test('poison deploys instantly for eight seconds, deals 91 per second, and stops after leaving the area',()=>{
+ const g=battle();g.towers.forEach(t=>{t.damage=0;});
+ const victim=spawn(g,1,'knight',190,390);victim.spawn=0;victim.speed=0;victim.damage=0;victim.x=190;victim.y=390;const before=victim.hp;
  ready(g,0,'poison');const r=deploy(g,0,'poison',190,390);assert.ok(r.ok);assert.equal(r.travelTime,0);assert.equal(g.zones.length,1);
- advance(g,.7);assert.equal(g.units.filter(u=>u.type==='boneswarm'&&u.owner===1).length,0);
- const victim=spawn(g,1,'blade',190,390);victim.spawn=0;victim.speed=0;victim.damage=0;victim.x=190;victim.y=390;const before=victim.hp;
- advance(g,.4);victim.x=500;victim.y=390;const afterContact=victim.hp;advance(g,1.2);assert.ok(afterContact<before);assert.ok(victim.hp<afterContact,'poison continues after leaving the area');
+ advance(g,2.1);const afterContact=victim.hp;assert.equal(before-afterContact,273);victim.x=500;victim.y=390;advance(g,2);assert.equal(victim.hp,afterContact,'poison must stop once the unit leaves the field');
 });
-test('poison trap chips towers at reduced damage and wakes the central core',()=>{
+test('poison chips towers for 21 per second and wakes the central core',()=>{
  const g=battle();g.towers.forEach(t=>{t.damage=0;});const core=g.towers.find(t=>t.owner===1&&t.kind==='core');ready(g,0,'poison');
  assert.ok(deploy(g,0,'poison',core.x,core.y).ok);advance(g,.2);assert.ok(core.hp<core.maxHp);assert.equal(core.awake,true);
 });
@@ -439,11 +499,20 @@ test('arrow rain is broader, lower damage and faster than fireball while still h
  const timing=battle();timing.towers.forEach(t=>{t.damage=0;});const core=timing.towers.find(t=>t.owner===0&&t.kind==='core');
  ready(timing,0,'arrowrain');const ar=deploy(timing,0,'arrowrain',190,235);assert.ok(ar.ok);assert.ok(ar.travelTime>=.35&&ar.travelTime<=1);
  const fbTime=Math.max(.6,Math.min(2,.45+distance(core,{x:190,y:235})/620));assert.ok(ar.travelTime<fbTime);
- const g=battle();g.towers.forEach(t=>{t.damage=0;});const frost=spawn(g,1,'frost',190,390),bone=spawn(g,1,'boneswarm',190,390),harpy=spawn(g,1,'harpy',190,390);for(const u of [frost,bone,harpy]){u.spawn=0;u.x=190;u.y=235;u.speed=0;u.damage=0;}
+ const g=battle();g.towers.forEach(t=>{t.damage=0;});const frost=spawn(g,1,'frost',190,390),bone=spawn(g,1,'skeleton',190,390),harpy=spawn(g,1,'harpy',190,390);for(const u of [frost,bone,harpy]){u.spawn=0;u.x=190;u.y=235;u.speed=0;u.damage=0;}
  const tower=g.towers.find(t=>t.owner===1&&t.kind==='tower'&&t.x===190),towerHp=tower.hp,frostHp=frost.hp;
  ready(g,0,'arrowrain');const r=deploy(g,0,'arrowrain',190,235);advance(g,r.travelTime+.2);
- assert.equal(frost.hp,frostHp-330);assert.equal(bone.hp,0);assert.equal(harpy.hp,Math.max(0,UNITS.harpy.hp-330));assert.equal(tower.hp,towerHp-80);
+ assert.equal(frost.hp,frostHp-366);assert.equal(bone.hp,0);assert.equal(harpy.hp,Math.max(0,UNITS.harpy.hp-366));assert.equal(tower.hp,towerHp-75);
 });
+test('lightning instantly strikes the four highest-current-HP enemies in radius and uses reduced building damage',()=>{
+ const g=battle();g.towers.forEach(t=>{t.damage=0;t.range=0;});const tower=g.towers.find(t=>t.owner===1&&t.kind==='tower'&&t.x===190);
+ const golem=spawn(g,1,'golem',120,390),mega=spawn(g,1,'megaknight',260,390),guard=spawn(g,1,'knight',400,390),blade=spawn(g,1,'blade',600,390);
+ const units=[golem,mega,guard,blade];units.forEach((u,i)=>{forceReady(g,u);u.x=170+i*13;u.y=245+(i%2)*10;u.speed=0;u.damage=0;});
+ const th=tower.hp,before=Object.fromEntries(units.map(u=>[u.id,u.hp]));ready(g,0,'lightning');const r=deploy(g,0,'lightning',190,245);assert.ok(r.ok,r.error);assert.equal(r.travelTime,0);assert.equal(r.targets,4);
+ assert.equal(tower.hp,th-265);assert.equal(golem.hp,before[golem.id]-1056);assert.equal(mega.hp,before[mega.id]-1056);assert.equal(guard.hp,before[guard.id]-1056);assert.equal(blade.hp,before[blade.id]);
+ assert.ok(g.events.some(e=>e.type==='lightning-cast'));assert.equal(g.events.filter(e=>e.type==='lightning-hit').length,4);
+});
+
 test('stone golem death blasts nearby enemies and still splits into two mini golems',()=>{
  const g=battle();g.towers.forEach(t=>{t.damage=0;});
  const golem=spawn(g,0,'golem',300,650),killer=spawn(g,1,'blade',300,390);golem.spawn=killer.spawn=0;golem.x=300;golem.y=600;killer.x=300;killer.y=555;
@@ -451,14 +520,14 @@ test('stone golem death blasts nearby enemies and still splits into two mini gol
  tick(g,.1);
  assert.equal(g.units.some(u=>u.id===golem.id),false);assert.equal(killer.hp,killerHp-UNITS.golem.deathDamage);
  const minis=g.units.filter(u=>u.type==='mini_golem'&&u.owner===0);assert.equal(minis.length,2);
- for(const m of minis){assert.equal(m.maxHp,1050);assert.equal(m.damage,96);assert.equal(m.buildingOnly,true);}
+ for(const m of minis){assert.equal(m.maxHp,851);assert.equal(m.damage,52);assert.equal(m.cooldown,2.5);assert.equal(m.deathDamage,52);assert.equal(m.buildingOnly,true);}
 });
-test('mini golem death blast is exactly one third of the parent blast',()=>{
+test('mini golem stats and death blast are one fifth of the parent values',()=>{
  const g=battle();g.towers.forEach(t=>{t.damage=0;});
  const mini={...UNITS.mini_golem,id:'mini-test',type:'mini_golem',owner:0,x:300,y:600,hp:1,maxHp:UNITS.mini_golem.hp,spawn:0,cd:0,walk:0,age:0,anim:0,hit:0,lane:190,face:-1,facing:-Math.PI/2,moving:false};
  const killer=spawn(g,1,'blade',300,390),victim=spawn(g,1,'knight',340,390);killer.spawn=victim.spawn=0;killer.x=300;killer.y=565;victim.x=340;victim.y=600;killer.speed=victim.speed=0;killer.damage=9999;killer.cd=0;victim.damage=0;
  g.units.unshift(mini);const victimHp=victim.hp;tick(g,.1);
- assert.equal(g.units.some(u=>u.id===mini.id),false);assert.equal(victim.hp,victimHp-60);assert.equal(UNITS.golem.deathDamage/UNITS.mini_golem.deathDamage,3);
+ assert.equal(g.units.some(u=>u.id===mini.id),false);assert.equal(victim.hp,victimHp-52);assert.equal(UNITS.golem.deathDamage/UNITS.mini_golem.deathDamage,5);assert.equal(UNITS.golem.damage/UNITS.mini_golem.damage,5);assert.equal(UNITS.mini_golem.hp,Math.floor(UNITS.golem.hp/5));
 });
 
 
@@ -579,9 +648,9 @@ test('equal tower count starts overtime; first tower wins',()=>{
  g.towers.find(t=>t.id==='t00').hp=0;tick(g,.1);assert.equal(g.winner,1);
 });
 test('full timeout uses remaining tower HP and exact tie draws',()=>{
- for(const hp of [1800,1980]){
+ for(const hp of [3000,3200]){
  const g=battle();g.overtime=true;g.time=239.9;g.towers[0].hp=hp;tick(g,.1);
- assert.equal(g.phase,'ended');assert.equal(g.winner,hp===1980?null:1);
+ assert.equal(g.phase,'ended');assert.equal(g.winner,hp===3200?null:1);
  }
 });
 test('ended matches do not continue to simulate',()=>{
@@ -704,13 +773,13 @@ test('v22 snapshots expose shield, stealth and phoenix egg state for online sync
  assert.equal(ss.shieldHp,650);assert.equal(ss.maxShieldHp,650);assert.equal(ms.stealthed,true);assert.ok(ms.stealthRemaining>0);assert.ok(es.eggHatchRemaining>3);
 });
 
-test('sky bomber flies past troops and attacks only enemy structures',()=>{
+test('sky bomber can target air units as well as ground units and structures',()=>{
  const g=battle();g.towers.forEach(t=>{t.range=0;t.damage=0;});
- const bomber=spawn(g,0,'skybomber',190,650),guard=spawn(g,1,'blade',190,390);
- Object.assign(bomber,{x:190,y:300,speed:0,cd:0});Object.assign(guard,{x:190,y:285,speed:0,damage:0,cd:99});
- const tower=g.towers.find(t=>t.owner===1&&t.kind==='tower'&&t.x===190),towerHp=tower.hp,guardHp=guard.hp,bomberHp=bomber.hp;
- advance(g,.5);
- assert.equal(towerHp-tower.hp,175);assert.equal(guard.hp,guardHp);assert.equal(bomber.hp,bomberHp);assert.equal(bomber.target,tower.id);
+ const bomber=spawn(g,0,'skybomber',190,650),air=spawn(g,1,'laserdragon',190,390);
+ Object.assign(bomber,{x:190,y:300,speed:0,cd:0});Object.assign(air,{x:190,y:285,speed:0,damage:0,laserBaseDps:0,cd:99});
+ const tower=g.towers.find(t=>t.owner===1&&t.kind==='tower'&&t.x===190),towerHp=tower.hp,airHp=air.hp;
+ advance(g,1);
+ assert.equal(airHp-air.hp,175);assert.equal(tower.hp,towerHp);assert.equal(bomber.target,air.id);
 });
 
 test('scrap drill ramps 90-135-180-240 DPS while attached and resets when displaced or stunned',()=>{
@@ -738,7 +807,7 @@ test('crusher ogre attacks every three seconds with 230-310-390-470 building hit
 
 test('siege turtle reduces ordinary ranged damage by 40 percent only while moving',()=>{
  const g=battle();g.towers.forEach(t=>{t.range=0;t.damage=0;});
- const turtle=spawn(g,0,'siegeturtle',190,650),archer=spawn(g,1,'archer',190,390);
+ const turtle=spawn(g,0,'siegeturtle',190,650),archer=spawn(g,1,'blowdart',190,390);
  Object.assign(turtle,{x:190,y:650});Object.assign(archer,{x:190,y:520,speed:0,damage:100,cooldown:99,cd:0});
  let hp=turtle.hp;advance(g,.6);assert.ok(Math.abs((hp-turtle.hp)-60)<.01,`moving ranged damage=${hp-turtle.hp}`);
  Object.assign(turtle,{x:190,y:295,speed:0});Object.assign(archer,{x:190,y:420,cd:0});hp=turtle.hp;advance(g,.5);
@@ -774,7 +843,7 @@ test('mega knight jump uses a two second windup, retargets to a newly closer ene
  tick(g,.1);assert.equal(mega.megaJumpState,'windup');assert.equal(mega.megaJumpTarget,a.id);
  advance(g,1);Object.assign(b,{x:190,y:590});tick(g,.1);assert.equal(mega.megaJumpState,'windup');assert.equal(mega.megaJumpTarget,b.id,'new closer enemy should replace the pre-jump target without cancelling windup');
  const bhp=b.hp;advance(g,1.1);assert.equal(mega.megaJumpState,'leap');assert.equal(b.hp,bhp,'the leap must stay airborne for 1.5 seconds rather than landing almost immediately');
- advance(g,1.4);assert.ok(bhp-b.hp>=420,'jump landing should deal the same 420 damage as deployment landing');
+ advance(g,1.4);assert.ok(bhp-b.hp>=537,'jump landing should deal 537 damage');
  assert.equal(mega.targetLock,b.id,'takeoff/landing should commit the chosen enemy');
  // No cooldown field is used: once the locked target is moved back into jump distance, a fresh 2s windup can start immediately.
  Object.assign(b,{x:mega.x,y:mega.y-120});mega.cd=0;tick(g,.1);assert.equal(mega.megaJumpState,'windup');assert.equal(mega.megaJumpTarget,b.id);
@@ -810,12 +879,12 @@ test('mega knight leap always takes 1.5 seconds regardless of jump distance and 
  advance(g,.2);assert.equal(mega.megaJumpState,null);assert.ok(Math.abs(mega.y-endY)<.01);
 });
 
-test('mega knight normal attack is a small 280 damage area smash',()=>{
+test('mega knight normal attack is a small 263 damage area smash',()=>{
  const g=battle();g.towers.forEach(t=>{t.range=0;t.damage=0;});
  const mega=spawn(g,0,'megaknight',190,650),a=spawn(g,1,'knight',190,390),b=spawn(g,1,'blade',530,390);
  Object.assign(mega,{x:190,y:600,speed:0,cd:0});Object.assign(a,{x:190,y:555,speed:0,damage:0,cd:99});Object.assign(b,{x:225,y:555,speed:0,damage:0,cd:99});
  // Both are close enough to skip jumping; the first melee smash should hit both.
- const ah=a.hp,bh=b.hp;tick(g,.1);assert.equal(ah-a.hp,280);assert.equal(bh-b.hp,280);
+ const ah=a.hp,bh=b.hp;tick(g,.1);assert.equal(ah-a.hp,263);assert.equal(bh-b.hp,263);
 });
 
 test('iron eye arrows apply a 20 percent damage mark that breaks at 500 accumulated damage for a 300 burst',()=>{
@@ -866,4 +935,30 @@ test('v24 snapshots expose drill, crusher, moving siege-turtle and mega jump sta
  assert.equal(ds.drillStage,2);assert.equal(ds.drillDps,180);assert.equal(ds.drillLockTime,3.2);assert.equal(os.crusherStage,3);assert.equal(ts.turtleShellActive,true);
  const mega=spawn(g,0,'megaknight',530,700);Object.assign(mega,{megaJumpState:'windup',megaJumpProgress:.5,megaJumpWindupUntil:g.time+1,megaJumpTargetX:530,megaJumpTargetY:580});
  const ms=viewMatch(g,0).units.find(u=>u.id===mega.id);assert.equal(ms.megaJumpState,'windup');assert.equal(ms.megaJumpProgress,.5);assert.equal(ms.megaJumpWindupRemaining,1);assert.equal(ms.megaJumpTargetY,580);
+});
+
+
+test('Valkyrie spin is centered on herself, damages nearby ground enemies and ignores air',()=>{
+ const g=battle();g.towers.forEach(t=>{t.range=0;t.damage=0;});
+ const v=spawn(g,0,'valkyrie',360,650),a=spawn(g,1,'blade',360,390),b=spawn(g,1,'blade',360,390),air=spawn(g,1,'gargoyle',360,390);
+ g.units=[v,a,b,air];v.x=360;v.y=600;v.cd=0;v.speed=0;a.x=375;a.y=600;a.speed=0;a.damage=0;b.x=340;b.y=608;b.speed=0;b.damage=0;air.x=365;air.y=600;air.speed=0;air.damage=0;
+ const ah=a.hp,bh=b.hp,fh=air.hp;tick(g,.1);
+ assert.equal(ah-a.hp,260);assert.equal(bh-b.hp,260);assert.equal(air.hp,fh);assert.ok(g.events.some(e=>e.type==='valkyrie-spin'));
+});
+
+test('Gargoyle card deploys three flyers and Gargoyle Swarm deploys six identical flyers',()=>{
+ const a=battle();a.towers.forEach(t=>t.range=0);ready(a,0,'gargoyle');const before=a.units.length;assert.ok(deploy(a,0,'gargoyle',360,650).ok);let made=a.units.slice(before);assert.equal(made.length,3);assert.ok(made.every(u=>u.type==='gargoyle'&&u.air&&u.targetsAir&&u.hp===230));
+ const b=battle();b.towers.forEach(t=>t.range=0);ready(b,0,'gargoyleswarm');const before2=b.units.length;assert.ok(deploy(b,0,'gargoyleswarm',360,650).ok);made=b.units.slice(before2);assert.equal(made.length,6);assert.ok(made.every(u=>u.type==='gargoyle'&&u.damage===102&&u.range===45));
+});
+
+test('v26.6 bomber bomb flight is intentionally slower than the old shot',()=>{
+ const g=battle(2660);g.towers.forEach(t=>t.range=0);
+ const bomber=spawn(g,0,'bomber',190,650),target=spawn(g,1,'blade',190,390);
+ target.x=190;target.y=525;bomber.speed=0;bomber.cd=0;target.speed=0;target.damage=0;target.cd=99;
+ tick(g,.1);
+ const bomb=g.projectiles.find(p=>p.kind==='bomb'&&p.owner===0);
+ assert.ok(bomb,'bomber should launch a bomb projectile');assert.equal(bomb.speed,180);
+ assert.ok((bomb.progress||0)>=0&&bomb.progress<1);
+ const hp=target.hp;advance(g,.3);assert.equal(target.hp,hp,'slower bomb should still be airborne shortly after launch');
+ advance(g,.7);assert.ok(target.hp<hp,'bomb should eventually land and deal damage');
 });

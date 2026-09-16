@@ -1,3 +1,100 @@
+## 29.0.0 - LIGHTNING & NECRO UPDATE (2026-09-16)
+- Necromancer: cost5 / HP839 / damage125 / 1.1s attack interval; skeleton summon cadence unchanged.
+- Dark Necromancer: cost4 / HP907 / damage304 / 1.3s attack interval; bat summon cadence unchanged.
+- Renamed Poison Trap to Poison. The zone lasts 8 seconds and deals 91 damage/second to units and 21 damage/second to buildings; the card art is a tall narrow red magic flask.
+- Fireball: 689 unit / 159 building damage. Arrow Rain: 366 unit / 75 building damage.
+- Added Lightning: cost6, radius105, selects up to four enemies in current-HP descending order, dealing 1056 to units and 265 to buildings.
+- Fixed the Elixir Golem detail demo so tower shots deal real damage, and added a dedicated pink split-burst effect for large -> medium -> blob deaths.
+- Card pool: 56 selectable cards = 50 unit cards + 6 spells. physicsVersion 45.
+
+## 28.0.0 - ROYAL ELIXIR UPDATE (2026-09-16)
+- Renamed Lumina Priest to Healer and rebuilt healing around successful attacks: HP1900, damage120, 1.75s attack interval, range120; each damaging hit heals self for 110 plus up to three injured nearby allies for 110 each.
+- Added Elixir Golem: cost3, HP1568, damage254, 2.0s attack interval, building-only. It splits 1 -> 2 -> 4 with halved HP/damage per generation and grants the opponent 1 / 1 / 0.5 energy when each stage dies.
+- Added Royal Giant: cost6, HP3164, damage307, 1.8s attack interval, range165, slow, building-only, with a dedicated cannon projectile.
+- Card pool: 55 selectable cards = 50 unit cards + 5 spells. physicsVersion 44.
+
+## 27.1.0 - RIVERBANK DEPLOY UPDATE (2026-09-16)
+- Extended the initial deployment line from 600/440 to 550/490 so the usable area reaches slightly onto each bridge.
+- Direct placement over open river water remains forbidden, including flying units; bridge ground remains valid.
+- Deployments clicked on legal lawn near the bank now snap inward when the unit radius would overlap water instead of failing.
+- Group cards apply the same safe riverbank correction to generated member positions.
+- No card stat changes. physicsVersion 43.
+
+## 27.0.0 - UNDEAD RIVER UPDATE (2026-09-16)
+- Iron Boar: HP1696 / damage318 / 1.6s attack interval. Near the river it now jumps directly to the opposite bank instead of routing to a bridge.
+- Added the 1-cost Skeleton card: three HP81 / damage81 skeletons. Bone Swarm is renamed Skeleton Squad and now deploys fifteen shared skeleton units.
+- Added Tombstone: cost3 / HP530 / 30 HP natural decay per second. It summons two skeletons on deployment completion and every four seconds, then four instant skeletons on destruction.
+- Mega Knight: HP3993 / normal damage263 / jump landing damage537; deployment drop remains 420.
+- Card pool: 53 selectable cards = 48 unit cards + 5 spells. physicsVersion 42.
+
+## 26.6.0 - ARSENAL & SWARM UPDATE (2026-09-16)
+- Renamed Bolt Cannon to 大砲 and changed it to HP1000 / damage200 / 1.0s attack interval; natural HP decay remains 30 per second.
+- Renamed Moon Bat to コウモリの群れ: five units, HP92, damage82, 1.2s attack interval per bat.
+- Renamed Pot Bomber to ボンバー, cost 3→2. Bomb projectile speed is slower and rendering now follows a rotating parabolic throw arc.
+- physicsVersion 41.
+
+## 26.5.0 - BATTLE READABILITY UPDATE (2026-09-16)
+- Leaf Archer placement/summon preview now shows both archers.
+- Central core: HP 4560 / damage 85. Side towers: HP 3200 / damage 105.
+- Long-pressing a battle hand card shows unit-target and tower-target damage values, including spell/structure modifiers.
+- physicsVersion 40.
+
+## 26.4.3 - GOLEM ARM SWAY TUNE (2026-09-16)
+- Stone Golem visual-only redesign: wider shoulders, outward upper arms, thick forward forearms and oversized planted fists.
+- Lowered the head between the shoulders and strengthened the forward gorilla-like posture while preserving stone, moss and blue rune identity.
+- Mini Golem inherits the same shared procedural drawing at reduced scale.
+- Gameplay stats remain unchanged from v26.4.0; card pool remains 51 and physicsVersion remains 39.
+
+## 26.4.0 - GOLEM WEIGHT UPDATE (2026-09-16)
+- Stone Golem: HP 4256, damage 260, attack interval 2.5s, death blast 260. Cost 8, building-only targeting and two-way split remain.
+- Mini Golem: HP 851, damage 52, attack interval 2.5s, death blast 52, matching roughly one fifth of the parent combat values.
+- Stone Golem procedural Canvas art keeps the same stone/moss/rune identity but changes to a lower forward-leaning gorilla posture with both oversized arms hanging in front.
+- Card pool remains 51 selectable cards = 46 units + 5 spells. physicsVersion 39.
+
+## 26.3.0 - FRONTLINE POWER UPDATE (2026-09-16)
+- Iron Guard damage: 98 -> 202. Cost 3, HP 1850 and 1.35s attack interval unchanged.
+- Kragg Berserker: HP 2450 -> 3760, damage 465 -> 842. Cost 7 and 1.8s attack interval unchanged.
+- Mini Berserker: HP 1300 -> 1390, damage 270 -> 755, attack interval 1.45s -> 1.6s.
+- Leaf Archer: cost 2 -> 3. The two-unit formation, HP304 each, damage112, range165 and 1.15s attack interval remain unchanged.
+- Card pool remains 51 selectable cards = 46 units + 5 spells. physicsVersion 38.
+
+## 26.2.0 - AXE & ARCHER UPDATE (2026-09-16)
+- Valkyrie HP 1400→2200 and damage 230→260. Radius-50 self-centered ground spin damage remains unchanged in shape; the animation now keeps her body upright and alternates front/back facing while only the axe circles around her.
+- Leaf Archer is now a two-unit card: each archer has HP304, damage112, range165, speed45, 1.15s cooldown and a smaller radius/model. The pair deploys side-by-side and can target ground and air.
+- Card pool remains 51 selectable cards = 46 units + 5 spells. physicsVersion 37.
+
+## 26.1.1 - BATTLE PACE TUNE (2026-09-16)
+- Increased every non-zero ordinary unit movement speed by about 5% from the v26.1.0 values, keeping relative fast/normal/slow roles intact.
+- Buildings and other speed-0 entities are unchanged. Mega Knight jump travel, Nightshade dash, Tigger burrow and Tracker hook timings/speeds are unchanged.
+- Card pool remains 51 selectable cards = 46 units + 5 spells. physicsVersion 36.
+
+## 26.1.0 - BATTLE PACE UPDATE (2026-09-16)
+- Reduced the normal movement speed of every mobile unit by about 15%, preserving the relative speed hierarchy between units.
+- Zero-speed structures remain unchanged. Special movement such as Mega Knight's fixed 1.5s leap, Nightshade dash, Tigger burrow and Tracker hook is unchanged.
+- Representative changes: Blade 56→48, Mini Berserker 52→44, Gargoyle 78→66, Bomb Carrier 88→75, Sky Bomber 58→49.
+- Card pool remains 51 selectable cards = 46 units + 5 spells. physicsVersion 35.
+
+## 26.0.0 - WILD WINGS UPDATE (2026-09-16)
+- Added Valkyrie: 4 cost, HP1400, damage230, speed38, 1.45s attack interval. Her axe attack spins around herself and damages ground targets within radius 50.
+- Added Gargoyle: 3 cost, deploys 3 flying units. Each has HP230, damage102, speed78, range45 and can attack ground and air.
+- Added Gargoyle Swarm: 5 cost, deploys 6 standard Gargoyles.
+- Card pool: 51 selectable cards = 46 units + 5 spells. physicsVersion 34.
+
+## 25.2.1 - SKY BOMBER AIR TARGET FIX (2026-09-16)
+- スカイボマーが地上ユニット・空中ユニット・建物のすべてを攻撃可能に変更。
+- HP650、4コスト、攻撃175、速度58、射程75、攻撃間隔1.6秒は据え置き。
+- physicsVersion 33。
+
+## 25.2.0 - SKY BOMBER RETARGET (2026-09-16)
+- スカイボマーの攻撃対象を「建物のみ」から「地上ユニット＋建物」へ変更。空中ユニットは引き続き攻撃不可。
+- HP 720 → 650。コスト4、攻撃175、速度58、射程75、攻撃間隔1.6秒は据え置き。
+- 対戦ロジック変更に伴い physicsVersion 32。
+
+## 25.1.1 - MOBILE DRAG FIX (2026-09-16)
+- TINY SIEGEの画面全体で `user-select: none` / `-webkit-touch-callout: none` を適用し、スマホ長押し時の文字選択・コピー・拡大ルーペ/コールアウトを抑制。
+- `contextmenu` / `selectstart` / `copy` / `cut` / native `dragstart` も全画面で抑制。
+- デッキドラッグ仕様・戦闘ロジックは変更なし。physicsVersion 31。
+
 ## 25.1.0 - DRAG DECK UPDATE (2026-09-15)
 - Added direct drag-and-drop deck editing while preserving the existing click/tap action sheet.
 - Pool cards can be dropped on deck slots to add or replace; deck slots can be dragged onto each other to reorder the eight-card deck.

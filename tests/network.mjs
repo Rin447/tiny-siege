@@ -1,7 +1,7 @@
 import {DEFAULT_DECK,UNITS} from '../public/game/units.js';
 /** Real HTTP + native Node WebSocket test. Start `npm start` in another terminal first. */
 import assert from 'node:assert/strict';
-const base=process.env.TEST_URL||'http://127.0.0.1:3000';
+const base=process.env.TEST_URL||'http://127.1.0.1:3000';
 const log=[];const sockets=[];
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 async function check(name,fn){await fn();log.push(name);console.log(`PASS ${log.length}: ${name}`);}
@@ -24,7 +24,7 @@ async function wait(fn,message){
 let a,b,c,room,other;
 try{
  await check('health and game config identify the correct game',async()=>{
-  const r=await fetch(base+'/api/config'),j=await r.json();assert.equal(j.version,'25.1.0');assert.equal(j.physicsVersion,31);assert.equal(j.cards,48);assert.equal(j.units,43);assert.equal(j.spells,5);assert.equal(j.maxDeck,8);assert.equal(j.game,'tiny-siege');
+  const r=await fetch(base+'/api/config'),j=await r.json();assert.equal(j.version,'29.0.0');assert.equal(j.physicsVersion,45);assert.equal(j.cards,56);assert.equal(j.units,50);assert.equal(j.spells,6);assert.equal(j.maxDeck,8);assert.equal(j.game,'tiny-siege');
  });
  await check('HTML, style and module assets load',async()=>{
   for(const url of ['/','/app.js','/styles.css','/game/engine.js','/game/art.js','/game/physics.js']){
@@ -59,8 +59,8 @@ try{
   await wait(()=>a.last().game.units.some(u=>u.owner===0)&&b.last().game.units.some(u=>u.owner===0),'deployment synchronization');
   const ua=a.last().game.units.find(u=>u.owner===0),ub=b.last().game.units.find(u=>u.id===ua.id);assert.ok(ub);assert.equal(ua.type,ub.type);
  });
- await check('server sends v25 / physics-v31 deployment, mark, hook, mega jump, summon, stun, charge, mud, burrow, poison, dash, laser and collision metadata identically to both seats',async()=>{
-  const ga=a.last().game,u=ga.units[0];assert.equal(ga.physicsVersion,31);assert.equal(typeof u.facing,'number');assert.equal(typeof u.mass,'number');assert.equal(typeof u.deploying,'boolean');assert.equal(typeof u.targetable,'boolean');assert.equal(typeof u.deployRemaining,'number');assert.equal(typeof u.shieldHp,'number');assert.equal(typeof u.maxShieldHp,'number');assert.equal(typeof u.stealthed,'boolean');assert.equal(typeof u.stealthRemaining,'number');assert.equal(typeof u.eggHatchRemaining,'number');assert.equal(typeof u.revived,'boolean');assert.equal(typeof u.drillStage,'number');assert.equal(typeof u.drillDps,'number');assert.equal(typeof u.drillLockTime,'number');assert.equal(typeof u.crusherStage,'number');assert.equal(typeof u.turtleShellActive,'boolean');assert.ok(Object.hasOwn(u,'megaJumpState'));assert.equal(typeof u.megaJumpProgress,'number');assert.equal(typeof u.ironSpinUsed,'boolean');assert.ok(Object.hasOwn(u,'ironSpinState'));assert.equal(typeof u.ironMarkProgress,'number');assert.ok(Object.hasOwn(u,'hookState'));assert.equal(typeof u.hookProgress,'number');assert.equal(typeof u.hookCooldownRemaining,'number');assert.equal(typeof u.hookAirAttackRemaining,'number');
+ await check('server sends v29.0.0 / physics-v45 deployment, mark, hook, mega jump, summon, stun, charge, mud, burrow, poison, dash, laser and collision metadata identically to both seats',async()=>{
+  const ga=a.last().game,u=ga.units[0];assert.equal(ga.physicsVersion,45);assert.equal(typeof u.facing,'number');assert.equal(typeof u.mass,'number');assert.equal(typeof u.deploying,'boolean');assert.equal(typeof u.targetable,'boolean');assert.equal(typeof u.deployRemaining,'number');assert.equal(typeof u.shieldHp,'number');assert.equal(typeof u.maxShieldHp,'number');assert.equal(typeof u.stealthed,'boolean');assert.equal(typeof u.stealthRemaining,'number');assert.equal(typeof u.eggHatchRemaining,'number');assert.equal(typeof u.revived,'boolean');assert.equal(typeof u.drillStage,'number');assert.equal(typeof u.drillDps,'number');assert.equal(typeof u.drillLockTime,'number');assert.equal(typeof u.crusherStage,'number');assert.equal(typeof u.turtleShellActive,'boolean');assert.ok(Object.hasOwn(u,'megaJumpState'));assert.equal(typeof u.megaJumpProgress,'number');assert.ok(Object.hasOwn(u,'riverJumpState'));assert.equal(typeof u.riverJumpProgress,'number');assert.equal(typeof u.ironSpinUsed,'boolean');assert.ok(Object.hasOwn(u,'ironSpinState'));assert.equal(typeof u.ironMarkProgress,'number');assert.ok(Object.hasOwn(u,'hookState'));assert.equal(typeof u.hookProgress,'number');assert.equal(typeof u.hookCooldownRemaining,'number');assert.equal(typeof u.hookAirAttackRemaining,'number');
   assert.equal(Object.hasOwn(u,'_nav'),false);assert.equal(Object.hasOwn(u,'_stuck'),false);
   const matching=[...b.messages].reverse().find(m=>m.type==='state'&&m.game?.time===ga.time&&m.game.units.some(v=>v.id===u.id));
   assert.ok(matching);assert.deepEqual(matching.game.units.find(v=>v.id===u.id),u);

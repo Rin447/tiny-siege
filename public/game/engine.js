@@ -1,5 +1,5 @@
 import {ARENA, UNITS, DECK, DEFAULT_DECK, MAX_DECK, normalizeDeck, summonDelayFor} from './units.js';
-import {PHYSICS_VERSION, staticFree, staticLineFree, spawnPositions, navigationWaypoint, moveBody, displaceBody, resolveBodies, faceToward, deploymentAllowed} from './physics.js';
+import {PHYSICS_VERSION, staticFree, staticLineFree, spawnPositions, navigationWaypoint, moveBody, displaceBody, resolveBodies, faceToward, deploymentAllowed, deploymentWater, snapDeploymentPoint} from './physics.js';
 
 export function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
 export function distance(a,b){return Math.hypot(a.x-b.x,a.y-b.y);}
@@ -19,7 +19,7 @@ export function createMatch({seed=12345,bot=false,difficulty='normal',decks=[DEF
     for(let i=0;i<3;i++){
       const core=i===2,x=core?360:(i===0?190:530);
       g.towers.push({id:`t${owner}${i}`,kind:core?'core':'tower',owner,x,y:owner===0?(core?905:805):(core?135:235),
-      hp:core?3240:1980,maxHp:core?3240:1980,radius:core?40:32,range:core?226:226,damage:core?92:83,cd:0,
+      hp:core?4560:3200,maxHp:core?4560:3200,radius:core?40:32,range:core?226:226,damage:core?85:105,cd:0,
       cooldown:core?0.9:1.0,targetsAir:true,projectile:'tower',hit:0,anim:0,awake:!core});
     }
   }
@@ -49,14 +49,15 @@ export function canPlace(g,owner,id,x,y){
     return null;
   }
   if(!deploymentAllowed(g,owner,x,y))return '自分の陣地、または破壊した敵サイドタワー側の前線に配置してください。';
+  if(deploymentWater(x,y))return '川の上には配置できません。橋か芝生を指定してください。';
   const deployCount=d.count+(d.summonOnDeploy?(d.summonCount||0):0);
   if(g.units.filter(u=>u.hp>0).length+deployCount>ARENA.maxUnits)return 'フィールドのユニット上限です。';
-  const blockers=placementStructures(g);
-  if(!staticFree(g,d,{x,y},1,blockers))return '建物や岸から少し離して配置してください。';
-  if(!spawnPositions(g,owner,d,x,y,blockers))return '配置する空間がありません。少し離してください。';
+  const blockers=placementStructures(g),p=snapDeploymentPoint(owner,d,x,y);
+  if(!staticFree(g,d,p,1,blockers))return '建物や岸から少し離して配置してください。';
+  if(!spawnPositions(g,owner,d,p.x,p.y,blockers))return '配置する空間がありません。少し離してください。';
   return null;
 }
-function event(g,type,data){g.events.push({id:g.nextId++,type,life:type==='death'?0.9:0.5,...data});}
+function event(g,type,data){g.events.push({id:g.nextId++,type,life:(type==='death'||type==='elixir-split')?0.9:0.5,...data});}
 function spendCard(g,owner,id){
   const p=g.players[owner],d=UNITS[id],index=p.hand.indexOf(id);
   p.energy=Math.max(0,p.energy-d.cost);p.hand[index]=p.queue.shift();p.queue.push(id);
@@ -70,6 +71,7 @@ function makeUnit(g,owner,type,x,y){
     shieldHp:d.shieldMax||0,maxShieldHp:d.shieldMax||0,stealthed:false,stealthUntil:0,revived:false,
     drillTarget:null,drillLockTime:0,drillStage:0,drillDps:d.drillBaseDps||0,crusherTarget:null,crusherStage:0,
     megaJumpState:null,megaJumpTarget:null,megaJumpWindupUntil:0,megaJumpTargetX:null,megaJumpTargetY:null,megaJumpProgress:0,megaJumpStartedAt:0,megaJumpStartX:null,megaJumpStartY:null,megaJumpEndX:null,megaJumpEndY:null,
+    riverJumpState:null,riverJumpProgress:0,riverJumpStartedAt:0,riverJumpStartX:null,riverJumpStartY:null,riverJumpEndX:null,riverJumpEndY:null,
     ironSpinUsed:false,ironSpinState:null,ironSpinStartedAt:0,ironSpinProgress:0,ironSpinStartX:null,ironSpinStartY:null,ironSpinEndX:null,ironSpinEndY:null,ironSpinTarget:null,ironSpinHitIds:[],
     hookState:null,hookTarget:null,hookWindupUntil:0,hookReadyAt:0,hookProgress:0,hookStartedAt:0,hookStartX:null,hookStartY:null,hookEndX:null,hookEndY:null,hookTargetX:null,hookTargetY:null,hookAirTarget:null,hookAirAttackUntil:0,hookControlUntil:0,
     ironMarked:false,ironMarkOwner:null,ironMarkDamage:0,ironMarkThreshold:0,ironMarkBurstDamage:0,ironMarkBonus:0,
@@ -108,6 +110,15 @@ function castSpell(g,owner,id,x,y){
   const err=canPlace(g,owner,id,x,y);if(err)return {ok:false,error:err};
   const d=UNITS[id],core=g.towers.find(t=>t.owner===owner&&t.kind==='core'&&t.hp>0);
   spendCard(g,owner,id);
+  if(d.spell==='lightning'){
+    const centre={x,y},targets=alive(g)
+      .filter(t=>t.owner!==owner&&t.hp>0&&t.targetable!==false&&t.burrowState!=='burrow'&&distance(centre,t)<=d.radius+(t.radius||12)*.35)
+      .sort((a,b)=>b.hp-a.hp||String(a.id).localeCompare(String(b.id)))
+      .slice(0,d.maxTargets||4);
+    event(g,'lightning-cast',{x,y,owner,radius:d.radius,targets:targets.length});
+    for(const t of targets){const amount=(t.kind||t.building)?d.buildingDamage:d.damage;event(g,'lightning-hit',{x:t.x,y:t.y,owner,targetOwner:t.owner,building:!!(t.kind||t.building),damage:amount});damage(g,t,amount,owner,{spell:true});}
+    return {ok:true,spell:true,travelTime:0,targets:targets.length};
+  }
   if(d.spell==='poison'){
     g.zones??=[];
     g.zones.push({id:`z${g.nextId++}`,owner,kind:'poison',spell:'poison',x,y,radius:d.radius,remaining:d.zoneDuration,total:d.zoneDuration,
@@ -148,7 +159,7 @@ export function deploy(g,owner,id,x,y){
     g.units.push(u);event(g,'burrow-start',{x:core.x,y:core.y,tx:x,ty:y,owner,travel});
     return {ok:true,burrow:true,travelTime:travel};
   }
-  const positions=spawnPositions(g,owner,d,x,y,placementStructures(g));spendCard(g,owner,id);
+  const placement=snapDeploymentPoint(owner,d,x,y),positions=spawnPositions(g,owner,d,placement.x,placement.y,placementStructures(g));spendCard(g,owner,id);
   for(let i=0;i<d.count;i++){
     const unitType=(Array.isArray(d.spawnTypes)&&d.spawnTypes[i])||d.spawnType||id,u=makeUnit(g,owner,unitType,positions[i].x,positions[i].y);
     startDeployment(g,u,d);g.units.push(u);event(g,'spawn',{x:u.x,y:u.y,owner,card:id});
@@ -218,6 +229,40 @@ function updateMegaJump(g,u,entities,dt){
   }
   return false;
 }
+function boarRiverJumpLanding(g,u,target){
+  if(!u.riverJumper||!target)return null;
+  const dir=u.owner===0?-1:1;
+  const y=u.owner===0?ARENA.riverTop-(u.radius||18)-12:ARENA.riverBottom+(u.radius||18)+12;
+  const aimed=clamp(u.x+(target.x-u.x)*.18,55,665);
+  for(const off of [0,-24,24,-48,48,-72,72]){
+    const p={x:clamp(aimed+off,55,665),y};
+    if(staticFree(g,u,p,0))return p;
+  }
+  return null;
+}
+function beginBoarRiverJump(g,u,target){
+  if(!u.riverJumper||u.riverJumpState||!target||target.owner===u.owner)return false;
+  const trigger=u.riverJumpTrigger||150,near=u.owner===0?(u.y>=ARENA.riverBottom&&u.y<=ARENA.riverBottom+trigger):(u.y<=ARENA.riverTop&&u.y>=ARENA.riverTop-trigger);
+  const across=u.owner===0?target.y<ARENA.riverTop:target.y>ARENA.riverBottom;
+  if(!near||!across)return false;
+  const end=boarRiverJumpLanding(g,u,target);if(!end)return false;
+  u.riverJumpState='leap';u.riverJumpStartedAt=g.time;u.riverJumpProgress=0;u.riverJumpStartX=u.x;u.riverJumpStartY=u.y;u.riverJumpEndX=end.x;u.riverJumpEndY=end.y;u.collisionDisabled=true;u.moving=true;u._nav=null;
+  faceToward(u,end.x,end.y);event(g,'boar-river-jump',{x:u.x,y:u.y,tx:end.x,ty:end.y,owner:u.owner,duration:u.riverJumpTravelTime||.85,life:u.riverJumpTravelTime||.85});return true;
+}
+function updateBoarRiverJump(g,u,dt){
+  if(!u.riverJumper||u.riverJumpState!=='leap')return false;
+  const duration=Math.max(.1,u.riverJumpTravelTime||.85),raw=clamp((g.time-(u.riverJumpStartedAt||g.time))/duration,0,1),moveP=raw*raw*(3-2*raw);
+  const sx=u.riverJumpStartX??u.x,sy=u.riverJumpStartY??u.y,ex=u.riverJumpEndX??u.x,ey=u.riverJumpEndY??u.y;
+  u.riverJumpProgress=raw;u.x=sx+(ex-sx)*moveP;u.y=sy+(ey-sy)*moveP;u.moving=true;faceToward(u,ex,ey);
+  if(raw>=1-1e-8){
+    u.x=ex;u.y=ey;u.riverJumpState=null;u.riverJumpProgress=1;u.collisionDisabled=false;u.moving=false;u._nav=null;
+    const travelled=Math.hypot(ex-sx,ey-sy);u.walk+=(travelled/Math.max(1,u.speed))*7;
+    if(u.chargeDistance){u.chargeRun=(u.chargeRun||0)+travelled;if(!u.charged&&u.chargeRun>=u.chargeDistance){u.charged=true;event(g,'charge',{x:u.x,y:u.y,owner:u.owner});}}
+    event(g,'boar-river-land',{x:u.x,y:u.y,owner:u.owner});
+  }
+  return true;
+}
+
 function pointSegmentDistance(px,py,ax,ay,bx,by){
   const dx=bx-ax,dy=by-ay,len2=dx*dx+dy*dy;if(len2<1e-8)return Math.hypot(px-ax,py-ay);
   const t=clamp(((px-ax)*dx+(py-ay)*dy)/len2,0,1),x=ax+dx*t,y=ay+dy*t;return Math.hypot(px-x,py-y);
@@ -526,11 +571,27 @@ function summonMiniGolems(g,parent){
     if(made>=count)break;const p={x:clamp(parent.x+ox,50,670),y:clamp(parent.y+oy*f,60,980)};
     if(!staticFree(g,d,p,0))continue;
     if(g.units.some(u=>u.hp>0&&!!u.air===!!d.air&&distance(p,u)<d.radius+(u.radius||12)*.72))continue;
-    const u=makeUnit(g,parent.owner,d.id,p.x,p.y);u.spawn=.35;u.lane=parent.lane;g.units.push(u);event(g,'split-spawn',{x:u.x,y:u.y,owner:u.owner});made++;
+    const u=makeUnit(g,parent.owner,d.id,p.x,p.y);u.spawn=.35;u.lane=parent.lane;g.units.push(u);event(g,'split-spawn',{x:u.x,y:u.y,owner:u.owner,minion:d.id});made++;
   }
   // Crowded bridge/tower fights can leave no perfect free point. ResolveBodies will safely separate this fallback.
-  while(made<count){const side=made?1:-1,u=makeUnit(g,parent.owner,d.id,clamp(parent.x+side*18,50,670),clamp(parent.y+10*f,60,980));u.spawn=.35;u.lane=parent.lane;g.units.push(u);event(g,'split-spawn',{x:u.x,y:u.y,owner:u.owner});made++;}
+  while(made<count){const side=made?1:-1,u=makeUnit(g,parent.owner,d.id,clamp(parent.x+side*18,50,670),clamp(parent.y+10*f,60,980));u.spawn=.35;u.lane=parent.lane;g.units.push(u);event(g,'split-spawn',{x:u.x,y:u.y,owner:u.owner,minion:d.id});made++;}
 }
+function summonDeathMinions(g,parent){
+  const d=UNITS[parent.deathSummonType];if(!d||!parent.deathSummonCount)return 0;
+  const available=Math.max(0,ARENA.maxUnits-g.units.filter(u=>u.hp>0).length),count=Math.min(parent.deathSummonCount,available);if(!count)return 0;
+  const f=parent.owner===0?1:-1,candidates=[[0,-28],[-26,0],[26,0],[0,28],[-38,-20],[38,-20],[-38,20],[38,20]];let made=0;
+  for(const [ox,oy] of candidates){
+    if(made>=count)break;const pos={x:clamp(parent.x+ox,50,670),y:clamp(parent.y+oy*f,60,980)};
+    if(!staticFree(g,d,pos,0))continue;
+    const u=makeUnit(g,parent.owner,d.id,pos.x,pos.y);u.spawn=0;u.lane=parent.lane;u.summonedBy=parent.id;g.units.push(u);event(g,'death-summon',{x:u.x,y:u.y,owner:u.owner,summoner:parent.type,minion:d.id});made++;
+  }
+  while(made<count){
+    const a=(made/count)*Math.PI*2,p2={x:clamp(parent.x+Math.cos(a)*22,50,670),y:clamp(parent.y+Math.sin(a)*22,60,980)},u=makeUnit(g,parent.owner,d.id,p2.x,p2.y);
+    u.spawn=0;u.lane=parent.lane;u.summonedBy=parent.id;u.collisionDisabled=false;g.units.push(u);event(g,'death-summon',{x:u.x,y:u.y,owner:u.owner,summoner:parent.type,minion:d.id});made++;
+  }
+  return made;
+}
+
 function revealStealth(g,u,reason='reveal'){
   if(!u.stealthed)return false;u.stealthed=false;u.stealthUntil=0;u.target=null;u.targetLock=null;event(g,'stealth-reveal',{x:u.x,y:u.y,owner:u.owner,reason});return true;
 }
@@ -577,12 +638,22 @@ function updateCycloneZones(g,dt){
 function handleUnitDeath(g,t){
   if(t._deathHandled)return;t._deathHandled=true;
   event(g,'death',{x:t.x,y:t.y,owner:t.owner,large:t.type==='golem'});
+  if(Number.isFinite(t.enemyEnergyOnDeath)&&t.enemyEnergyOnDeath>0){
+    const enemy=t.owner===0?1:0,p=g.players[enemy],before=p.energy;
+    p.energy=Math.min(ARENA.maxEnergy,p.energy+t.enemyEnergyOnDeath);
+    const granted=p.energy-before;
+    if(granted>1e-8)event(g,'energy-gift',{x:t.x,y:t.y,owner:enemy,sourceOwner:t.owner,amount:granted});
+  }
   if(t.deathDamage&&t.deathRadius){
     event(g,'death-blast',{x:t.x,y:t.y,owner:t.owner,radius:t.deathRadius,damage:t.deathDamage,unitType:t.type});
     const victims=[...alive(g)];
     for(const v of victims)if(v.id!==t.id&&v.owner!==t.owner&&v.hp>0&&distance(t,v)<=t.deathRadius+(v.radius||12)*.35)damage(g,v,t.deathDamage,t.owner);
   }
-  if(t.splitType&&t.splitCount)summonMiniGolems(g,t);
+  if(t.splitType&&t.splitCount){
+    if(t.type==='elixirgolem'||t.type==='elixir_golem_mid')event(g,'elixir-split',{x:t.x,y:t.y,owner:t.owner,fromType:t.type,toType:t.splitType,count:t.splitCount,stage:t.elixirStage||1});
+    summonMiniGolems(g,t);
+  }
+  if(t.deathSummonType&&t.deathSummonCount)summonDeathMinions(g,t);
   if(t.phoenixRevive&&!t.revived)spawnPhoenixEgg(g,t);
   if(t.carrierDeathDamage&&t.carrierDeathRadius&&!t._carrierReachedTarget){
     event(g,'carrier-blast',{x:t.x,y:t.y,owner:t.owner,radius:t.carrierDeathRadius,damage:t.carrierDeathDamage});
@@ -646,6 +717,17 @@ function heal(g,t,amount,owner){
   const before=t.hp;t.hp=Math.min(t.maxHp,t.hp+amount);
   const restored=t.hp-before;if(restored>0)event(g,'heal',{x:t.x,y:t.y,owner,amount:restored});
   return restored;
+}
+function healOnHitPulse(g,sourceId){
+  if(!sourceId)return 0;
+  const u=g.units.find(q=>q.id===sourceId&&q.hp>0);if(!u||!u.healOnHit)return 0;
+  const amount=u.healOnHit,range=u.healOnHitRange||120,maxAllies=Math.max(0,u.healOnHitMaxAllies??3);
+  let healed=heal(g,u,amount,u.owner)>0?1:0;
+  const allies=g.units.filter(t=>t.id!==u.id&&t.owner===u.owner&&t.hp>0&&!t.kind&&!t.building&&!t.eggUnit&&t.hp<t.maxHp&&distance(u,t)<=range+(t.radius||12));
+  allies.sort((a,b)=>(b.maxHp-b.hp)-(a.maxHp-a.hp)||a.hp/a.maxHp-b.hp/b.maxHp||String(a.id).localeCompare(String(b.id)));
+  for(const t of allies.slice(0,maxAllies))if(heal(g,t,amount,u.owner)>0)healed++;
+  if(healed)event(g,'healer-pulse',{x:u.x,y:u.y,owner:u.owner,radius:range,amount,targets:healed});
+  return healed;
 }
 function applySlow(g,t,p){
   if(!p.slowDuration||t.kind||t.building||t.air)return;
@@ -768,21 +850,22 @@ function impact(g,p,entities){
     createMudZone(g,p);
   }else if(target&&targetable(p,target)){
     const wasIronMarked=!!(p.ironMark&&target.ironMarked&&target.ironMarkOwner===p.owner);
-    damage(g,target,p.damage,p.owner,{shieldable:true,ranged:true,sourceX:p.sx,sourceY:p.sy});
+    const dealt=damage(g,target,p.damage,p.owner,{shieldable:true,ranged:true,sourceX:p.sx,sourceY:p.sy});
+    if(dealt>0&&p.sourceUnitId)healOnHitPulse(g,p.sourceUnitId);
     if(target.hp>0&&p.ironMark&&!wasIronMarked)applyIronMark(g,target,{ironMark:true,owner:p.owner,markDamageBonus:p.markDamageBonus,markThreshold:p.markThreshold,markBurstDamage:p.markBurstDamage});
     if(target.hp>0&&p.knockback){const moved=forceAway(g,target,p.sx,p.sy,knockbackAmountFor(target));if(moved>0)event(g,'wind-push',{x:target.x,y:target.y,owner:p.owner,amount:moved});}
     applySlow(g,target,p);
   }
 }
 function projectileSpeed(kind){
-  return ({bomb:220,sky_bomb:260,lightning:520,electro:450,wind:430,gravity:360,phoenix_fire:420,thrown_spear:480,dart:560,iron_arrow:500,mud:300,royal_arrow:470,sparkblast:340})[kind]||390;
+  return ({bomb:180,sky_bomb:260,lightning:520,electro:450,wind:430,gravity:360,phoenix_fire:420,thrown_spear:480,dart:560,iron_arrow:500,mud:300,royal_arrow:470,royal_shell:310,sparkblast:340})[kind]||390;
 }
 function attack(g,u,t){
   if(u.sparkUnit&&!u.sparkCharged)return;
   // First actual attack commits ordinary mobile units to this target.
   commitMobileTarget(u,t);
   const attackFactor=(u.slowUntil||0)>g.time?(u.slowAttackFactor||1):1;
-  u.cd=u.cooldown/Math.max(.15,attackFactor);u.anim=.35;faceToward(u,t.x,t.y);u.target=t.id;
+  u.cd=u.cooldown/Math.max(.15,attackFactor);u.anim=u.valkyrieSpin?.5:.35;faceToward(u,t.x,t.y);u.target=t.id;
   if(u.suicideUnit&&(t.kind||t.building)){
     const amount=u.suicideDamage||u.damage;damage(g,t,amount,u.owner,{shieldable:false,sourceX:u.x,sourceY:u.y});
     event(g,'suicide-hit',{x:t.x,y:t.y,owner:u.owner,amount});u._carrierReachedTarget=true;u.hp=0;handleUnitDeath(g,u);return;
@@ -801,12 +884,13 @@ function attack(g,u,t){
   }
   if(u.projectile){
     g.projectiles.push({id:`p${g.nextId++}`,owner:u.owner,x:u.x,y:u.y-6,sx:u.x,sy:u.y,tx:t.x,ty:t.y,target:t.id,
-    kind:u.projectile,speed:projectileSpeed(u.projectile),damage:amount,splash:u.splash||0,
+    kind:u.projectile,speed:projectileSpeed(u.projectile),damage:amount,splash:u.splash||0,sourceUnitId:u.id,
     targetsAir:u.targetsAir,life:3,slowMove:u.slowMove,slowAttack:u.slowAttack,slowMoveStages:u.slowMoveStages,slowAttackStages:u.slowAttackStages,slowDuration:u.slowDuration,
     ironMark:!!u.ironMark,markDamageBonus:u.markDamageBonus,markThreshold:u.markThreshold,markBurstDamage:u.markBurstDamage,sourceUnitType:u.type,
     chainCount:u.chainCount,chainRange:u.chainRange,chainFalloff:u.chainFalloff,chainDamages:Array.isArray(u.chainDamages)?u.chainDamages.map(v=>u.damage?Math.round(v*(amount/u.damage)):0):u.chainDamages,stunDuration:u.stunDuration,stunUnitsOnly:u.stunUnitsOnly,mudRadius:u.mudRadius,mudDuration:u.mudDuration,mudTickEvery:u.mudTickEvery,mudDamage:u.mudDamage,mudSlow:u.mudSlow,knockback:!!u.knockback,gravityPull:!!u.gravityPull});
   }else{
-    if(u.meleeSplash)megaAreaDamage(g,u,t.x,t.y,amount,u.meleeSplash,u.megaKnight?'mega-smash':'slash-splash',true);
+    if(u.valkyrieSpin&&u.meleeSplash)megaAreaDamage(g,u,u.x,u.y,amount,u.meleeSplash,'valkyrie-spin',true);
+    else if(u.meleeSplash)megaAreaDamage(g,u,t.x,t.y,amount,u.meleeSplash,u.megaKnight?'mega-smash':'slash-splash',true);
     else damage(g,t,amount,u.owner,{shieldable:true,sourceX:u.x,sourceY:u.y});
     event(g,'slash',{x:t.x,y:t.y,owner:u.owner,angle:Math.atan2(t.y-u.y,t.x-u.x),kind:u.type});
     if(u.crusherRamp){
@@ -880,14 +964,15 @@ export function runBot(g,owner=1){
     const fireCluster=enemies.filter(u=>distance(u,threat)<=UNITS.fireball.radius+u.radius).length;
     const arrowCluster=enemies.filter(u=>distance(u,threat)<=UNITS.arrowrain.radius+u.radius).length;
     if(aff.includes('zap')&&(threat.type==='sparky'||threat.type==='lasertower'||fireCluster>=4)){deploy(g,owner,'zap',threat.x,threat.y);return;}
-    if(aff.includes('poison')&&(threat.type==='boneswarm'||fireCluster>=4)){deploy(g,owner,'poison',threat.x,threat.y);return;}
+    if(aff.includes('lightning')&&(threat.hp>=900||fireCluster>=3)){deploy(g,owner,'lightning',threat.x,threat.y);return;}
+    if(aff.includes('poison')&&((threat.type==='boneswarm'||threat.type==='skeleton')||fireCluster>=4)){deploy(g,owner,'poison',threat.x,threat.y);return;}
     if(aff.includes('cyclone')&&arrowCluster>=3){deploy(g,owner,'cyclone',threat.x,threat.y);return;}
     if(aff.includes('arrowrain')&&arrowCluster>=3){deploy(g,owner,'arrowrain',threat.x,threat.y);return;}
     if(aff.includes('fireball')&&(fireCluster>=2||threat.type==='frost'||threat.type==='lumina')){deploy(g,owner,'fireball',threat.x,threat.y);return;}
   }
   let choices=aff.filter(id=>!UNITS[id].spell);if(!choices.length){
     const target=threat||g.towers.find(t=>t.owner!==owner&&t.kind==='tower'&&t.hp>0)||g.towers.find(t=>t.owner!==owner&&t.kind==='core'&&t.hp>0);
-    const spell=aff.includes('zap')?'zap':aff.includes('cyclone')?'cyclone':aff.includes('arrowrain')?'arrowrain':aff.includes('fireball')?'fireball':aff.includes('poison')?'poison':null;
+    const spell=aff.includes('lightning')?'lightning':aff.includes('zap')?'zap':aff.includes('cyclone')?'cyclone':aff.includes('arrowrain')?'arrowrain':aff.includes('fireball')?'fireball':aff.includes('poison')?'poison':null;
     if(target&&spell)deploy(g,owner,spell,target.x,target.y);return;
   }
   if(threat?.air&&choices.some(id=>UNITS[id].targetsAir))choices=choices.filter(id=>UNITS[id].targetsAir);
@@ -939,6 +1024,7 @@ export function tick(g,dt=ARENA.tick){
       if(u.sparkUnit)updateSparkyCharge(g,u);
       if(u.spawn>0){u.spawn=Math.max(0,u.spawn-dt);continue;}
       if(u.decayPerSecond){decayStructure(g,u,u.decayPerSecond*dt);if(u.hp<=0)continue;}
+      if(updateBoarRiverJump(g,u,dt))continue;
     }
     if((u.hookControlUntil||0)>g.time){u.target=null;u.moving=false;continue;}
     if((u.stunUntil||0)>g.time){u.target=null;if(u.laserTower||u.laserUnit)resetLaserTower(u);if(u.drillUnit)resetDrill(u);if(u.crusherRamp)resetCrusher(u);continue;}
@@ -953,6 +1039,7 @@ export function tick(g,dt=ARENA.tick){
     const target=getTarget(g,u,entities);
     if(!target){if(u.laserTower||u.laserUnit)resetLaserTower(u);if(u.drillUnit)resetDrill(u);if(u.crusherRamp)resetCrusher(u);u.target=null;continue;}
     u.target=target.id;
+    if(beginBoarRiverJump(g,u,target))continue;
     const reach=u.range+target.radius;
     if(u.megaKnight&&megaJumpReady(u,target)){beginMegaJumpWindup(g,u,target);continue;}
     if(u.crusherRamp&&u.crusherTarget&&(u.crusherTarget!==target.id||distance(u,target)>reach))resetCrusher(u);
@@ -982,7 +1069,11 @@ export function tick(g,dt=ARENA.tick){
     }
     const t=entities.find(e=>e.id===p.target&&e.hp>0);if(t){p.tx=t.x;p.ty=t.y;}
     const d=Math.hypot(p.tx-p.x,p.ty-p.y),step=p.speed*dt;
-    if(d<=step+5){p.x=p.tx;p.y=p.ty;impact(g,p,entities);p.life=0;}
+    if(p.kind==='bomb'){
+      const full=Math.max(1,Math.hypot(p.tx-p.sx,p.ty-p.sy));
+      p.progress=clamp(1-d/full,0,1);
+    }
+    if(d<=step+5){p.x=p.tx;p.y=p.ty;p.progress=1;impact(g,p,entities);p.life=0;}
     else {p.x+=(p.tx-p.x)/d*step;p.y+=(p.ty-p.y)/d*step;}
   }
   g.projectiles=g.projectiles.filter(p=>p.life>0);
@@ -994,7 +1085,7 @@ export function viewMatch(g,seat=0){
   const p=g.players[seat];
   return {physicsVersion:PHYSICS_VERSION,phase:g.phase,countdown:g.countdown,time:rnd(g.time),overtime:g.overtime,winner:g.winner,reason:g.reason,
     scores:[towerScore(g,0),towerScore(g,1)],energy:rnd(p.energy),hand:[...p.hand],next:p.queue[0],deck:[...p.deck],
-    units:g.units.map(u=>({id:u.id,type:u.type,owner:u.owner,x:rnd(u.x),y:rnd(u.y),hp:u.hp,maxHp:u.maxHp,radius:u.radius,air:u.air,building:!!u.building,anim:u.anim,hit:u.hit,walk:u.walk,spawn:u.spawn,face:u.face,facing:u.facing,moving:!!u.moving,mass:u.mass,age:u.age,target:u.target||null,targetable:u.targetable!==false,deploying:!!u.deploying,deployTotal:rnd(u.deployTotal||0),deployRemaining:rnd(u.deployRemaining||0),collisionDisabled:!!u.collisionDisabled,laserStage:u.laserStage||0,laserDps:rnd(u.laserDps||0),laserLockTime:rnd(u.laserLockTime||0),charged:!!u.charged,chargeRun:rnd(u.chargeRun||0),sparkCharged:!!u.sparkCharged,sparkChargeProgress:rnd(u.sparkChargeProgress||0),stunned:(u.stunUntil||0)>g.time,stunRemaining:rnd(Math.max(0,(u.stunUntil||0)-g.time)),slowed:(u.slowUntil||0)>g.time,slowStage:(u.slowUntil||0)>g.time?(u.slowStage||1):0,slowRemaining:rnd(Math.max(0,(u.slowUntil||0)-g.time)),poisoned:(u.poisonUntil||0)>g.time,poisonOwner:Number.isFinite(u.poisonOwner)?u.poisonOwner:null,poisonRemaining:rnd(Math.max(0,(u.poisonUntil||0)-g.time)),mudded:(u.mudUntil||0)>g.time,mudRemaining:rnd(Math.max(0,(u.mudUntil||0)-g.time)),burrowState:u.burrowState||null,burrowProgress:rnd(u.burrowProgress||0),summonType:u.summonType||null,summonCount:u.summonCount||0,summonRemaining:u.summonInterval?rnd(Math.max(0,(u.summonNextAt||g.time)-g.time)):0,summonCasting:(u.summonCastingUntil||0)>g.time,summonWindupRemaining:rnd(Math.max(0,(u.summonCastingUntil||0)-g.time)),dashState:u.dashState||null,dashWindupRemaining:rnd(Math.max(0,(u.dashWindupUntil||0)-g.time)),dashCooldownRemaining:rnd(Math.max(0,(u.dashReadyAt||0)-g.time)),invulnerable:(u.invulnerableUntil||0)>g.time,shieldHp:rnd(u.shieldHp||0),maxShieldHp:rnd(u.maxShieldHp||0),stealthed:!!u.stealthed,stealthRemaining:rnd(Math.max(0,(u.stealthUntil||0)-g.time)),eggHatchRemaining:u.eggUnit?rnd(Math.max(0,(u.eggHatchAt||g.time)-g.time)):0,revived:!!u.revived,drillStage:u.drillStage||0,drillDps:rnd(u.drillDps||0),drillLockTime:rnd(u.drillLockTime||0),crusherStage:u.crusherStage||0,megaJumpState:u.megaJumpState||null,megaJumpProgress:rnd(u.megaJumpProgress||0),megaJumpWindupRemaining:rnd(Math.max(0,(u.megaJumpWindupUntil||0)-g.time)),megaJumpTargetX:Number.isFinite(u.megaJumpTargetX)?rnd(u.megaJumpTargetX):null,megaJumpTargetY:Number.isFinite(u.megaJumpTargetY)?rnd(u.megaJumpTargetY):null,megaJumpStartX:Number.isFinite(u.megaJumpStartX)?rnd(u.megaJumpStartX):null,megaJumpStartY:Number.isFinite(u.megaJumpStartY)?rnd(u.megaJumpStartY):null,megaJumpEndX:Number.isFinite(u.megaJumpEndX)?rnd(u.megaJumpEndX):null,megaJumpEndY:Number.isFinite(u.megaJumpEndY)?rnd(u.megaJumpEndY):null,jumpRadius:u.jumpRadius||0,ironSpinUsed:!!u.ironSpinUsed,ironSpinState:u.ironSpinState||null,ironSpinProgress:rnd(u.ironSpinProgress||0),ironSpinEndX:Number.isFinite(u.ironSpinEndX)?rnd(u.ironSpinEndX):null,ironSpinEndY:Number.isFinite(u.ironSpinEndY)?rnd(u.ironSpinEndY):null,ironMarked:!!u.ironMarked,ironMarkOwner:Number.isFinite(u.ironMarkOwner)?u.ironMarkOwner:null,ironMarkProgress:u.ironMarked?rnd(clamp((u.ironMarkDamage||0)/Math.max(1,u.ironMarkThreshold||500),0,1)):0,hookState:u.hookState||null,hookProgress:rnd(u.hookProgress||0),hookCooldownRemaining:rnd(Math.max(0,(u.hookReadyAt||0)-g.time)),hookTargetX:Number.isFinite(u.hookTargetX)?rnd(u.hookTargetX):null,hookTargetY:Number.isFinite(u.hookTargetY)?rnd(u.hookTargetY):null,hookAirAttackRemaining:rnd(Math.max(0,(u.hookAirAttackUntil||0)-g.time)),turtleShellActive:!!(u.siegeTurtle&&u.moving)})),
+    units:g.units.map(u=>({id:u.id,type:u.type,owner:u.owner,x:rnd(u.x),y:rnd(u.y),hp:u.hp,maxHp:u.maxHp,radius:u.radius,air:u.air,building:!!u.building,anim:u.anim,hit:u.hit,walk:u.walk,spawn:u.spawn,face:u.face,facing:u.facing,moving:!!u.moving,mass:u.mass,age:u.age,target:u.target||null,targetable:u.targetable!==false,deploying:!!u.deploying,deployTotal:rnd(u.deployTotal||0),deployRemaining:rnd(u.deployRemaining||0),collisionDisabled:!!u.collisionDisabled,laserStage:u.laserStage||0,laserDps:rnd(u.laserDps||0),laserLockTime:rnd(u.laserLockTime||0),charged:!!u.charged,chargeRun:rnd(u.chargeRun||0),sparkCharged:!!u.sparkCharged,sparkChargeProgress:rnd(u.sparkChargeProgress||0),stunned:(u.stunUntil||0)>g.time,stunRemaining:rnd(Math.max(0,(u.stunUntil||0)-g.time)),slowed:(u.slowUntil||0)>g.time,slowStage:(u.slowUntil||0)>g.time?(u.slowStage||1):0,slowRemaining:rnd(Math.max(0,(u.slowUntil||0)-g.time)),poisoned:(u.poisonUntil||0)>g.time,poisonOwner:Number.isFinite(u.poisonOwner)?u.poisonOwner:null,poisonRemaining:rnd(Math.max(0,(u.poisonUntil||0)-g.time)),mudded:(u.mudUntil||0)>g.time,mudRemaining:rnd(Math.max(0,(u.mudUntil||0)-g.time)),burrowState:u.burrowState||null,burrowProgress:rnd(u.burrowProgress||0),summonType:u.summonType||null,summonCount:u.summonCount||0,summonRemaining:u.summonInterval?rnd(Math.max(0,(u.summonNextAt||g.time)-g.time)):0,summonCasting:(u.summonCastingUntil||0)>g.time,summonWindupRemaining:rnd(Math.max(0,(u.summonCastingUntil||0)-g.time)),dashState:u.dashState||null,dashWindupRemaining:rnd(Math.max(0,(u.dashWindupUntil||0)-g.time)),dashCooldownRemaining:rnd(Math.max(0,(u.dashReadyAt||0)-g.time)),invulnerable:(u.invulnerableUntil||0)>g.time,shieldHp:rnd(u.shieldHp||0),maxShieldHp:rnd(u.maxShieldHp||0),stealthed:!!u.stealthed,stealthRemaining:rnd(Math.max(0,(u.stealthUntil||0)-g.time)),eggHatchRemaining:u.eggUnit?rnd(Math.max(0,(u.eggHatchAt||g.time)-g.time)):0,revived:!!u.revived,drillStage:u.drillStage||0,drillDps:rnd(u.drillDps||0),drillLockTime:rnd(u.drillLockTime||0),crusherStage:u.crusherStage||0,megaJumpState:u.megaJumpState||null,megaJumpProgress:rnd(u.megaJumpProgress||0),megaJumpWindupRemaining:rnd(Math.max(0,(u.megaJumpWindupUntil||0)-g.time)),megaJumpTargetX:Number.isFinite(u.megaJumpTargetX)?rnd(u.megaJumpTargetX):null,megaJumpTargetY:Number.isFinite(u.megaJumpTargetY)?rnd(u.megaJumpTargetY):null,megaJumpStartX:Number.isFinite(u.megaJumpStartX)?rnd(u.megaJumpStartX):null,megaJumpStartY:Number.isFinite(u.megaJumpStartY)?rnd(u.megaJumpStartY):null,megaJumpEndX:Number.isFinite(u.megaJumpEndX)?rnd(u.megaJumpEndX):null,megaJumpEndY:Number.isFinite(u.megaJumpEndY)?rnd(u.megaJumpEndY):null,jumpRadius:u.jumpRadius||0,riverJumpState:u.riverJumpState||null,riverJumpProgress:rnd(u.riverJumpProgress||0),riverJumpEndX:Number.isFinite(u.riverJumpEndX)?rnd(u.riverJumpEndX):null,riverJumpEndY:Number.isFinite(u.riverJumpEndY)?rnd(u.riverJumpEndY):null,ironSpinUsed:!!u.ironSpinUsed,ironSpinState:u.ironSpinState||null,ironSpinProgress:rnd(u.ironSpinProgress||0),ironSpinEndX:Number.isFinite(u.ironSpinEndX)?rnd(u.ironSpinEndX):null,ironSpinEndY:Number.isFinite(u.ironSpinEndY)?rnd(u.ironSpinEndY):null,ironMarked:!!u.ironMarked,ironMarkOwner:Number.isFinite(u.ironMarkOwner)?u.ironMarkOwner:null,ironMarkProgress:u.ironMarked?rnd(clamp((u.ironMarkDamage||0)/Math.max(1,u.ironMarkThreshold||500),0,1)):0,hookState:u.hookState||null,hookProgress:rnd(u.hookProgress||0),hookCooldownRemaining:rnd(Math.max(0,(u.hookReadyAt||0)-g.time)),hookTargetX:Number.isFinite(u.hookTargetX)?rnd(u.hookTargetX):null,hookTargetY:Number.isFinite(u.hookTargetY)?rnd(u.hookTargetY):null,hookAirAttackRemaining:rnd(Math.max(0,(u.hookAirAttackUntil||0)-g.time)),turtleShellActive:!!(u.siegeTurtle&&u.moving)})),
     towers:g.towers.map(t=>({id:t.id,kind:t.kind,owner:t.owner,x:t.x,y:t.y,hp:t.hp,maxHp:t.maxHp,radius:t.radius,anim:t.anim,hit:t.hit,facing:t.facing,awake:t.kind==='core'?!!t.awake:true,stunned:(t.stunUntil||0)>g.time,stunRemaining:rnd(Math.max(0,(t.stunUntil||0)-g.time))})),
     projectiles:g.projectiles.map(p=>({id:p.id,owner:p.owner,x:rnd(p.x),y:rnd(p.y),tx:rnd(p.tx),ty:rnd(p.ty),kind:p.kind,spell:p.spell||null,progress:rnd(p.progress||0),radius:p.splash||0})),
     zones:(g.zones||[]).map(z=>({id:z.id,owner:z.owner,kind:z.kind,spell:z.spell,x:rnd(z.x),y:rnd(z.y),radius:z.radius,remaining:rnd(z.remaining),total:z.total})),

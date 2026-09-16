@@ -22,19 +22,17 @@ test('spell team colors are viewer-relative: own blue/solid and enemy red/dashed
   assert.ok(SPELL_TEAM_COLORS.enemy.dash.length>0);
 });
 
-test('lingering poison snapshot retains caster owner for spell-side rendering',()=>{
+test('eight-second poison zone snapshot retains caster owner for spell-side rendering',()=>{
   const deck=['poison','blade','knight','archer','mage','spear','bat','bomber'];
   const g=battleWithDeck(deck);
-  // Put an enemy inside the poison zone and advance to the immediate first poison tick.
-  const u={...g.towers[0],id:'u-poison-test',kind:undefined,building:false,type:'blade',owner:1,x:360,y:700,hp:500,maxHp:500,radius:16,air:false,targetable:true,cd:0,spawn:0,anim:0,hit:0,walk:0,face:1,facing:0,moving:false,mass:2,age:0};
-  g.units.push(u);
   assert.equal(deploy(g,0,'poison',360,700).ok,true);
   tick(g,.1);
-  const snap=viewMatch(g,0),poisoned=snap.units.find(x=>x.id==='u-poison-test');
-  assert.equal(poisoned.poisoned,true);
-  assert.equal(poisoned.poisonOwner,0);
+  const snap=viewMatch(g,0),zone=snap.zones.find(z=>z.kind==='poison');
+  assert.ok(zone);
+  assert.equal(zone.owner,0);
+  assert.equal(zone.total,8);
+  assert.ok(zone.remaining>7.8&&zone.remaining<=8);
 });
-
 
 test('sparkblast render uses drawArena time and frame rendering resets transforms',()=>{
   const source=fs.readFileSync(new URL('../public/game/art.js',import.meta.url),'utf8');
@@ -60,4 +58,29 @@ test('team ownership bands are hidden in deck and library portraits but remain a
   assert.match(art,/c\.__hideTeamBands===true&&TEAM_COLORS\.includes\(color\)/);
   assert.match(art,/c\.__hideTeamBands=deckMode\|\|portraitMode==='library'/);
   assert.match(app,/can\.dataset\.portraitMode='library'/);
+});
+test('v26.2 Valkyrie stays upright while the axe spins and Leaf Archer portrait shows a duo',()=>{
+  const art=fs.readFileSync(new URL('../public/game/art.js',import.meta.url),'utf8');
+  const valk=art.slice(art.indexOf('function drawValkyrie'),art.indexOf('function drawGargoyle'));
+  assert.match(valk,/const viewBack=/);
+  assert.match(valk,/const axeAngle=attack\?/);
+  assert.doesNotMatch(valk,/c\.rotate\(spin\*TAU/);
+  assert.match(art,/if\(type==='archer'\)\{[\s\S]{0,180}group=\[\[46,101,\.82\],\[74,101,\.82\]\]/);
+});
+
+test('v26.5 Leaf Archer placement preview is a visible two-unit duo',()=>{
+  const art=fs.readFileSync(new URL('../public/game/art.js',import.meta.url),'utf8');
+  assert.match(art,/options\.selected==='archer'[\s\S]{0,220}for\(const dx of \[-17,17\]\)[\s\S]{0,180}drawUnit\(c,'archer'/);
+});
+test('v26.5 battle hand long press exposes unit and tower damage',()=>{
+  const app=fs.readFileSync(new URL('../public/app.js',import.meta.url),'utf8');
+  const css=fs.readFileSync(new URL('../public/styles.css',import.meta.url),'utf8');
+  assert.match(app,/HOLD_DAMAGE_MS=430/);assert.match(app,/cardDamageInfo\(d\)/);assert.match(app,/対ユニット/);assert.match(app,/対タワー/);
+  assert.match(css,/\.card-damage-pop/);assert.match(css,/\.card-damage-pop\.show/);
+});
+
+test('v26.6 Bomber bomb render follows a rotating parabolic throw arc',()=>{
+  const art=fs.readFileSync(new URL('../public/game/art.js',import.meta.url),'utf8');
+  assert.match(art,/p\.kind==='bomb'[\s\S]{0,180}Math\.sin\(Math\.PI\*bombProgress\)\*42/);
+  assert.match(art,/thrownBomb\?angle\+bombProgress\*TAU\*1\.35:angle/);
 });

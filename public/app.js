@@ -1,9 +1,110 @@
-import {VERSION,ARENA,UNITS,DECK,DEFAULT_DECK,MAX_DECK,normalizeDeck,summonDelayFor} from './game/units.js';
+import {VERSION,ARENA,UNITS,DECK,DEFAULT_DECK,MAX_DECK,normalizeDeck,summonDelayFor,cardDamageInfo} from './game/units.js';
 import {createMatch,tick,runBot,deploy,viewMatch,clamp,canPlace} from './game/engine.js';
 import {drawArena,drawPortrait,orient} from './game/art.js';
+import {snapDeploymentPoint} from './game/physics.js';
 
 const $=s=>document.querySelector(s);
+// Keep the whole game surface free from browser text-selection/copy callouts so touch dragging stays game-controlled.
+function blockNativeTextActions(e){e.preventDefault();}
+document.addEventListener('contextmenu',blockNativeTextActions,{capture:true});
+document.addEventListener('selectstart',blockNativeTextActions,{capture:true});
+document.addEventListener('copy',blockNativeTextActions,{capture:true});
+document.addEventListener('cut',blockNativeTextActions,{capture:true});
+document.addEventListener('dragstart',blockNativeTextActions,{capture:true});
+document.addEventListener('selectionchange',()=>{const sel=window.getSelection?.();if(sel&&!sel.isCollapsed)sel.removeAllRanges();});
 const PATCH_NOTES = Object.freeze([
+  {version:'29.0.0',date:'2026-09-16',title:'LIGHTNING & NECRO UPDATE',items:[
+    'ネクロマンサーを5コスト・HP839・攻撃間隔1.1秒へ、ダークネクロマンサーを4コスト・HP907・攻撃304へ調整。既存の召喚能力は維持。',
+    '「ポイズントラップ」を「ポイズン」へ改名。8秒間、範囲内のユニットへ毎秒91・建物へ毎秒21ダメージ。カード絵を赤い細長い魔法瓶へ変更。',
+    'ファイヤーボールを対ユニット689 / 対建物159、矢の雨を対ユニット366 / 対建物75へ調整。',
+    '新6コスト呪文「ライトニング」を追加。半径105内の現在HPが高い敵4体へ、ユニット1056 / 建物265ダメージ。青い長方形の魔法瓶＋電流デザイン。',
+    'エリクサーゴーレム詳細映像のタワーダメージを修正し、大→中→小への分裂時にピンクの破裂演出を追加。カード総数56枚（50ユニット＋6呪文）、physicsVersion 45。'
+  ]},
+  {version:'28.0.0',date:'2026-09-16',title:'ROYAL ELIXIR UPDATE',items:[
+    '「ルミナ司祭」を「ヒーラー」へ改名。HP1900・攻撃120・攻撃間隔1.75秒・射程120へ変更し、攻撃命中時に自分＋周囲の傷ついた味方最大3体を各110回復する戦闘型回復へ刷新。',
+    '新3コスト「エリクサーゴーレム」を追加。HP1568・攻撃254・2秒攻撃・建物限定。大1→中2→小4へ分裂し、撃破段階ごとに相手へ1 / 1 / 0.5エリクサーを付与。',
+    '新6コスト「ロイヤルジャイアント」を追加。HP3164・攻撃307・攻撃間隔1.8秒・射程165・低速・建物限定。手持ち大砲から専用砲弾を発射。',
+    'カード総数55枚（50ユニット＋5呪文）。新能力とオンライン同期更新に伴い physicsVersion 44。'
+  ]},
+  {version:'27.1.0',date:'2026-09-16',title:'RIVERBANK DEPLOY UPDATE',items:[
+    '初期召喚可能ラインを自陣側600/440から、橋へ少しかかる550/490まで拡張。芝生の最前線と実際の配置範囲を一致させた。',
+    '川の水面そのものを直接指定した場合は配置不可。橋の上は新しい前線の範囲内なら配置可能。',
+    '芝生ギリギリの配置でユニットの体が川へはみ出す場合、配置失敗にせず体が岸に収まる位置まで自陣側へ自動スナップ。複数体カードも各ユニットを安全な岸側へ補正。',
+    '配置判定変更に伴い physicsVersion 43。カード性能は変更なし。'
+  ]},
+  {version:'27.0.0',date:'2026-09-16',title:'UNDEAD RIVER UPDATE',items:[
+    'アイアンボアをHP1696・攻撃318・攻撃間隔1.6秒へ変更。川付近では橋へ迂回せず、対岸へ直接ジャンプする専用移動を追加。',
+    '1コスト「スケルトン」を追加。HP81・攻撃81のスケルトン3体を展開。「ボーンスウォーム」は「スケルトン部隊」へ改名し、同性能のスケルトン15体編成へ変更。',
+    '新設置物「墓石」を追加。3コスト / HP530 / 毎秒30自然減衰。配置完了時と4秒ごとにスケルトン2体、破壊時に待ち時間なしで4体召喚。',
+    'メガナイトをHP3993・通常攻撃263・ジャンプ着地537へ変更。配置時の落下420ダメージは維持。',
+    'カード総数53枚（48ユニット＋5呪文）。対戦ロジック変更に伴い physicsVersion 42。'
+  ]},
+  {version:'26.6.0',date:'2026-09-16',title:'ARSENAL & SWARM UPDATE',items:[
+    'ボルト砲台を「大砲」へ改名。HP1000・攻撃200・攻撃間隔1.0秒へ調整。毎秒30の自然耐久減少は維持。',
+    'ムーンバットを「コウモリの群れ」へ改名。5体編成へ増加し、各HP92・攻撃82・攻撃間隔1.2秒へ調整。',
+    'ポット爆弾兵を「ボンバー」へ改名し、コスト3→2。爆弾の飛行速度を少し落とし、山なりに回転しながら投げる演出を追加。',
+    '戦闘バランス変更に伴い physicsVersion 41。'
+  ]},
+  {version:'26.5.0',date:'2026-09-16',title:'BATTLE READABILITY UPDATE',items:[
+    'リーフ弓兵の配置・召喚プレビューを1体表示から左右2体表示へ修正。実際の2体編成と見た目を一致。',
+    '中央本拠地をHP4560・攻撃85、左右サイドタワーを各HP3200・攻撃105へ調整。',
+    '戦闘中の手札カードを長押しすると、対ユニットDMGと対タワーDMGをその場で確認できる情報パネルを追加。',
+    'ファイヤーボール560/140、矢の雨330/80、ポイズン55/10など、建物補正を実際の設定値から表示。physicsVersion 40。'
+  ]},
+  {version:'26.4.3',date:'2026-09-16',title:'GOLEM ARM SWAY TUNE',items:[
+    'ストーンゴーレム / ちびゴーレムの腕振りの周期を少し遅く調整し、より重いテンポで揺れるように調整。',
+    'v26.4.1のゴリラ型シルエット、低い頭、石・苔・青いルーンの見た目は維持。',
+    '攻撃時の見た目や性能値は変更なし（ストーンゴーレム HP4256 / 攻撃260 / 攻撃間隔2.5秒 / 死亡爆発260）。',
+    'visual update only。戦闘ロジック変更なしのため physicsVersion 39を維持。'
+  ]},
+  {version:'26.4.0',date:'2026-09-16',title:'GOLEM WEIGHT UPDATE',items:[
+    'ストーンゴーレムをHP4256・攻撃260・攻撃間隔2.5秒へ変更。死亡爆発も260へ強化。8コスト・建物特攻・分裂2体は維持。',
+    'ちびゴーレムを本体のおよそ1/5性能へ統一。HP851・攻撃52・死亡爆発52、攻撃間隔は本体と同じ2.5秒。',
+    'ストーンゴーレムの石・苔・ルーンのデザインは維持しつつ、頭を低くして前傾し、両腕を前へ垂らすゴリラ風の重量姿勢へ変更。',
+    'カード総数51枚（46ユニット＋5呪文）、physicsVersion 39。'
+  ]},
+  {version:'26.3.0',date:'2026-09-16',title:'FRONTLINE POWER UPDATE',items:[
+    'アイアン衛士の攻撃を98→202へ強化。HP1850・3コスト・攻撃間隔1.35秒は据え置き。',
+    'クラッグバーサーカーをHP2450→3760、攻撃465→842へ大幅強化。7コスト・攻撃間隔1.8秒は据え置き。',
+    'ミニバーサーカーをHP1300→1390、攻撃270→755へ強化し、攻撃間隔を1.45→1.6秒へ調整。',
+    'リーフ弓兵は2体編成・各HP304・攻撃112・射程165を維持し、コストを2→3へ変更。カード総数51枚（46ユニット＋5呪文）、physicsVersion 38。'
+  ]},
+  {version:'26.2.0',date:'2026-09-16',title:'AXE & ARCHER UPDATE',items:[
+    'ヴァルキリーをHP2200・攻撃260へ強化。回転斬りの範囲とエフェクトは維持しつつ、体全体を回転させず、前向き/後ろ向きを切り替えながら斧だけを大きく振り回す見た目へ変更。',
+    'リーフ弓兵を小型2体編成へ変更。2コストのまま、1体HP304・攻撃112・射程165。横並びで2体出撃し、地上・空中へ射撃。',
+    'リーフ弓兵の戦闘モデルとカード画像も一回り小さく調整。カード総数51枚（46ユニット＋5呪文）、physicsVersion 37。'
+  ]},
+  {version:'26.1.1',date:'2026-09-16',title:'BATTLE PACE TUNE',items:[
+    'V26.1.0で遅くした全ユニットの通常移動速度を、現在値から約5%だけ上げて微調整しました。速い・普通・遅いというキャラ間の速度差は維持しています。',
+    '建物など速度0はそのまま。メガナイトの固定1.5秒ジャンプ、ナイトシェイドの突進、穴掘り、追跡者のフックなど特殊移動の速度・時間も変更していません。',
+    'カード総数51枚（46ユニット＋5呪文）、physicsVersion 36。'
+  ]},
+  {version:'26.1.0',date:'2026-09-16',title:'BATTLE PACE UPDATE',items:[
+    '全ユニットの通常移動速度を約15%低下。速い・普通・遅いというキャラ間の相対差は維持したまま、戦場全体の移動テンポを落としました。',
+    '建物など元から移動速度0のユニットは変更なし。メガナイトの1.5秒ジャンプ、ナイトシェイドの突進、穴掘り、フックなど特殊移動の速度・時間も変更していません。',
+    'カード総数51枚（46ユニット＋5呪文）、physicsVersion 35。'
+  ]},
+  {version:'26.0.0',date:'2026-09-16',title:'WILD WINGS UPDATE',items:[
+    '新ユニット「ヴァルキリー」を追加。4コスト / HP1400 / 攻撃230。自分中心の半径50回転斬りで地上群体をまとめて攻撃。',
+    '新ユニット「ガーゴイル」を追加。3コストで3体。1体HP230 / 攻撃102 / 速度78 / 射程45。地上・空中の両方を攻撃可能。',
+    '新カード「ガーゴイルの群れ」を追加。5コストで同性能のガーゴイル6体を展開。',
+    'カード総数51枚（46ユニット＋5呪文）、physicsVersion 34。'
+  ]},
+  {version:'25.2.1',date:'2026-09-16',title:'SKY BOMBER AIR TARGET FIX',items:[
+    'スカイボマーが地上ユニット・空中ユニット・建物のすべてを攻撃できるように変更。',
+    'HP650、4コスト、攻撃175、速度58、射程75、攻撃間隔1.6秒は25.2.0から据え置き。',
+    '対戦ロジック変更に伴い physicsVersion を33へ更新。'
+  ]},
+  {version:'25.2.0',date:'2026-09-16',title:'SKY BOMBER RETARGET',items:[
+    'スカイボマーを建物専用から地上ユニット＋建物を攻撃する飛行爆撃兵へ変更。空中ユニットは引き続き攻撃不可。',
+    'HPを720から650へ低下。4コスト、攻撃175、速度58、射程75、攻撃間隔1.6秒は据え置き。',
+    '対戦ロジック変更に伴い physicsVersion を32へ更新。'
+  ]},
+  {version:'25.1.1',date:'2026-09-16',title:'MOBILE DRAG FIX',items:[
+    'スマホの長押しドラッグ時に出ていたブラウザ標準の文字選択・コピー・拡大ルーペ/コールアウトを、TINY SIEGEの画面全体で抑制しました。',
+    '右クリック/長押しメニュー、文字選択、コピー/切り取り、ネイティブドラッグをゲーム画面全体で無効化。通常のタップ・スクロール・ゲーム操作は維持します。',
+    'デッキ編成の約0.18秒長押し後ドラッグ仕様はそのまま。戦闘ロジック変更なしのため physicsVersion は31を維持します。'
+  ]},
   {version:'25.1.0',date:'2026-09-15',title:'DRAG DECK UPDATE',items:[
     'デッキ編集にドラッグ＆ドロップ編成を追加。カード一覧から8枠へ直接ドラッグすると、満杯時はその枠と入れ替え、空きがある場合は追加できます。',
     'デッキ8枠同士もドラッグで順番を入れ替え可能。ドラッグ中はカードが指・マウスへ追従し、置ける枠と現在のドロップ先を強調表示します。',
@@ -134,7 +235,7 @@ const PATCH_NOTES = Object.freeze([
   ]},
   {version:'17.0.0',date:'2026-09-10',title:'SUMMONERS UPDATE',items:[
     '新ユニット「ネクロマンサー」を追加。6コスト・HP1350・地上/空中への範囲攻撃。配置直後にボーン3体、その後6秒ごとに3体を召喚します。',
-    '新ユニット「ダークネクロマンサー」を追加。5コスト・HP1150・地上のみを攻撃。配置直後にムーンバット2体、その後5秒ごとに2体を召喚します。',
+    '新ユニット「ダークネクロマンサー」を追加。5コスト・HP1150・地上のみを攻撃。配置直後にコウモリ2体、その後5秒ごとに2体を召喚します。',
     '新カード「アッシュ部隊」を追加。5コストで既存アッシュ剣士3体を、敵方向へ前1体・後ろ2体の三角陣形で展開します。',
     '3枚ともカード詳細に本番エンジンの専用LIVE BATTLE DEMOを追加。ネクロ系は初回召喚と定期召喚、アッシュ部隊は三角陣形から後衛へ突入する動きを確認できます。'
   ]},
@@ -243,7 +344,7 @@ function loadDeck(){
   try{const raw=JSON.parse(safeStorage('local','tiny-deck-v21')||safeStorage('local','tiny-deck-v20')||safeStorage('local','tiny-deck-v19')||safeStorage('local','tiny-deck-v18')||safeStorage('local','tiny-deck-v17')||safeStorage('local','tiny-deck-v16')||safeStorage('local','tiny-deck-v15')||safeStorage('local','tiny-deck-v14')||safeStorage('local','tiny-deck-v13')||safeStorage('local','tiny-deck-v12')||safeStorage('local','tiny-deck-v11')||safeStorage('local','tiny-deck-v10')||safeStorage('local','tiny-deck-v9')||safeStorage('local','tiny-deck-v8')||safeStorage('local','tiny-deck-v7')||safeStorage('local','tiny-deck-v6')||safeStorage('local','tiny-deck-v5')||safeStorage('local','tiny-deck-v4')||safeStorage('local','tiny-deck-v3')||'null');return migrateDeck(raw);}catch{return [...DEFAULT_DECK];}
 }
 let playerDeck=loadDeck();
-const MYLIST_KEY='tiny-deck-presets-v25',LEGACY_MYLIST_KEYS=['tiny-deck-presets-v24','tiny-deck-presets-v23','tiny-deck-presets-v22','tiny-deck-presets-v21','tiny-deck-presets-v20','tiny-deck-presets-v19','tiny-deck-presets-v18','tiny-deck-presets-v17','tiny-deck-presets-v16'],MAX_MYLIST=10;
+const MYLIST_KEY='tiny-deck-presets-v27',LEGACY_MYLIST_KEYS=['tiny-deck-presets-v26','tiny-deck-presets-v25','tiny-deck-presets-v24','tiny-deck-presets-v23','tiny-deck-presets-v22','tiny-deck-presets-v21','tiny-deck-presets-v20','tiny-deck-presets-v19','tiny-deck-presets-v18','tiny-deck-presets-v17','tiny-deck-presets-v16'],MAX_MYLIST=10;
 function storageFor(store='local'){return store==='session'?window.sessionStorage:window.localStorage;}
 function verifiedStorageWrite(store,key,value){
   try{const storage=storageFor(store);storage.setItem(key,value);return storage.getItem(key)===value;}catch{return false;}
@@ -489,12 +590,25 @@ function updateHUD(){
     el('rematchBtn').textContent=gameMode==='cpu'?'もう一度対戦':seat===room?.host?'再戦の待機ルームへ':'ホストの再戦操作を待っています';
     el('rematchBtn').disabled=gameMode==='online'&&seat!==room?.host;
   }
-  el('battleHint').textContent=selected?(()=>{const d=UNITS[selected];if(!d.spell){if(d.tunnelAnywhere)return `${d.name}：戦場の好きな地上地点を指定 / コスト ${d.cost}。自軍本拠地から地下移動し、遠いほど到着が遅れます。`;if(d.building)return `${d.name}を配置 / 必要エナジー ${d.cost}。置きたい場所を1回タップすると即設置します。`;return `${d.name}を配置 / 必要エナジー ${d.cost}`;}if(d.spell==='poison')return `${d.name}：地点を指定すると即展開 / コスト ${d.cost}。範囲外へ出ても毒が残ります。`;if(d.spell==='cyclone')return `${d.name}：地点を指定すると半径${d.radius}の渦を${d.zoneDuration}秒展開 / コスト ${d.cost}。敵を中心へ吸い寄せます。`;if(d.spell==='arrowrain')return `${d.name}：広い着弾地点を指定 / コスト ${d.cost}。ファイヤーボールより速く届きます。`;return `${d.name}：着弾地点を指定 / コスト ${d.cost}。遠いほど着弾が遅れます。`;})():'カードを選択。片塔破壊はそのレーン＋中央細帯、両塔破壊後は敵陣前半を横いっぱい使えます。';
+  el('battleHint').textContent=selected?(()=>{const d=UNITS[selected];if(!d.spell){if(d.tunnelAnywhere)return `${d.name}：戦場の好きな地上地点を指定 / コスト ${d.cost}。自軍本拠地から地下移動し、遠いほど到着が遅れます。`;if(d.building)return `${d.name}を配置 / 必要エナジー ${d.cost}。置きたい場所を1回タップすると即設置します。`;return `${d.name}を配置 / 必要エナジー ${d.cost}`;}if(d.spell==='poison')return `${d.name}：地点を指定すると8秒間展開 / コスト ${d.cost}。範囲内へ毎秒ダメージを与えます。`;if(d.spell==='lightning')return `${d.name}：半径${d.radius}内のHPが高い敵を最大${d.maxTargets||4}体へ即時落雷 / コスト ${d.cost}。`;if(d.spell==='cyclone')return `${d.name}：地点を指定すると半径${d.radius}の渦を${d.zoneDuration}秒展開 / コスト ${d.cost}。敵を中心へ吸い寄せます。`;if(d.spell==='arrowrain')return `${d.name}：広い着弾地点を指定 / コスト ${d.cost}。ファイヤーボールより速く届きます。`;return `${d.name}：着弾地点を指定 / コスト ${d.cost}。遠いほど着弾が遅れます。`;})():'カードを選択。長押しで対ユニット/対タワーDMGを確認できます。片塔破壊はそのレーン＋中央細帯、両塔破壊後は敵陣前半を横いっぱい使えます。';
 }
 for(let i=0;i<10;i++){const seg=document.createElement('i'),fill=document.createElement('b');seg.append(fill);el('energyTrack').append(seg);}
 function choose(id){
   if(!snapshot||snapshot.phase==='ended')return;
   selected=selected===id?null:id;hover=null;pendingBuildingPlacement=null;updateInspector(id);updateHand();
+}
+const HOLD_DAMAGE_MS=430;
+function hideCardDamagePopups(except=null){
+  for(const pop of el('hand').querySelectorAll('.card-damage-pop.show'))if(pop!==except)pop.classList.remove('show');
+}
+function buildCardDamagePopup(id){
+  const d=UNITS[id],info=cardDamageInfo(d),pop=document.createElement('span');pop.className='card-damage-pop';
+  const title=document.createElement('b');title.textContent='DAMAGE';
+  const unitRow=document.createElement('span'),unitLabel=document.createElement('small'),unitValue=document.createElement('strong');
+  unitLabel.textContent='対ユニット';unitValue.textContent=info.unit;unitRow.append(unitLabel,unitValue);
+  const towerRow=document.createElement('span'),towerLabel=document.createElement('small'),towerValue=document.createElement('strong');
+  towerLabel.textContent='対タワー';towerValue.textContent=info.tower;towerRow.append(towerLabel,towerValue);
+  pop.append(title,unitRow,towerRow);return pop;
 }
 function updateHand(){
   if(!snapshot)return;
@@ -507,22 +621,27 @@ function updateHand(){
       const cost=document.createElement('span');cost.className='cost';cost.textContent=UNITS[id].cost;
       const name=document.createElement('span');name.className='card-name';name.textContent=UNITS[id].short;
       const key=document.createElement('span');key.className='shortcut';key.textContent=i+1;
-      b.append(cost,key,can,name);el('hand').append(b);
-      let startPoint=null,dragged=false;
+      const damagePop=buildCardDamagePopup(id);
+      b.append(cost,key,can,name,damagePop);el('hand').append(b);
+      let startPoint=null,dragged=false,holdTimer=null,holdShown=false,selectedBeforeHold=null;
+      const clearHold=()=>{if(holdTimer){clearTimeout(holdTimer);holdTimer=null;}};
+      const closeDamage=()=>{damagePop.classList.remove('show');holdShown=false;};
       b.addEventListener('pointerdown',e=>{
-        e.preventDefault();selected=id;hover=null;pendingBuildingPlacement=null;updateInspector(id);updateHand();
-        startPoint={x:e.clientX,y:e.clientY};dragged=false;b.setPointerCapture(e.pointerId);
+        e.preventDefault();hideCardDamagePopups(damagePop);selectedBeforeHold=selected;selected=id;hover=null;pendingBuildingPlacement=null;updateInspector(id);updateHand();
+        startPoint={x:e.clientX,y:e.clientY};dragged=false;holdShown=false;b.setPointerCapture(e.pointerId);
+        clearHold();holdTimer=setTimeout(()=>{if(!startPoint||dragged)return;holdShown=true;selected=selectedBeforeHold;hover=null;pendingBuildingPlacement=null;updateHand();damagePop.classList.add('show');navigator.vibrate?.(8);},HOLD_DAMAGE_MS);
       });
       b.addEventListener('pointermove',e=>{
         if(!startPoint)return;
-        if(Math.hypot(e.clientX-startPoint.x,e.clientY-startPoint.y)>7)dragged=true;
+        if(Math.hypot(e.clientX-startPoint.x,e.clientY-startPoint.y)>7){dragged=true;clearHold();closeDamage();}
         if(dragged)hover=pointFromEvent(e,true);
       });
       b.addEventListener('pointerup',e=>{
-        if(dragged&&pointFromEvent(e,true))place(pointFromEvent(e,true));
-        startPoint=null;dragged=false;hover=null;
+        clearHold();
+        if(!holdShown&&dragged&&pointFromEvent(e,true))place(pointFromEvent(e,true));
+        closeDamage();startPoint=null;dragged=false;hover=null;
       });
-      b.addEventListener('pointercancel',()=>{startPoint=null;dragged=false;hover=null;});
+      b.addEventListener('pointercancel',()=>{clearHold();closeDamage();startPoint=null;dragged=false;hover=null;});
       b.addEventListener('click',e=>{if(e.detail===0&&!e.pointerType)choose(id);});
     });
   }
@@ -543,9 +662,14 @@ function updateInspector(id){
 function pointFromEvent(e,inside=false){
   const r=el('arenaCanvas').getBoundingClientRect(),x=(e.clientX-r.left)/r.width*720,y=(e.clientY-r.top)/r.height*1040;
   if(inside&&(x<0||x>720||y<0||y>1040))return null;
-  const p={x:clamp(x,0,720),y:clamp(y,0,1040)},world=orient(p,seat);
+  let p={x:clamp(x,0,720),y:clamp(y,0,1040)},world=orient(p,seat);
   let valid=false;
-  if(snapshot&&selected){const players=[{hand:[],energy:0},{hand:[],energy:0}];players[seat]={hand:snapshot.hand,energy:snapshot.energy};valid=!canPlace({...snapshot,players},seat,selected,world.x,world.y);}
+  if(snapshot&&selected){
+    const players=[{hand:[],energy:0},{hand:[],energy:0}];players[seat]={hand:snapshot.hand,energy:snapshot.energy};
+    valid=!canPlace({...snapshot,players},seat,selected,world.x,world.y);
+    const d=UNITS[selected];
+    if(valid&&!d.spell&&!d.tunnelAnywhere){const snapped=snapDeploymentPoint(seat,d,world.x,world.y);p=orient(snapped,seat);}
+  }
   return {...p,valid};
 }
 el('arenaCanvas').addEventListener('pointermove',e=>{if(selected)hover=pointFromEvent(e);});
@@ -750,7 +874,7 @@ function toggleDeckCard(id,{fromDetail=false}={}){
 }
 function targetLabel(d){if(d.buildingOnly)return '建物のみ';if(d.id==='mossling')return '地上＋空中（槍兵2）';return d.targetsAir?'地上＋空中':'地上のみ';}
 function detailStatsFor(d){
-  if(d.spell){const stats=[['COST',d.cost],['TYPE','SPELL'],['範囲',`R${d.radius}`]];if(d.spell==='cyclone'){stats.push(['効果時間',`${d.zoneDuration}秒`],['吸引','継続・軽量ほど強い'],['ダメージ',`外${d.outerDps} / 中${d.midDps} / 中心${d.innerDps} DPS`],['建物','吸引・ダメージなし']);return stats;}stats.push(['兵ダメージ',d.damage],['建物ダメージ',d.buildingDamage]);if(d.stunDuration)stats.push(['スタン',`${d.stunDuration}秒`]);return stats;}
+  if(d.spell){const stats=[['COST',d.cost],['TYPE','SPELL'],['範囲',`R${d.radius}`]];if(d.spell==='cyclone'){stats.push(['効果時間',`${d.zoneDuration}秒`],['吸引','継続・軽量ほど強い'],['ダメージ',`外${d.outerDps} / 中${d.midDps} / 中心${d.innerDps} DPS`],['建物','吸引・ダメージなし']);return stats;}stats.push(['兵ダメージ',d.damage],['建物ダメージ',d.buildingDamage]);if(d.spell==='poison')stats.push(['効果時間',`${d.zoneDuration}秒`],['ダメージ間隔',`${d.tickEvery}秒`]);if(d.spell==='lightning')stats.push(['対象',`現在HPが高い順 最大${d.maxTargets||4}体`]);if(d.stunDuration)stats.push(['スタン',`${d.stunDuration}秒`]);return stats;}
   const dmg=d.id==='mossling'?'地上65 / 槍45':d.drillUnit?`${d.drillBaseDps} DPS〜`:(d.laserTower||d.laserUnit)?`${d.laserBaseDps} DPS〜`:d.damage;const interval=d.drillUnit?'継続':(d.laserTower||d.laserUnit)?'継続':d.suicideUnit?'到達時に自爆':d.sparkUnit?`${d.sparkChargeTime}秒チャージ`:d.cooldown?`${d.cooldown.toFixed(2).replace(/0+$/,'').replace(/\.$/,'')}秒`:'—';
   const deployTime=d.tunnelAnywhere?'地下移動（追加待機なし）':`${summonDelayFor(d).toFixed(1)}秒`;
   const stats=[['COST',d.cost],[d.building?'建設時間':'召喚時間',deployTime],['HP',`${d.hp}${d.count>1?` ×${d.count}`:''}`],['攻撃',dmg],['攻撃間隔',interval],['射程',d.range],['対象',targetLabel(d)],['移動',d.building?'固定':d.air?`飛行 ${d.speed}`:`地上 ${d.speed}`]];
@@ -766,16 +890,21 @@ function detailStatsFor(d){
   if(d.id==='phoenix')stats.push(['復活','卵HP600を4秒守る → HP450で1回のみ']);
   if(d.id==='gravityorb')stats.push(['重力範囲','R60・軽量ほど強く中心へ吸引']);
   if(d.id==='mirage')stats.push(['ステルス','最大3秒・攻撃/被弾/時間切れで解除'],['ステルス初撃','×1.4']);
-  if(d.id==='skybomber')stats.push(['特性','飛行・敵ユニット無視・建物のみ攻撃'],['爆弾','175 / 1.6秒']);
+  if(d.id==='skybomber')stats.push(['特性','飛行・地上ユニット＋建物を攻撃'],['爆弾','175 / 1.6秒']);
   if(d.id==='scrapdrill')stats.push(['ドリルDPS','90 → 135 → 180 → 240'],['増幅','同一建物へ1.5秒ごと'],['リセット','射程外 / 対象変更 / スタン']);
   if(d.id==='crusherogre')stats.push(['連続打撃','230 → 310 → 390 → 470'],['攻撃間隔','3.0秒'],['リセット','射程外 / 対象変更 / スタン']);
   if(d.id==='miniberserker')stats.push(['特徴','頭と体が約1:1・大剣を掲げて高速進軍'],['役割','4コストの高火力単体近接']);
-  if(d.id==='megaknight')stats.push(['通常範囲','R48 / 280'],['落下召喚','1.5秒後・R48へ420'],['ジャンプ','距離80〜160 / 準備2秒 / R48へ420'],['対象固定','飛び始めた相手を倒すまで追跡']);
+  if(d.id==='boar')stats.push(['川越え','川付近から対岸へ直接ジャンプ'],['突進',`走行${d.chargeDistance} → 初撃×${d.chargeMultiplier}`]);
+  if(d.id==='megaknight')stats.push(['通常範囲',`R${d.meleeSplash} / ${d.damage}`],['落下召喚',`1.5秒後・R${d.dropRadius}へ${d.dropDamage}`],['ジャンプ',`距離${d.jumpMinRange}〜${d.jumpMaxRange} / 準備${d.jumpWindup}秒 / R${d.jumpRadius}へ${d.jumpDamage}`],['対象固定','飛び始めた相手を倒すまで追跡']);
   if(d.id==='ironeye')stats.push(['マーク','被ダメージ+20%'],['破裂','累計500 → 追加300'],['回転突進','1体につき1回 / 180 / 貫通'],['突進命中','マーク＋2.5秒間30%鈍足']);
   if(d.id==='tracker')stats.push(['フック','射程180 / 構え0.6秒 / CT4秒'],['地上','敵を近接距離へ引き寄せ'],['空中','引き寄せた対象だけ2秒攻撃可'],['建物','自分が建物へ引き寄せられる']);
   if(d.id==='siegeturtle')stats.push(['移動中装甲','遠距離ダメージ40%軽減'],['近接反撃','受けた実ダメージの1/3・R54'],['反撃対象外','遠距離 / スペル / 継続ダメージ']);
   if(d.id==='bombcarrier')stats.push(['建物自爆','480'],['死亡時','周囲の敵ユニットへ80'],['移動速度','88']);
+  if(d.id==='lumina')stats.push(['命中時回復','自分110＋周囲の味方最大3体へ各110'],['回復範囲',`R${d.healOnHitRange}`]);
+  if(d.id==='elixirgolem')stats.push(['分裂','大1 → 中2（HP784 / 攻撃127）→ 小4（HP392 / 攻撃64）'],['敵エリクサー','大+1 / 中1体+1 / 小1体+0.5']);
+  if(d.id==='royalgiant')stats.push(['特性','建物のみ・遠距離砲撃'],['砲撃射程',d.range]);
   if(d.summonType){const summonLabel=(d.summonOnDeploy?`配置時＋${d.summonInterval}秒ごと`:`${d.summonInterval}秒ごと`)+(d.summonWindup?`（準備${d.summonWindup}秒）`:'')+` ×${d.summonCount}`;stats.push(['召喚',summonLabel]);}
+  if(d.deathSummonType&&d.deathSummonCount)stats.push(['破壊時召喚',`${UNITS[d.deathSummonType]?.name||d.deathSummonType} ×${d.deathSummonCount}（即時）`]);
   if(d.spawnType==='blade')stats.push(['編成','前1・後2の3体']);
   if(d.sparkUnit)stats.push(['充電','敵不在でも常時・ザップで0へ']);
   return stats;
@@ -801,9 +930,12 @@ function createDetailDemo(id){
     if(id==='zap'){
       const [laser]=enemy('lasertower',lane,420),[sparky]=enemy('sparky',480,420),[guard]=own('knight',lane,650);demoStageUnit(laser,lane,515);demoStageUnit(sparky,480,540);demoStageUnit(guard,lane,650);if(laser){laser.laserStage=4;laser.laserDps=320;laser.target=guard?.id||null;laser.laserTarget=guard?.id||null;laser.laserLockTime=6;}if(sparky){sparky.sparkCharged=true;sparky.sparkChargeProgress=1;}demoDeploy(g,0,id,505,525);
       label='レーザー塔＋満充電スパーキーへ電撃 → 1.5秒スタン＋攻撃対象/増幅/充電をリセット';scenarioKey='zap-reset-stun';duration=7;
+    }else if(id==='lightning'){
+      g.towers.forEach(t=>t.damage=0);const [golem]=enemy('golem',lane,420),[mega]=enemy('megaknight',485,420),[guard]=enemy('knight',565,420),[archer]=enemy('archer',520,420),[blade]=enemy('blade',450,420);const staged=[golem,mega,guard,archer,blade].filter(Boolean);staged.forEach((u,i)=>{demoStageUnit(u,460+i*30,500+(i%2)*24);u.speed=0;u.damage=0;});demoDeploy(g,0,id,520,510);
+      label='半径105内の敵を現在HPが高い順に選択 → 上位4体へ同時落雷（ユニット1056 / 建物265）';scenarioKey='lightning-top-hp-four';duration=6;
     }else if(id==='poison'){
       const [guard]=enemy('knight',lane,420);demoStageUnit(guard,lane,505);demoDeploy(g,0,id,lane,500);
-      label='高HPのアイアン衛士が毒を通過 → 範囲DoT＋範囲外の残留毒';scenarioKey='poison-zone-linger';duration=10;
+      label='8秒間の毒エリア → 範囲内のユニットへ毎秒91、建物へ毎秒21ダメージ';scenarioKey='poison-zone-8s';duration=10;
     }else if(id==='arrowrain'){
       enemy('mossling',lane,420);enemy('boneswarm',470,410);demoDeploy(g,0,id,lane,455);
       label='密集した小型群体へ着弾予告 → 広範囲一斉ダメージ';scenarioKey='arrowrain-wide-swarm';duration=7;
@@ -828,12 +960,12 @@ function createDetailDemo(id){
     const deployed=own(id,lane,650),summoner=deployed.find(u=>u.type==='necromancer');demoStageUnit(summoner,lane,610);if(summoner)summoner.summonNextAt=7.5;
     const swarm=enemy('mossling',500,420);swarm.forEach((u,i)=>{demoStageUnit(u,485+(i%3)*32,460+Math.floor(i/3)*30,{cd:1.2});u.damage=0;});
     const bats=enemy('bat',565,420);bats.forEach((u,i)=>{demoStageUnit(u,555+(i%2)*28,470+Math.floor(i/2)*26,{cd:1.2});u.damage=0;});
-    label='配置直後にボーン3体 → 地上/空中への範囲魔法 → 7.5秒後にボーン3体を追加召喚';scenarioKey='necromancer-bone-summon';duration=12;
+    label='5コスト・HP839・1.1秒攻撃。召喚完了時にスケルトン3体 → 7.5秒ごとに追加召喚';scenarioKey='necromancer-skeleton-summon';duration=12;
   }else if(id==='darknecro'){
     g.towers.forEach(t=>t.range=0);
     const deployed=own(id,lane,650),summoner=deployed.find(u=>u.type==='darknecro');demoStageUnit(summoner,lane,610);if(summoner)summoner.summonNextAt=6.5;
     const [guard]=enemy('knight',lane,420);demoStageUnit(guard,lane,500,{cd:1.2});if(guard)guard.damage=0;const bats=enemy('bat',485,420);bats.forEach((u,i)=>{demoStageUnit(u,475+(i%2)*26,485+Math.floor(i/2)*24,{cd:1.2});u.damage=0;});
-    label='配置直後にムーンバット2体 → 本体は地上近接攻撃 → 6.5秒後にバット2体を追加召喚';scenarioKey='darknecro-bat-summon';duration=11;
+    label='4コスト・HP907・攻撃304。召喚完了時にコウモリ2体 → 6.5秒ごとに追加召喚';scenarioKey='darknecro-bat-summon';duration=11;
 }else if(id==='dosranboss'){
     g.towers.forEach(t=>t.range=0);
     const deployed=own(id,lane,650),boss=deployed.find(u=>u.type==='dosranboss');demoStageUnit(boss,lane,615);
@@ -879,7 +1011,7 @@ function createDetailDemo(id){
     g.towers.forEach(t=>t.range=0);const [assassin]=own(id,lane,650);demoStageUnit(assassin,lane,610);const [archer]=enemy('archer',lane,420);demoStageUnit(archer,lane,500);if(archer){archer.speed=0;archer.damage=0;}
     label='召喚完了後に最大3秒ステルス → 直接狙われず接近 → 初撃1.4倍で姿を現す';scenarioKey='mirage-stealth-strike';duration=8;
   }else if(id==='skybomber'){
-    g.towers.forEach(t=>t.damage=0);const [bomber]=own(id,lane,650);demoStageUnit(bomber,lane,365);label='飛行で敵ユニットを無視して建物へ直行 → 射程75から1.6秒ごとに175ダメージの爆弾投下';scenarioKey='skybomber-building-run';duration=8;
+    g.towers.forEach(t=>t.damage=0);const [bomber]=own(id,lane,650);demoStageUnit(bomber,lane,430);const [guard]=enemy('blade',lane,420);demoStageUnit(guard,lane,350,{cd:99});if(guard){guard.damage=0;guard.speed=0;}label='飛行で地上ユニットにも爆撃 → 敵兵がいなければ建物へ進軍。射程75から1.6秒ごとに175ダメージ';scenarioKey='skybomber-ground-bomb';duration=8;
   }else if(id==='scrapdrill'){
     g.towers.forEach(t=>t.damage=0);const [drill]=own(id,lane,650);demoStageUnit(drill,lane,310);label='建物へ張り付き → 90 DPSから1.5秒ごとに135→180→240 DPSまでドリル火力上昇';scenarioKey='scrapdrill-ramp';duration=9;
   }else if(id==='crusherogre'){
@@ -893,8 +1025,16 @@ function createDetailDemo(id){
     const [cannon]=own(id,lane,650),[guard]=enemy('knight',lane,420);demoStageUnit(cannon,lane,650);demoStageUnit(guard,lane,515);
     label='アイアン衛士をロックして防衛。設置後は耐久も毎秒30ずつ自然減衰';scenarioKey='cannon-lock-decay';duration=9;
   }else if(id==='lumina'){
-    const [guard]=own('knight',500,650);demoStageUnit(guard,500,625,{hp:Math.round(UNITS.knight.hp*.32)});const [priest]=own(id,555,700);demoStageUnit(priest,555,680);const [blade]=enemy('blade',lane,420);demoStageUnit(blade,515,515);
-    label='瀕死に近い味方衛士を実際の回復AIで115ずつ回復';scenarioKey='lumina-heal';duration=8.5;
+    const [healer]=own(id,555,700);demoStageUnit(healer,555,650,{hp:1250});const allies=[...own('knight',500,650),...own('blade',460,650),...own('frost',600,650),...own('spear',640,650)];allies.forEach((u,i)=>demoStageUnit(u,475+i*45,690,{hp:Math.max(80,u.maxHp-450+i*80)}));const [blade]=enemy('blade',lane,420);demoStageUnit(blade,555,520);if(blade){blade.speed=0;blade.damage=0;}
+    label='敵へ120ダメージが命中 → ヒーラー自身110＋周囲の傷ついた味方最大3体を各110回復';scenarioKey='healer-on-hit';duration=9;
+  }else if(id==='elixirgolem'){
+    g.towers.forEach(t=>{t.damage=0;t.range=0;});const enemyTower=g.towers.find(t=>t.owner===1&&t.kind==='tower'&&t.x===lane);if(enemyTower){enemyTower.damage=105;enemyTower.range=226;enemyTower.cooldown=1;enemyTower.cd=.15;}
+    const [eg]=own(id,lane,650);demoStageUnit(eg,lane,360,{hp:750});if(eg){eg.speed=0;eg.damage=0;}
+    const [guard]=enemy('knight',lane,420);demoStageUnit(guard,lane,410);if(guard){guard.damage=280;guard.speed=0;guard.cooldown=1.2;guard.range=44;}
+    label='敵タワーの105ダメージも実際にHPへ反映 → 撃破時はピンクの破裂演出とともに大1→中2→小4へ分裂';scenarioKey='elixir-golem-split-visible';duration=14;
+  }else if(id==='royalgiant'){
+    g.towers.forEach(t=>t.damage=0);const [rg]=own(id,lane,650);demoStageUnit(rg,lane,405);const [guard]=enemy('knight',lane,420);demoStageUnit(guard,500,430);if(guard){guard.speed=0;guard.damage=0;}
+    label='目の前の敵兵を無視して、射程165から建物だけへ307ダメージの砲弾を発射';scenarioKey='royal-giant-cannon';duration=9;
   }else if(id==='harpy'){
     own(id,lane,650);const swarm=enemy('mossling',lane,420);swarm.forEach((u,i)=>demoStageUnit(u,490+(i%3)*42,455+Math.floor(i/3)*34));
     label='2秒ごとの連鎖雷 → 1体目180 / 2体目130 / 3体目90ダメージ＋各1秒スタン';scenarioKey='harpy-chain-falloff-stun';duration=9;
@@ -927,7 +1067,7 @@ function createDetailDemo(id){
 }
 function resetDetailDemo(){
   if(!detailCardId)return;const demo=createDetailDemo(detailCardId);detailDemoGame=demo.game;detailDemoDuration=demo.duration;detailDemoScenarioKey=demo.scenarioKey;detailDemoEvidence={seenSummonEvents:new Set(),initialSummons:0,periodicSummons:0};detailDemoLast=performance.now();if(el('cardDemoScenario'))el('cardDemoScenario').textContent=demo.label;
-  const can=el('cardDetailDemo');can.dataset.demoEngine='live';can.dataset.demoCard=detailCardId;can.dataset.demoScenario=detailDemoScenarioKey;can.dataset.demoTime='0';can.dataset.demoDeathBlast='false';can.dataset.demoMiniGolems='0';can.dataset.demoTowerDamaged='false';can.dataset.demoBonesHit='false';can.dataset.demoMudZone='false';can.dataset.demoMudded='false';can.dataset.demoInitialSummons='0';can.dataset.demoPeriodicSummons='0';updateDetailDemoEvidence(can);drawArena(can,viewMatch(detailDemoGame,0),{time:0,seat:0});
+  const can=el('cardDetailDemo');can.dataset.demoEngine='live';can.dataset.demoCard=detailCardId;can.dataset.demoScenario=detailDemoScenarioKey;can.dataset.demoTime='0';can.dataset.demoDeathBlast='false';can.dataset.demoMiniGolems='0';can.dataset.demoTowerDamaged='false';can.dataset.demoBonesHit='false';can.dataset.demoMudZone='false';can.dataset.demoMudded='false';can.dataset.demoInitialSummons='0';can.dataset.demoPeriodicSummons='0';can.dataset.demoElixirHpDropped='false';can.dataset.demoElixirSplit='false';updateDetailDemoEvidence(can);drawArena(can,viewMatch(detailDemoGame,0),{time:0,seat:0});
 }
 function updateDetailDemoEvidence(can){
   if(!detailDemoGame)return;const g=detailDemoGame,events=g.events||[];
@@ -936,9 +1076,14 @@ function updateDetailDemoEvidence(can){
   const minis=g.units.filter(u=>u.hp>0&&u.type==='mini_golem'&&u.owner===0).length;detailDemoEvidence.miniGolems=Math.max(detailDemoEvidence.miniGolems||0,minis);
   const enemySide=g.towers.find(t=>t.owner===1&&t.kind==='tower'&&t.x===530);if(enemySide&&enemySide.hp<enemySide.maxHp)detailDemoEvidence.towerDamaged=true;
   if((g.zones||[]).some(z=>z.kind==='mud'&&z.remaining>0))detailDemoEvidence.mudZone=true;
+  if(detailDemoScenarioKey==='elixir-golem-split-visible'){
+    const large=g.units.find(u=>u.owner===0&&u.type==='elixirgolem'&&u.hp>0);
+    if(large&&large.hp<750)detailDemoEvidence.elixirHpDropped=true;
+    if(events.some(e=>e.type==='elixir-split'&&e.owner===0))detailDemoEvidence.elixirSplit=true;
+  }
   if(g.units.some(u=>u.owner===1&&u.type==='knight'&&(u.mudUntil||0)>g.time))detailDemoEvidence.mudded=true;
   const summonEvents=events.filter(e=>e.type==='summon-spawn'&&e.owner===0);for(const e of summonEvents){if(detailDemoEvidence.seenSummonEvents.has(e.id))continue;detailDemoEvidence.seenSummonEvents.add(e.id);if(e.initial)detailDemoEvidence.initialSummons++;else detailDemoEvidence.periodicSummons++;}
-  can.dataset.demoDeathBlast=String(!!detailDemoEvidence.deathBlast);can.dataset.demoMiniGolems=String(detailDemoEvidence.miniGolems||0);can.dataset.demoTowerDamaged=String(!!detailDemoEvidence.towerDamaged);can.dataset.demoBonesHit=String(!!detailDemoEvidence.bonesHit);can.dataset.demoMudZone=String(!!detailDemoEvidence.mudZone);can.dataset.demoMudded=String(!!detailDemoEvidence.mudded);can.dataset.demoInitialSummons=String(detailDemoEvidence.initialSummons||0);can.dataset.demoPeriodicSummons=String(detailDemoEvidence.periodicSummons||0);
+  can.dataset.demoDeathBlast=String(!!detailDemoEvidence.deathBlast);can.dataset.demoMiniGolems=String(detailDemoEvidence.miniGolems||0);can.dataset.demoTowerDamaged=String(!!detailDemoEvidence.towerDamaged);can.dataset.demoBonesHit=String(!!detailDemoEvidence.bonesHit);can.dataset.demoMudZone=String(!!detailDemoEvidence.mudZone);can.dataset.demoMudded=String(!!detailDemoEvidence.mudded);can.dataset.demoInitialSummons=String(detailDemoEvidence.initialSummons||0);can.dataset.demoPeriodicSummons=String(detailDemoEvidence.periodicSummons||0);can.dataset.demoElixirHpDropped=String(!!detailDemoEvidence.elixirHpDropped);can.dataset.demoElixirSplit=String(!!detailDemoEvidence.elixirSplit);
 }
 function openCardDetail(id){
   detailCardId=id;const d=UNITS[id];el('cardDetailRole').textContent=d.role;el('cardDetailName').textContent=d.name;el('cardDetailDesc').textContent=d.desc;const stats=el('cardDetailStats');stats.replaceChildren();

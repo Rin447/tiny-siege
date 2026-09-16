@@ -1,6 +1,24 @@
-# TINY SIEGE v25.1.0 architecture
+# TINY SIEGE v29.0.0 architecture
+- V29.0.0 adds authoritative Lightning top-HP targeting, 8-second Poison DoT, Necromancer balance changes, and a visible Elixir Golem split event. Authoritative combat uses `physicsVersion=45`.
+- V28.0.0 adds attack-triggered Healer pulses, recursive Elixir Golem splitting with opponent-energy rewards, and Royal Giant building-only cannon fire. Authoritative combat uses `physicsVersion=44`.
+- Tombstone uses the normal summon system for its initial and four-second waves, while `deathSummonType` / `deathSummonCount` creates four skeletons with `spawn=0` so destruction summons have no extra delay.
+- Iron Boar stores a synchronized `riverJumpState` and interpolates directly between banks while collision is disabled; the traveled jump distance contributes to its charge run.
+- V26.6.0 changes authoritative Cannon/Bat/Bomber balance, raises `physicsVersion=41`, and adds an arcing visual trajectory for Bomber projectiles.
+- V26.4 changes Stone Golem/Mini Golem authoritative balance and the Stone Golem procedural pose. Stone Golem is HP4256 / damage260 / cooldown2.5 / deathDamage260; Mini Golem is HP851 / damage52 / cooldown2.5 / deathDamage52. Authoritative combat uses `physicsVersion=39`.
+- V26.3 changes authoritative combat balance for Iron Guard, Kragg Berserker, Mini Berserker and Leaf Archer. Card pool remains 51; authoritative combat uses `physicsVersion=38`.
+- V26.2 changes Valkyrie balance/art presentation and changes Leaf Archer into a side-by-side two-unit deployment. Authoritative combat uses `physicsVersion=37`.
+- Leaf Archer uses `count:2`, `radius:12`, HP304, damage112 and range165. `groupOffset()` has an explicit two-unit horizontal formation so the pair spawns beside each other.
+- Valkyrie keeps `valkyrieSpin:true` and `meleeSplash:50`; only the body/axe animation presentation changed, while HP is 2200 and damage is 260.
+- V26.1.1 raises ordinary non-zero unit movement speed by about 5% from v26.1.0 while leaving special movement timings/speeds unchanged. Authoritative combat uses `physicsVersion=36`.
+- V26.1 globally reduced ordinary unit movement speed by about 15% while leaving special movement timings/speeds unchanged. Authoritative combat used `physicsVersion=35`.
+- V26.0 adds Valkyrie self-centered melee splash and two Gargoyle cards. Authoritative combat uses `physicsVersion=34`.
+- Card pool: **55 cards (50 unit cards + 5 spells)**, eight-card decks.
+- Valkyrie uses `valkyrieSpin:true` with `meleeSplash:50`; the damage area is centered on Valkyrie herself.
+- Gargoyle is a three-unit flying card. Gargoyle Swarm is a six-unit card using `spawnType:'gargoyle'`, so both cards share the same per-unit balance values.
+- V25.2.1: Sky Bomber can target ground units, air units and structures; HP remains 650. Authoritative target selection uses `physicsVersion=33`.
 
-CPU練習、Nodeローカルサーバー、Cloudflare Durable Objects は同じ `public/game/engine.js` を共有します。v25.1 は **48カード（43ユニットカード＋5呪文）**、8枚デッキ、4枚手札、`physicsVersion=31` です。
+CPU練習、Nodeローカルサーバー、Cloudflare Durable Objects は同じ `public/game/engine.js` を共有します。v25.2.1 は **48カード（43ユニットカード＋5呪文）**、8枚デッキ、4枚手札、`physicsVersion=33` です。
+- V25.2: Sky Bomber is no longer `buildingOnly`; it can target ground units and structures, remains unable to target air, and HP is 650. Authoritative target selection therefore uses `physicsVersion=32`.
 
 ## V25.1 drag-deck UI
 - Deck editing remains a client-only UI concern; combat state and `physicsVersion=31` are unchanged.

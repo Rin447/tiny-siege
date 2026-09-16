@@ -4,7 +4,7 @@ import {ARENA} from './units.js';
  * Ground bodies live on the lawn/bridges. Air bodies share a separate layer.
  * Buildings are static circles; tree/grass artwork is decorative only.
  */
-export const PHYSICS_VERSION=31;
+export const PHYSICS_VERSION=45;
 export const FIELD={left:34,right:686,top:28,bottom:1012};
 const EPS=0.001,GRID=20,COLS=33,ROWS=49;
 const worldCaches=new WeakMap();
@@ -14,6 +14,23 @@ export const isStructure=u=>!!(u.kind||u.building);
 export const bodyRadius=u=>u.radius||12;
 export const sameLayer=(a,b)=>!!a.air===!!b.air;
 export const solidStructures=g=>[...g.towers,...g.units.filter(u=>u.building&&!u.collisionDisabled)].filter(u=>u.hp>0);
+
+export const bridgeGround=x=>ARENA.bridges.some(b=>Math.abs(x-b)<=ARENA.bridgeHalf);
+export const deploymentWater=(x,y)=>y>ARENA.riverTop&&y<ARENA.riverBottom&&!bridgeGround(x);
+/** Keep a legal lawn-edge deployment from letting the unit body overlap open water.
+ * Direct taps whose centre is actually over open water are rejected by canPlace;
+ * this helper only nudges edge-overlap back to the nearest own riverbank.
+ */
+export function snapDeploymentPoint(owner,u,x,y,{correctWater=false}={}){
+  const p={x,y};if(owner!==0&&owner!==1)return p;
+  const r=bodyRadius(u)+1,onBridge=bridgeGround(x),inWater=deploymentWater(x,y);
+  if(inWater&&!correctWater)return p;
+  if(onBridge)return p;
+  if(owner===0){
+    if(y<ARENA.riverBottom+r&&y>ARENA.riverTop-r)p.y=ARENA.riverBottom+r;
+  }else if(y>ARENA.riverTop-r&&y<ARENA.riverBottom+r)p.y=ARENA.riverTop-r;
+  return p;
+}
 
 export function deploymentAllowed(g,owner,x,y){
   if(owner!==0&&owner!==1)return false;
@@ -246,6 +263,7 @@ export function resolveBodies(g,dt=.1){
 /** Find all group-spawn positions before charging energy. No displacement of enemies. */
 function groupOffset(count,i,spacing=24){
   if(count<=1)return {x:0,y:0};
+  if(count===2)return [{x:-spacing*.60,y:0},{x:spacing*.60,y:0}][i];
   if(count===3)return [{x:-spacing,y:8},{x:0,y:-16},{x:spacing,y:8}][i];
   if(count===5)return [{x:0,y:-24},{x:-22,y:-5},{x:22,y:-5},{x:-13,y:18},{x:13,y:18}][i];
   const cols=Math.ceil(Math.sqrt(count)),row=Math.floor(i/cols),col=i%cols;
@@ -262,7 +280,8 @@ export function spawnPositions(g,owner,data,x,y,structures=null){
     for(const rr of rings){
       const n=rr?16:1;
       for(let k=0;k<n;k++){
-        const a=k*Math.PI*2/n+(owner===1?Math.PI:0),p={x:wanted.x+Math.cos(a)*rr,y:wanted.y+Math.sin(a)*rr};
+        const a=k*Math.PI*2/n+(owner===1?Math.PI:0),raw={x:wanted.x+Math.cos(a)*rr,y:wanted.y+Math.sin(a)*rr};
+        const p=snapDeploymentPoint(owner,data,raw.x,raw.y,{correctWater:true});
         if(p.x<48||p.x>672||p.y<58||p.y>982||!deploymentAllowed(g,owner,p.x,p.y))continue;
         if(!staticFree(g,data,p,1,blockers))continue;
         if(g.units.some(u=>u.hp>0&&sameLayer(data,u)&&dist(p,u)<bodyRadius(data)+bodyRadius(u)+.5))continue;

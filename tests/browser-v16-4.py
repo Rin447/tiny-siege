@@ -38,12 +38,12 @@ async def main():
         await ok('Tigger detail reflects attack 20 while keeping the live burrow scenario')
         await close_detail(page)
 
-        # Moon Bat is now a four-unit card and the demo says so.
+        # Bat Horde is now a five-unit card and the demo says so.
         await open_detail(page,'bat')
         stats=await page.locator('#cardDetailStats').inner_text()
-        assert '×4' in stats,stats
-        assert '4体' in await page.locator('#cardDemoScenario').inner_text()
-        await ok('Moon Bat detail and live demo reflect the four-unit deployment')
+        assert '×5' in stats,stats
+        assert '5体' in await page.locator('#cardDemoScenario').inner_text()
+        await ok('Bat Horde detail and live demo reflect the five-unit deployment')
         await close_detail(page)
 
         # Golem scenario must actually demonstrate death blast, tower damage, bone casualties and split.

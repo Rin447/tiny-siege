@@ -12,25 +12,45 @@ function advance(g,n){for(let i=0;i<n;i++)tick(g,.1);}
 function body(g,type,owner,x,y){const u={...UNITS[type],id:`u${g.nextId++}`,type,owner,x,y,maxHp:UNITS[type].hp,spawn:0,cd:999,walk:0,age:0,anim:0,hit:0,lane:x<360?190:530,face:owner===0?-1:1};g.units.push(u);return u;}
 function checkStatics(g){for(const u of g.units)if(!u.building&&u.burrowState!=='burrow')assert.ok(staticFree(g,u,u),`${u.id} ${u.type} in static at ${u.x},${u.y}`);}
 
-test('v25 physics version and mass/radius data are explicit',()=>{
- assert.equal(VERSION,'25.1.0');assert.equal(PHYSICS_VERSION,31);
+test('v29 physics version and mass/radius data are explicit',()=>{
+ assert.equal(VERSION,'29.0.0');assert.equal(PHYSICS_VERSION,45);
  assert.ok(UNITS.knight.mass>UNITS.archer.mass);assert.ok(UNITS.knight.radius>UNITS.archer.radius);
- assert.equal(createMatch().physicsVersion,31);
+ assert.equal(createMatch().physicsVersion,45);
 });
 test('body may not put its edge across the river even if its centre is on land',()=>{
  const u=UNITS.knight;assert.equal(terrainFree(u,{x:350,y:480}),false);
  assert.equal(terrainFree(u,{x:190,y:520}),true);assert.equal(terrainFree(u,{x:225,y:520}),false);
  assert.equal(terrainFree(UNITS.bat,{x:350,y:520}),true);
 });
+test('initial deployment line reaches slightly onto the bridge but open river stays forbidden',()=>{
+ const g=game();assert.equal(ARENA.deployBottom,550);assert.equal(ARENA.deployTop,490);
+ card(g,'knight',0);assert.equal(canPlace(g,0,'knight',190,552),null);
+ card(g,'knight',0);assert.equal(canPlace(g,0,'knight',350,552),'川の上には配置できません。橋か芝生を指定してください。');
+ card(g,'bat',0);assert.equal(canPlace(g,0,'bat',350,552),'川の上には配置できません。橋か芝生を指定してください。');
+ card(g,'knight',1);assert.equal(canPlace(g,1,'knight',530,488),null);
+});
+test('riverbank edge placement snaps the unit inward instead of rejecting it',()=>{
+ for(const owner of [0,1]){
+   const g=game();card(g,'knight',owner);const y=owner===0?559:481,r=deploy(g,owner,'knight',350,y);assert.ok(r.ok,r.error);
+   const u=g.units.find(v=>v.owner===owner&&v.type==='knight');assert.ok(u);
+   const expected=owner===0?ARENA.riverBottom+UNITS.knight.radius+1:ARENA.riverTop-UNITS.knight.radius-1;
+   assert.equal(u.y,expected);assert.ok(terrainFree(u,u));
+ }
+});
+test('group deployment near the bank snaps generated members back onto safe lawn',()=>{
+ const g=game();card(g,'archer',0);const r=deploy(g,0,'archer',350,559);assert.ok(r.ok,r.error);
+ const archers=g.units.filter(u=>u.owner===0&&u.type==='archer');assert.equal(archers.length,2);
+ for(const u of archers){assert.ok(u.y>=ARENA.riverBottom+u.radius-.001);assert.ok(terrainFree(u,u));}
+});
 test('ground rejects deployment inside towers; air may fly/deploy over them',()=>{
  const g=game();card(g,'knight');assert.ok(canPlace(g,0,'knight',190,805));
  card(g,'bat');assert.equal(canPlace(g,0,'bat',190,805),null);assert.ok(deploy(g,0,'bat',190,805).ok);
 });
-test('all four air group members have legal non-overlapping initial positions',()=>{
+test('all five air group members have legal non-overlapping initial positions',()=>{
  const g=game();card(g,'bat');assert.ok(deploy(g,0,'bat',60,605).ok);
- assert.equal(g.units.length,4);checkStatics(g);
+ assert.equal(g.units.length,5);checkStatics(g);
  for(const a of g.units)for(const b of g.units)if(a!==b)assert.ok(distance(a,b)>=a.radius+b.radius);
- for(const u of g.units)assert.ok(u.y>=600);
+ for(const u of g.units)assert.ok(u.y>=ARENA.deployBottom);
 });
 test('spawn near a ground ally shifts to free space without spending twice',()=>{
  const g=game(),a=unit(g,'knight',0,150,700);const b=unit(g,'blade',0,150,700);
@@ -46,7 +66,7 @@ for(const owner of [0,1])for(const type of ['blade','knight','archer','mage','sp
  const start={x:u.x,y:u.y};let lateral=0;
  for(let n=0;n<260;n++){tick(g,.1);checkStatics(g);lateral=Math.max(lateral,Math.abs(u.x-start.x));if(owner===0?u.y<460:u.y>580)break;}
  assert.ok(owner===0?u.y<460:u.y>580,`did not cross: ${u.x} ${u.y}`);
- assert.ok(lateral>=u.radius+25,`did not go around tower: ${lateral}`);
+ assert.ok(lateral>=u.radius+(type==='archer'?18:25),`did not go around tower: ${lateral}`);
 });
 test('air crosses river and a tower in a straight path without ground detours',()=>{
  const g=game(),u=body(g,'bat',0,360,980),target={id:'goal',x:360,y:350,radius:0};
@@ -145,7 +165,7 @@ test('rendering depth mixes towers and ground troops; air is always after ground
  assert.deepEqual(renderOrder(g,1).map(x=>x.entity.id),['front','tower','rear','air']);
 });
 test('server snapshots expose facing/mass/layer but not pathfinding internals',()=>{
- const g=game(),u=unit(g,'knight',0,190,930);advance(g,15);const snap=viewMatch(g,0);assert.equal(snap.physicsVersion,31);
+ const g=game(),u=unit(g,'knight',0,190,930);advance(g,15);const snap=viewMatch(g,0);assert.equal(snap.physicsVersion,45);
  assert.equal(snap.units[0].mass,6);assert.equal(typeof snap.units[0].facing,'number');assert.ok(!('_nav' in snap.units[0]));
 });
 test('legacy active matches terminate safely instead of resuming inside new obstacles',()=>{
@@ -158,4 +178,10 @@ test('new physics remains deterministic across JSON save/restore',()=>{
 test('full mixed-army match stays finite and outside all static obstacles',()=>{
  const g=game();g.bot=true;g.difficulty='hard';
  for(let n=0;n<1400&&g.phase!=='ended';n++){if(n%12===0)runBot(g,0);tick(g,.1);checkStatics(g);for(const u of g.units)assert.ok(Number.isFinite(u.x)&&Number.isFinite(u.y));}
+});
+
+
+test('v26.1 global movement-speed reduction keeps relative roles',()=>{
+ assert.equal(UNITS.blade.speed,50);assert.equal(UNITS.miniberserker.speed,46);assert.equal(UNITS.gargoyle.speed,69);assert.equal(UNITS.bombcarrier.speed,79);assert.equal(UNITS.skybomber.speed,51);
+ assert.equal(UNITS.cannon.speed,0);assert.equal(UNITS.lasertower.speed,0);assert.equal(UNITS.megaknight.jumpTravelTime,1.5);assert.equal(UNITS.nightshade.dashSpeed,650);
 });

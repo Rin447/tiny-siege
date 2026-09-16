@@ -48,10 +48,10 @@ async def main():
         await page.click('#deckBtn')
         await page.wait_for_timeout(150)
         cards=page.locator('#deckPool .deck-choice')
-        assert await cards.count()==48, await cards.count()
-        for cid in ['necromancer','darknecro','ashsquad','princess','sparky','zap','electrowizard','laserdragon','shieldknight','windmage','phoenix','gravityorb','mirage','cyclone','skybomber','scrapdrill','crusherogre','siegeturtle','bombcarrier','miniberserker','megaknight','ironeye','tracker']:
+        assert await cards.count()==56, await cards.count()
+        for cid in ['elixirgolem','royalgiant','lumina','lightning','necromancer','darknecro','ashsquad','princess','sparky','zap','electrowizard','laserdragon','shieldknight','windmage','phoenix','gravityorb','mirage','cyclone','skybomber','scrapdrill','crusherogre','siegeturtle','bombcarrier','miniberserker','megaknight','ironeye','tracker','valkyrie','gargoyle','gargoyleswarm']:
             assert await page.locator(f'#deckPool .deck-choice[data-card="{cid}"]').count()==1
-        await ok('Deck builder exposes all 48 selectable cards, including the V25 Iron Eye and Tracker')
+        await ok('Deck builder exposes all 56 selectable cards, including Lightning, Healer, Elixir Golem and Royal Giant')
 
         # V25.1 direct drag deck editing: pool -> slot replacement, slot -> slot reorder, and ordinary click coexistence.
         pool=page.locator('#deckPool .deck-choice[data-card="blade"]');await pool.scroll_into_view_if_needed();await page.wait_for_timeout(40)
@@ -79,17 +79,17 @@ async def main():
         await open_detail(page,'miniberserker')
         stats=await page.locator('#cardDetailStats').inner_text()
         desc=await page.locator('#cardDetailDesc').inner_text()
-        assert '4' in stats and '1300' in stats and '270' in stats and '1.45' in stats and '大剣' in desc
+        assert '4' in stats and '1390' in stats and '755' in stats and '1.6' in stats and '大剣' in desc
         await close_detail(page)
-        await ok('Mini Berserker detail shows 4 cost, HP1300, attack270 and 1.45-second high-speed melee role')
+        await ok('Mini Berserker detail shows 4 cost, HP1390, attack755 and 1.6-second high-power melee role')
 
         await open_detail(page,'megaknight')
         stats=await page.locator('#cardDetailStats').inner_text()
         desc=await page.locator('#cardDetailDesc').inner_text()
-        assert '7' in stats and '2400' in stats and '280' in stats and '420' in stats and '80〜160' in stats and '2秒' in stats and '黒い鉄球' in desc
+        assert '7' in stats and '3993' in stats and '263' in stats and '420' in stats and '537' in stats and '80〜160' in stats and '2秒' in stats and '黒い鉄球' in desc
         await page.wait_for_timeout(2300)
         await close_detail(page)
-        await ok('Mega Knight detail exposes drop 420, 2-second jump windup, 80-160 jump range and renders its live demo')
+        await ok('Mega Knight detail exposes HP3993, damage263, drop420, jump537 and renders its live demo')
 
         # V25 units
         await open_detail(page,'ironeye')
@@ -155,6 +155,28 @@ async def main():
         await ok('Zap detail shows cost 2, 225 damage, radius 78, 1.5-second stun and reset mechanics')
         await close_detail(page)
 
+        # V29 spell rebalance and Lightning.
+        await open_detail(page,'lightning')
+        stats=await page.locator('#cardDetailStats').inner_text();canvas=page.locator('#cardDetailDemo')
+        assert '6' in stats and '1056' in stats and '265' in stats and 'R105' in stats and '最大4体' in stats,stats
+        assert await canvas.get_attribute('data-demo-scenario')=='lightning-top-hp-four'
+        await close_detail(page)
+        await open_detail(page,'poison')
+        stats=await page.locator('#cardDetailStats').inner_text();canvas=page.locator('#cardDetailDemo')
+        assert '91' in stats and '21' in stats and '8秒' in stats and '1秒' in stats,stats
+        assert await canvas.get_attribute('data-demo-scenario')=='poison-zone-8s'
+        await close_detail(page)
+        await ok('V29 Lightning and Poison details expose the new damage, target count and duration')
+
+        # Elixir Golem demo must take real tower damage and show its split event.
+        await open_detail(page,'elixirgolem')
+        canvas=page.locator('#cardDetailDemo')
+        assert await canvas.get_attribute('data-demo-scenario')=='elixir-golem-split-visible'
+        await page.wait_for_function("() => document.getElementById('cardDetailDemo').dataset.demoElixirHpDropped === 'true'", timeout=7000)
+        await page.wait_for_function("() => document.getElementById('cardDetailDemo').dataset.demoElixirSplit === 'true'", timeout=9000)
+        await close_detail(page)
+        await ok('Elixir Golem detail demo takes real tower damage and exposes the visible split event')
+
         # New unit: Elekitel Wizard
         await open_detail(page,'electrowizard')
         stats=await page.locator('#cardDetailStats').inner_text()
@@ -183,10 +205,10 @@ async def main():
         desc=await page.locator('#cardDetailDesc').inner_text()
         canvas=page.locator('#cardDetailDemo')
         assert '5' in stats and '1300' in stats and '145' in stats and '20 DPS' in stats,stats
-        assert '地上＋空中' in stats and '飛行 46' in stats and '1.5秒ごとに ×2' in stats,stats
+        assert '地上＋空中' in stats and '飛行 41' in stats and '1.5秒ごとに ×2' in stats,stats
         assert '対象変更・射程外・スタン' in desc,desc
         assert await canvas.get_attribute('data-demo-scenario')=='laserdragon-mobile-ramp'
-        await ok('Laser Dragon detail shows 5 cost, HP1300, flying speed46, range145 and ramping laser')
+        await ok('Laser Dragon detail shows 5 cost, HP1300, flying speed41, range145 and ramping laser')
         await close_detail(page)
 
         # V22 tactical cards: five units plus Cyclone spell.
@@ -206,14 +228,15 @@ async def main():
 
         # V23 siege specialists: five building-only units with distinct mechanics.
         for cid,scenario in [
-            ('skybomber','skybomber-building-run'),('scrapdrill','scrapdrill-ramp'),('crusherogre','crusher-ogre-ramp'),
+            ('scrapdrill','scrapdrill-ramp'),('crusherogre','crusher-ogre-ramp'),
             ('siegeturtle','siege-turtle-shell'),('bombcarrier','bomb-carrier-suicide')]:
             await open_detail(page,cid)
             assert await page.locator('#cardDetailDemo').get_attribute('data-demo-scenario')==scenario
             assert '建物のみ' in await page.locator('#cardDetailStats').inner_text()
             await close_detail(page)
         await open_detail(page,'skybomber')
-        sstats=await page.locator('#cardDetailStats').inner_text();assert '720' in sstats and '175' in sstats and '75' in sstats and '飛行 58' in sstats,sstats
+        sstats=await page.locator('#cardDetailStats').inner_text();assert '650' in sstats and '175' in sstats and '75' in sstats and '飛行 51' in sstats and '地上＋空中' in sstats,sstats
+        assert await page.locator('#cardDetailDemo').get_attribute('data-demo-scenario')=='skybomber-ground-bomb'
         await close_detail(page)
         await open_detail(page,'scrapdrill')
         dstats=await page.locator('#cardDetailStats').inner_text();assert '90 → 135 → 180 → 240' in dstats and '1.5秒ごと' in dstats,dstats
@@ -243,18 +266,18 @@ async def main():
         # Existing balance changes from v17.1 remain intact.
         await open_detail(page,'necromancer')
         stats=await page.locator('#cardDetailStats').inner_text()
-        assert '配置時＋7.5秒ごと ×3' in stats and '召喚時間' in stats and '1.5秒' in stats,stats
+        assert '配置時＋7.5秒ごと ×3' in stats and '召喚時間' in stats and '1.2秒' in stats and '839' in stats and '1.1秒' in stats,stats
         await close_detail(page)
         await open_detail(page,'darknecro')
         stats=await page.locator('#cardDetailStats').inner_text()
-        assert '配置時＋6.5秒ごと ×2' in stats and '召喚時間' in stats and '1.2秒' in stats,stats
-        await ok('Summoner details show 1.5s/1.2s parent delays while retaining 7.5s/6.5s intervals')
+        assert '配置時＋6.5秒ごと ×2' in stats and '召喚時間' in stats and '0.9秒' in stats and '907' in stats and '304' in stats,stats
+        await ok('Summoner details show v29 balance and 1.2s/0.9s parent delays while retaining summon intervals')
         await close_detail(page)
 
         # My List persistence remains intact.
         await page.click('#saveMyListBtn')
         await page.wait_for_timeout(140)
-        stored=await page.evaluate("window.__v18Store['tiny-deck-presets-v25'] || null")
+        stored=await page.evaluate("window.__v18Store['tiny-deck-presets-v27'] || null")
         assert stored and len(json.loads(stored).get('presets',[]))==1,stored
         assert await page.locator('#myListGrid .mylist-card').count()==1
         await ok('My List persists the current eight-card deck under the current storage key')
@@ -264,9 +287,9 @@ async def main():
         await page.evaluate("document.getElementById('updatesBtn').click()")
         await page.wait_for_timeout(130)
         text=await page.locator('#patchNotes').inner_text()
-        assert 'v25.1.0' in text and 'DRAG DECK UPDATE' in text and 'v25.0.0' in text and "HUNTER'S MARK UPDATE" in text, text
+        assert 'v29.0.0' in text and 'LIGHTNING & NECRO UPDATE' in text and 'v28.0.0' in text and 'ROYAL ELIXIR UPDATE' in text and 'v27.1.0' in text and 'RIVERBANK DEPLOY UPDATE' in text and 'v27.0.0' in text and 'UNDEAD RIVER UPDATE' in text and 'v26.6.0' in text and 'ARSENAL & SWARM UPDATE' in text and 'v26.5.0' in text and 'BATTLE READABILITY UPDATE' in text and 'v26.4.0' in text and 'GOLEM WEIGHT UPDATE' in text and 'v26.3.0' in text and 'FRONTLINE POWER UPDATE' in text and 'v26.2.0' in text and 'v26.1.1' in text and 'v26.1.0' in text and 'v26.0.0' in text, text
         assert all(name in text for name in ['スカイボマー','スクラップドリル','クラッシャーオーガ','シージタートル','ボムキャリア']), text
-        assert '48枚（43ユニット＋5呪文）' in text and 'physicsVersion を31' in text, text
+        assert '56枚（50ユニット＋6呪文）' in text and 'physicsVersion 45' in text and 'ライトニング' in text, text
         assert 'v22.0.0' in text and 'TACTICAL FORCES UPDATE' in text and all(name in text for name in ['シールドナイト','ウィンドメイジ','フェニックス','グラビティオーブ','ミラージュアサシン','サイクロン']), text
         assert 'エレキテルウィザード' in text and '180' in text and '160' in text and '1秒スタン' in text, text
         assert 'v19.3.0' in text and 'SUMMON DELAY SYSTEM' in text, text
@@ -279,7 +302,7 @@ async def main():
         assert 'v18.0.0' in text and 'LONGSHOT & VOLTAGE' in text, text
         assert 'プリンセスアーチャー' in text and 'ザップ' in text and 'スパーキー' in text, text
         assert 'v17 UPDATE SERIES' in text and 'v17.1.0' in text, text
-        await ok('Patch Notes shows v25.1 drag-deck update, v25 Hunter mark update and retained v24-v17 history')
+        await ok('Patch Notes shows v26 Wild Wings update and retained v25-v17 history')
 
         await page.click('#updatesModal .close-modal')
         await page.fill('#nickname','Rin')
@@ -291,7 +314,7 @@ async def main():
         await ok('Self-contained HTML starts a playable CPU battle with a four-card hand and visible arena')
 
         assert not errors,errors
-        await ok('No uncaught JavaScript errors in the v25.1 drag deck, detail demos, Patch Notes or CPU battle flow')
+        await ok('No uncaught JavaScript errors in the v26 deck, detail demos, Patch Notes or CPU battle flow')
         await browser.close()
 
     result={'passed':len(CHECKS),'checks':CHECKS,'errors':errors}

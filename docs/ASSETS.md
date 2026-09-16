@@ -1,3 +1,64 @@
+## v29.0.0 Lightning & Necro Update
+- Poison card art is now a tall narrow red magic flask.
+- Lightning uses a rectangular blue magic flask surrounded by procedural electric arcs.
+- Elixir Golem splitting adds a pink procedural burst/ring effect to make each death/split stage readable in the live detail demo.
+- No external raster assets are required.
+
+## v28.0.0 Royal Elixir Update
+- Added original procedural Canvas art for Elixir Golem: a broad pink slime-golem body for the large/mid forms and a round pink blob for the final split form.
+- Added original procedural Canvas art for Royal Giant: blond, crowned, heavy-set cannon carrier with a dedicated cannonball projectile.
+- Healer keeps the existing procedural priest silhouette while its name/stats/ability are changed. No external raster assets are required.
+
+## v27.1.0 Riverbank Deploy Update
+- No new art assets. The deployment overlay line now uses the new riverbank-forward initial deployment boundary.
+
+## v27.0.0 Undead River Update
+- Added procedural Canvas art for Tombstone; no external raster asset is required.
+- Skeleton and Skeleton Squad reuse the shared procedural skeleton drawing at different group counts.
+- Iron Boar river jumping adds a procedural lift/tilt motion and speed-line treatment while preserving the existing character art.
+
+## v26.6.0 Arsenal & Swarm Update
+- No new external raster assets were added.
+- Bomber bombs now use procedural parabolic lift and rotation while the underlying projectile travels toward its target.
+
+## v26.5.0 Battle Readability
+- Leaf Archer placement ghost now draws two procedural archer figures instead of one.
+- Battle-card damage popup is DOM/CSS UI; no external image assets were added.
+
+## v26.4.3 Golem Arm Sway
+- Stone Golem and Mini Golem keep the v26.4.1 silhouette, but their forearms and fists now bob vertically in alternating rhythm while moving.
+- No new raster assets were added; the animation remains procedural.
+
+## v26.4.3 Golem Arm Redesign
+No external character asset was added. Stone Golem and Mini Golem remain procedural Canvas art in `public/game/art.js`. The shared rig now uses oversized side-grown shoulders, outward upper arms, thick forward forearms and huge planted fists, with a lower head and stronger gorilla-like forward lean. Existing stone, moss and blue-rune motifs are preserved.
+
+## v26.4.0 Golem Weight Update
+No external assets were added. Stone Golem and Mini Golem remain original procedural Canvas drawings in `public/game/art.js`. The established stone, moss and rune design is preserved while the parent/small shared drawing now uses a lower forward-leaning gorilla stance with both oversized arms positioned in front.
+
+## v26.3.0 Frontline Power Update
+No new visual assets were added. This update changes combat balance only: Iron Guard, Kragg Berserker, Mini Berserker and Leaf Archer stats/cost. Existing procedural Canvas art is unchanged.
+
+## v26.2.0 Axe & Archer Update
+No external assets were added. Valkyrie remains original procedural Canvas art, but her attack no longer rotates the whole body: the upright sprite swaps front/back presentation while the axe circles around her. Leaf Archer uses the existing original procedural archer art at a smaller battle scale, and its card portrait now shows the two-unit formation.
+
+## v26.1.1 Battle Pace Tune
+No external visual assets were added. This patch only raises ordinary non-zero unit movement speeds by about 5% from v26.1.0 and leaves all character artwork unchanged.
+
+## v26.1.0 Battle Pace Update
+- No new external assets. This update changes normal movement balance only; character art is unchanged.
+
+## v26.0.0 Wild Wings Update
+No external character assets were added. Valkyrie and Gargoyle visuals are original procedural Canvas drawings in `public/game/art.js`. Gargoyle Swarm reuses the same Gargoyle drawing in a six-unit formation.
+
+## v25.2.1 Sky Bomber Air Target Fix
+No external assets were added. Sky Bomber keeps its existing procedural Canvas artwork; only targeting was expanded to include air units.
+
+## v25.2.0 Sky Bomber Retarget
+No external assets were added. Sky Bomber keeps its existing procedural Canvas artwork; only gameplay targeting and HP were adjusted.
+
+## v25.1.1 Mobile Drag Fix
+No external assets were added. The mobile fix is CSS/JavaScript only: text selection, copy/cut callouts and native drag behavior are disabled across the full game UI so custom touch dragging is not interrupted.
+
 ## v25.1.0 Drag Deck UI
 No new image assets were added. The deck drag ghost reuses the existing procedural card portrait canvas and deck portrait mode.
 
