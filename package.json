@@ -1,9 +1,9 @@
 {
   "name": "tiny-siege",
-  "version": "29.0.0",
+  "version": "36.0.0",
   "private": true,
   "type": "module",
-  "description": "Original 2D lane battler with 56 selectable cards, CPU practice and private 1v1 on Cloudflare Workers.",
+  "description": "Original 2D lane battler with 66 selectable cards, CPU practice and private 1v1 on Cloudflare Workers.",
   "engines": {
     "node": ">=22"
   },

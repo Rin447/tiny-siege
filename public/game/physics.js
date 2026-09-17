@@ -4,7 +4,7 @@ import {ARENA} from './units.js';
  * Ground bodies live on the lawn/bridges. Air bodies share a separate layer.
  * Buildings are static circles; tree/grass artwork is decorative only.
  */
-export const PHYSICS_VERSION=45;
+export const PHYSICS_VERSION=57;
 export const FIELD={left:34,right:686,top:28,bottom:1012};
 const EPS=0.001,GRID=20,COLS=33,ROWS=49;
 const worldCaches=new WeakMap();
@@ -271,9 +271,12 @@ function groupOffset(count,i,spacing=24){
 }
 export function spawnPositions(g,owner,data,x,y,structures=null){
   const points=[],f=owner===0?1:-1,blockers=structures||solidStructures(g);
+  const wideSpacing=data.wideFormation?(data.wideFormationSpacing||100):0;
+  const wideSpan=data.wideFormation?Math.max(0,(data.count-1)*wideSpacing):0;
+  const wideCenter=data.wideFormation?clampP(x,48+wideSpan/2,672-wideSpan/2):x;
   for(let i=0;i<data.count;i++){
-    const off=groupOffset(data.count,i,data.radius<=10?20:24);
-    const wanted={x:x+off.x*f,y:y+off.y*f};
+    const off=data.wideFormation?{x:(i-(data.count-1)/2)*wideSpacing,y:0}:groupOffset(data.count,i,data.radius<=10?20:24);
+    const wanted={x:(data.wideFormation?wideCenter:x)+off.x*f,y:y+off.y*f};
     let found=null;
     // Ground buildings must remain exactly where clicked, not shift out from under the cursor.
     const rings=data.building?[0]:[0,12,24,36,48];

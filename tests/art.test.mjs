@@ -84,3 +84,115 @@ test('v26.6 Bomber bomb render follows a rotating parabolic throw arc',()=>{
   assert.match(art,/p\.kind==='bomb'[\s\S]{0,180}Math\.sin\(Math\.PI\*bombProgress\)\*42/);
   assert.match(art,/thrownBomb\?angle\+bombProgress\*TAU\*1\.35:angle/);
 });
+
+test('v29.1 Yuno procedural art is a short white-haired green-hood dagger assassin',()=>{
+  const art=fs.readFileSync(new URL('../public/game/art.js',import.meta.url),'utf8');
+  const start=art.indexOf('function drawNightshade');
+  const end=art.indexOf('function drawGoblinTrooper',start);
+  const yuno=art.slice(start,end);
+  assert.match(yuno,/cloak='#3d8551'/);
+  assert.match(yuno,/hair='#f2f0e8'/);
+  assert.match(yuno,/mask='#171d20'/);
+  assert.match(yuno,/short dagger|タガー|path\(c,\[\[-1,0\],\[1,-19\]/);
+  assert.match(yuno,/dashWindup/);
+  assert.match(yuno,/dashing/);
+});
+
+
+test('v29.3 Royal Ghost procedural art shows a pale crowned bearded dagger ghost and stealth transparency',()=>{
+  const art=fs.readFileSync(new URL('../public/game/art.js',import.meta.url),'utf8');
+  const start=art.indexOf('function drawRoyalGhost');
+  const end=art.indexOf('function drawSkyBomber',start);
+  const ghost=art.slice(start,end);
+  assert.ok(start>0);
+  assert.match(ghost,/beard='#f8fbf7'/);
+  assert.match(ghost,/gold='#d7b34d'/);
+  assert.match(ghost,/dagger='#b9c9cc'/);
+  assert.match(ghost,/opts\.stealthed[\s\S]{0,80}globalAlpha\*=\.42/);
+  assert.match(art,/type==='mirage'\)\{drawRoyalGhost/);
+});
+
+test('v30 Ice Golem has dedicated icy procedural art',()=>{
+  const art=fs.readFileSync(new URL('../public/game/art.js',import.meta.url),'utf8');
+  const start=art.indexOf('function drawIceGolem');
+  const end=art.indexOf('function drawRoyalGiant',start);
+  const ice=art.slice(start,end);
+  assert.ok(start>0);assert.match(ice,/Compact icy feet and a squat, heavy body/);assert.match(ice,/Ice crystal shoulders and stubby arms/);assert.match(ice,/cold blue eyes/);assert.match(art,/type==='icegolem'\)\{drawIceGolem/);
+});
+
+test('v31.0.2 Royal Giant restores the exact V29.2 visual pose',()=>{
+  const art=fs.readFileSync(new URL('../public/game/art.js',import.meta.url),'utf8');
+  const start=art.indexOf('function drawRoyalGiant');
+  const end=art.indexOf('function drawLumina',start);
+  const giant=art.slice(start,end);
+  assert.ok(start>0);
+  assert.match(giant,/Cannon arm: shoulder -> forearm -> handheld barrel/);
+  assert.match(giant,/Other hand visibly carries a cannonball/);
+  assert.match(giant,/Huge torso and royal sash/);
+});
+
+
+test('v32 Giant Skeleton has dedicated winter-hat bomb-and-barrel procedural art',()=>{
+  const art=fs.readFileSync(new URL('../public/game/art.js',import.meta.url),'utf8');
+  const start=art.indexOf('function drawGiantSkeleton');
+  const end=art.indexOf('function drawTombstone',start);
+  const giant=art.slice(start,end);
+  assert.ok(start>0);assert.match(giant,/Backpack barrel/);assert.match(giant,/Right hand carries the bomb/);assert.match(giant,/Fur winter hat/);assert.match(art,/type==='giantskeleton'\)\{drawGiantSkeleton/);
+});
+
+test('v32 Skeleton Rush has a purple zone, owner border, and spell portrait branch',()=>{
+  const art=fs.readFileSync(new URL('../public/game/art.js',import.meta.url),'utf8');
+  assert.match(art,/rush=z\.kind==='skeletonrush'/);assert.match(art,/#7a48a8/);assert.match(art,/d\.spell==='skeletonrush'/);assert.match(art,/skeletonrush-activate/);
+});
+
+
+test('v33 Giant Skeleton walks with vertically oscillating arms',()=>{
+  const art=fs.readFileSync(new URL('../public/game/art.js',import.meta.url),'utf8');
+  const start=art.indexOf('function drawGiantSkeleton');const end=art.indexOf('function drawTombstone',start);const giant=art.slice(start,end);
+  assert.match(giant,/armLift=moving\?Math\.sin\(walk\)\*7:0/);assert.match(giant,/translate\(-24,-52\+armLift\)/);assert.match(giant,/translate\(23,-53-armLift\)/);
+});
+
+test('v33 Mega Gargoyle has dedicated armored procedural art and dispatch',()=>{
+  const art=fs.readFileSync(new URL('../public/game/art.js',import.meta.url),'utf8');
+  const start=art.indexOf('function drawMegaGargoyle');const end=art.indexOf('function drawGargoyleSwarmCard',start);const mega=art.slice(start,end);
+  assert.ok(start>0);assert.match(mega,/Heavy breastplate and team-colored waist guard/);assert.match(mega,/Armored shoulders/);assert.match(art,/type==='megagargoyle'\)\{drawMegaGargoyle/);
+});
+
+test('v33 Goblin cards have dedicated multi-unit portraits',()=>{
+  const art=fs.readFileSync(new URL('../public/game/art.js',import.meta.url),'utf8');
+  assert.match(art,/if\(type==='goblins'\)/);assert.match(art,/if\(type==='speargoblins'\)/);assert.match(art,/options\.selected==='mossling'/);
+});
+
+test('v34 Apprentice Guards have dedicated shield-breaking recruit art and six-unit card portrait',()=>{
+ const art=fs.readFileSync(new URL('../public/game/art.js',import.meta.url),'utf8');
+ const start=art.indexOf('function drawApprenticeGuard');const end=art.indexOf('function drawIceSpirit',start);const recruit=art.slice(start,end);
+ assert.match(recruit,/hasShield=\(opts\.shieldHp\?\?240\)>0/);assert.match(recruit,/Closed helmet/);assert.match(recruit,/Spea?r|Spear/);
+ assert.match(art,/type==='apprenticeguard'\|\|type==='apprenticeguards'/);assert.match(art,/if\(type==='apprenticeguards'\)[\s\S]{0,500}for\(let i=0;i<group\.length;i\+\+\)/);
+});
+
+test('v34 Ice Spirit has snowball limb art and leap progress rendering',()=>{
+ const art=fs.readFileSync(new URL('../public/game/art.js',import.meta.url),'utf8');
+ const start=art.indexOf('function drawIceSpirit');const end=art.indexOf('function drawShieldKnight',start);const ice=art.slice(start,end);
+ assert.match(ice,/iceSpiritProgress/);assert.match(ice,/iceSpiritState==='leap'/);assert.match(ice,/Math\.sin\(Math\.PI\*p\)\*22/);assert.match(art,/type==='icespirit'\)\{drawIceSpirit/);
+});
+
+
+test('v35 Fire Spirit has magma limb art and leap progress rendering',()=>{
+ const art=fs.readFileSync(new URL('../public/game/art.js',import.meta.url),'utf8');
+ const start=art.indexOf('function drawFireSpirit');const end=art.indexOf('function drawShieldKnight',start);const fire=art.slice(start,end);
+ assert.ok(start>0);assert.match(fire,/fireSpiritProgress/);assert.match(fire,/fireSpiritState==='leap'/);assert.match(fire,/Math\.sin\(Math\.PI\*p\)\*22/);assert.match(fire,/magma='#e9572f'/);assert.match(art,/type==='firespirit'\)\{drawFireSpirit/);
+});
+
+test('v35 Oven has a square stove, oversized pot, and dedicated dispatch',()=>{
+ const art=fs.readFileSync(new URL('../public/game/art.js',import.meta.url),'utf8');
+ const start=art.indexOf('function drawOven');const end=art.indexOf('function drawElixirGolem',start);const oven=art.slice(start,end);
+ assert.ok(start>0);assert.match(oven,/Oversized pot above the square stove/);assert.match(oven,/rr\(c,-27,-26,54,34/);assert.match(art,/type==='oven'\)\{drawOven/);
+});
+
+
+test('v36 Barbarians have dedicated bare-chested gold-hair art and Siege Barbarian has a wooden charged ram',()=>{
+ const art=fs.readFileSync(new URL('../public/game/art.js',import.meta.url),'utf8');
+ const b0=art.indexOf('function drawBarbarian');const b1=art.indexOf('function drawSiegeBarbarian',b0);const barb=art.slice(b0,b1);const s0=b1,s1=art.indexOf('function drawOven',s0);const ram=art.slice(s0,s1);
+ assert.ok(b0>0&&s0>0);assert.match(barb,/Big bare-chested veteran/);assert.match(barb,/hair='#f2c84e'/);assert.match(barb,/Gold hair and huge moustache\/beard/);
+ assert.match(ram,/Two barbarians are visibly tucked inside a hollow wooden ram/);assert.match(ram,/const charged=!!opts\.charged/);assert.match(art,/type==='barbarian'\|\|type==='barbarians'\)\{drawBarbarian/);assert.match(art,/type==='siegebarbarian'\)\{drawSiegeBarbarian/);
+});

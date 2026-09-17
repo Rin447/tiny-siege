@@ -33,7 +33,10 @@ export function canPlace(g,owner,id,x,y){
   if(typeof id!=='string'||!DECK.includes(id))return '不明なカードです。';
   const d=UNITS[id];
   if(!Number.isFinite(x)||!Number.isFinite(y))return '指定位置が正しくありません。';
-  if(x<30||x>690||y<30||y>1010)return 'フィールドの内側を指定してください。';
+  if(d.spell==='skeletonrush'){
+    const visibleInset=(d.radius||110)*(1-(d.offscreenFraction??.4));
+    if(x<visibleInset||x>ARENA.width-visibleInset||y<visibleInset||y>ARENA.height-visibleInset)return '\u30d5\u30a3\u30fc\u30eb\u30c9\u5185\u306b\u7bc4\u56f2\u306e60%\u4ee5\u4e0a\u304c\u6b8b\u308b\u4f4d\u7f6e\u3092\u6307\u5b9a\u3057\u3066\u304f\u3060\u3055\u3044\u3002';
+  }else if(x<30||x>690||y<30||y>1010)return '\u30d5\u30a3\u30fc\u30eb\u30c9\u306e\u5185\u5074\u3092\u6307\u5b9a\u3057\u3066\u304f\u3060\u3055\u3044\u3002';
   if(!g.players[owner].hand.includes(id))return 'そのカードは手札にありません。';
   if(g.players[owner].energy+0.00001<d.cost)return 'エナジーが足りません。';
   if(d.spell){
@@ -64,14 +67,17 @@ function spendCard(g,owner,id){
 }
 function makeUnit(g,owner,type,x,y){
   const d=UNITS[type];
-  return {...d,id:`u${g.nextId++}`,type,owner,x,y,hp:d.hp,maxHp:d.hp,cd:0,spawn:0.5,anim:0,hit:0,walk:0,target:null,targetLock:null,targetable:true,collisionDisabled:false,deploying:false,deployTotal:0,deployRemaining:0,face:owner===0?-1:1,
+  return {...d,id:`u${g.nextId++}`,type,owner,x,y,hp:d.hp,maxHp:d.hp,cd:0,spawn:0.5,anim:0,hit:0,walk:0,target:null,targetLock:null,firstStrikeTarget:null,firstStrikeReadyAt:0,targetable:true,collisionDisabled:false,deploying:false,deployTotal:0,deployRemaining:0,face:owner===0?-1:1,
     lane:x<360?190:530,age:0,facing:owner===0?-Math.PI/2:Math.PI/2,moving:false,
     summonNextAt:d.summonInterval?g.time+d.summonInterval:null,summonCastingUntil:0,
     stunUntil:0,sparkCharged:false,sparkChargeStartAt:d.sparkChargeTime?g.time:null,sparkChargeProgress:0,
     shieldHp:d.shieldMax||0,maxShieldHp:d.shieldMax||0,stealthed:false,stealthUntil:0,revived:false,
+    iceSpiritState:null,iceSpiritTarget:null,iceSpiritStartedAt:0,iceSpiritProgress:0,iceSpiritStartX:null,iceSpiritStartY:null,iceSpiritEndX:null,iceSpiritEndY:null,
+    fireSpiritState:null,fireSpiritTarget:null,fireSpiritStartedAt:0,fireSpiritProgress:0,fireSpiritStartX:null,fireSpiritStartY:null,fireSpiritEndX:null,fireSpiritEndY:null,
+    ramChargeTime:0,
     drillTarget:null,drillLockTime:0,drillStage:0,drillDps:d.drillBaseDps||0,crusherTarget:null,crusherStage:0,
     megaJumpState:null,megaJumpTarget:null,megaJumpWindupUntil:0,megaJumpTargetX:null,megaJumpTargetY:null,megaJumpProgress:0,megaJumpStartedAt:0,megaJumpStartX:null,megaJumpStartY:null,megaJumpEndX:null,megaJumpEndY:null,
-    riverJumpState:null,riverJumpProgress:0,riverJumpStartedAt:0,riverJumpStartX:null,riverJumpStartY:null,riverJumpEndX:null,riverJumpEndY:null,
+    riverJumpMode:d.riverJumper?boarRiverRouteForSpawn(d,owner,x,y):null,riverJumpState:null,riverJumpProgress:0,riverJumpStartedAt:0,riverJumpStartX:null,riverJumpStartY:null,riverJumpEndX:null,riverJumpEndY:null,
     ironSpinUsed:false,ironSpinState:null,ironSpinStartedAt:0,ironSpinProgress:0,ironSpinStartX:null,ironSpinStartY:null,ironSpinEndX:null,ironSpinEndY:null,ironSpinTarget:null,ironSpinHitIds:[],
     hookState:null,hookTarget:null,hookWindupUntil:0,hookReadyAt:0,hookProgress:0,hookStartedAt:0,hookStartX:null,hookStartY:null,hookEndX:null,hookEndY:null,hookTargetX:null,hookTargetY:null,hookAirTarget:null,hookAirAttackUntil:0,hookControlUntil:0,
     ironMarked:false,ironMarkOwner:null,ironMarkDamage:0,ironMarkThreshold:0,ironMarkBurstDamage:0,ironMarkBonus:0,
@@ -118,6 +124,12 @@ function castSpell(g,owner,id,x,y){
     event(g,'lightning-cast',{x,y,owner,radius:d.radius,targets:targets.length});
     for(const t of targets){const amount=(t.kind||t.building)?d.buildingDamage:d.damage;event(g,'lightning-hit',{x:t.x,y:t.y,owner,targetOwner:t.owner,building:!!(t.kind||t.building),damage:amount});damage(g,t,amount,owner,{spell:true});}
     return {ok:true,spell:true,travelTime:0,targets:targets.length};
+  }
+  if(d.spell==='skeletonrush'){
+    g.zones??=[];const delay=d.activationDelay||1.2,duration=d.zoneDuration||9;
+    g.zones.push({id:`z${g.nextId++}`,owner,kind:'skeletonrush',spell:'skeletonrush',x,y,radius:d.radius,remaining:duration,total:duration,activateAt:g.time+delay,expiresAt:g.time+delay+duration,nextSpawnAt:g.time+delay+(d.firstSpawnDelay||3),spawnEvery:d.spawnEvery||.5,spawnType:d.spawnType||'skeleton',activated:false});
+    event(g,'skeletonrush-deploy',{x,y,owner,radius:d.radius,duration:delay});
+    return {ok:true,spell:true,travelTime:delay};
   }
   if(d.spell==='poison'){
     g.zones??=[];
@@ -195,7 +207,7 @@ function beginMegaLeap(g,u,t){
   u.megaJumpState='leap';u.megaJumpStartedAt=g.time;u.megaJumpProgress=0;u.megaJumpTarget=t?.id||u.megaJumpTarget;
   u.megaJumpStartX=u.x;u.megaJumpStartY=u.y;u.megaJumpEndX=end.x;u.megaJumpEndY=end.y;u.megaJumpTargetX=end.x;u.megaJumpTargetY=end.y;
   u.collisionDisabled=true;u.moving=true;
-  if(t&&targetable(u,t)){u.target=t.id;u.targetLock=t.id;faceToward(u,t.x,t.y);}
+  if(t&&targetable(u,t)){u.target=t.id;u.targetLock=t.id;markFirstStrikeComplete(g,u,t);faceToward(u,t.x,t.y);}
   const duration=u.jumpTravelTime||1.5;
   event(g,'mega-jump',{x:u.x,y:u.y,tx:end.x,ty:end.y,owner:u.owner,duration,life:duration});
 }
@@ -229,29 +241,107 @@ function updateMegaJump(g,u,entities,dt){
   }
   return false;
 }
+function beginIceSpiritLeap(g,u,t){
+  if(!u.iceSpirit||!t||!targetable(u,t))return false;
+  commitMobileTarget(u,t);markFirstStrikeComplete(g,u,t);faceToward(u,t.x,t.y);
+  u.iceSpiritState='leap';u.iceSpiritTarget=t.id;u.iceSpiritStartedAt=g.time;u.iceSpiritProgress=0;
+  u.iceSpiritStartX=u.x;u.iceSpiritStartY=u.y;u.iceSpiritEndX=t.x;u.iceSpiritEndY=t.y;u.collisionDisabled=true;u.moving=true;u.target=t.id;
+  const duration=u.iceLeapDuration||.24;event(g,'ice-spirit-leap',{x:u.x,y:u.y,tx:t.x,ty:t.y,owner:u.owner,duration,life:duration});return true;
+}
+function finishIceSpiritLeap(g,u,entities){
+  const radius=u.iceBlastRadius||48,amount=u.damage||110,duration=u.stunDuration||1.1,centre={x:u.x,y:u.y};
+  let hits=0;
+  for(const v of [...alive(g)]){
+    if(v.id===u.id||v.owner===u.owner||v.hp<=0||v.targetable===false||v.burrowState==='burrow')continue;
+    if(distance(centre,v)>radius+(v.radius||12)*.35)continue;
+    const beforeHp=v.hp,beforeShield=v.shieldHp||0;
+    damage(g,v,amount,u.owner,{shieldable:true,sourceX:u.x,sourceY:u.y});
+    const hit=v.hp<beforeHp-1e-8||(v.shieldHp||0)<beforeShield-1e-8;
+    if(hit){hits++;if(v.hp>0)applyStun(g,v,duration,u.owner);}
+  }
+  event(g,'ice-spirit-burst',{x:u.x,y:u.y,owner:u.owner,radius,damage:amount,stunDuration:duration,hits});
+  u.collisionDisabled=false;u.iceSpiritState=null;u.iceSpiritProgress=1;u.hp=0;handleUnitDeath(g,u);
+}
+function updateIceSpiritLeap(g,u,entities,dt){
+  if(!u.iceSpirit||u.iceSpiritState!=='leap')return false;
+  const t=entities.find(e=>e.id===u.iceSpiritTarget&&e.hp>0&&targetable(u,e))||null;
+  if(t){u.iceSpiritEndX=t.x;u.iceSpiritEndY=t.y;faceToward(u,t.x,t.y);}
+  const duration=Math.max(.05,u.iceLeapDuration||.24),raw=clamp((g.time-(u.iceSpiritStartedAt??g.time))/duration,0,1),moveP=raw*raw*(3-2*raw);
+  const sx=Number.isFinite(u.iceSpiritStartX)?u.iceSpiritStartX:u.x,sy=Number.isFinite(u.iceSpiritStartY)?u.iceSpiritStartY:u.y;
+  const ex=Number.isFinite(u.iceSpiritEndX)?u.iceSpiritEndX:u.x,ey=Number.isFinite(u.iceSpiritEndY)?u.iceSpiritEndY:u.y;
+  u.iceSpiritProgress=raw;u.moving=true;u.x=sx+(ex-sx)*moveP;u.y=sy+(ey-sy)*moveP;
+  if(raw>=1-1e-8){u.x=ex;u.y=ey;finishIceSpiritLeap(g,u,entities);}
+  return true;
+}
+
+function beginFireSpiritLeap(g,u,t){
+  if(!u.fireSpirit||!t||!targetable(u,t))return false;
+  commitMobileTarget(u,t);markFirstStrikeComplete(g,u,t);faceToward(u,t.x,t.y);
+  u.fireSpiritState='leap';u.fireSpiritTarget=t.id;u.fireSpiritStartedAt=g.time;u.fireSpiritProgress=0;
+  u.fireSpiritStartX=u.x;u.fireSpiritStartY=u.y;u.fireSpiritEndX=t.x;u.fireSpiritEndY=t.y;u.collisionDisabled=true;u.moving=true;u.target=t.id;
+  const duration=u.fireLeapDuration||.24;event(g,'fire-spirit-leap',{x:u.x,y:u.y,tx:t.x,ty:t.y,owner:u.owner,duration,life:duration});return true;
+}
+function finishFireSpiritLeap(g,u,entities){
+  const radius=u.fireBlastRadius||48,amount=u.damage||215,centre={x:u.x,y:u.y};let hits=0;
+  for(const v of [...alive(g)]){
+    if(v.id===u.id||v.owner===u.owner||v.hp<=0||v.targetable===false||v.burrowState==='burrow')continue;
+    if(distance(centre,v)>radius+(v.radius||12)*.35)continue;
+    const beforeHp=v.hp,beforeShield=v.shieldHp||0;damage(g,v,amount,u.owner,{shieldable:true,sourceX:u.x,sourceY:u.y});
+    if(v.hp<beforeHp-1e-8||(v.shieldHp||0)<beforeShield-1e-8)hits++;
+  }
+  event(g,'fire-spirit-burst',{x:u.x,y:u.y,owner:u.owner,radius,damage:amount,hits});
+  u.collisionDisabled=false;u.fireSpiritState=null;u.fireSpiritProgress=1;u.hp=0;handleUnitDeath(g,u);
+}
+function updateFireSpiritLeap(g,u,entities,dt){
+  if(!u.fireSpirit||u.fireSpiritState!=='leap')return false;
+  const t=entities.find(e=>e.id===u.fireSpiritTarget&&e.hp>0&&targetable(u,e))||null;
+  if(t){u.fireSpiritEndX=t.x;u.fireSpiritEndY=t.y;faceToward(u,t.x,t.y);}
+  const duration=Math.max(.05,u.fireLeapDuration||.24),raw=clamp((g.time-(u.fireSpiritStartedAt??g.time))/duration,0,1),moveP=raw*raw*(3-2*raw);
+  const sx=Number.isFinite(u.fireSpiritStartX)?u.fireSpiritStartX:u.x,sy=Number.isFinite(u.fireSpiritStartY)?u.fireSpiritStartY:u.y;
+  const ex=Number.isFinite(u.fireSpiritEndX)?u.fireSpiritEndX:u.x,ey=Number.isFinite(u.fireSpiritEndY)?u.fireSpiritEndY:u.y;
+  u.fireSpiritProgress=raw;u.moving=true;u.x=sx+(ex-sx)*moveP;u.y=sy+(ey-sy)*moveP;
+  if(raw>=1-1e-8){u.x=ex;u.y=ey;finishFireSpiritLeap(g,u,entities);}
+  return true;
+}
+function boarRiverRouteForSpawn(u,owner,x,y){
+  if(!u.riverJumper)return null;
+  if(ARENA.bridges.some(b=>Math.abs(x-b)<=ARENA.bridgeHalf))return 'bridge';
+  const band=u.riverJumpSpawnBand||90;
+  const besideRiver=owner===0
+    ? y>=ARENA.riverBottom&&y<=ARENA.riverBottom+band
+    : y<=ARENA.riverTop&&y>=ARENA.riverTop-band;
+  return besideRiver?'river':'bridge';
+}
+function boarRiverTargetAcross(u,target){
+  return !!target&&(u.owner===0?target.y<ARENA.riverTop:target.y>ARENA.riverBottom);
+}
+function boarRiverApproachPoint(u,target){
+  if(!u.riverJumper||u.riverJumpMode!=='river'||u.riverJumpState||!boarRiverTargetAcross(u,target))return null;
+  const r=u.radius||18,onOwnSide=u.owner===0?u.y>=ARENA.riverBottom:u.y<=ARENA.riverTop;
+  if(!onOwnSide)return null;
+  return {x:u.x,y:u.owner===0?ARENA.riverBottom+r+2:ARENA.riverTop-r-2};
+}
 function boarRiverJumpLanding(g,u,target){
-  if(!u.riverJumper||!target)return null;
-  const dir=u.owner===0?-1:1;
-  const y=u.owner===0?ARENA.riverTop-(u.radius||18)-12:ARENA.riverBottom+(u.radius||18)+12;
-  const aimed=clamp(u.x+(target.x-u.x)*.18,55,665);
-  for(const off of [0,-24,24,-48,48,-72,72]){
+  if(!u.riverJumper||u.riverJumpMode!=='river'||!target)return null;
+  const r=u.radius||18,y=u.owner===0?ARENA.riverTop-r-2:ARENA.riverBottom+r+2;
+  const aimed=clamp(u.x,55,665);
+  for(const off of [0,-12,12,-24,24,-40,40]){
     const p={x:clamp(aimed+off,55,665),y};
     if(staticFree(g,u,p,0))return p;
   }
   return null;
 }
 function beginBoarRiverJump(g,u,target){
-  if(!u.riverJumper||u.riverJumpState||!target||target.owner===u.owner)return false;
-  const trigger=u.riverJumpTrigger||150,near=u.owner===0?(u.y>=ARENA.riverBottom&&u.y<=ARENA.riverBottom+trigger):(u.y<=ARENA.riverTop&&u.y>=ARENA.riverTop-trigger);
-  const across=u.owner===0?target.y<ARENA.riverTop:target.y>ARENA.riverBottom;
-  if(!near||!across)return false;
+  if(!u.riverJumper||u.riverJumpMode!=='river'||u.riverJumpState||!target||target.owner===u.owner)return false;
+  const trigger=u.riverJumpTrigger||28,near=u.owner===0?(u.y>=ARENA.riverBottom&&u.y<=ARENA.riverBottom+trigger):(u.y<=ARENA.riverTop&&u.y>=ARENA.riverTop-trigger);
+  if(!near||!boarRiverTargetAcross(u,target))return false;
   const end=boarRiverJumpLanding(g,u,target);if(!end)return false;
   u.riverJumpState='leap';u.riverJumpStartedAt=g.time;u.riverJumpProgress=0;u.riverJumpStartX=u.x;u.riverJumpStartY=u.y;u.riverJumpEndX=end.x;u.riverJumpEndY=end.y;u.collisionDisabled=true;u.moving=true;u._nav=null;
-  faceToward(u,end.x,end.y);event(g,'boar-river-jump',{x:u.x,y:u.y,tx:end.x,ty:end.y,owner:u.owner,duration:u.riverJumpTravelTime||.85,life:u.riverJumpTravelTime||.85});return true;
+  faceToward(u,end.x,end.y);event(g,'boar-river-jump',{x:u.x,y:u.y,tx:end.x,ty:end.y,owner:u.owner,duration:u.riverJumpTravelTime||1.2,life:u.riverJumpTravelTime||1.2});return true;
 }
 function updateBoarRiverJump(g,u,dt){
   if(!u.riverJumper||u.riverJumpState!=='leap')return false;
-  const duration=Math.max(.1,u.riverJumpTravelTime||.85),raw=clamp((g.time-(u.riverJumpStartedAt||g.time))/duration,0,1),moveP=raw*raw*(3-2*raw);
+  const duration=Math.max(.1,u.riverJumpTravelTime||1.2),raw=clamp((g.time-(u.riverJumpStartedAt||g.time))/duration,0,1),moveP=raw*raw*(3-2*raw);
   const sx=u.riverJumpStartX??u.x,sy=u.riverJumpStartY??u.y,ex=u.riverJumpEndX??u.x,ey=u.riverJumpEndY??u.y;
   u.riverJumpProgress=raw;u.x=sx+(ex-sx)*moveP;u.y=sy+(ey-sy)*moveP;u.moving=true;faceToward(u,ex,ey);
   if(raw>=1-1e-8){
@@ -331,7 +421,7 @@ function cancelTrackerHook(g,u){
 }
 function finishTrackerPull(g,u,t){
   const wasAir=!!t?.air;u.hookState=null;u.hookProgress=1;u.collisionDisabled=false;u.moving=false;
-  if(t&&t.hp>0){u.target=t.id;u.targetLock=t.id;if(wasAir){u.hookAirTarget=t.id;u.hookAirAttackUntil=g.time+(u.hookAirAttackDuration||2);event(g,'tracker-air-window',{x:u.x,y:u.y,owner:u.owner,duration:u.hookAirAttackDuration||2,life:u.hookAirAttackDuration||2});}}
+  if(t&&t.hp>0){u.target=t.id;u.targetLock=t.id;markFirstStrikeComplete(g,u,t);if(wasAir){u.hookAirTarget=t.id;u.hookAirAttackUntil=g.time+(u.hookAirAttackDuration||2);event(g,'tracker-air-window',{x:u.x,y:u.y,owner:u.owner,duration:u.hookAirAttackDuration||2,life:u.hookAirAttackDuration||2});}}
 }
 function updateTrackerHook(g,u,entities,dt){
   if(!u.tracker||!u.hookState)return false;let t=entities.find(e=>e.id===u.hookTarget&&e.hp>0)||null;
@@ -376,6 +466,17 @@ function nearestMobileCombatTarget(u,entities){
     if(d<=reach&&d<bestD){best=t;bestD=d;}
   }
   return best;
+}
+function resetFirstStrike(u){u.firstStrikeTarget=null;u.firstStrikeReadyAt=0;}
+function markFirstStrikeComplete(g,u,t){
+  if(!u.kind&&t){u.firstStrikeTarget=t.id;u.firstStrikeReadyAt=g.time;}
+}
+function firstStrikeReady(g,u,t){
+  if(u.kind)return true; // Arena towers keep their existing response timing.
+  const delay=Number.isFinite(u.firstStrikeDelay)?Math.max(0,u.firstStrikeDelay):Math.max(0,ARENA.firstStrikeDelay||0);
+  if(delay<=0)return true;
+  if(u.firstStrikeTarget!==t.id){u.firstStrikeTarget=t.id;u.firstStrikeReadyAt=g.time+delay;return false;}
+  return g.time+1e-8>=u.firstStrikeReadyAt;
 }
 function commitMobileTarget(u,t){
   if(!u.kind&&!u.building&&!u.buildingOnly&&t&&targetable(u,t))u.targetLock=t.id;
@@ -443,7 +544,7 @@ function beginShadowRush(g,u,t){
   const end=dashEndpoint(u,t);
   if(!staticLineFree(g,u,u,end,1)){u.dashState=null;u.dashTarget=null;return false;}
   // The rush itself is the attack commitment, so the target becomes locked here, not during windup.
-  commitMobileTarget(u,t);
+  commitMobileTarget(u,t);markFirstStrikeComplete(g,u,t);
   u.dashState='rush';u.dashEnd=end;u.invulnerableUntil=g.time+Math.max(.12,distance(u,end)/(u.dashSpeed||650)+.12);
   faceToward(u,t.x,t.y);event(g,'shadow-rush',{x:u.x,y:u.y,tx:end.x,ty:end.y,owner:u.owner});return true;
 }
@@ -451,7 +552,7 @@ function finishShadowRush(g,u,t){
   u.dashState=null;u.invulnerableUntil=0;u.dashReadyAt=g.time+(u.dashCooldown||4);u.dashTarget=null;u.dashEnd=null;
   u.cd=Math.max(u.cd,u.cooldown);u.anim=.35;
   if(t&&t.hp>0&&targetable(u,t)&&distance(u,t)<=u.range+t.radius+14){
-    const amount=Math.round(u.damage*(u.dashMultiplier||2));damage(g,t,amount,u.owner);
+    const amount=Number.isFinite(u.dashDamage)?u.dashDamage:Math.round(u.damage*(u.dashMultiplier||2));damage(g,t,amount,u.owner);
     event(g,'shadow-hit',{x:t.x,y:t.y,owner:u.owner,amount});
   }
 }
@@ -498,17 +599,23 @@ function canRushAfterWindup(g,u,t){
 }
 function move(g,u,t,dt){
   if(!u.speed)return;
-  const dest=navigationWaypoint(g,u,t,u.range+t.radius);
+  const dest=boarRiverApproachPoint(u,t)||navigationWaypoint(g,u,t,u.range+t.radius);
   const start={x:u.x,y:u.y};
   const frostFactor=(u.slowUntil||0)>g.time?(u.slowMoveFactor||1):1;
   const mudFactor=(u.mudUntil||0)>g.time?(u.mudSlowFactor||1):1;
-  const moved=moveBody(g,u,dest,dt*frostFactor*mudFactor);
+  const ramSpeedFactor=u.siegeRam&&u.charged?(u.ramChargeSpeedMultiplier||1.35):1;
+  const moved=moveBody(g,u,dest,dt*frostFactor*mudFactor*ramSpeedFactor);
   if(moved>.025){
     faceToward(u,u.x+(u.x-start.x),u.y+(u.y-start.y));u.walk+=moved/Math.max(1,u.speed)*7;u.moving=true;
-    if(u.chargeDistance&&u.buildingOnly){
+    if(u.siegeRam){
+      u.ramChargeTime=(u.ramChargeTime||0)+dt;
+      if(!u.charged&&u.ramChargeTime+1e-8>=(u.ramChargeAfter||2)){u.charged=true;event(g,'charge',{x:u.x,y:u.y,owner:u.owner,kind:'siege-ram'});}
+    }else if(u.chargeDistance&&u.buildingOnly){
       u.chargeRun=(u.chargeRun||0)+moved;
       if(!u.charged&&u.chargeRun>=u.chargeDistance){u.charged=true;event(g,'charge',{x:u.x,y:u.y,owner:u.owner});}
     }
+  }else if(u.siegeRam&&!u.charged){
+    u.ramChargeTime=0;
   }else if(u.chargeDistance){
     u.chargeRun=Math.max(0,(u.chargeRun||0)-dt*90);
     if(u.chargeRun<u.chargeDistance*.55)u.charged=false;
@@ -635,9 +742,56 @@ function updateCycloneZones(g,dt){
   }
   g.zones=g.zones.filter(z=>z.remaining>1e-8);
 }
+function skeletonRushSpawnPoint(g,z){
+  const d=UNITS[z.spawnType||'skeleton'];if(!d)return null;
+  const valid=p=>staticFree(g,d,p,0)&&!g.units.some(u=>u.hp>0&&!u.air&&!u.building&&distance(p,u)<(d.radius||7)+(u.radius||12)*.45);
+  for(let i=0;i<32;i++){
+    const a=random(g)*Math.PI*2,r=Math.sqrt(random(g))*Math.max(0,(z.radius||110)-(d.radius||7)),p={x:z.x+Math.cos(a)*r,y:z.y+Math.sin(a)*r};
+    if(valid(p))return p;
+  }
+  for(const frac of [.2,.4,.6,.8])for(let i=0;i<16;i++){
+    const a=i*Math.PI*2/16+(z.owner?Math.PI/16:0),r=(z.radius||110)*frac,p={x:z.x+Math.cos(a)*r,y:z.y+Math.sin(a)*r};
+    if(valid(p))return p;
+  }
+  return null;
+}
+function spawnSkeletonRushMinion(g,z){
+  if(g.units.filter(u=>u.hp>0).length>=ARENA.maxUnits)return false;
+  const d=UNITS[z.spawnType||'skeleton'],p=skeletonRushSpawnPoint(g,z);if(!d||!p)return false;
+  const u=makeUnit(g,z.owner,d.id,p.x,p.y);u.spawn=.2;u.summonedBy=z.id;u.lane=p.x<360?190:530;g.units.push(u);
+  event(g,'skeletonrush-spawn',{x:u.x,y:u.y,owner:u.owner,minion:d.id});return true;
+}
+function updateSkeletonRushZones(g,dt){
+  for(const z of g.zones||[]){
+    if(z.kind!=='skeletonrush')continue;
+    if(g.time+1e-8<z.activateAt){z.remaining=z.total;continue;}
+    if(!z.activated){z.activated=true;event(g,'skeletonrush-activate',{x:z.x,y:z.y,owner:z.owner,radius:z.radius});}
+    while(z.nextSpawnAt<=g.time+1e-8&&z.nextSpawnAt<=z.expiresAt+1e-8){spawnSkeletonRushMinion(g,z);z.nextSpawnAt+=z.spawnEvery||.5;}
+    z.remaining=Math.max(0,z.expiresAt-g.time);
+  }
+}
+function updateGiantSkeletonBombs(g,dt){
+  for(const z of g.zones||[]){
+    if(z.kind!=='giantskeletonbomb')continue;
+    z.remaining=Math.max(0,z.detonateAt-g.time);
+    if(z.detonated||g.time+1e-8<z.detonateAt)continue;
+    z.detonated=true;event(g,'giantskeleton-bomb-explode',{x:z.x,y:z.y,owner:z.owner,radius:z.radius,damage:z.damage});
+    const centre={x:z.x,y:z.y};
+    for(const v of [...alive(g)]){
+      if(v.owner===z.owner||v.hp<=0||distance(centre,v)>z.radius+(v.radius||12)*.35)continue;
+      if(v.air&&!v.kind&&!v.building)continue;
+      damage(g,v,z.damage,z.owner,{spell:true,giantSkeletonBomb:true});
+    }
+    z.remaining=0;
+  }
+}
 function handleUnitDeath(g,t){
   if(t._deathHandled)return;t._deathHandled=true;
   event(g,'death',{x:t.x,y:t.y,owner:t.owner,large:t.type==='golem'});
+  if(t.deathBombDamage&&t.deathBombRadius&&t.deathBombDelay){
+    g.zones??=[];g.zones.push({id:`z${g.nextId++}`,owner:t.owner,kind:'giantskeletonbomb',x:t.x,y:t.y,radius:t.deathBombRadius,damage:t.deathBombDamage,total:t.deathBombDelay,remaining:t.deathBombDelay,detonateAt:g.time+t.deathBombDelay,detonated:false});
+    event(g,'giantskeleton-bomb-place',{x:t.x,y:t.y,owner:t.owner,radius:t.deathBombRadius,duration:t.deathBombDelay});
+  }
   if(Number.isFinite(t.enemyEnergyOnDeath)&&t.enemyEnergyOnDeath>0){
     const enemy=t.owner===0?1:0,p=g.players[enemy],before=p.energy;
     p.energy=Math.min(ARENA.maxEnergy,p.energy+t.enemyEnergyOnDeath);
@@ -672,7 +826,10 @@ function damage(g,t,amount,owner,meta={}){
     const reduction=clamp(t.movingRangedReduction||.40,0,.9);hpAmount*=1-reduction;
     event(g,'turtle-shell',{x:t.x,y:t.y,owner:t.owner,reduction});
   }
-  if(meta.shieldable&&!meta.spell&&t.shieldHp>0&&frontShieldHit(t,meta.sourceX,meta.sourceY)){
+  if(t.shieldAll&&t.shieldHp>0&&amount>0){
+    absorbed=Math.min(t.shieldHp,amount);t.shieldHp=Math.max(0,t.shieldHp-absorbed);hpAmount=Math.max(0,amount-absorbed);
+    event(g,'shield-hit',{x:t.x,y:t.y,owner:t.owner,absorbed,shieldHp:t.shieldHp,maxShieldHp:t.maxShieldHp||t.shieldMax||0});if(t.shieldHp<=1e-8)event(g,'shield-break',{x:t.x,y:t.y,owner:t.owner});
+  }else if(meta.shieldable&&!meta.spell&&t.shieldHp>0&&frontShieldHit(t,meta.sourceX,meta.sourceY)){
     const wanted=amount*(t.shieldAbsorb||.65);absorbed=Math.min(t.shieldHp,wanted);t.shieldHp=Math.max(0,t.shieldHp-absorbed);hpAmount=Math.max(0,amount-absorbed);
     event(g,'shield-hit',{x:t.x,y:t.y,owner:t.owner,absorbed,shieldHp:t.shieldHp,maxShieldHp:t.maxShieldHp||t.shieldMax||0});if(t.shieldHp<=1e-8)event(g,'shield-break',{x:t.x,y:t.y,owner:t.owner});
   }
@@ -760,6 +917,7 @@ function applyStun(g,t,duration,owner){
   if(t.drillUnit)resetDrill(t);
   if(t.crusherRamp)resetCrusher(t);
   if(t.sparkUnit)resetSparkyCharge(g,t,until);
+  if(t.siegeRam){t.charged=false;t.ramChargeTime=0;}
   if(t.dashState){t.dashState=null;t.dashTarget=null;t.dashEnd=null;t.invulnerableUntil=0;t.dashReadyAt=Math.max(t.dashReadyAt||0,until+.35);}
   event(g,'stun',{x:t.x,y:t.y,owner,targetOwner:t.owner,duration});
 }
@@ -866,6 +1024,12 @@ function attack(g,u,t){
   commitMobileTarget(u,t);
   const attackFactor=(u.slowUntil||0)>g.time?(u.slowAttackFactor||1):1;
   u.cd=u.cooldown/Math.max(.15,attackFactor);u.anim=u.valkyrieSpin?.5:.35;faceToward(u,t.x,t.y);u.target=t.id;
+  if(u.siegeRam&&(t.kind||t.building)){
+    const charged=!!u.charged,amount=charged?(u.ramChargeDamage||572):(u.ramImpactDamage||u.suicideDamage||u.damage);
+    damage(g,t,amount,u.owner,{shieldable:false,sourceX:u.x,sourceY:u.y});
+    event(g,'ram-hit',{x:t.x,y:t.y,owner:u.owner,amount,charged,radius:charged?54:40});
+    u.charged=false;u.ramChargeTime=0;u._carrierReachedTarget=true;u.hp=0;handleUnitDeath(g,u);return;
+  }
   if(u.suicideUnit&&(t.kind||t.building)){
     const amount=u.suicideDamage||u.damage;damage(g,t,amount,u.owner,{shieldable:false,sourceX:u.x,sourceY:u.y});
     event(g,'suicide-hit',{x:t.x,y:t.y,owner:u.owner,amount});u._carrierReachedTarget=true;u.hp=0;handleUnitDeath(g,u);return;
@@ -966,13 +1130,14 @@ export function runBot(g,owner=1){
     if(aff.includes('zap')&&(threat.type==='sparky'||threat.type==='lasertower'||fireCluster>=4)){deploy(g,owner,'zap',threat.x,threat.y);return;}
     if(aff.includes('lightning')&&(threat.hp>=900||fireCluster>=3)){deploy(g,owner,'lightning',threat.x,threat.y);return;}
     if(aff.includes('poison')&&((threat.type==='boneswarm'||threat.type==='skeleton')||fireCluster>=4)){deploy(g,owner,'poison',threat.x,threat.y);return;}
+    if(aff.includes('skeletonrush')&&random(g)<.35){const tower=g.towers.find(t=>t.owner!==owner&&t.kind==='tower'&&t.hp>0)||g.towers.find(t=>t.owner!==owner&&t.kind==='core'&&t.hp>0);if(tower){deploy(g,owner,'skeletonrush',tower.x,tower.y);return;}}
     if(aff.includes('cyclone')&&arrowCluster>=3){deploy(g,owner,'cyclone',threat.x,threat.y);return;}
     if(aff.includes('arrowrain')&&arrowCluster>=3){deploy(g,owner,'arrowrain',threat.x,threat.y);return;}
     if(aff.includes('fireball')&&(fireCluster>=2||threat.type==='frost'||threat.type==='lumina')){deploy(g,owner,'fireball',threat.x,threat.y);return;}
   }
   let choices=aff.filter(id=>!UNITS[id].spell);if(!choices.length){
     const target=threat||g.towers.find(t=>t.owner!==owner&&t.kind==='tower'&&t.hp>0)||g.towers.find(t=>t.owner!==owner&&t.kind==='core'&&t.hp>0);
-    const spell=aff.includes('lightning')?'lightning':aff.includes('zap')?'zap':aff.includes('cyclone')?'cyclone':aff.includes('arrowrain')?'arrowrain':aff.includes('fireball')?'fireball':aff.includes('poison')?'poison':null;
+    const spell=aff.includes('skeletonrush')?'skeletonrush':aff.includes('lightning')?'lightning':aff.includes('zap')?'zap':aff.includes('cyclone')?'cyclone':aff.includes('arrowrain')?'arrowrain':aff.includes('fireball')?'fireball':aff.includes('poison')?'poison':null;
     if(target&&spell)deploy(g,owner,spell,target.x,target.y);return;
   }
   if(threat?.air&&choices.some(id=>UNITS[id].targetsAir))choices=choices.filter(id=>UNITS[id].targetsAir);
@@ -1001,7 +1166,7 @@ export function tick(g,dt=ARENA.tick){
   g.time+=dt;g.step++;
   for(const p of g.players)p.energy=Math.min(10,p.energy+dt*(g.time>=120?1.25:.625));
   g.events=g.events.map(e=>({...e,life:e.life-dt})).filter(e=>e.life>0);
-  g.zones??=[];updatePoisonZones(g,dt);decayMudZones(g,dt);updateMudZones(g);updateCycloneZones(g,dt);
+  g.zones??=[];updateSkeletonRushZones(g,dt);updateGiantSkeletonBombs(g,dt);updatePoisonZones(g,dt);decayMudZones(g,dt);updateMudZones(g);updateCycloneZones(g,dt);
   refreshCoreWake(g);
   if(g.bot&&g.time>=g.botNext){
     runBot(g,1);g.botNext=g.time+(g.difficulty==='easy'?2.6:g.difficulty==='hard'?.65:1.3)+random(g)*.7;
@@ -1030,6 +1195,8 @@ export function tick(g,dt=ARENA.tick){
     if((u.stunUntil||0)>g.time){u.target=null;if(u.laserTower||u.laserUnit)resetLaserTower(u);if(u.drillUnit)resetDrill(u);if(u.crusherRamp)resetCrusher(u);continue;}
     if(!u.kind&&updateSummoner(g,u)){u.target=null;if(u.laserTower||u.laserUnit)resetLaserTower(u);continue;}
     if(updateMegaJump(g,u,entities,dt))continue;
+    if(updateIceSpiritLeap(g,u,entities,dt))continue;
+    if(updateFireSpiritLeap(g,u,entities,dt))continue;
     if(updateShadowRush(g,u,entities,dt))continue;
     if(updateIronSpin(g,u,entities,dt))continue;
     if(updateTrackerHook(g,u,entities,dt))continue;
@@ -1037,27 +1204,37 @@ export function tick(g,dt=ARENA.tick){
     const hookTarget=trackerHookCandidate(g,u,entities);if(hookTarget){beginTrackerHook(g,u,hookTarget);continue;}
     healingPulse(g,u,entities);
     const target=getTarget(g,u,entities);
-    if(!target){if(u.laserTower||u.laserUnit)resetLaserTower(u);if(u.drillUnit)resetDrill(u);if(u.crusherRamp)resetCrusher(u);u.target=null;continue;}
+    if(!target){if(u.laserTower||u.laserUnit)resetLaserTower(u);if(u.drillUnit)resetDrill(u);if(u.crusherRamp)resetCrusher(u);resetFirstStrike(u);u.target=null;continue;}
     u.target=target.id;
+    if(u.iceSpirit&&distance(u,target)<=((u.iceLeapRange||70)+(target.radius||0))){beginIceSpiritLeap(g,u,target);continue;}
+    if(u.fireSpirit&&distance(u,target)<=((u.fireLeapRange||70)+(target.radius||0))){beginFireSpiritLeap(g,u,target);continue;}
     if(beginBoarRiverJump(g,u,target))continue;
     const reach=u.range+target.radius;
     if(u.megaKnight&&megaJumpReady(u,target)){beginMegaJumpWindup(g,u,target);continue;}
     if(u.crusherRamp&&u.crusherTarget&&(u.crusherTarget!==target.id||distance(u,target)>reach))resetCrusher(u);
     if(u.drillUnit){
-      if(distance(u,target)<=reach)updateDrill(g,u,target,dt);
-      else {resetDrill(u);move(g,u,target,dt);}
+      if(distance(u,target)<=reach){
+        faceToward(u,target.x,target.y);if(u.drillTarget&&u.drillTarget!==target.id)resetDrill(u);
+        if(firstStrikeReady(g,u,target))updateDrill(g,u,target,dt);
+      }else {resetFirstStrike(u);resetDrill(u);move(g,u,target,dt);}
       continue;
     }
     if(u.laserTower||u.laserUnit){
-      if(distance(u,target)<=reach)updateLaserTower(g,u,target,dt);
-      else {resetLaserTower(u);if(u.laserUnit&&!u.kind&&!u.building)move(g,u,target,dt);}
+      if(distance(u,target)<=reach){
+        faceToward(u,target.x,target.y);if(u.laserTarget&&u.laserTarget!==target.id)resetLaserTower(u);
+        if(firstStrikeReady(g,u,target))updateLaserTower(g,u,target,dt);
+      }else {resetFirstStrike(u);resetLaserTower(u);if(u.laserUnit&&!u.kind&&!u.building)move(g,u,target,dt);}
       continue;
     }
     if(canShadowRush(g,u,target)){beginShadowWindup(g,u,target);continue;}
     if(distance(u,target)<=reach){
       faceToward(u,target.x,target.y);
-      if(u.cd<=0)attack(g,u,target);
-    }else if(!u.kind)move(g,u,target,dt);
+      // Start the short first-strike preparation as soon as a new target is in range.
+      // It runs in parallel with any remaining ordinary attack cooldown so target changes
+      // do not add an unnecessary extra quarter-second after that cooldown finishes.
+      const firstReady=firstStrikeReady(g,u,target);
+      if(u.cd<=0&&firstReady)attack(g,u,target);
+    }else if(!u.kind){resetFirstStrike(u);move(g,u,target,dt);}
   }
   for(const p of g.projectiles){
     p.life-=dt;
@@ -1085,9 +1262,9 @@ export function viewMatch(g,seat=0){
   const p=g.players[seat];
   return {physicsVersion:PHYSICS_VERSION,phase:g.phase,countdown:g.countdown,time:rnd(g.time),overtime:g.overtime,winner:g.winner,reason:g.reason,
     scores:[towerScore(g,0),towerScore(g,1)],energy:rnd(p.energy),hand:[...p.hand],next:p.queue[0],deck:[...p.deck],
-    units:g.units.map(u=>({id:u.id,type:u.type,owner:u.owner,x:rnd(u.x),y:rnd(u.y),hp:u.hp,maxHp:u.maxHp,radius:u.radius,air:u.air,building:!!u.building,anim:u.anim,hit:u.hit,walk:u.walk,spawn:u.spawn,face:u.face,facing:u.facing,moving:!!u.moving,mass:u.mass,age:u.age,target:u.target||null,targetable:u.targetable!==false,deploying:!!u.deploying,deployTotal:rnd(u.deployTotal||0),deployRemaining:rnd(u.deployRemaining||0),collisionDisabled:!!u.collisionDisabled,laserStage:u.laserStage||0,laserDps:rnd(u.laserDps||0),laserLockTime:rnd(u.laserLockTime||0),charged:!!u.charged,chargeRun:rnd(u.chargeRun||0),sparkCharged:!!u.sparkCharged,sparkChargeProgress:rnd(u.sparkChargeProgress||0),stunned:(u.stunUntil||0)>g.time,stunRemaining:rnd(Math.max(0,(u.stunUntil||0)-g.time)),slowed:(u.slowUntil||0)>g.time,slowStage:(u.slowUntil||0)>g.time?(u.slowStage||1):0,slowRemaining:rnd(Math.max(0,(u.slowUntil||0)-g.time)),poisoned:(u.poisonUntil||0)>g.time,poisonOwner:Number.isFinite(u.poisonOwner)?u.poisonOwner:null,poisonRemaining:rnd(Math.max(0,(u.poisonUntil||0)-g.time)),mudded:(u.mudUntil||0)>g.time,mudRemaining:rnd(Math.max(0,(u.mudUntil||0)-g.time)),burrowState:u.burrowState||null,burrowProgress:rnd(u.burrowProgress||0),summonType:u.summonType||null,summonCount:u.summonCount||0,summonRemaining:u.summonInterval?rnd(Math.max(0,(u.summonNextAt||g.time)-g.time)):0,summonCasting:(u.summonCastingUntil||0)>g.time,summonWindupRemaining:rnd(Math.max(0,(u.summonCastingUntil||0)-g.time)),dashState:u.dashState||null,dashWindupRemaining:rnd(Math.max(0,(u.dashWindupUntil||0)-g.time)),dashCooldownRemaining:rnd(Math.max(0,(u.dashReadyAt||0)-g.time)),invulnerable:(u.invulnerableUntil||0)>g.time,shieldHp:rnd(u.shieldHp||0),maxShieldHp:rnd(u.maxShieldHp||0),stealthed:!!u.stealthed,stealthRemaining:rnd(Math.max(0,(u.stealthUntil||0)-g.time)),eggHatchRemaining:u.eggUnit?rnd(Math.max(0,(u.eggHatchAt||g.time)-g.time)):0,revived:!!u.revived,drillStage:u.drillStage||0,drillDps:rnd(u.drillDps||0),drillLockTime:rnd(u.drillLockTime||0),crusherStage:u.crusherStage||0,megaJumpState:u.megaJumpState||null,megaJumpProgress:rnd(u.megaJumpProgress||0),megaJumpWindupRemaining:rnd(Math.max(0,(u.megaJumpWindupUntil||0)-g.time)),megaJumpTargetX:Number.isFinite(u.megaJumpTargetX)?rnd(u.megaJumpTargetX):null,megaJumpTargetY:Number.isFinite(u.megaJumpTargetY)?rnd(u.megaJumpTargetY):null,megaJumpStartX:Number.isFinite(u.megaJumpStartX)?rnd(u.megaJumpStartX):null,megaJumpStartY:Number.isFinite(u.megaJumpStartY)?rnd(u.megaJumpStartY):null,megaJumpEndX:Number.isFinite(u.megaJumpEndX)?rnd(u.megaJumpEndX):null,megaJumpEndY:Number.isFinite(u.megaJumpEndY)?rnd(u.megaJumpEndY):null,jumpRadius:u.jumpRadius||0,riverJumpState:u.riverJumpState||null,riverJumpProgress:rnd(u.riverJumpProgress||0),riverJumpEndX:Number.isFinite(u.riverJumpEndX)?rnd(u.riverJumpEndX):null,riverJumpEndY:Number.isFinite(u.riverJumpEndY)?rnd(u.riverJumpEndY):null,ironSpinUsed:!!u.ironSpinUsed,ironSpinState:u.ironSpinState||null,ironSpinProgress:rnd(u.ironSpinProgress||0),ironSpinEndX:Number.isFinite(u.ironSpinEndX)?rnd(u.ironSpinEndX):null,ironSpinEndY:Number.isFinite(u.ironSpinEndY)?rnd(u.ironSpinEndY):null,ironMarked:!!u.ironMarked,ironMarkOwner:Number.isFinite(u.ironMarkOwner)?u.ironMarkOwner:null,ironMarkProgress:u.ironMarked?rnd(clamp((u.ironMarkDamage||0)/Math.max(1,u.ironMarkThreshold||500),0,1)):0,hookState:u.hookState||null,hookProgress:rnd(u.hookProgress||0),hookCooldownRemaining:rnd(Math.max(0,(u.hookReadyAt||0)-g.time)),hookTargetX:Number.isFinite(u.hookTargetX)?rnd(u.hookTargetX):null,hookTargetY:Number.isFinite(u.hookTargetY)?rnd(u.hookTargetY):null,hookAirAttackRemaining:rnd(Math.max(0,(u.hookAirAttackUntil||0)-g.time)),turtleShellActive:!!(u.siegeTurtle&&u.moving)})),
+    units:g.units.map(u=>({id:u.id,type:u.type,owner:u.owner,x:rnd(u.x),y:rnd(u.y),hp:u.hp,maxHp:u.maxHp,radius:u.radius,air:u.air,building:!!u.building,anim:u.anim,hit:u.hit,walk:u.walk,spawn:u.spawn,face:u.face,facing:u.facing,moving:!!u.moving,mass:u.mass,age:u.age,target:u.target||null,firstStrikeRemaining:rnd(Math.max(0,(u.firstStrikeReadyAt||0)-g.time)),targetable:u.targetable!==false,deploying:!!u.deploying,deployTotal:rnd(u.deployTotal||0),deployRemaining:rnd(u.deployRemaining||0),collisionDisabled:!!u.collisionDisabled,laserStage:u.laserStage||0,laserDps:rnd(u.laserDps||0),laserLockTime:rnd(u.laserLockTime||0),charged:!!u.charged,chargeRun:rnd(u.chargeRun||0),ramChargeProgress:rnd(clamp((u.ramChargeTime||0)/Math.max(.01,u.ramChargeAfter||2),0,1)),sparkCharged:!!u.sparkCharged,sparkChargeProgress:rnd(u.sparkChargeProgress||0),stunned:(u.stunUntil||0)>g.time,stunRemaining:rnd(Math.max(0,(u.stunUntil||0)-g.time)),slowed:(u.slowUntil||0)>g.time,slowStage:(u.slowUntil||0)>g.time?(u.slowStage||1):0,slowRemaining:rnd(Math.max(0,(u.slowUntil||0)-g.time)),poisoned:(u.poisonUntil||0)>g.time,poisonOwner:Number.isFinite(u.poisonOwner)?u.poisonOwner:null,poisonRemaining:rnd(Math.max(0,(u.poisonUntil||0)-g.time)),mudded:(u.mudUntil||0)>g.time,mudRemaining:rnd(Math.max(0,(u.mudUntil||0)-g.time)),burrowState:u.burrowState||null,burrowProgress:rnd(u.burrowProgress||0),summonType:u.summonType||null,summonCount:u.summonCount||0,summonRemaining:u.summonInterval?rnd(Math.max(0,(u.summonNextAt||g.time)-g.time)):0,summonCasting:(u.summonCastingUntil||0)>g.time,summonWindupRemaining:rnd(Math.max(0,(u.summonCastingUntil||0)-g.time)),dashState:u.dashState||null,dashWindupRemaining:rnd(Math.max(0,(u.dashWindupUntil||0)-g.time)),dashCooldownRemaining:rnd(Math.max(0,(u.dashReadyAt||0)-g.time)),invulnerable:(u.invulnerableUntil||0)>g.time,shieldHp:rnd(u.shieldHp||0),maxShieldHp:rnd(u.maxShieldHp||0),stealthed:!!u.stealthed,stealthRemaining:rnd(Math.max(0,(u.stealthUntil||0)-g.time)),eggHatchRemaining:u.eggUnit?rnd(Math.max(0,(u.eggHatchAt||g.time)-g.time)):0,revived:!!u.revived,drillStage:u.drillStage||0,drillDps:rnd(u.drillDps||0),drillLockTime:rnd(u.drillLockTime||0),crusherStage:u.crusherStage||0,iceSpiritState:u.iceSpiritState||null,iceSpiritProgress:rnd(u.iceSpiritProgress||0),fireSpiritState:u.fireSpiritState||null,fireSpiritProgress:rnd(u.fireSpiritProgress||0),megaJumpState:u.megaJumpState||null,megaJumpProgress:rnd(u.megaJumpProgress||0),megaJumpWindupRemaining:rnd(Math.max(0,(u.megaJumpWindupUntil||0)-g.time)),megaJumpTargetX:Number.isFinite(u.megaJumpTargetX)?rnd(u.megaJumpTargetX):null,megaJumpTargetY:Number.isFinite(u.megaJumpTargetY)?rnd(u.megaJumpTargetY):null,megaJumpStartX:Number.isFinite(u.megaJumpStartX)?rnd(u.megaJumpStartX):null,megaJumpStartY:Number.isFinite(u.megaJumpStartY)?rnd(u.megaJumpStartY):null,megaJumpEndX:Number.isFinite(u.megaJumpEndX)?rnd(u.megaJumpEndX):null,megaJumpEndY:Number.isFinite(u.megaJumpEndY)?rnd(u.megaJumpEndY):null,jumpRadius:u.jumpRadius||0,riverJumpMode:u.riverJumpMode||null,riverJumpState:u.riverJumpState||null,riverJumpProgress:rnd(u.riverJumpProgress||0),riverJumpEndX:Number.isFinite(u.riverJumpEndX)?rnd(u.riverJumpEndX):null,riverJumpEndY:Number.isFinite(u.riverJumpEndY)?rnd(u.riverJumpEndY):null,ironSpinUsed:!!u.ironSpinUsed,ironSpinState:u.ironSpinState||null,ironSpinProgress:rnd(u.ironSpinProgress||0),ironSpinEndX:Number.isFinite(u.ironSpinEndX)?rnd(u.ironSpinEndX):null,ironSpinEndY:Number.isFinite(u.ironSpinEndY)?rnd(u.ironSpinEndY):null,ironMarked:!!u.ironMarked,ironMarkOwner:Number.isFinite(u.ironMarkOwner)?u.ironMarkOwner:null,ironMarkProgress:u.ironMarked?rnd(clamp((u.ironMarkDamage||0)/Math.max(1,u.ironMarkThreshold||500),0,1)):0,hookState:u.hookState||null,hookProgress:rnd(u.hookProgress||0),hookCooldownRemaining:rnd(Math.max(0,(u.hookReadyAt||0)-g.time)),hookTargetX:Number.isFinite(u.hookTargetX)?rnd(u.hookTargetX):null,hookTargetY:Number.isFinite(u.hookTargetY)?rnd(u.hookTargetY):null,hookAirAttackRemaining:rnd(Math.max(0,(u.hookAirAttackUntil||0)-g.time)),turtleShellActive:!!(u.siegeTurtle&&u.moving)})),
     towers:g.towers.map(t=>({id:t.id,kind:t.kind,owner:t.owner,x:t.x,y:t.y,hp:t.hp,maxHp:t.maxHp,radius:t.radius,anim:t.anim,hit:t.hit,facing:t.facing,awake:t.kind==='core'?!!t.awake:true,stunned:(t.stunUntil||0)>g.time,stunRemaining:rnd(Math.max(0,(t.stunUntil||0)-g.time))})),
     projectiles:g.projectiles.map(p=>({id:p.id,owner:p.owner,x:rnd(p.x),y:rnd(p.y),tx:rnd(p.tx),ty:rnd(p.ty),kind:p.kind,spell:p.spell||null,progress:rnd(p.progress||0),radius:p.splash||0})),
-    zones:(g.zones||[]).map(z=>({id:z.id,owner:z.owner,kind:z.kind,spell:z.spell,x:rnd(z.x),y:rnd(z.y),radius:z.radius,remaining:rnd(z.remaining),total:z.total})),
+    zones:(g.zones||[]).map(z=>({id:z.id,owner:z.owner,kind:z.kind,spell:z.spell,x:rnd(z.x),y:rnd(z.y),radius:z.radius,remaining:rnd(z.remaining),total:z.total,active:z.kind==='skeletonrush'?g.time+1e-8>=z.activateAt:true,activationRemaining:z.kind==='skeletonrush'?rnd(Math.max(0,z.activateAt-g.time)):0,detonateRemaining:z.kind==='giantskeletonbomb'?rnd(Math.max(0,z.detonateAt-g.time)):0})),
     events:g.events.map(e=>({...e})),bot:g.bot,difficulty:g.difficulty};
 }
