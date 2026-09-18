@@ -1,11 +1,17 @@
-TINY SIEGE v36.0.0 - BARBARIAN & SIEGE BARBARIAN UPDATE
+TINY SIEGE v37.2.0 - MAP VARIATION & TOWER RANGE UPDATE
 
-1) CPU戦: PLAY-OFFLINE.html を開く
-2) ローカル: START-LOCAL-WINDOWS.bat
-3) テスト: _2_TEST.bat または npm test
-4) Cloudflare: 01-SETUP-CLOUDFLARE.bat -> 02-LOGIN-CLOUDFLARE.bat -> 03-DEPLOY-CLOUDFLARE.bat
+1) すぐCPU戦: START-PRACTICE-WINDOWS.bat または PLAY-OFFLINE.html
+2) ローカル対戦: START-LOCAL-WINDOWS.bat
+3) Cloudflare: 01-SETUP-CLOUDFLARE.bat -> 02-LOGIN-CLOUDFLARE.bat -> 03-DEPLOY-CLOUDFLARE.bat
 
-V36 CHECK
-- バーバリアン: 5コスト / 5体 / HP716 / damage192 / 1.4s / normal speed
-- 攻城バーバリアン: 4コスト / wood HP966 / normal 265 / charge after 2s / charge 572 / stun reset / death spawn 2 Barbarians
-- 66 cards / 59 units / 7 spells / physicsVersion 57
+CHECK
+- Arena: 18 columns x 32 rows / 1 cell = 40 world units.
+- River: Y16-17 (grid hidden) / bridges: X3-5 (center X4) and X14-16 (center X15), two cells wide.
+- Blue side towers: X3-5,Y6-8 / X14-16,Y6-8. Blue core: X8-11,Y2-5. Red side is mirrored.
+- Side towers are 3x3, core is 4x4, ordinary placed buildings are 3x3.
+- Archer attack range is the 5-cell reference. Vision: small 4 / medium 5 / large 6 cells.
+- Structure range uses the nearest footprint edge, not the structure centre.
+- 66 cards / 59 units / 7 spells / physicsVersion 63.
+
+- Tower attack range: 7 cells measured from the outer edge of the 3x3/4x4 tower footprint.
+- Visual map themes: grass / stone / lava / snow / desert.

@@ -34,7 +34,7 @@
   </section>
   <section class="demo-area" aria-label="ゲームの自動デモ">
     <div class="demo-label"><span class="live-dot"></span> LIVE ARENA PREVIEW <span>AUTOPLAY</span></div>
-    <div class="demo-frame"><canvas id="demoCanvas" width="720" height="1040"></canvas></div>
+    <div class="demo-frame"><canvas id="demoCanvas" width="720" height="1280"></canvas></div>
     <div class="demo-caption">2つの橋。3つのタワー。無数の組み合わせ。</div>
   </section>
   <section class="entry-panel">
@@ -95,7 +95,7 @@
   <section class="play-column">
     <div class="scorebar"><div><span class="team-dot enemy"></span><strong id="enemyName">CPU</strong><span id="enemyScore">0</span></div><div id="clock" class="clock">3:00</div><span id="energyMode" class="energy-mode">×1</span></div>
     <div class="arena-wrap">
-      <canvas id="arenaCanvas" width="720" height="1040" aria-label="対戦フィールド。カードを選び、自分の陣地をタップして配置" tabindex="0"></canvas>
+      <canvas id="arenaCanvas" width="720" height="1280" aria-label="対戦フィールド。カードを選び、自分の陣地をタップして配置" tabindex="0"></canvas>
       <div id="countdownOverlay" class="arena-overlay countdown" hidden><small>GET READY</small><strong id="countdownNum">3</strong><span>カードを選んで、陣地に配置</span></div>
       <div id="pausedOverlay" class="arena-overlay paused" hidden><span class="spinner"></span><h3 id="pausedTitle">再接続を待っています</h3><p id="pausedText"></p></div>
       <div id="resultOverlay" class="arena-overlay result" hidden><small id="resultLabel">VICTORY</small><strong id="resultTitle">勝利！</strong><p id="resultReason"></p><div id="resultStats"></div><button id="rematchBtn" class="btn primary">もう一度対戦</button><button id="backHomeBtn" class="textbtn">ホームへ戻る</button></div>
@@ -114,7 +114,7 @@
     <div class="match-rules"><h4>この一戦のルール</h4><p>本拠地を壊せば即勝利。3分で同数なら延長戦。延長後も同数なら残りタワーHPで決着。</p><p>残り1分からエナジー回復が2倍。切り札を重ねて攻めよう。</p></div>
   </aside>
 </main>
-<footer id="footer"><span>ひとつのURLから、小さな戦場へ。</span><span>TINY SIEGE <i>/</i> v36.0.0 · BARBARIAN & SIEGE BARBARIAN UPDATE</span></footer>
+<footer id="footer"><span>ひとつのURLから、小さな戦場へ。</span><span>TINY SIEGE <i>/</i> v37.2.0 · MAP VARIATION & TOWER RANGE UPDATE</span></footer>
 
 <div id="toast" class="toast" role="status" hidden></div>
 <dialog id="deckModal" class="deck-modal">
@@ -145,7 +145,7 @@
     <button id="cardDetailBackdrop" class="deck-action-backdrop" type="button" aria-label="カード詳細を閉じる"></button>
     <section class="card-detail-sheet">
       <div class="card-detail-head"><div><span id="cardDetailRole" class="eyebrow"></span><h2 id="cardDetailName"></h2></div><button id="cardDetailClose" class="iconbtn" type="button" aria-label="詳細を閉じる">×</button></div>
-      <div class="card-demo-wrap"><div class="card-demo-label"><span class="live-dot"></span> LIVE BATTLE DEMO <span id="cardDemoScenario">本番と同じ戦闘ロジック</span><button id="cardDemoReplayBtn" class="textbtn" type="button">↻ もう一度</button></div><canvas id="cardDetailDemo" width="720" height="1040" aria-label="実戦と同じ戦闘エンジンによるカードデモ"></canvas></div>
+      <div class="card-demo-wrap"><div class="card-demo-label"><span class="live-dot"></span> LIVE BATTLE DEMO <span id="cardDemoScenario">本番と同じ戦闘ロジック</span><button id="cardDemoReplayBtn" class="textbtn" type="button">↻ もう一度</button></div><canvas id="cardDetailDemo" width="720" height="1280" aria-label="実戦と同じ戦闘エンジンによるカードデモ"></canvas></div>
       <div id="cardDetailStats" class="card-detail-stats"></div>
       <div class="card-detail-ability"><small>ABILITY / ROLE</small><p id="cardDetailDesc"></p></div>
       <div class="card-detail-actions"><button id="detailDeckToggleBtn" class="btn primary" type="button">デッキに入れる</button><button id="cardDetailBack" class="btn outline" type="button">カード一覧へ戻る</button></div>

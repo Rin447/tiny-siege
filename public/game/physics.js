@@ -2,18 +2,37 @@ import {ARENA} from './units.js';
 
 /** Shared deterministic navigation and collision geometry. No browser APIs.
  * Ground bodies live on the lawn/bridges. Air bodies share a separate layer.
- * Buildings are static circles; tree/grass artwork is decorative only.
+ * Buildings and towers use rectangular grid footprints; tree/grass artwork is decorative only.
  */
-export const PHYSICS_VERSION=57;
-export const FIELD={left:34,right:686,top:28,bottom:1012};
-const EPS=0.001,GRID=20,COLS=33,ROWS=49;
+export const PHYSICS_VERSION=63;
+export const FIELD={left:0,right:ARENA.width,top:0,bottom:ARENA.height};
+const EPS=0.001,GRID=ARENA.cellSize/2,COLS=Math.floor(ARENA.width/GRID)+1,ROWS=Math.floor(ARENA.height/GRID)+1;
 const worldCaches=new WeakMap();
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
 const clampP=(n,a,b)=>Math.max(a,Math.min(b,n));
 export const isStructure=u=>!!(u.kind||u.building);
-export const bodyRadius=u=>u.radius||12;
+export const bodyRadius=u=>(u?.kind||u?.building)?(u.radius||12):Math.min(u?.radius||12,ARENA.cellSize*.45);
 export const sameLayer=(a,b)=>!!a.air===!!b.air;
 export const solidStructures=g=>[...g.towers,...g.units.filter(u=>u.building&&!u.collisionDisabled)].filter(u=>u.hp>0);
+
+export function footprintRect(u,p=u){
+  if(!(u?.kind||u?.building))return null;
+  const cols=u.footprintCols||ARENA.defaultBuildingCells,rows=u.footprintRows||ARENA.defaultBuildingCells;
+  const hw=cols*ARENA.cellSize/2,hh=rows*ARENA.cellSize/2;
+  return {l:p.x-hw,r:p.x+hw,t:p.y-hh,b:p.y+hh,hw,hh};
+}
+function rectsOverlap(a,b,margin=0){return a.l<b.r+margin&&a.r>b.l-margin&&a.t<b.b+margin&&a.b>b.t-margin;}
+function pointRectDistance(p,r){return Math.hypot(p.x-clampP(p.x,r.l,r.r),p.y-clampP(p.y,r.t,r.b));}
+function buildingFootprintTerrainFree(u,p,margin=0){
+  const r=footprintRect(u,p);if(!r)return false;
+  if(r.l<FIELD.left+margin-EPS||r.r>FIELD.right-margin+EPS||r.t<FIELD.top+margin-EPS||r.b>FIELD.bottom-margin+EPS)return false;
+  // A normal 3x3 building may not cover open river cells. The wider bridges remain traversal lanes, not building pads.
+  return water.every(w=>!rectsOverlap(r,w,margin));
+}
+function buildingDeploymentAllowed(g,owner,u,p){
+  const r=footprintRect(u,p);if(!r)return deploymentAllowed(g,owner,p.x,p.y);
+  return [[r.l+1,r.t+1],[r.r-1,r.t+1],[r.l+1,r.b-1],[r.r-1,r.b-1]].every(([x,y])=>deploymentAllowed(g,owner,x,y));
+}
 
 export const bridgeGround=x=>ARENA.bridges.some(b=>Math.abs(x-b)<=ARENA.bridgeHalf);
 export const deploymentWater=(x,y)=>y>ARENA.riverTop&&y<ARENA.riverBottom&&!bridgeGround(x);
@@ -23,6 +42,11 @@ export const deploymentWater=(x,y)=>y>ARENA.riverTop&&y<ARENA.riverBottom&&!brid
  */
 export function snapDeploymentPoint(owner,u,x,y,{correctWater=false}={}){
   const p={x,y};if(owner!==0&&owner!==1)return p;
+  if(u?.building){
+    p.x=(Math.floor(clampP(x,0,ARENA.width-EPS)/ARENA.cellSize)+.5)*ARENA.cellSize;
+    p.y=(Math.floor(clampP(y,0,ARENA.height-EPS)/ARENA.cellSize)+.5)*ARENA.cellSize;
+    return p;
+  }
   const r=bodyRadius(u)+1,onBridge=bridgeGround(x),inWater=deploymentWater(x,y);
   if(inWater&&!correctWater)return p;
   if(onBridge)return p;
@@ -46,7 +70,7 @@ export function deploymentAllowed(g,owner,x,y){
     return owner===0?y>=line:y<=line;
   }
   // One tower down: only that lane plus a narrow centre connector gains ground.
-  const t=fallen[0],left=t.x<360,laneOK=left?x<=320:x>=400,centreOK=Math.abs(x-360)<=centreHalf;
+  const t=fallen[0],left=t.x<ARENA.midX,laneOK=left?x<=ARENA.midX-ARENA.cellSize:x>=ARENA.midX+ARENA.cellSize,centreOK=Math.abs(x-ARENA.midX)<=centreHalf;
   if(!laneOK&&!centreOK)return false;
   return owner===0?y>=t.y+inset:y<=t.y-inset;
 }
@@ -60,7 +84,7 @@ const water=[
   {l:ARENA.bridges[0]+ARENA.bridgeHalf,r:ARENA.bridges[1]-ARENA.bridgeHalf,t:ARENA.riverTop,b:ARENA.riverBottom},
   {l:ARENA.bridges[1]+ARENA.bridgeHalf,r:ARENA.width,t:ARENA.riverTop,b:ARENA.riverBottom}
 ];
-function rectDistance(p,r){return Math.hypot(p.x-clampP(p.x,r.l,r.r),p.y-clampP(p.y,r.t,r.b));}
+function rectDistance(p,r){return pointRectDistance(p,r);}
 export function terrainFree(u,p,margin=0){
   const r=bodyRadius(u)+margin;
   if(!Number.isFinite(p.x)||!Number.isFinite(p.y))return false;
@@ -68,9 +92,18 @@ export function terrainFree(u,p,margin=0){
   return !!u.air||water.every(w=>rectDistance(p,w)>=r-EPS);
 }
 export function staticFree(g,u,p,margin=0,structures=null){
+  const blockers=structures||solidStructures(g);
+  if(u.building){
+    if(!buildingFootprintTerrainFree(u,p,margin))return false;
+    const own=footprintRect(u,p);
+    return blockers.every(s=>{if(s.id===u.id)return true;const sr=footprintRect(s);return sr?!rectsOverlap(own,sr,margin):pointRectDistance(s,own)>=bodyRadius(s)+margin-EPS;});
+  }
   if(!terrainFree(u,p,margin))return false;
   if(u.air)return true;
-  return (structures||solidStructures(g)).every(s=>s.id===u.id||dist(p,s)>=bodyRadius(u)+bodyRadius(s)+margin-EPS);
+  return blockers.every(s=>{
+    if(s.id===u.id)return true;
+    const sr=footprintRect(s);return sr?pointRectDistance(p,sr)>=bodyRadius(u)+margin-EPS:dist(p,s)>=bodyRadius(u)+bodyRadius(s)+margin-EPS;
+  });
 }
 function segmentPointDistance(a,b,p){
   const dx=b.x-a.x,dy=b.y-a.y,len=dx*dx+dy*dy;
@@ -78,25 +111,21 @@ function segmentPointDistance(a,b,p){
   return Math.hypot(a.x+dx*t-p.x,a.y+dy*t-p.y);
 }
 export function staticLineFree(g,u,a,b,margin=0,structures=null){
-  if(!terrainFree(u,a,margin)||!terrainFree(u,b,margin))return false;
+  if(!staticFree(g,u,a,margin,structures)||!staticFree(g,u,b,margin,structures))return false;
   if(u.air)return true;
-  const r=bodyRadius(u)+margin;
-  for(const s of structures||solidStructures(g))if(s.id!==u.id&&segmentPointDistance(a,b,s)<r+bodyRadius(s)-EPS)return false;
-  // The river is axis-aligned. Sample only when the swept circle can reach it.
-  if(Math.min(a.y,b.y)-r<=ARENA.riverBottom&&Math.max(a.y,b.y)+r>=ARENA.riverTop){
-    const steps=Math.max(1,Math.ceil(dist(a,b)/4));
-    for(let i=1;i<steps;i++)if(!terrainFree(u,{x:a.x+(b.x-a.x)*i/steps,y:a.y+(b.y-a.y)*i/steps},margin))return false;
-  }
+  const steps=Math.max(1,Math.ceil(dist(a,b)/(ARENA.cellSize/5)));
+  for(let i=1;i<steps;i++)if(!staticFree(g,u,{x:a.x+(b.x-a.x)*i/steps,y:a.y+(b.y-a.y)*i/steps},margin,structures))return false;
   return true;
 }
+
 function topology(g){
   const structures=solidStructures(g);
-  const key=structures.map(s=>`${s.id}:${s.x}:${s.y}:${s.radius}`).join('|');
+  const key=structures.map(s=>`${s.id}:${s.x}:${s.y}:${s.radius}:${s.footprintCols||0}:${s.footprintRows||0}`).join('|');
   let cache=worldCaches.get(g);
   if(!cache||cache.key!==key){cache={key,structures,grids:new Map()};worldCaches.set(g,cache);}
   return cache;
 }
-function gridPoint(i){return {x:40+(i%COLS)*GRID,y:40+Math.floor(i/COLS)*GRID};}
+function gridPoint(i){return {x:(i%COLS)*GRID,y:Math.floor(i/COLS)*GRID};}
 function getGrid(g,u,cache){
   const r=bodyRadius(u);if(cache.grids.has(r))return cache.grids.get(r);
   const free=new Uint8Array(COLS*ROWS);
@@ -113,7 +142,7 @@ function routeToRange(g,u,target,reach,cache){
   const grid=getGrid(g,u,cache),len=grid.free.length,cost=new Float64Array(len).fill(Infinity),parent=new Int32Array(len).fill(-1),closed=new Uint8Array(len),heap=new MinHeap();
   const heuristic=p=>Math.max(0,dist(p,target)-reach);
   // Multiple visible starting cells avoid snapping/teleporting onto the grid.
-  const cx=Math.round((u.x-40)/GRID),cy=Math.round((u.y-40)/GRID);
+  const cx=Math.round(u.x/GRID),cy=Math.round(u.y/GRID);
   for(let oy=-2;oy<=2;oy++)for(let ox=-2;ox<=2;ox++){
     const x=cx+ox,y=cy+oy;if(x<0||x>=COLS||y<0||y>=ROWS)continue;
     const id=y*COLS+x,p=gridPoint(id);
@@ -226,8 +255,17 @@ function projectStatic(g,u){
   for(let pass=0;pass<8;pass++){
     let changed=false;
     for(const s of solidStructures(g)){
-      const d=dist(u,s),min=r+bodyRadius(s)+.02;
-      if(d<min){let dx=d>.0001?(u.x-s.x)/d:(u.owner===0?-1:1),dy=d>.0001?(u.y-s.y)/d:0;u.x=s.x+dx*min;u.y=s.y+dy*min;changed=true;}
+      const sr=footprintRect(s);
+      if(sr){
+        const d=pointRectDistance(u,sr);
+        if(d<r+.02){
+          const left=Math.abs(u.x-(sr.l-r-.02)),right=Math.abs(u.x-(sr.r+r+.02)),top=Math.abs(u.y-(sr.t-r-.02)),bottom=Math.abs(u.y-(sr.b+r+.02));
+          const m=Math.min(left,right,top,bottom);if(m===left)u.x=sr.l-r-.02;else if(m===right)u.x=sr.r+r+.02;else if(m===top)u.y=sr.t-r-.02;else u.y=sr.b+r+.02;changed=true;
+        }
+      }else{
+        const d=dist(u,s),min=r+bodyRadius(s)+.02;
+        if(d<min){let dx=d>.0001?(u.x-s.x)/d:(u.owner===0?-1:1),dy=d>.0001?(u.y-s.y)/d:0;u.x=s.x+dx*min;u.y=s.y+dy*min;changed=true;}
+      }
     }
     for(const w of water)if(rectDistance(u,w)<r){
       const candidates=[{x:w.l-r-.02,y:u.y},{x:w.r+r+.02,y:u.y},{x:u.x,y:w.t-r-.02},{x:u.x,y:w.b+r+.02}]
@@ -261,21 +299,25 @@ export function resolveBodies(g,dt=.1){
   for(const u of units)projectStatic(g,u);
 }
 /** Find all group-spawn positions before charging energy. No displacement of enemies. */
-function groupOffset(count,i,spacing=24){
+function groupOffset(count,i,radiusWorld=ARENA.cellSize){
   if(count<=1)return {x:0,y:0};
-  if(count===2)return [{x:-spacing*.60,y:0},{x:spacing*.60,y:0}][i];
-  if(count===3)return [{x:-spacing,y:8},{x:0,y:-16},{x:spacing,y:8}][i];
-  if(count===5)return [{x:0,y:-24},{x:-22,y:-5},{x:22,y:-5},{x:-13,y:18},{x:13,y:18}][i];
-  const cols=Math.ceil(Math.sqrt(count)),row=Math.floor(i/cols),col=i%cols;
-  return {x:(col-(cols-1)/2)*spacing,y:(row-(Math.ceil(count/cols)-1)/2)*spacing};
+  const r=Math.max(ARENA.cellSize*.5,radiusWorld);
+  if(count===2)return [{x:-r*.65,y:0},{x:r*.65,y:0}][i];
+  if(count===3)return [{x:0,y:-r},{x:-r*.86,y:r*.5},{x:r*.86,y:r*.5}][i];
+  if(count===5)return [{x:0,y:-r},{x:-r*.9,y:-r*.2},{x:r*.9,y:-r*.2},{x:-r*.55,y:r*.78},{x:r*.55,y:r*.78}][i];
+  const cols=Math.ceil(Math.sqrt(count)),rows=Math.ceil(count/cols),row=Math.floor(i/cols),col=i%cols;
+  const sx=count>4?r*1.55/Math.max(1,cols-1):r,sy=r*1.55/Math.max(1,rows-1);
+  return {x:(col-(cols-1)/2)*sx,y:(row-(rows-1)/2)*sy};
 }
 export function spawnPositions(g,owner,data,x,y,structures=null){
   const points=[],f=owner===0?1:-1,blockers=structures||solidStructures(g);
   const wideSpacing=data.wideFormation?(data.wideFormationSpacing||100):0;
   const wideSpan=data.wideFormation?Math.max(0,(data.count-1)*wideSpacing):0;
-  const wideCenter=data.wideFormation?clampP(x,48+wideSpan/2,672-wideSpan/2):x;
+  const margin=ARENA.cellSize*.5;
+  const wideCenter=data.wideFormation?clampP(x,margin+wideSpan/2,ARENA.width-margin-wideSpan/2):x;
   for(let i=0;i<data.count;i++){
-    const off=data.wideFormation?{x:(i-(data.count-1)/2)*wideSpacing,y:0}:groupOffset(data.count,i,data.radius<=10?20:24);
+    const formationRadius=(data.summonFormationRadiusCells||1)*ARENA.cellSize;
+    const off=data.wideFormation?{x:(i-(data.count-1)/2)*wideSpacing,y:0}:groupOffset(data.count,i,formationRadius);
     const wanted={x:(data.wideFormation?wideCenter:x)+off.x*f,y:y+off.y*f};
     let found=null;
     // Ground buildings must remain exactly where clicked, not shift out from under the cursor.
@@ -285,7 +327,8 @@ export function spawnPositions(g,owner,data,x,y,structures=null){
       for(let k=0;k<n;k++){
         const a=k*Math.PI*2/n+(owner===1?Math.PI:0),raw={x:wanted.x+Math.cos(a)*rr,y:wanted.y+Math.sin(a)*rr};
         const p=snapDeploymentPoint(owner,data,raw.x,raw.y,{correctWater:true});
-        if(p.x<48||p.x>672||p.y<58||p.y>982||!deploymentAllowed(g,owner,p.x,p.y))continue;
+        const edge=Math.max(margin,bodyRadius(data)+1);
+        if(p.x<edge||p.x>ARENA.width-edge||p.y<edge||p.y>ARENA.height-edge||!(data.building?buildingDeploymentAllowed(g,owner,data,p):deploymentAllowed(g,owner,p.x,p.y)))continue;
         if(!staticFree(g,data,p,1,blockers))continue;
         if(g.units.some(u=>u.hp>0&&sameLayer(data,u)&&dist(p,u)<bodyRadius(data)+bodyRadius(u)+.5))continue;
         if(points.some(q=>dist(p,q)<data.radius*2+.5))continue;

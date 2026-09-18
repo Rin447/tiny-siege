@@ -1,5 +1,10 @@
-# v36.0.0
+# v37.2.0 - MAP VARIATION & TOWER RANGE UPDATE
 
-- Added Barbarians: 5-cost card spawning five 716 HP / 192 damage / 1.4s melee fighters.
-- Added Siege Barbarian: 4-cost 966 HP wooden ram, 265 normal impact, 572 charged impact after 2s movement, stun resets charge, releases two Barbarians on break/impact.
-- 66 cards / 59 unit cards / 7 spells / physicsVersion 57.
+- Bridge traversal widened to two grid cells while staying centred on X4 / X15.
+- River grid lines are hidden; river rules still occupy Y16-17.
+- Tower attack range is seven cells measured from the 3x3 / 4x4 footprint edge, so 6-cell Blowdart pressure is answerable.
+- Five visual themes: grass, stone/ruins, lava, snow/ice, desert.
+- Added non-colliding themed arena-border decoration.
+- 66 selectable cards / 59 unit-or-building cards / 7 spells / physicsVersion 63.
+
+- Decorative bridge rails, ropes, grass, stones, bank shading and water details are render-only.

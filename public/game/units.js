@@ -1,18 +1,61 @@
 /** Balance data: original prototype values. Both browser and server import this file. */
-export const VERSION = '36.0.0';
+export const VERSION = '37.2.0';
 export const MAX_DECK = 8;
+export const MAP_THEMES = Object.freeze(['grass','stone','lava','snow','desert']);
+export const GRID_COLS = 18;
+export const GRID_ROWS = 32;
+export const GRID_CELL = 40;
+export const GRID_BASELINE_PX = 33; // v36 archer 165px == v37 five cells.
+export const cellsToWorld = cells => cells * GRID_CELL;
+export const worldToCells = world => world / GRID_CELL;
+export const gridColumnCenter = col => (col - .5) * GRID_CELL;
+export const gridRowCenter = row => GRID_ROWS * GRID_CELL - (row - .5) * GRID_CELL;
+export function gridRectCenter(col1,col2,row1,row2){
+  return {x:((col1+col2)/2-.5)*GRID_CELL,y:GRID_ROWS*GRID_CELL-((row1+row2)/2-.5)*GRID_CELL};
+}
 export const ARENA = Object.freeze({
-  width:720, height:1040, riverTop:482, riverBottom:558, bridges:[190,530],
-  bridgeHalf:42, deployBottom:550, deployTop:490, advancedDeployInset:120, advancedCenterHalf:40, maxUnits:120,
-  duration:180, overtime:60, maxEnergy:10, tick:0.1, firstStrikeDelay:.25
+  cols:GRID_COLS, rows:GRID_ROWS, cellSize:GRID_CELL,
+  width:GRID_COLS*GRID_CELL, height:GRID_ROWS*GRID_CELL,
+  midX:GRID_COLS*GRID_CELL/2,
+  riverRows:Object.freeze([16,17]), riverTop:15*GRID_CELL, riverBottom:17*GRID_CELL,
+  // Bridges are two grid cells wide while staying centred on the two lane/tower centre lines.
+  bridgeCenterColumns:Object.freeze([4,15]),
+  bridgeColumns:Object.freeze([[3,5],[14,16]]),
+  bridges:Object.freeze([gridColumnCenter(4),gridColumnCenter(15)]), bridgeHalf:GRID_CELL,
+  laneColumns:Object.freeze([4,15]), lanes:Object.freeze([gridColumnCenter(4),gridColumnCenter(15)]),
+  deployBottom:17*GRID_CELL, deployTop:15*GRID_CELL,
+  advancedDeployInset:3*GRID_CELL, advancedCenterHalf:GRID_CELL,
+  sideTowerCells:3, coreTowerCells:4, defaultBuildingCells:3,
+  maxUnits:120, duration:180, overtime:60, maxEnergy:10, tick:0.1, firstStrikeDelay:.25
+});
+export const TOWER_GRID = Object.freeze({
+  blue:Object.freeze({left:Object.freeze([3,5,6,8]),right:Object.freeze([14,16,6,8]),core:Object.freeze([8,11,2,5])}),
+  red:Object.freeze({left:Object.freeze([3,5,25,27]),right:Object.freeze([14,16,25,27]),core:Object.freeze([8,11,28,31])})
 });
 export const SUMMON_DELAY_BY_COST = Object.freeze({1:.4,2:.5,3:.7,4:.9,5:1.2,6:1.5,7:1.8,8:2.1});
+export const VISION_CELLS_BY_SIZE = Object.freeze({small:4,medium:5,large:6});
+export const VISION_BY_SIZE = Object.freeze(Object.fromEntries(Object.entries(VISION_CELLS_BY_SIZE).map(([k,v])=>[k,cellsToWorld(v)])));
+export function visionSizeFor(data){
+  if(!data)return 'small';
+  if(data.visionSize&&VISION_BY_SIZE[data.visionSize])return data.visionSize;
+  const radius=Number.isFinite(data.radius)?data.radius:12;
+  return radius>=24?'large':radius>=15?'medium':'small';
+}
+export function visionRangeFor(data){
+  if(!data)return VISION_BY_SIZE.small;
+  if(Number.isFinite(data.aggroRange))return Math.max(0,data.aggroRange);
+  const base=VISION_BY_SIZE[visionSizeFor(data)]||VISION_BY_SIZE.medium;
+  // Long-range weapons can acquire targets one grid cell beyond their firing range.
+  const ranged=(!data.buildingOnly&&(data.projectile||data.laserUnit||data.sparkUnit||(data.rangeCells||0)>=3))?Math.max(0,(data.range||0)+GRID_CELL):0;
+  return Math.max(base,ranged);
+}
+export function visionCellsFor(data){return visionRangeFor(data)/GRID_CELL;}
 export function summonDelayFor(data){
   if(!data||data.spell||data.hidden||data.tunnelAnywhere)return 0;
   if(Number.isFinite(data.summonDelay))return Math.max(0,data.summonDelay);
   return SUMMON_DELAY_BY_COST[data.cost]??Math.max(.4,Math.min(2.5,.3+(data.cost||1)*.25));
 }
-export const UNITS = Object.freeze({
+const RAW_UNITS = {
   blade: {id:'blade',mass:2,name:'アッシュ剣士',short:'剣士',role:'近接アタッカー',cost:2,hp:780,damage:112,speed:50,range:34,cooldown:1.05,radius:16,count:1,air:false,targetsAir:false,color:'#efc577',desc:'攻守の基準になる剣士。盾役の後ろで前線を押し上げる。'},
   knight:{id:'knight',mass:6,name:'アイアン衛士',short:'衛士',role:'近接タンク',cost:3,hp:1850,damage:202,speed:32,range:36,cooldown:1.35,radius:23,count:1,air:false,targetsAir:false,color:'#a7b9c3',desc:'高い体力で攻撃を受け止めながら、202の近接攻撃で前線を押し返す3コスト前衛。後ろに弓兵や術師を重ねると安定する。'},
   archer:{id:'archer',mass:1.2,name:'リーフ弓兵',short:'弓兵',role:'遠距離・対空・2体編成',cost:3,hp:304,damage:112,speed:45,range:165,cooldown:1.15,radius:12,count:2,air:false,targetsAir:true,projectile:'arrow',color:'#a6ca8b',desc:'小柄なリーフ弓兵2体を横並びで展開する3コスト遠距離カード。1体HP304・攻撃112・射程165で地上と空中を狙う。2体同時の射撃性能に合わせてコストを3へ調整。'},
@@ -49,7 +92,7 @@ export const UNITS = Object.freeze({
   skeleton:{id:'skeleton',mass:.20,name:'スケルトン',short:'スケルトン',role:'低コスト・3体編成',cost:1,hp:81,damage:81,speed:69,range:19,cooldown:.72,radius:7,count:3,air:false,targetsAir:false,color:'#d9d2b5',desc:'1コストでHP81・攻撃81のスケルトンを3体展開する低コスト群体。単体攻撃の足止めや素早い防衛に向く。'},
   boneswarm:{id:'boneswarm',mass:.20,name:'スケルトン部隊',short:'スケ部隊',role:'群体・15体編成',cost:4,hp:81,damage:81,speed:69,range:19,cooldown:.72,radius:7,count:15,air:false,targetsAir:false,spawnType:'skeleton',color:'#d9d2b5',desc:'HP81・攻撃81のスケルトン15体を一気に展開する超群体。単体攻撃へ圧倒的な物量で押し寄せる一方、範囲攻撃には弱い。'},
   tombstone:{id:'tombstone',mass:1000000,name:'墓石',short:'墓石',role:'設置物・スケルトン継続召喚',cost:3,hp:530,damage:0,speed:0,range:0,cooldown:99,radius:22,count:1,air:false,targetsAir:false,building:true,decayPerSecond:30,summonType:'skeleton',summonCount:2,summonInterval:4,summonOnDeploy:true,deathSummonType:'skeleton',deathSummonCount:4,color:'#7e8073',desc:'HP530の3コスト設置物。建設完了時にスケルトン2体を呼び、その後4秒ごとに2体を追加召喚。毎秒30ずつHPが自然減少し、破壊された瞬間は召喚待ちなしでスケルトン4体をその場に出す。'},
-  oven:{id:'oven',mass:1000000,name:'オーブン',short:'オーブン',role:'設置物・ファイヤスピリット継続召喚',cost:4,hp:900,damage:0,speed:0,range:0,cooldown:99,radius:26,count:1,air:false,targetsAir:false,building:true,summonType:'firespirit',summonCount:2,summonInterval:10,summonOnDeploy:true,color:'#c87545',desc:'HP900の4コスト設置物。建設完了時にファイヤスピリット2体を召喚し、その後も10秒ごとに2体ずつ追加召喚する。四角いコンロの上に大きな鍋が載り、鍋の中から炎の精霊が飛び出す。'},
+  oven:{id:'oven',mass:1000000,name:'オーブン',short:'オーブン',role:'設置物・ファイヤスピリット継続召喚',cost:4,hp:900,damage:0,speed:0,range:0,cooldown:99,radius:26,count:1,air:false,targetsAir:false,building:true,decayPerSecond:30,summonType:'firespirit',summonCount:2,summonInterval:10,summonOnDeploy:true,color:'#c87545',desc:'HP900の4コスト設置物。建設完了時にファイヤスピリット2体を召喚し、その後も10秒ごとに2体ずつ追加召喚する。毎秒30ずつHPが自然減少し、攻撃を受けなくても約30秒で崩れる。四角いコンロの上に大きな鍋が載り、鍋の中から炎の精霊が飛び出す。'},
   barbarian:{id:'barbarian',hidden:true,mass:3.8,name:'バーバリアン',short:'バーバリアン',role:'地上近接',cost:0,hp:716,damage:192,speed:40,range:34,cooldown:1.4,radius:21,count:1,air:false,targetsAir:false,color:'#d7ad55',desc:'上半身裸の金髪・金髭の地上近接戦士。HP716・攻撃192・攻撃間隔1.4秒・移動速度は普通。'},
   barbarians:{id:'barbarians',mass:3.8,name:'バーバリアン',short:'バーバリアン',role:'地上近接・5体編成',cost:5,hp:716,damage:192,speed:40,range:34,cooldown:1.4,radius:21,count:5,air:false,targetsAir:false,spawnType:'barbarian',color:'#d7ad55',desc:'5コストでバーバリアン5体を召喚。1体ごとにHP716・攻撃192・攻撃間隔1.4秒・普通速度で、地上の敵と建物を近接攻撃する。上半身裸の金髪・金髭の大柄な戦士。'},
   siegebarbarian:{id:'siegebarbarian',mass:8.8,name:'攻城バーバリアン',short:'攻城ババ',role:'建物特攻・2秒加速突進・撃破展開',cost:4,hp:966,damage:265,speed:40,range:30,cooldown:99,radius:24,count:1,air:false,targetsAir:false,buildingOnly:true,siegeRam:true,suicideUnit:true,suicideDamage:265,ramImpactDamage:265,ramChargeDamage:572,ramChargeAfter:2,ramChargeSpeedMultiplier:1.35,deathSummonType:'barbarian',deathSummonCount:2,color:'#9b774d',desc:'4コストの木製攻城兵器。木のHPは966で建物だけを狙う。通常接触は265ダメージ。連続して2秒進むと少し加速して突進状態となり、接触ダメージが572へ上昇。ザップなどのスタンで加速はリセット。木が壊れた時、または建物へ衝突して砕けた時に中からバーバリアン2体が出現する。'},
@@ -89,7 +132,68 @@ export const UNITS = Object.freeze({
   lightning:{id:'lightning',cardType:'spell',spell:'lightning',name:'ライトニング',short:'ライトニング',role:'呪文・高HP4体雷撃',cost:6,damage:1056,buildingDamage:265,radius:105,maxTargets:4,count:0,targetsAir:true,color:'#69aee8',desc:'半径105の範囲内にいる敵から現在HPが高い順に最大4体を選び、ユニットへ1056ダメージ、建物へ265ダメージの落雷を同時に与える6コスト呪文。'},
   zap:{id:'zap',cardType:'spell',spell:'zap',name:'ザップ',short:'ザップ',role:'呪文・瞬間スタン＋思考リセット',cost:2,damage:225,buildingDamage:225,radius:78,count:0,targetsAir:true,stunDuration:1.5,color:'#75bde8',desc:'指定地点へ瞬時に電撃を落とし、半径78の敵ユニット・建物へ225ダメージと1.5秒スタン。現在の攻撃対象を解除し、レーザー塔の火力上昇やスパーキーの充電も0へリセットする。スタン解除後に対象を選び直す。'},
   cyclone:{id:'cyclone',cardType:'spell',spell:'cyclone',name:'サイクロン',short:'サイクロン',role:'呪文・大範囲継続吸引',cost:3,damage:10,buildingDamage:0,radius:130,count:0,targetsAir:true,zoneDuration:3,pullSpeed:70,outerDps:10,midDps:20,innerDps:35,color:'#8bc8cf',desc:'指定地点に半径130の巨大な渦を3秒間生成。範囲内の敵ユニットを中心へ吸い寄せ続け、軽量ほど強く引き込む。建物・タワーは動かない。渦のダメージはおまけで、外周10・中間20・中心35 DPSと中心ほど少し痛い。吸引中も敵は攻撃・能力使用ができる。'}
+
+};
+
+const RANGE_CELL_OVERRIDES = Object.freeze({
+  blade:1,knight:1,archer:5,mage:5,spear:1.5,bat:1,bomber:4.5,cannon:6.5,golem:1,icegolem:1,
+  berserker:1,miniberserker:1,megaknight:1,ironeye:5,tracker:1,valkyrie:1,gargoyle:1.5,gargoyleswarm:1.5,
+  mini_golem:1,boar:1,tigger:1,muddragon:4,nightshade:1,mossling:1,goblin_melee:1,goblin_spear:4,goblins:1,speargoblins:4,
+  megagargoyle:2,apprenticeguards:1.5,apprenticeguard:1.5,icespirit:1,firespirit:1,skeleton:1,boneswarm:1,
+  tombstone:0,oven:0,barbarian:1,barbarians:1,siegebarbarian:1,elixirgolem:1,elixir_golem_mid:1,elixir_blob:1,
+  royalgiant:5,lumina:4,frost:5,harpy:5,electrowizard:5,necromancer:5,darknecro:1,dosranboss:1,ranbos:1,
+  ashsquad:1,princess:10.5,sparky:4.5,blowdart:6,lasertower:6.5,laserdragon:4.5,shieldknight:1,
+  windmage:5.5,phoenix:3.5,phoenix_egg:0,mirage:1,skybomber:5,scrapdrill:1,bombcarrier:1,skeletonbarrel:1,giantskeleton:1
 });
+const SPELL_RADIUS_CELLS = Object.freeze({skeletonrush:3.5,fireball:2.5,poison:2.5,arrowrain:4,lightning:3,zap:2.5,cyclone:4});
+const DISTANCE_KEY_TO_CELL_KEY = Object.freeze({
+  splash:'splashCells',deathRadius:'deathRadiusCells',dropRadius:'dropRadiusCells',jumpMinRange:'jumpMinRangeCells',jumpMaxRange:'jumpMaxRangeCells',
+  jumpRadius:'jumpRadiusCells',hookRange:'hookRangeCells',hookMinRange:'hookMinRangeCells',spinTriggerRange:'spinTriggerRangeCells',spinDistance:'spinDistanceCells',
+  spinHitRadius:'spinHitRadiusCells',chargeDistance:'chargeDistanceCells',carrierDeathRadius:'carrierDeathRadiusCells',chainRange:'chainRangeCells',
+  dashAggroRange:'dashAggroRangeCells',dashMinRange:'dashMinRangeCells',dashMaxRange:'dashMaxRangeCells',deathBombRadius:'deathBombRadiusCells',
+  fireBlastRadius:'fireBlastRadiusCells',fireLeapRange:'fireLeapRangeCells',iceBlastRadius:'iceBlastRadiusCells',iceLeapRange:'iceLeapRangeCells',
+  healOnHitRange:'healOnHitRangeCells',mudRadius:'mudRadiusCells',riverJumpSpawnBand:'riverJumpSpawnBandCells',riverJumpTrigger:'riverJumpTriggerCells'
+});
+const DISTANCE_CELL_OVERRIDES = Object.freeze({
+  'megaknight.jumpMinRange':2.5,'megaknight.jumpMaxRange':5,'megaknight.jumpRadius':1.5,'megaknight.dropRadius':1.5,
+  'tracker.hookRange':6,'tracker.hookMinRange':2,
+  'nightshade.aggroRange':3,'nightshade.dashAggroRange':3,'nightshade.dashMinRange':2.5,'nightshade.dashMaxRange':6,
+  'giantskeleton.deathBombRadius':1.5,
+  'icespirit.iceLeapRange':2,'icespirit.iceBlastRadius':1.5,
+  'firespirit.fireLeapRange':2,'firespirit.fireBlastRadius':1.5,
+  'apprenticeguards.wideFormationSpacing':2.5,
+  'boar.riverJumpSpawnBand':2.5,'boar.riverJumpTrigger':1
+});
+function quantizeCells(px,{min=.5}={}){
+  if(!Number.isFinite(px)||px<=0)return 0;
+  return Math.max(min,Math.round((px/GRID_BASELINE_PX)*2)/2);
+}
+function gridizeCard(id,d){
+  const out={...d};
+  const rangeCells=RANGE_CELL_OVERRIDES[id]??quantizeCells(d.range||0,{min:1});
+  out.rangeCells=rangeCells;out.range=cellsToWorld(rangeCells);
+  if(d.spell){const rc=SPELL_RADIUS_CELLS[id]??quantizeCells(d.radius||0);out.radiusCells=rc;out.radius=cellsToWorld(rc);}
+  if(d.building){out.footprintCols=d.footprintCols||ARENA.defaultBuildingCells;out.footprintRows=d.footprintRows||ARENA.defaultBuildingCells;out.footprintCells=`${out.footprintCols}x${out.footprintRows}`;}
+  for(const [key,cellKey] of Object.entries(DISTANCE_KEY_TO_CELL_KEY)){
+    if(!Number.isFinite(d[key]))continue;
+    const cells=DISTANCE_CELL_OVERRIDES[`${id}.${key}`]??quantizeCells(d[key]);
+    out[cellKey]=cells;out[key]=cellsToWorld(cells);
+  }
+  if(Number.isFinite(d.aggroRange)){
+    const cells=DISTANCE_CELL_OVERRIDES[`${id}.aggroRange`]??quantizeCells(d.aggroRange);
+    out.aggroRangeCells=cells;out.aggroRange=cellsToWorld(cells);
+  }
+  if(Number.isFinite(d.wideFormationSpacing)){
+    const cells=DISTANCE_CELL_OVERRIDES[`${id}.wideFormationSpacing`]??quantizeCells(d.wideFormationSpacing);
+    out.wideFormationSpacingCells=cells;out.wideFormationSpacing=cellsToWorld(cells);
+  }
+  out.visionSize=visionSizeFor(out);out.visionCells=Number.isFinite(out.aggroRangeCells)?out.aggroRangeCells:VISION_CELLS_BY_SIZE[out.visionSize];
+  if((out.count||0)>1){
+    out.summonFormationRadiusCells=out.wideFormation?((out.count-1)*(out.wideFormationSpacingCells||2.5)/2):Math.min(2.5,.5+Math.ceil(out.count/3)*.5);
+  }else out.summonFormationRadiusCells=0;
+  return Object.freeze(out);
+}
+export const UNITS = Object.freeze(Object.fromEntries(Object.entries(RAW_UNITS).map(([id,d])=>[id,gridizeCard(id,d)])));
 export function cardDamageInfo(data){
   if(!data)return {unit:'-',tower:'-'};
   if(data.spell==='skeletonrush')return {unit:'スケルトン召喚',tower:'召喚'};

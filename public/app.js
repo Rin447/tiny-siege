@@ -1,4 +1,4 @@
-import {VERSION,ARENA,UNITS,DECK,DEFAULT_DECK,MAX_DECK,normalizeDeck,summonDelayFor,cardDamageInfo} from './game/units.js';
+import {VERSION,ARENA,UNITS,DECK,DEFAULT_DECK,MAX_DECK,normalizeDeck,summonDelayFor,cardDamageInfo,visionSizeFor,visionRangeFor} from './game/units.js';
 import {createMatch,tick,runBot,deploy,viewMatch,clamp,canPlace} from './game/engine.js';
 import {drawArena,drawPortrait,orient} from './game/art.js';
 import {snapDeploymentPoint} from './game/physics.js';
@@ -13,6 +13,42 @@ document.addEventListener('cut',blockNativeTextActions,{capture:true});
 document.addEventListener('dragstart',blockNativeTextActions,{capture:true});
 document.addEventListener('selectionchange',()=>{const sel=window.getSelection?.();if(sel&&!sel.isCollapsed)sel.removeAllRanges();});
 const PATCH_NOTES = Object.freeze([
+  {version:'37.2.0',date:'2026-09-18',title:'MAP VARIATION & TOWER RANGE UPDATE',items:[
+    '橋の実通行幅を1マスから2マスへ拡大。中心X4 / X15は維持し、大型・群体が詰まりにくい橋へ変更。',
+    '川のグリッド線を非表示化し、川は地形として自然に見えるよう調整。',
+    'サイド/中央タワーの射程7マスを、タワー中心ではなく占有外周から計測する方式へ変更。射程6マスの吹き矢ゴブリンへ必ず反撃可能。',
+    '草原・石/遺跡・溶岩・雪/氷・砂漠の5テーマを追加。対戦ごとに地形色・川・橋・外周装飾を切り替え。',
+    '外周フレームにテーマ別の非衝突装飾を追加。physicsVersion 63。'
+  ]},
+  {version:'37.1.0',date:'2026-09-18',title:'BRIDGE ALIGNMENT & MAP DECOR UPDATE',items:[
+    '\u5de6\u6a4b\u3092X3.5\u301c4.5\uff08\u4e2d\u5fc3X4\uff09\u3001\u53f3\u6a4b\u3092X14.5\u301c15.5\uff08\u4e2d\u5fc3X15\uff09\u3078\u79fb\u52d5\u3002\u5b9f\u969b\u306e\u901a\u884c\u5224\u5b9a\u30821\u30de\u30b9\u5e45\u306b\u7d71\u4e00\u3002',
+    '\u30b5\u30a4\u30c9\u30bf\u30ef\u30fc\u306e\u4e2d\u5fc3\u7dda\u3068\u6a4b\u4e2d\u5fc3\u3092\u4e00\u81f4\u3055\u305b\u3001\u5de6\u53f3\u30ec\u30fc\u30f3\u306e\u9053\u304b\u3089\u771f\u3063\u76f4\u3050\u6a4b\u3078\u5165\u308c\u308b\u69cb\u6210\u3078\u5909\u66f4\u3002',
+    '\u6728\u677f\u30fb\u5074\u6881\u30fb\u676d\u30fb\u30ed\u30fc\u30d7\u30fb\u8349\u30fb\u77f3\u30fb\u6c34\u9762\u30fb\u5cb8\u8fba\u306a\u3069\u3001\u5f53\u305f\u308a\u5224\u5b9a\u306e\u306a\u3044\u30de\u30c3\u30d7\u88c5\u98fe\u3092\u8ffd\u52a0\u3002',
+    '18\u00d732\u30b0\u30ea\u30c3\u30c9\u3001\u30bf\u30ef\u30fc\u914d\u7f6e\u3001\u5c04\u7a0b\u30fb\u8996\u754c\u30fb\u53ec\u559a\u30eb\u30fc\u30eb\u306fV37.0.0\u4ed5\u69d8\u3092\u7dad\u6301\u3002physicsVersion 62\u3002'
+  ]},
+  {version:'37.0.0',date:'2026-09-18',title:'GRID MAP OVERHAUL',items:[
+    '戦場を横18×縦32の固定グリッドへ全面刷新。1マス=40ワールド単位で、移動表示は滑らかなまま射程・視界・範囲・配置をマス基準に統一。',
+    '川は中央2マス（Y16〜17）、橋は左X4〜5・右X14〜15。青サイドタワーはX3〜5/Y6〜8・X14〜16/Y6〜8、中央本拠地はX8〜11/Y2〜5。赤側は完全対称。',
+    'サイドタワー3×3、中央本拠地4×4、通常設置物3×3。設置物はグリッドへスナップし、占有マスが川・タワー・他建物・マップ外へ重なる場合は設置不可。',
+    '弓兵の射程を5マスの基準値に設定して全カードの射程・範囲を再換算。視界は小型4・中型5・大型6マス、特殊能力射程は独立管理。physicsVersion 61。'
+  ]},
+  {version:'36.3.0',date:'2026-09-18',title:'VISION TARGETING UPDATE',items:[
+    '新しい「視界」システムを追加。通常索敵はキャラの大きさで小型R115・中型R150・大型R185に分類。',
+    '攻撃前に追っている敵が視界外へ出た場合は追跡を解除し、元のタワー進行ルートへ復帰。1度攻撃した後は従来どおりターゲットをロック。',
+    '大型は小型・中型より遠くの敵を見つけるため、小型ユニットで大型だけを釣る非対称な誘導が可能。',
+    'メガナイトのジャンプ、追跡者のフック、ユーノの専用索敵など特殊能力の取得距離は通常視界と別管理。カード総数66枚、physicsVersion 60。'
+  ]},
+  {version:'36.2.0',date:'2026-09-18',title:'TARGETING SYSTEM UPDATE',items:[
+    '建物特攻ユニットは配置した左右レーンを維持。同レーンのタワー破壊後も反対側タワーへ横断せず、そのまま本拠地側へ進軍。',
+    '敵の大砲・レーザー塔・オーブンなど設置物が近距離（R165）にある場合は、防衛建物へ引き寄せられる。',
+    '通常近接ユニットの基本索敵を150へ縮小。メガナイトのジャンプ160、追跡者のフック180、ユーノ105など特殊能力の索敵は独立して維持。',
+    'カード総数66枚（59ユニット＋7呪文）、physicsVersion 59。'
+  ]},
+  {version:'36.1.0',date:'2026-09-18',title:'OVEN DECAY UPDATE',items:[
+    'オーブンに毎秒30の自然HP減少を追加。HP900なので、攻撃を受けなくても約30秒で崩れる。',
+    '配置時のファイヤスピリット2体召喚と、その後10秒ごとの2体召喚はそのまま維持。',
+    'カード総数66枚（59ユニット＋7呪文）、physicsVersion 58。'
+  ]},
   {version:'36.0.0',date:'2026-09-17',title:'BARBARIAN & SIEGE BARBARIAN UPDATE',items:[
     '新5コスト「バーバリアン」を追加。HP716・攻撃192・攻撃間隔1.4秒・普通速度の地上近接バーバリアンを5体召喚。金髪・金髭・上半身裸の専用描画。',
     '新4コスト「攻城バーバリアン」を追加。木のHP966・建物のみ攻撃。通常接触265ダメージ、2秒連続移動で加速し突進572ダメージ。',
@@ -739,14 +775,14 @@ function updateInspector(id){
   inspectId=id;const d=UNITS[id];
   el('inspectorRole').textContent=d.role;el('inspectorName').textContent=d.name;el('inspectorDesc').textContent=d.desc;
   el('inspectorStats').replaceChildren();
-  const stats=d.spell?[['COST',d.cost],['AREA',`R${d.radius}`],['DMG',`${d.damage}/${d.buildingDamage}`]]:[['COST',d.cost],['HP',d.hp+(d.count>1?` ×${d.count}`:'')],['DMG',d.damage]];
+  const stats=d.spell?[['COST',d.cost],['AREA',`${d.radiusCells ?? (d.radius/ARENA.cellSize)}マス`],['DMG',`${d.damage}/${d.buildingDamage}`]]:[['COST',d.cost],['HP',d.hp+(d.count>1?` ×${d.count}`:'')],['RANGE',`${d.rangeCells ?? (d.range/ARENA.cellSize)}マス`]];
   for(const [label,value] of stats){const div=document.createElement('div'),s=document.createElement('small'),strong=document.createElement('strong');s.textContent=label;strong.textContent=value;div.append(s,strong);el('inspectorStats').append(div);}
   el('tacticalTip').textContent=d.desc;
 }
 function pointFromEvent(e,inside=false){
-  const r=el('arenaCanvas').getBoundingClientRect(),x=(e.clientX-r.left)/r.width*720,y=(e.clientY-r.top)/r.height*1040;
-  if(inside&&(x<0||x>720||y<0||y>1040))return null;
-  let p={x:clamp(x,0,720),y:clamp(y,0,1040)},world=orient(p,seat);
+  const r=el('arenaCanvas').getBoundingClientRect(),x=(e.clientX-r.left)/r.width*ARENA.width,y=(e.clientY-r.top)/r.height*ARENA.height;
+  if(inside&&(x<0||x>ARENA.width||y<0||y>ARENA.height))return null;
+  let p={x:clamp(x,0,ARENA.width),y:clamp(y,0,ARENA.height)},world=orient(p,seat);
   let valid=false;
   if(snapshot&&selected){
     const players=[{hand:[],energy:0},{hand:[],energy:0}];players[seat]={hand:snapshot.hand,energy:snapshot.energy};
@@ -958,22 +994,25 @@ function toggleDeckCard(id,{fromDetail=false}={}){
 }
 function targetLabel(d){if(d.buildingOnly)return '建物のみ';if(d.id==='mossling')return '地上＋空中（槍3）';return d.targetsAir?'地上＋空中':'地上のみ';}
 function detailStatsFor(d){
-  if(d.spell){const stats=[['COST',d.cost],['TYPE','SPELL'],['範囲',`R${d.radius}`]];if(d.spell==='cyclone'){stats.push(['効果時間',`${d.zoneDuration}秒`],['吸引','継続・軽量ほど強い'],['ダメージ',`外${d.outerDps} / 中${d.midDps} / 中心${d.innerDps} DPS`],['建物','吸引・ダメージなし']);return stats;}stats.push(['兵ダメージ',d.damage],['建物ダメージ',d.buildingDamage]);if(d.spell==='poison')stats.push(['効果時間',`${d.zoneDuration}秒`],['ダメージ間隔',`${d.tickEvery}秒`]);if(d.spell==='lightning')stats.push(['対象',`現在HPが高い順 最大${d.maxTargets||4}体`]);if(d.stunDuration)stats.push(['スタン',`${d.stunDuration}秒`]);return stats;}
+  if(d.spell){const stats=[['COST',d.cost],['TYPE','SPELL'],['範囲',`${d.radiusCells ?? (d.radius/ARENA.cellSize)}マス`]];if(d.spell==='cyclone'){stats.push(['効果時間',`${d.zoneDuration}秒`],['吸引','継続・軽量ほど強い'],['ダメージ',`外${d.outerDps} / 中${d.midDps} / 中心${d.innerDps} DPS`],['建物','吸引・ダメージなし']);return stats;}stats.push(['兵ダメージ',d.damage],['建物ダメージ',d.buildingDamage]);if(d.spell==='poison')stats.push(['効果時間',`${d.zoneDuration}秒`],['ダメージ間隔',`${d.tickEvery}秒`]);if(d.spell==='lightning')stats.push(['対象',`現在HPが高い順 最大${d.maxTargets||4}体`]);if(d.stunDuration)stats.push(['スタン',`${d.stunDuration}秒`]);return stats;}
   const dmg=d.id==='mossling'?'地上125 / 槍81':d.drillUnit?`${d.drillBaseDps} DPS〜`:(d.laserTower||d.laserUnit)?`${d.laserBaseDps} DPS〜`:d.damage;const interval=d.drillUnit?'継続':(d.laserTower||d.laserUnit)?'継続':d.suicideUnit?'到達時に自爆':d.sparkUnit?`${d.sparkChargeTime}秒チャージ`:d.cooldown?`${d.cooldown.toFixed(2).replace(/0+$/,'').replace(/\.$/,'')}秒`:'—';
   const deployTime=d.tunnelAnywhere?'地下移動（追加待機なし）':`${summonDelayFor(d).toFixed(1)}秒`;
-  const stats=[['COST',d.cost],[d.building?'建設時間':'召喚時間',deployTime],['HP',`${d.hp}${d.count>1?` ×${d.count}`:''}`],['攻撃',dmg],['攻撃間隔',interval],['射程',d.range],['対象',targetLabel(d)],['移動',d.building?'固定':d.air?`飛行 ${d.speed}`:`地上 ${d.speed}`]];
+  const stats=[['COST',d.cost],[d.building?'建設時間':'召喚時間',deployTime],['HP',`${d.hp}${d.count>1?` ×${d.count}`:''}`],['攻撃',dmg],['攻撃間隔',interval],['射程',`${d.rangeCells ?? (d.range/ARENA.cellSize)}マス`],['対象',targetLabel(d)],['移動',d.building?'固定':d.air?`飛行 ${d.speed}`:`地上 ${d.speed}`]];
+  if(!d.building&&!d.buildingOnly){const size=visionSizeFor(d),label=size==='small'?'小型':size==='large'?'大型':'中型';stats.push(['サイズ',label],['視界',`${d.visionCells ?? (visionRangeFor(d)/ARENA.cellSize)}マス`]);}
+  if(d.building)stats.push(['占有',`${d.footprintCols||3}×${d.footprintRows||3}マス`]);
+  if((d.count||0)>1)stats.push(['召喚展開',`中心から約${d.summonFormationRadiusCells||0}マス`]);
   if(d.structureDamage!=null)stats.push(['対タワー・設置物',d.structureDamage]);
-  if(d.splash)stats.push(['範囲',`R${d.splash}`]);
+  if(d.splash)stats.push(['範囲',`${d.splashCells ?? (d.splash/ARENA.cellSize)}マス`]);
   if(d.id==='frost')stats.push(['鈍足','3段階：80% → 65% → 50%']);
   if(d.id==='harpy'){stats.push(['連鎖ダメージ','180 → 130 → 90']);stats.push(['スタン','各命中先 1.0秒']);}
-  if(d.id==='mossling'){stats.push(['編成','ゴブリン3（HP202 / 攻撃125）＋槍3（HP133 / 攻撃81 / 対空可）']);stats.push(['槍ゴブ射程','160（投げ槍）']);}
+  if(d.id==='mossling'){stats.push(['編成','ゴブリン3（HP202 / 攻撃125）＋槍3（HP133 / 攻撃81 / 対空可）']);stats.push(['槍ゴブ射程',`${UNITS.goblin_spear.rangeCells}マス（投げ槍）`]);}
   if(d.id==='goblins')stats.push(['編成','ゴブリン4体'],['1体あたり','HP202 / 攻撃125 / 1.1秒']);
-  if(d.id==='speargoblins')stats.push(['編成','槍ゴブリン3体'],['1体あたり','HP133 / 攻撃81 / 1.6秒'],['射程','160']);
-  if(d.id==='megagargoyle')stats.push(['攻撃対象','地上＋空中'],['射程','60（ガーゴイル45より少し長い）'],['移動速度','45（普通）']);
+  if(d.id==='speargoblins')stats.push(['編成','槍ゴブリン3体'],['1体あたり','HP133 / 攻撃81 / 1.6秒'],['射程',`${d.rangeCells}マス`]);
+  if(d.id==='megagargoyle')stats.push(['攻撃対象','地上＋空中'],['射程',`${d.rangeCells}マス（ガーゴイル${UNITS.gargoyle.rangeCells}マスより長い）`],['移動速度','45（普通）']);
   if(d.id==='apprenticeguards')stats.push(['編成','横一列6体（配置位置で4+2分割可）'],['1体あたり','HP547 + シールド240 / 攻撃133 / 1.3秒'],['シールド','全方向のダメージを先に受ける / 破壊で盾が消える']);
-  if(d.id==='icespirit')stats.push(['飛びつき','射程70でジャンプ'],['爆発','R48 / 110範囲ダメージ'],['フリーズ','命中した敵を1.1秒完全停止'],['移動速度','96（とても速い）']);
-  if(d.id==='firespirit')stats.push(['飛びつき','射程70でジャンプ'],['自爆','R48 / 215範囲ダメージ'],['対象','地上＋空中'],['移動速度','96（とても速い）']);
-  if(d.id==='oven')stats.push(['能力','配置時にファイヤスピリット2体'],['継続召喚','10秒ごとに2体'],['耐久','HP900・固定設置物']);
+  if(d.id==='icespirit')stats.push(['飛びつき',`${d.fireLeapRangeCells||d.iceLeapRangeCells}マスでジャンプ`],['爆発',`${d.iceBlastRadiusCells}マス / 110範囲ダメージ`],['フリーズ','命中した敵を1.1秒完全停止'],['移動速度','96（とても速い）']);
+  if(d.id==='firespirit')stats.push(['飛びつき',`${d.fireLeapRangeCells||d.iceLeapRangeCells}マスでジャンプ`],['自爆',`${d.fireBlastRadiusCells}マス / 215範囲ダメージ`],['対象','地上＋空中'],['移動速度','96（とても速い）']);
+  if(d.id==='oven')stats.push(['能力','配置時にファイヤスピリット2体'],['継続召喚','10秒ごとに2体'],['耐久','HP900・毎秒30自然減衰']);
   if(d.id==='barbarians')stats.push(['編成','バーバリアン5体'],['1体HP',716],['1体攻撃',192],['攻撃間隔','1.4秒']);
   if(d.id==='siegebarbarian')stats.push(['木HP',966],['通常衝突',265],['加速','2秒連続移動後・少し高速化'],['突進',572],['スタン','加速リセット'],['破壊/衝突後','バーバリアン2体']);
   if(d.id==='electrowizard')stats.push(['スタン','範囲内の敵ユニット全員 1.0秒']);
@@ -982,22 +1021,22 @@ function detailStatsFor(d){
   if(d.id==='windmage')stats.push(['ノックバック','小型34 / 中型20 / 大型8 / 超重量0 px']);
   if(d.id==='phoenix')stats.push(['復活','卵HP600を4秒守る → HP450で1回のみ']);
   if(d.id==='mirage')stats.push(['ステルス','最大3秒・半透明 / 攻撃・被弾・時間切れで解除'],['ステルス初撃','×1.4'],['短剣範囲',`R${d.meleeSplash}`]);
-  if(d.id==='skybomber')stats.push(['特性','飛行・地上/空中ユニット＋建物を攻撃'],['爆弾','175 / 1.6秒'],['射程',d.range]);
+  if(d.id==='skybomber')stats.push(['特性','飛行・地上/空中ユニット＋建物を攻撃'],['爆弾','175 / 1.6秒'],['射程',`${d.rangeCells}マス`]);
   if(d.id==='scrapdrill')stats.push(['ドリルDPS','90 → 135 → 180 → 240'],['増幅','同一建物へ1.5秒ごと'],['リセット','射程外 / 対象変更 / スタン']);
   if(d.id==='miniberserker')stats.push(['特徴','頭と体が約1:1・大剣を掲げて高速進軍'],['役割','4コストの高火力単体近接']);
   if(d.id==='boar')stats.push(['川越え','川岸すぐ横のみジャンプ / それ以外は橋へ'],['着地','対岸のすぐそば / 1.2秒でジャンプ'],['突進',`走行${d.chargeDistance} → 初撃×${d.chargeMultiplier}`]);
-  if(d.id==='megaknight')stats.push(['通常範囲',`R${d.meleeSplash} / ${d.damage}`],['落下召喚',`1.5秒後・R${d.dropRadius}へ${d.dropDamage}`],['ジャンプ',`距離${d.jumpMinRange}〜${d.jumpMaxRange} / 準備${d.jumpWindup}秒 / R${d.jumpRadius}へ${d.jumpDamage}`],['対象固定','飛び始めた相手を倒すまで追跡']);
+  if(d.id==='megaknight')stats.push(['通常範囲',`${d.meleeSplashCells ?? (d.meleeSplash/ARENA.cellSize)}マス / ${d.damage}`],['落下召喚',`1.5秒後・${d.dropRadiusCells}マスへ${d.dropDamage}`],['ジャンプ',`${d.jumpMinRangeCells}〜${d.jumpMaxRangeCells}マス / 準備${d.jumpWindup}秒 / ${d.jumpRadiusCells}マスへ${d.jumpDamage}`],['対象固定','飛び始めた相手を倒すまで追跡']);
   if(d.id==='ironeye')stats.push(['マーク','被ダメージ+20%'],['破裂','累計500 → 追加300'],['回転突進','1体につき1回 / 180 / 貫通'],['突進命中','マーク＋2.5秒間30%鈍足']);
-  if(d.id==='tracker')stats.push(['フック','射程180 / 構え0.6秒 / CT4秒'],['地上','敵を近接距離へ引き寄せ'],['空中','引き寄せた対象だけ2秒攻撃可'],['建物','自分が建物へ引き寄せられる']);
+  if(d.id==='tracker')stats.push(['フック',`${d.hookRangeCells}マス / 構え0.6秒 / CT4秒`],['地上','敵を近接距離へ引き寄せ'],['空中','引き寄せた対象だけ2秒攻撃可'],['建物','自分が建物へ引き寄せられる']);
   if(d.id==='nightshade')stats.push(['ダッシュ',`準備${d.dashWindup}秒 / ${d.dashDamage}ダメージ / CT${d.dashCooldown}秒`],['特徴','ダッシュ中は無敵']);
   if(d.id==='bombcarrier')stats.push(['建物自爆','480'],['死亡時','周囲の敵ユニットへ80'],['移動速度','88']);
-  if(d.id==='lumina')stats.push(['命中時回復','自分110＋周囲の味方最大3体へ各110'],['回復範囲',`R${d.healOnHitRange}`]);
+  if(d.id==='lumina')stats.push(['命中時回復','自分110＋周囲の味方最大3体へ各110'],['回復範囲',`${d.healOnHitRangeCells}マス`]);
   if(d.id==='elixirgolem')stats.push(['分裂','大1 → 中2（HP784 / 攻撃127）→ 小4（HP392 / 攻撃64）'],['敵エリクサー','大+1 / 中1体+1 / 小1体+0.5']);
-  if(d.id==='icegolem')stats.push(['攻撃対象','建物のみ'],['死亡時',`R${d.deathRadius}へ${d.deathDamage}ダメージ`],['特徴','低速・建物特攻']);
+  if(d.id==='icegolem')stats.push(['攻撃対象','建物のみ'],['死亡時',`${d.deathRadiusCells}マスへ${d.deathDamage}ダメージ`],['特徴','低速・建物特攻']);
   if(d.id==='skeletonbarrel')stats.push(['攻撃対象','建物のみ（飛行）'],['到達/死亡時','145ダメージ'],['破壊時召喚','スケルトン7体'],['特徴','少し速い建物特攻']);
-  if(d.id==='giantskeleton')stats.push(['\u653b\u6483\u5bfe\u8c61','\u5730\u4e0a\u30e6\u30cb\u30c3\u30c8\uff0b\u5efa\u7269'],['\u6b7b\u4ea1\u7206\u5f3e','3\u79d2\u5f8c / 688\u30c0\u30e1\u30fc\u30b8 / R58'],['\u79fb\u52d5\u901f\u5ea6','40\uff08\u666e\u901a\uff09']);
+  if(d.id==='giantskeleton')stats.push(['\u653b\u6483\u5bfe\u8c61','\u5730\u4e0a\u30e6\u30cb\u30c3\u30c8\uff0b\u5efa\u7269'],['\u6b7b\u4ea1\u7206\u5f3e',`3\u79d2\u5f8c / 688\u30c0\u30e1\u30fc\u30b8 / ${d.deathBombRadiusCells}\u30de\u30b9`],['\u79fb\u52d5\u901f\u5ea6','40\uff08\u666e\u901a\uff09']);
   if(d.id==='skeletonrush')stats.push(['\u767a\u52d5','1.2\u79d2\u5f8c\u306b\u7d2b\u8272\u30a8\u30ea\u30a2'],['\u52b9\u679c\u6642\u9593','9\u79d2'],['\u53ec\u559a','\u767a\u52d53\u79d2\u5f8c\u21920.5\u79d2\u3054\u30681\u4f53'],['\u7279\u6027','\u5efa\u7269\u3068\u91cd\u306d\u53ef / 40%\u753b\u9762\u5916\u53ef']);
-  if(d.id==='royalgiant')stats.push(['特性','建物のみ・遠距離砲撃'],['砲撃射程',d.range]);
+  if(d.id==='royalgiant')stats.push(['特性','建物のみ・遠距離砲撃'],['砲撃射程',`${d.rangeCells}マス`]);
   if(d.summonType){const summonLabel=(d.summonOnDeploy?`配置時＋${d.summonInterval}秒ごと`:`${d.summonInterval}秒ごと`)+(d.summonWindup?`（準備${d.summonWindup}秒）`:'')+` ×${d.summonCount}`;stats.push(['召喚',summonLabel]);}
   if(d.deathSummonType&&d.deathSummonCount)stats.push(['破壊時召喚',`${UNITS[d.deathSummonType]?.name||d.deathSummonType} ×${d.deathSummonCount}（即時）`]);
   if(d.spawnType==='blade')stats.push(['編成','前1・後2の3体']);
@@ -1008,16 +1047,17 @@ function refreshDetailToggle(){if(!detailCardId)return;const inDeck=editingDeck.
 function demoReadyCard(g,owner,id){
   const fillers=DECK.filter(k=>k!==id);g.players[owner].hand=[id,...fillers.slice(0,3)];g.players[owner].queue=fillers.slice(3,7);g.players[owner].deck=[id,...fillers.slice(0,7)];g.players[owner].energy=10;
 }
-function demoDeploy(g,owner,id,x,y){demoReadyCard(g,owner,id);const result=deploy(g,owner,id,x,y);g.players[owner].energy=10;return result;}
+const DEMO_Y_SCALE=ARENA.height/1040;
+function demoDeploy(g,owner,id,x,y){demoReadyCard(g,owner,id);const result=deploy(g,owner,id,x,y*DEMO_Y_SCALE);g.players[owner].energy=10;return result;}
 function demoDeployUnits(g,owner,id,x,y){
   const before=g.units.length,result=demoDeploy(g,owner,id,x,y);return {result,units:g.units.slice(before)};
 }
 function demoStageUnit(u,x,y,{hp=null,spawn=0,cd=0}={}){
-  if(!u)return null;u.x=x;u.y=y;u.lane=x<360?190:530;u.target=null;u.moving=false;u.spawn=spawn;u.cd=cd;if(Number.isFinite(hp))u.hp=Math.max(1,Math.min(u.maxHp,hp));return u;
+  if(!u)return null;u.x=x;u.y=y*DEMO_Y_SCALE;u.lane=x<ARENA.midX?ARENA.lanes[0]:ARENA.lanes[1];u.target=null;u.moving=false;u.spawn=spawn;u.cd=cd;if(Number.isFinite(hp))u.hp=Math.max(1,Math.min(u.maxHp,hp));return u;
 }
 function createDetailDemo(id){
   const g=createMatch({seed:18000+DECK.indexOf(id),bot:false,difficulty:'normal',decks:[DEFAULT_DECK,DEFAULT_DECK]});g.phase='battle';g.countdown=0;g.time=0;g.bot=false;for(const p of g.players)p.energy=10;
-  const d=UNITS[id],lane=530;let label='本番と同じ戦闘ロジックでAUTO実演',scenarioKey='standard',duration=8.5;
+  const d=UNITS[id],lane=ARENA.lanes[1];let label='本番と同じ戦闘ロジックでAUTO実演',scenarioKey='standard',duration=8.5;
   const put=(owner,type,x,y)=>demoDeployUnits(g,owner,type,x,y).units;
   const enemy=(type,x=lane,y=420)=>put(1,type,x,y);
   const own=(type,x=lane,y=650)=>put(0,type,x,y);
@@ -1074,7 +1114,7 @@ function createDetailDemo(id){
     label='配置時にファイヤスピリット2体 → その後10秒ごとに2体ずつ鍋から追加召喚';scenarioKey='oven-fire-spirit-spawner';duration=12;
   }else if(id==='giantskeleton'){
     g.towers.forEach(t=>{t.range=0;t.damage=0;});const [giant]=own(id,lane,650),[killer]=enemy('knight',lane,420),[victim]=enemy('blade',lane+38,420);demoStageUnit(giant,lane,520,{hp:80,cd:99});demoStageUnit(killer,lane,482,{cd:0});demoStageUnit(victim,lane+42,520,{cd:99});if(giant){giant.speed=0;}if(killer){killer.speed=0;killer.damage=900;}if(victim){victim.speed=0;victim.damage=0;}
-    label='\u5de8\u5927\u30b9\u30b1\u30eb\u30c8\u30f3\u304c\u5012\u308c\u308b \u2192 \u6b7b\u4ea1\u5730\u70b9\u306b\u7206\u5f3e \u2192 3\u79d2\u5f8c\u306bR58\u3078688\u30c0\u30e1\u30fc\u30b8';scenarioKey='giantskeleton-death-bomb';duration=7;
+    label='巨大スケルトンが倒れる → 死亡地点に爆弾 → 3秒後に半径1.5マスへ688ダメージ';scenarioKey='giantskeleton-death-bomb';duration=7;
   }else if(id==='golem'){
     const [golem]=own(id,lane,650);demoStageUnit(golem,lane,318,{hp:60,cd:99});if(golem)golem.speed=0;
     const bones=enemy('boneswarm',lane,390);const cx=lane,cy=318,r=42;
@@ -1123,7 +1163,7 @@ function createDetailDemo(id){
     label='通常矢で弱点マーク → 接近した地上敵へ一度きりの隠し刃回転突進 → 貫通した敵へマーク＋鈍足';scenarioKey='iron-eye-mark-spin';duration=9;
   }else if(id==='tracker'){
     g.towers.forEach(t=>t.range=0);const [hunter]=own(id,lane,650);demoStageUnit(hunter,lane,620);const [guard]=enemy('knight',lane,420);demoStageUnit(guard,lane,490,{cd:99});if(guard){guard.damage=0;guard.speed=0;}const bats=enemy('bat',485,420);bats.forEach((u,i)=>{demoStageUnit(u,485+i*18,505+i*8,{cd:99});u.damage=0;u.speed=0;});
-    label='射程180のフック → 地上敵を引き寄せ。空中敵を捕まえた場合はその対象だけ2秒間近接攻撃可能';scenarioKey='tracker-hook-control';duration=10;
+    label='6マスのフック → 地上敵を引き寄せ。空中敵を捕まえた場合はその対象だけ2秒間近接攻撃可能';scenarioKey='tracker-hook-control';duration=10;
   }else if(id==='shieldknight'){
     g.towers.forEach(t=>t.range=0);const [shield]=own(id,lane,650),[archer]=enemy('archer',lane,420);demoStageUnit(shield,lane,585);demoStageUnit(archer,lane,430);if(archer){archer.speed=0;archer.damage=100;}
     label='正面からの矢を大盾で受け、65%を盾耐久へ・35%を本体へ分散。盾が割れると通常ダメージ';scenarioKey='shield-front-block';duration=10;
@@ -1155,7 +1195,7 @@ function createDetailDemo(id){
     label='敵タワーの105ダメージも実際にHPへ反映 → 撃破時はピンクの破裂演出とともに大1→中2→小4へ分裂';scenarioKey='elixir-golem-split-visible';duration=14;
   }else if(id==='royalgiant'){
     g.towers.forEach(t=>t.damage=0);const [rg]=own(id,lane,650);demoStageUnit(rg,lane,405);const [guard]=enemy('knight',lane,420);demoStageUnit(guard,500,430);if(guard){guard.speed=0;guard.damage=0;}
-    label='目の前の敵兵を無視して、射程165から建物だけへ307ダメージの砲弾を発射';scenarioKey='royal-giant-cannon';duration=9;
+    label='目の前の敵兵を無視して、射程5マスから建物だけへ307ダメージの砲弾を発射';scenarioKey='royal-giant-cannon';duration=9;
   }else if(id==='harpy'){
     own(id,lane,650);const swarm=enemy('mossling',lane,420);swarm.forEach((u,i)=>demoStageUnit(u,490+(i%3)*42,455+Math.floor(i/3)*34));
     label='2秒ごとの連鎖雷 → 1体目180 / 2体目130 / 3体目90ダメージ＋各1秒スタン';scenarioKey='harpy-chain-falloff-stun';duration=9;
@@ -1195,7 +1235,7 @@ function updateDetailDemoEvidence(can){
   if(events.some(e=>e.type==='death-blast'&&e.unitType==='golem'))detailDemoEvidence.deathBlast=true;
   if(events.some(e=>e.type==='death'&&e.owner===1)&&detailDemoScenarioKey==='golem-death-blast-split')detailDemoEvidence.bonesHit=true;
   const minis=g.units.filter(u=>u.hp>0&&u.type==='mini_golem'&&u.owner===0).length;detailDemoEvidence.miniGolems=Math.max(detailDemoEvidence.miniGolems||0,minis);
-  const enemySide=g.towers.find(t=>t.owner===1&&t.kind==='tower'&&t.x===530);if(enemySide&&enemySide.hp<enemySide.maxHp)detailDemoEvidence.towerDamaged=true;
+  const enemySide=g.towers.find(t=>t.owner===1&&t.kind==='tower'&&t.x===ARENA.lanes[1]);if(enemySide&&enemySide.hp<enemySide.maxHp)detailDemoEvidence.towerDamaged=true;
   if((g.zones||[]).some(z=>z.kind==='mud'&&z.remaining>0))detailDemoEvidence.mudZone=true;
   if(detailDemoScenarioKey==='elixir-golem-split-visible'){
     const large=g.units.find(u=>u.owner===0&&u.type==='elixirgolem'&&u.hp>0);

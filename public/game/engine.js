@@ -1,25 +1,32 @@
-import {ARENA, UNITS, DECK, DEFAULT_DECK, MAX_DECK, normalizeDeck, summonDelayFor} from './units.js';
+import {ARENA, TOWER_GRID, MAP_THEMES, gridRectCenter, cellsToWorld, UNITS, DECK, DEFAULT_DECK, MAX_DECK, normalizeDeck, summonDelayFor, visionRangeFor} from './units.js';
 import {PHYSICS_VERSION, staticFree, staticLineFree, spawnPositions, navigationWaypoint, moveBody, displaceBody, resolveBodies, faceToward, deploymentAllowed, deploymentWater, snapDeploymentPoint} from './physics.js';
 
 export function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
 export function distance(a,b){return Math.hypot(a.x-b.x,a.y-b.y);}
+const safeInset=(u=null)=>Math.max(ARENA.cellSize*.5,(u?.radius||0)+ARENA.cellSize*.25);
+function clampInsideArena(v,axis,u=null){const m=safeInset(u);return axis==='x'?clamp(v,m,ARENA.width-m):clamp(v,m,ARENA.height-m);}
 export function random(g){
   let x=g.rng|0; x^=x<<13; x^=x>>>17; x^=x<<5;
   g.rng=x>>>0; return g.rng/4294967296;
 }
 function shuffled(g,source=DEFAULT_DECK){const a=[...source];for(let i=a.length-1;i>0;i--){const j=Math.floor(random(g)*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 export function validateDeck(value){return normalizeDeck(value,{fallback:false});}
-export function createMatch({seed=12345,bot=false,difficulty='normal',decks=[DEFAULT_DECK,DEFAULT_DECK]}={}){
-  const g={physicsVersion:PHYSICS_VERSION,phase:'countdown',countdown:3,time:0,overtime:false,rng:seed||1,units:[],projectiles:[],zones:[],events:[],nextId:1,step:0,
+export function createMatch({seed=12345,bot=false,difficulty='normal',decks=[DEFAULT_DECK,DEFAULT_DECK],mapTheme=null}={}){
+  const normalizedSeed=(Number(seed)||1)>>>0;
+  const chosenTheme=MAP_THEMES.includes(mapTheme)?mapTheme:MAP_THEMES[normalizedSeed%MAP_THEMES.length];
+  const g={physicsVersion:PHYSICS_VERSION,mapTheme:chosenTheme,phase:'countdown',countdown:3,time:0,overtime:false,rng:seed||1,units:[],projectiles:[],zones:[],events:[],nextId:1,step:0,
     winner:null,reason:'',bot,difficulty,botNext:1.5,
     players:[{energy:5,hand:[],queue:[],deck:[]},{energy:5,hand:[],queue:[],deck:[]}],towers:[]};
   const safeDecks=[normalizeDeck(decks?.[0]),normalizeDeck(decks?.[1])];
   for(let owner=0;owner<2;owner++){
     const d=shuffled(g,safeDecks[owner]);g.players[owner].deck=[...safeDecks[owner]];g.players[owner].hand=d.slice(0,4);g.players[owner].queue=d.slice(4);
-    for(let i=0;i<3;i++){
-      const core=i===2,x=core?360:(i===0?190:530);
-      g.towers.push({id:`t${owner}${i}`,kind:core?'core':'tower',owner,x,y:owner===0?(core?905:805):(core?135:235),
-      hp:core?4560:3200,maxHp:core?4560:3200,radius:core?40:32,range:core?226:226,damage:core?85:105,cd:0,
+    const layout=owner===0?TOWER_GRID.blue:TOWER_GRID.red;
+    const specs=[['left',false],['right',false],['core',true]];
+    for(let i=0;i<specs.length;i++){
+      const [slot,core]=specs[i],rect=layout[slot],pos=gridRectCenter(...rect),footprintCells=core?ARENA.coreTowerCells:ARENA.sideTowerCells;
+      g.towers.push({id:`t${owner}${i}`,kind:core?'core':'tower',slot,owner,x:pos.x,y:pos.y,
+      footprintCols:footprintCells,footprintRows:footprintCells,footprintCells:`${footprintCells}x${footprintCells}`,
+      hp:core?4560:3200,maxHp:core?4560:3200,radius:core?40:32,rangeCells:7,range:cellsToWorld(7),damage:core?85:105,cd:0,
       cooldown:core?0.9:1.0,targetsAir:true,projectile:'tower',hit:0,anim:0,awake:!core});
     }
   }
@@ -36,7 +43,7 @@ export function canPlace(g,owner,id,x,y){
   if(d.spell==='skeletonrush'){
     const visibleInset=(d.radius||110)*(1-(d.offscreenFraction??.4));
     if(x<visibleInset||x>ARENA.width-visibleInset||y<visibleInset||y>ARENA.height-visibleInset)return '\u30d5\u30a3\u30fc\u30eb\u30c9\u5185\u306b\u7bc4\u56f2\u306e60%\u4ee5\u4e0a\u304c\u6b8b\u308b\u4f4d\u7f6e\u3092\u6307\u5b9a\u3057\u3066\u304f\u3060\u3055\u3044\u3002';
-  }else if(x<30||x>690||y<30||y>1010)return '\u30d5\u30a3\u30fc\u30eb\u30c9\u306e\u5185\u5074\u3092\u6307\u5b9a\u3057\u3066\u304f\u3060\u3055\u3044\u3002';
+  }else {const margin=ARENA.cellSize*.5;if(x<margin||x>ARENA.width-margin||y<margin||y>ARENA.height-margin)return '\u30d5\u30a3\u30fc\u30eb\u30c9\u306e\u5185\u5074\u3092\u6307\u5b9a\u3057\u3066\u304f\u3060\u3055\u3044\u3002';}
   if(!g.players[owner].hand.includes(id))return 'そのカードは手札にありません。';
   if(g.players[owner].energy+0.00001<d.cost)return 'エナジーが足りません。';
   if(d.spell){
@@ -68,7 +75,7 @@ function spendCard(g,owner,id){
 function makeUnit(g,owner,type,x,y){
   const d=UNITS[type];
   return {...d,id:`u${g.nextId++}`,type,owner,x,y,hp:d.hp,maxHp:d.hp,cd:0,spawn:0.5,anim:0,hit:0,walk:0,target:null,targetLock:null,firstStrikeTarget:null,firstStrikeReadyAt:0,targetable:true,collisionDisabled:false,deploying:false,deployTotal:0,deployRemaining:0,face:owner===0?-1:1,
-    lane:x<360?190:530,age:0,facing:owner===0?-Math.PI/2:Math.PI/2,moving:false,
+    lane:x<ARENA.midX?ARENA.lanes[0]:ARENA.lanes[1],age:0,facing:owner===0?-Math.PI/2:Math.PI/2,moving:false,
     summonNextAt:d.summonInterval?g.time+d.summonInterval:null,summonCastingUntil:0,
     stunUntil:0,sparkCharged:false,sparkChargeStartAt:d.sparkChargeTime?g.time:null,sparkChargeProgress:0,
     shieldHp:d.shieldMax||0,maxShieldHp:d.shieldMax||0,stealthed:false,stealthUntil:0,revived:false,
@@ -192,7 +199,7 @@ function megaAreaDamage(g,u,x,y,amount,radius,eventType='mega-impact',shieldable
 }
 function megaJumpReady(u,t){
   if(!u.megaKnight||!t||!targetable(u,t))return false;
-  const d=distance(u,t);return d>=(u.jumpMinRange||80)&&d<=(u.jumpMaxRange||160);
+  const d=distance(u,t);return d>=(u.jumpMinRange||cellsToWorld(2.5))&&d<=(u.jumpMaxRange||cellsToWorld(5));
 }
 function megaLeapEndpoint(u,t){
   const dx=u.x-t.x,dy=u.y-t.y,len=Math.hypot(dx,dy)||1,stop=Math.max(1,(u.radius||12)+(t.radius||12)-1);
@@ -221,7 +228,7 @@ function updateMegaJump(g,u,entities,dt){
   if(u.megaJumpState==='windup'){
     let current=entities.find(e=>e.id===u.megaJumpTarget&&targetable(u,e))||null;
     if(!u.targetLock){
-      const candidates=entities.filter(e=>e.id!==u.id&&targetable(u,e)&&distance(u,e)<=(u.jumpMaxRange||160)).sort((a,b)=>distance(u,a)-distance(u,b)||String(a.id).localeCompare(String(b.id)));
+      const candidates=entities.filter(e=>e.id!==u.id&&targetable(u,e)&&distance(u,e)<=(u.jumpMaxRange||cellsToWorld(5))).sort((a,b)=>distance(u,a)-distance(u,b)||String(a.id).localeCompare(String(b.id)));
       if(candidates.length&&(!current||distance(u,candidates[0])<distance(u,current)-.001))current=candidates[0];
     }
     if(!current){u.megaJumpState=null;u.megaJumpTarget=null;u.megaJumpWindupUntil=0;u.megaJumpProgress=0;return false;}
@@ -306,7 +313,7 @@ function updateFireSpiritLeap(g,u,entities,dt){
 function boarRiverRouteForSpawn(u,owner,x,y){
   if(!u.riverJumper)return null;
   if(ARENA.bridges.some(b=>Math.abs(x-b)<=ARENA.bridgeHalf))return 'bridge';
-  const band=u.riverJumpSpawnBand||90;
+  const band=u.riverJumpSpawnBand||ARENA.cellSize*2.5;
   const besideRiver=owner===0
     ? y>=ARENA.riverBottom&&y<=ARENA.riverBottom+band
     : y<=ARENA.riverTop&&y>=ARENA.riverTop-band;
@@ -324,16 +331,16 @@ function boarRiverApproachPoint(u,target){
 function boarRiverJumpLanding(g,u,target){
   if(!u.riverJumper||u.riverJumpMode!=='river'||!target)return null;
   const r=u.radius||18,y=u.owner===0?ARENA.riverTop-r-2:ARENA.riverBottom+r+2;
-  const aimed=clamp(u.x,55,665);
-  for(const off of [0,-12,12,-24,24,-40,40]){
-    const p={x:clamp(aimed+off,55,665),y};
+  const aimed=clampInsideArena(u.x,'x',u);
+  for(const off of [0,-ARENA.cellSize*.3,ARENA.cellSize*.3,-ARENA.cellSize*.6,ARENA.cellSize*.6,-ARENA.cellSize,ARENA.cellSize]){
+    const p={x:clampInsideArena(aimed+off,'x',u),y};
     if(staticFree(g,u,p,0))return p;
   }
   return null;
 }
 function beginBoarRiverJump(g,u,target){
   if(!u.riverJumper||u.riverJumpMode!=='river'||u.riverJumpState||!target||target.owner===u.owner)return false;
-  const trigger=u.riverJumpTrigger||28,near=u.owner===0?(u.y>=ARENA.riverBottom&&u.y<=ARENA.riverBottom+trigger):(u.y<=ARENA.riverTop&&u.y>=ARENA.riverTop-trigger);
+  const trigger=u.riverJumpTrigger||ARENA.cellSize,near=u.owner===0?(u.y>=ARENA.riverBottom&&u.y<=ARENA.riverBottom+trigger):(u.y<=ARENA.riverTop&&u.y>=ARENA.riverTop-trigger);
   if(!near||!boarRiverTargetAcross(u,target))return false;
   const end=boarRiverJumpLanding(g,u,target);if(!end)return false;
   u.riverJumpState='leap';u.riverJumpStartedAt=g.time;u.riverJumpProgress=0;u.riverJumpStartX=u.x;u.riverJumpStartY=u.y;u.riverJumpEndX=end.x;u.riverJumpEndY=end.y;u.collisionDisabled=true;u.moving=true;u._nav=null;
@@ -370,10 +377,10 @@ function ironSpinCandidate(g,u,entities){
     .sort((a,b)=>distance(u,a)-distance(u,b)||String(a.id).localeCompare(String(b.id)))[0]||null;
 }
 function beginIronSpin(g,u,t){
-  const dx=t.x-u.x,dy=t.y-u.y,len=Math.hypot(dx,dy)||1,desired=u.spinDistance||120;
+  const dx=t.x-u.x,dy=t.y-u.y,len=Math.hypot(dx,dy)||1,desired=u.spinDistance||cellsToWorld(3.5);
   let end=null;
   for(const d of [desired,desired*.85,desired*.70]){
-    const p={x:clamp(u.x+dx/len*d,45,675),y:clamp(u.y+dy/len*d,45,995)};
+    const p={x:clampInsideArena(u.x+dx/len*d,'x',u),y:clampInsideArena(u.y+dy/len*d,'y',u)};
     if(staticLineFree(g,u,u,p,1)){end=p;break;}
   }
   if(!end)return false;
@@ -437,18 +444,42 @@ function updateTrackerHook(g,u,entities,dt){
   }
   if(raw>=1-1e-8){if(u.hookState==='pull-self'){u.x=u.hookEndX;u.y=u.hookEndY;}else if(t){t.x=u.hookEndX;t.y=u.hookEndY;t.hookControlUntil=g.time;}finishTrackerPull(g,u,t);}return true;
 }
+export function structureFootprintRect(t){
+  if(!(t?.kind||t?.building))return null;
+  const cols=t.footprintCols||ARENA.defaultBuildingCells,rows=t.footprintRows||ARENA.defaultBuildingCells;
+  const hw=cols*ARENA.cellSize/2,hh=rows*ARENA.cellSize/2;
+  return {l:t.x-hw,r:t.x+hw,t:t.y-hh,b:t.y+hh,hw,hh};
+}
+export function targetEdgePoint(source,target){
+  const rect=structureFootprintRect(target);
+  if(!rect)return {x:target.x,y:target.y};
+  return {x:clamp(source.x,rect.l,rect.r),y:clamp(source.y,rect.t,rect.b)};
+}
+export function targetGap(source,target){
+  const sourceRect=source?.kind?structureFootprintRect(source):null,targetRect=structureFootprintRect(target);
+  if(sourceRect&&targetRect){
+    const dx=Math.max(targetRect.l-sourceRect.r,sourceRect.l-targetRect.r,0),dy=Math.max(targetRect.t-sourceRect.b,sourceRect.t-targetRect.b,0);
+    return Math.hypot(dx,dy);
+  }
+  if(targetRect){const p=targetEdgePoint(source,target);return distance(source,p);}
+  if(sourceRect){
+    const px=clamp(target.x,sourceRect.l,sourceRect.r),py=clamp(target.y,sourceRect.t,sourceRect.b);
+    return distance(target,{x:px,y:py});
+  }
+  return Math.max(0,distance(source,target)-(target?.radius||0));
+}
 function lockedStructureTarget(u,entities){
   if(!(u.kind||u.building)||!u.target)return null;
   const t=entities.find(e=>e.id===u.target);
   if(!t||!targetable(u,t))return null;
-  return distance(u,t)<=u.range+t.radius?t:null;
+  return targetGap(u,t)<=u.range?t:null;
 }
 function nearestStructureTarget(u,entities){
   let best=null,bestD=Infinity;
   for(const t of entities){
     if(!targetable(u,t))continue;
-    const d=distance(u,t);
-    if(d<=u.range+t.radius&&d<bestD){best=t;bestD=d;}
+    const d=targetGap(u,t);
+    if(d<=u.range&&d<bestD){best=t;bestD=d;}
   }
   return best;
 }
@@ -457,15 +488,48 @@ function preferredTower(g,u){
   const out=g.towers.find(t=>t.owner===enemy&&t.kind==='tower'&&t.x===u.lane&&t.hp>0);
   return out||g.towers.find(t=>t.owner===enemy&&t.kind==='core'&&t.hp>0);
 }
+function mobileVisionRange(u){
+  return visionRangeFor(u);
+}
 function nearestMobileCombatTarget(u,entities){
-  const reach=u.aggroRange??Math.max(205,u.range+35);
+  const sight=mobileVisionRange(u),explicit=Number.isFinite(u.aggroRange);
   let best=null,bestD=Infinity;
   for(const t of entities){
     if(!targetable(u,t))continue;
-    const d=distance(u,t)-t.radius-(u.aggroRange?u.range:0);
-    if(d<=reach&&d<bestD){best=t;bestD=d;}
+    // Size vision is centre-to-centre. Explicit specialist sight (Yuno) keeps its tuned edge-gap contract.
+    const raw=distance(u,t),d=explicit?Math.max(0,raw-(t.radius||0)-(u.range||0)):raw;
+    if(d<=sight&&d<bestD){best=t;bestD=d;}
   }
   return best;
+}
+function megaJumpCandidate(u,entities){
+  if(!u.megaKnight||u.targetLock)return null;
+  let best=null,bestD=Infinity;
+  for(const t of entities){
+    if(t.id===u.id||!megaJumpReady(u,t))continue;
+    const d=distance(u,t);
+    if(d<bestD){best=t;bestD=d;}
+  }
+  return best;
+}
+function nearbyDefensiveBuilding(u,entities){
+  const pull=u.buildingPullRange??cellsToWorld(4.5);
+  let best=null,bestD=Infinity;
+  for(const t of entities){
+    if(!t.building||!targetable(u,t))continue;
+    const d=targetGap(u,t);
+    if(d<=pull&&d<bestD){best=t;bestD=d;}
+  }
+  return best;
+}
+function buildingOnlyTarget(g,u,entities){
+  // Player-placed defensive buildings may still pull a siege unit when they are genuinely nearby.
+  const defence=nearbyDefensiveBuilding(u,entities);if(defence)return defence;
+  const enemy=1-u.owner;
+  // Otherwise preserve the lane chosen at deployment. Never cross the arena just because the opposite tower survives.
+  const laneTower=g.towers.find(t=>t.owner===enemy&&t.kind==='tower'&&t.x===u.lane&&t.hp>0);
+  if(laneTower)return laneTower;
+  return g.towers.find(t=>t.owner===enemy&&t.kind==='core'&&t.hp>0)||null;
 }
 function resetFirstStrike(u){u.firstStrikeTarget=null;u.firstStrikeReadyAt=0;}
 function markFirstStrikeComplete(g,u,t){
@@ -494,21 +558,16 @@ function getTarget(g,u,entities){
     if(locked)return locked;
     return nearestStructureTarget(u,entities);
   }
-  // Building-only mobile units NEVER hard-lock. They continuously re-evaluate the nearest enemy structure.
-  // This intentionally allows pulls toward a newly-closer defence or even the central core.
+  // Siege units keep their deployment lane instead of crossing to the opposite side tower.
+  // Nearby player-placed defence buildings can still pull them off the route.
   if(u.buildingOnly){
     u.targetLock=null;
-    let best=null,bestD=Infinity;
-    for(const t of entities){
-      if(!targetable(u,t)||!(t.kind||t.building))continue;
-      const d=distance(u,t)-t.radius;
-      if(d<bestD){best=t;bestD=d;}
-    }
-    return best;
+    return buildingOnlyTarget(g,u,entities);
   }
-  // Ordinary mobile units only hard-lock AFTER they actually commit an attack.
-  // Until the first attack, they keep re-evaluating the nearest valid enemy every tick.
-  // After an attack, leaving attack/aggro range does not break the lock: the unit chases the same target.
+  // Ordinary mobile units use size-based vision before engagement.
+  // Small / medium / large bodies see progressively farther, so a large unit can be lured by a smaller one that has not noticed it.
+  // Before the first attack, leaving vision immediately releases pursuit and the unit resumes its tower route.
+  // After an attack commits the lock, leaving vision no longer breaks pursuit.
   if(u.targetLock){
     const locked=entities.find(t=>t.id===u.targetLock);
     if(locked&&targetable(u,locked))return locked;
@@ -516,18 +575,21 @@ function getTarget(g,u,entities){
   }
   const best=nearestMobileCombatTarget(u,entities);
   if(best)return best;
+  // Special ability acquisition is deliberately separate from ordinary vision.
+  // Mega Knight jump, Tracker hook and other ability-specific ranges do not widen everyone else's sight.
+  const jumpTarget=megaJumpCandidate(u,entities);if(jumpTarget)return jumpTarget;
   // A preferred tower is only a navigation objective while it is outside aggro range.
   // It becomes a real hard lock only after the unit actually attacks it.
   return preferredTower(g,u);
 }
 function dashEndpoint(u,t){
-  const dx=u.x-t.x,dy=u.y-t.y,len=Math.hypot(dx,dy)||1;
-  const stop=Math.max(1,u.range+t.radius-1);
-  return {x:t.x+dx/len*stop,y:t.y+dy/len*stop};
+  const edge=targetEdgePoint(u,t),dx=u.x-edge.x,dy=u.y-edge.y,len=Math.hypot(dx,dy)||1;
+  const stop=Math.max(1,u.range-1);
+  return {x:edge.x+dx/len*stop,y:edge.y+dy/len*stop};
 }
 function shadowRushTargetReady(g,u,t){
   if(!t||!targetable(u,t))return false;
-  const gap=Math.max(0,distance(u,t)-(u.range+t.radius));
+  const gap=Math.max(0,targetGap(u,t)-u.range);
   if(gap<(u.dashMinRange||0)||gap>(u.dashAggroRange??u.dashMaxRange??Infinity))return false;
   const end=dashEndpoint(u,t);
   return staticLineFree(g,u,u,end,1);
@@ -551,7 +613,7 @@ function beginShadowRush(g,u,t){
 function finishShadowRush(g,u,t){
   u.dashState=null;u.invulnerableUntil=0;u.dashReadyAt=g.time+(u.dashCooldown||4);u.dashTarget=null;u.dashEnd=null;
   u.cd=Math.max(u.cd,u.cooldown);u.anim=.35;
-  if(t&&t.hp>0&&targetable(u,t)&&distance(u,t)<=u.range+t.radius+14){
+  if(t&&t.hp>0&&targetable(u,t)&&targetGap(u,t)<=u.range+ARENA.cellSize*.35){
     const amount=Number.isFinite(u.dashDamage)?u.dashDamage:Math.round(u.damage*(u.dashMultiplier||2));damage(g,t,amount,u.owner);
     event(g,'shadow-hit',{x:t.x,y:t.y,owner:u.owner,amount});
   }
@@ -593,13 +655,24 @@ function updateBurrow(g,u,dt){
   return true;
 }
 function canRushAfterWindup(g,u,t){
-  const gap=Math.max(0,distance(u,t)-(u.range+t.radius));
-  if(gap>(u.dashMaxRange||Infinity)+35)return false;
+  const gap=Math.max(0,targetGap(u,t)-u.range);
+  if(gap>(u.dashMaxRange||Infinity)+ARENA.cellSize)return false;
   const end=dashEndpoint(u,t);return staticLineFree(g,u,u,end,1);
+}
+function buildingLaneCoreWaypoint(g,u,t){
+  if(!u.buildingOnly||!t||t.kind!=='core')return null;
+  const enemy=1-u.owner,side=g.towers.find(v=>v.owner===enemy&&v.kind==='tower'&&v.x===u.lane);
+  if(!side||side.hp>0)return null;
+  const forward=u.owner===0?-1:1,turnY=side.y+forward*ARENA.cellSize*1.5;
+  const beforeTurn=forward<0?u.y>turnY:u.y<turnY;
+  return beforeTurn?{id:`lane-core-${enemy}-${u.lane}`,x:u.lane,y:turnY,radius:1}:null;
 }
 function move(g,u,t,dt){
   if(!u.speed)return;
-  const dest=boarRiverApproachPoint(u,t)||navigationWaypoint(g,u,t,u.range+t.radius);
+  const lanePoint=buildingLaneCoreWaypoint(g,u,t),edge=(t.kind||t.building)?targetEdgePoint(u,t):null;
+  const navTarget=edge?{id:`edge-${t.id}`,x:edge.x,y:edge.y,radius:0}:t;
+  const navReach=edge?u.range:u.range+(t.radius||0);
+  const dest=boarRiverApproachPoint(u,t)||(lanePoint?navigationWaypoint(g,u,lanePoint,2):navigationWaypoint(g,u,navTarget,navReach));
   const start={x:u.x,y:u.y};
   const frostFactor=(u.slowUntil||0)>g.time?(u.slowMoveFactor||1):1;
   const mudFactor=(u.mudUntil||0)>g.time?(u.mudSlowFactor||1):1;
@@ -637,13 +710,15 @@ function summonMinions(g,parent,initial=false){
   const d=UNITS[parent.summonType];if(!d||!parent.summonCount)return 0;
   const available=Math.max(0,ARENA.maxUnits-g.units.filter(u=>u.hp>0).length),count=Math.min(parent.summonCount,available);if(!count)return 0;
   const f=parent.owner===0?1:-1;
-  const base=count===2?[[-22,-12],[22,-12]]:count===3?[[0,-30],[-24,12],[24,12]]:Array.from({length:count},(_,i)=>{const a=-Math.PI/2+i*Math.PI*2/count;return [Math.cos(a)*28,Math.sin(a)*28];});
+  const cs=ARENA.cellSize,buildingClear=parent.building?((parent.footprintRows||ARENA.defaultBuildingCells)*cs/2+(d.radius||10)+cs*.25):0;
+  const forward=buildingClear||cs*.30;
+  const base=count===2?[[-cs*.55,-forward],[cs*.55,-forward]]:count===3?[[0,-Math.max(cs*.75,forward)],[-cs*.60,Math.max(cs*.30,buildingClear?forward*.20:cs*.30)],[cs*.60,Math.max(cs*.30,buildingClear?forward*.20:cs*.30)]]:Array.from({length:count},(_,i)=>{const a=-Math.PI/2+i*Math.PI*2/count;const r=Math.max(cs*.70,buildingClear);return [Math.cos(a)*r,Math.sin(a)*r];});
   const candidates=[];
   for(const [ox,oy] of base)candidates.push([ox,oy]);
-  for(const r of [38,50,64])for(let i=0;i<12;i++){const a=i*Math.PI*2/12+(parent.owner===1?Math.PI:0);candidates.push([Math.cos(a)*r,Math.sin(a)*r]);}
+  for(const r of [ARENA.cellSize,ARENA.cellSize*1.3,ARENA.cellSize*1.7])for(let i=0;i<12;i++){const a=i*Math.PI*2/12+(parent.owner===1?Math.PI:0);candidates.push([Math.cos(a)*r,Math.sin(a)*r]);}
   let made=0;
   for(const [ox0,oy0] of candidates){
-    if(made>=count)break;const ox=ox0*f,oy=oy0*f,p={x:clamp(parent.x+ox,50,670),y:clamp(parent.y+oy,60,980)};
+    if(made>=count)break;const ox=ox0*f,oy=oy0*f,p={x:clampInsideArena(parent.x+ox,'x',d),y:clampInsideArena(parent.y+oy,'y',d)};
     if(!staticFree(g,d,p,0))continue;
     if(g.units.some(u=>u.hp>0&&!!u.air===!!d.air&&distance(p,u)<d.radius+(u.radius||12)*.80))continue;
     const u=makeUnit(g,parent.owner,d.id,p.x,p.y);u.spawn=.3;u.lane=parent.lane;u.summonedBy=parent.id;g.units.push(u);event(g,'summon-spawn',{x:u.x,y:u.y,owner:u.owner,summoner:parent.type,minion:d.id,initial});made++;
@@ -672,28 +747,28 @@ function updateSummoner(g,u){
 function summonMiniGolems(g,parent){
   const d=UNITS[parent.splitType||'mini_golem'];if(!d)return;
   const count=Math.min(parent.splitCount||2,Math.max(0,ARENA.maxUnits-g.units.filter(u=>u.hp>0).length));
-  const f=parent.owner===0?1:-1,candidates=[[-22,4],[22,4],[-18,20],[18,20],[-32,-8],[32,-8],[0,28],[0,-28]];
+  const cs=ARENA.cellSize,f=parent.owner===0?1:-1,candidates=[[-cs*.55,cs*.1],[cs*.55,cs*.1],[-cs*.45,cs*.5],[cs*.45,cs*.5],[-cs*.8,-cs*.2],[cs*.8,-cs*.2],[0,cs*.7],[0,-cs*.7]];
   let made=0;
   for(const [ox,oy] of candidates){
-    if(made>=count)break;const p={x:clamp(parent.x+ox,50,670),y:clamp(parent.y+oy*f,60,980)};
+    if(made>=count)break;const p={x:clampInsideArena(parent.x+ox,'x',d),y:clampInsideArena(parent.y+oy*f,'y',d)};
     if(!staticFree(g,d,p,0))continue;
     if(g.units.some(u=>u.hp>0&&!!u.air===!!d.air&&distance(p,u)<d.radius+(u.radius||12)*.72))continue;
     const u=makeUnit(g,parent.owner,d.id,p.x,p.y);u.spawn=.35;u.lane=parent.lane;g.units.push(u);event(g,'split-spawn',{x:u.x,y:u.y,owner:u.owner,minion:d.id});made++;
   }
   // Crowded bridge/tower fights can leave no perfect free point. ResolveBodies will safely separate this fallback.
-  while(made<count){const side=made?1:-1,u=makeUnit(g,parent.owner,d.id,clamp(parent.x+side*18,50,670),clamp(parent.y+10*f,60,980));u.spawn=.35;u.lane=parent.lane;g.units.push(u);event(g,'split-spawn',{x:u.x,y:u.y,owner:u.owner,minion:d.id});made++;}
+  while(made<count){const side=made?1:-1,u=makeUnit(g,parent.owner,d.id,clampInsideArena(parent.x+side*ARENA.cellSize*.45,'x',d),clampInsideArena(parent.y+ARENA.cellSize*.25*f,'y',d));u.spawn=.35;u.lane=parent.lane;g.units.push(u);event(g,'split-spawn',{x:u.x,y:u.y,owner:u.owner,minion:d.id});made++;}
 }
 function summonDeathMinions(g,parent){
   const d=UNITS[parent.deathSummonType];if(!d||!parent.deathSummonCount)return 0;
   const available=Math.max(0,ARENA.maxUnits-g.units.filter(u=>u.hp>0).length),count=Math.min(parent.deathSummonCount,available);if(!count)return 0;
-  const f=parent.owner===0?1:-1,candidates=[[0,-28],[-26,0],[26,0],[0,28],[-38,-20],[38,-20],[-38,20],[38,20]];let made=0;
+  const cs=ARENA.cellSize,f=parent.owner===0?1:-1,candidates=[[0,-cs*.7],[-cs*.65,0],[cs*.65,0],[0,cs*.7],[-cs*.95,-cs*.5],[cs*.95,-cs*.5],[-cs*.95,cs*.5],[cs*.95,cs*.5]];let made=0;
   for(const [ox,oy] of candidates){
-    if(made>=count)break;const pos={x:clamp(parent.x+ox,50,670),y:clamp(parent.y+oy*f,60,980)};
+    if(made>=count)break;const pos={x:clampInsideArena(parent.x+ox,'x',d),y:clampInsideArena(parent.y+oy*f,'y',d)};
     if(!staticFree(g,d,pos,0))continue;
     const u=makeUnit(g,parent.owner,d.id,pos.x,pos.y);u.spawn=0;u.lane=parent.lane;u.summonedBy=parent.id;g.units.push(u);event(g,'death-summon',{x:u.x,y:u.y,owner:u.owner,summoner:parent.type,minion:d.id});made++;
   }
   while(made<count){
-    const a=(made/count)*Math.PI*2,p2={x:clamp(parent.x+Math.cos(a)*22,50,670),y:clamp(parent.y+Math.sin(a)*22,60,980)},u=makeUnit(g,parent.owner,d.id,p2.x,p2.y);
+    const a=(made/count)*Math.PI*2,p2={x:clampInsideArena(parent.x+Math.cos(a)*ARENA.cellSize*.55,'x',d),y:clampInsideArena(parent.y+Math.sin(a)*ARENA.cellSize*.55,'y',d)},u=makeUnit(g,parent.owner,d.id,p2.x,p2.y);
     u.spawn=0;u.lane=parent.lane;u.summonedBy=parent.id;u.collisionDisabled=false;g.units.push(u);event(g,'death-summon',{x:u.x,y:u.y,owner:u.owner,summoner:parent.type,minion:d.id});made++;
   }
   return made;
@@ -718,10 +793,10 @@ function forceAway(g,t,x,y,amount){
   if(!amount||t.kind||t.building||t.eggUnit||t.hp<=0)return 0;const dx=t.x-x,dy=t.y-y,len=Math.hypot(dx,dy);if(len<.001)return 0;return displaceBody(g,t,dx/len*amount,dy/len*amount);
 }
 function findPhoenixEggPoint(g,t){
-  const d=UNITS[t.eggType||'phoenix_egg'],base={x:clamp(t.x,55,665),y:clamp(t.y,55,985)};
+  const d=UNITS[t.eggType||'phoenix_egg'],base={x:clampInsideArena(t.x,'x',d),y:clampInsideArena(t.y,'y',d)};
   if(staticFree(g,d,base,0))return base;
-  for(const r of [20,40,60,80,110,140,180])for(let i=0;i<16;i++){const a=i*Math.PI*2/16,p={x:clamp(base.x+Math.cos(a)*r,55,665),y:clamp(base.y+Math.sin(a)*r,55,985)};if(staticFree(g,d,p,0))return p;}
-  return {x:t.x<360?190:530,y:t.owner===0?ARENA.riverBottom+40:ARENA.riverTop-40};
+  for(const r of [ARENA.cellSize*.5,ARENA.cellSize,ARENA.cellSize*1.5,ARENA.cellSize*2,ARENA.cellSize*3,ARENA.cellSize*4,ARENA.cellSize*5])for(let i=0;i<16;i++){const a=i*Math.PI*2/16,p={x:clampInsideArena(base.x+Math.cos(a)*r,'x',d),y:clampInsideArena(base.y+Math.sin(a)*r,'y',d)};if(staticFree(g,d,p,0))return p;}
+  return {x:t.x<ARENA.midX?ARENA.lanes[0]:ARENA.lanes[1],y:t.owner===0?ARENA.riverBottom+ARENA.cellSize:ARENA.riverTop-ARENA.cellSize};
 }
 function spawnPhoenixEgg(g,t){
   const type=t.eggType||'phoenix_egg',d=UNITS[type];if(!d)return null;const p=findPhoenixEggPoint(g,t),egg=makeUnit(g,t.owner,type,p.x,p.y);egg.spawn=.2;egg.lane=t.lane;egg.eggHatchAt=g.time+(egg.eggHatchTime||4);g.units.push(egg);event(g,'phoenix-egg',{x:egg.x,y:egg.y,owner:egg.owner,duration:egg.eggHatchTime||4});return egg;
@@ -746,11 +821,11 @@ function skeletonRushSpawnPoint(g,z){
   const d=UNITS[z.spawnType||'skeleton'];if(!d)return null;
   const valid=p=>staticFree(g,d,p,0)&&!g.units.some(u=>u.hp>0&&!u.air&&!u.building&&distance(p,u)<(d.radius||7)+(u.radius||12)*.45);
   for(let i=0;i<32;i++){
-    const a=random(g)*Math.PI*2,r=Math.sqrt(random(g))*Math.max(0,(z.radius||110)-(d.radius||7)),p={x:z.x+Math.cos(a)*r,y:z.y+Math.sin(a)*r};
+    const a=random(g)*Math.PI*2,r=Math.sqrt(random(g))*Math.max(0,(z.radius||cellsToWorld(3.5))-(d.radius||7)),p={x:z.x+Math.cos(a)*r,y:z.y+Math.sin(a)*r};
     if(valid(p))return p;
   }
   for(const frac of [.2,.4,.6,.8])for(let i=0;i<16;i++){
-    const a=i*Math.PI*2/16+(z.owner?Math.PI/16:0),r=(z.radius||110)*frac,p={x:z.x+Math.cos(a)*r,y:z.y+Math.sin(a)*r};
+    const a=i*Math.PI*2/16+(z.owner?Math.PI/16:0),r=(z.radius||cellsToWorld(3.5))*frac,p={x:z.x+Math.cos(a)*r,y:z.y+Math.sin(a)*r};
     if(valid(p))return p;
   }
   return null;
@@ -758,7 +833,7 @@ function skeletonRushSpawnPoint(g,z){
 function spawnSkeletonRushMinion(g,z){
   if(g.units.filter(u=>u.hp>0).length>=ARENA.maxUnits)return false;
   const d=UNITS[z.spawnType||'skeleton'],p=skeletonRushSpawnPoint(g,z);if(!d||!p)return false;
-  const u=makeUnit(g,z.owner,d.id,p.x,p.y);u.spawn=.2;u.summonedBy=z.id;u.lane=p.x<360?190:530;g.units.push(u);
+  const u=makeUnit(g,z.owner,d.id,p.x,p.y);u.spawn=.2;u.summonedBy=z.id;u.lane=p.x<ARENA.midX?ARENA.lanes[0]:ARENA.lanes[1];g.units.push(u);
   event(g,'skeletonrush-spawn',{x:u.x,y:u.y,owner:u.owner,minion:d.id});return true;
 }
 function updateSkeletonRushZones(g,dt){
@@ -778,7 +853,9 @@ function updateGiantSkeletonBombs(g,dt){
     z.detonated=true;event(g,'giantskeleton-bomb-explode',{x:z.x,y:z.y,owner:z.owner,radius:z.radius,damage:z.damage});
     const centre={x:z.x,y:z.y};
     for(const v of [...alive(g)]){
-      if(v.owner===z.owner||v.hp<=0||distance(centre,v)>z.radius+(v.radius||12)*.35)continue;
+      if(v.owner===z.owner||v.hp<=0)continue;
+      const gap=(v.kind||v.building)?targetGap(centre,v):distance(centre,v);
+      if(gap>z.radius+(v.kind||v.building?0:(v.radius||12)*.35))continue;
       if(v.air&&!v.kind&&!v.building)continue;
       damage(g,v,z.damage,z.owner,{spell:true,giantSkeletonBomb:true});
     }
@@ -878,7 +955,7 @@ function heal(g,t,amount,owner){
 function healOnHitPulse(g,sourceId){
   if(!sourceId)return 0;
   const u=g.units.find(q=>q.id===sourceId&&q.hp>0);if(!u||!u.healOnHit)return 0;
-  const amount=u.healOnHit,range=u.healOnHitRange||120,maxAllies=Math.max(0,u.healOnHitMaxAllies??3);
+  const amount=u.healOnHit,range=u.healOnHitRange||cellsToWorld(4),maxAllies=Math.max(0,u.healOnHitMaxAllies??3);
   let healed=heal(g,u,amount,u.owner)>0?1:0;
   const allies=g.units.filter(t=>t.id!==u.id&&t.owner===u.owner&&t.hp>0&&!t.kind&&!t.building&&!t.eggUnit&&t.hp<t.maxHp&&distance(u,t)<=range+(t.radius||12));
   allies.sort((a,b)=>(b.maxHp-b.hp)-(a.maxHp-a.hp)||a.hp/a.maxHp-b.hp/b.maxHp||String(a.id).localeCompare(String(b.id)));
@@ -1112,7 +1189,7 @@ function winCheck(g){
   const scores=[towerScore(g,0),towerScore(g,1)];
   if(g.time>=ARENA.duration-1e-7&&!g.overtime){
     if(scores[0]!==scores[1]){finish(g,scores[0]>scores[1]?0:1,'制限時間・タワー破壊数');return;}
-    g.overtime=true;event(g,'overtime',{x:360,y:520});
+    g.overtime=true;event(g,'overtime',{x:ARENA.midX,y:ARENA.height/2});
   }
   if(g.overtime&&scores[0]!==scores[1]){finish(g,scores[0]>scores[1]?0:1,'延長戦・先にタワーを破壊');return;}
   if(g.time>=ARENA.duration+ARENA.overtime-1e-7){
@@ -1123,7 +1200,7 @@ function winCheck(g){
 export function runBot(g,owner=1){
   const p=g.players[owner],aff=p.hand.filter(id=>UNITS[id].cost<=p.energy);
   if(!aff.length)return;
-  const enemies=g.units.filter(u=>u.owner!==owner&&u.hp>0),threat=enemies.filter(u=>(owner===1?u.y<450:u.y>590)).sort((a,b)=>distance(a,{x:360,y:owner===1?150:890})-distance(b,{x:360,y:owner===1?150:890}))[0];
+  const enemies=g.units.filter(u=>u.owner!==owner&&u.hp>0),threat=enemies.filter(u=>(owner===1?u.y<ARENA.riverTop-ARENA.cellSize:u.y>ARENA.riverBottom+ARENA.cellSize)).sort((a,b)=>distance(a,{x:ARENA.midX,y:owner===1?ARENA.cellSize*3:ARENA.height-ARENA.cellSize*3})-distance(b,{x:ARENA.midX,y:owner===1?ARENA.cellSize*3:ARENA.height-ARENA.cellSize*3}))[0];
   if(threat){
     const fireCluster=enemies.filter(u=>distance(u,threat)<=UNITS.fireball.radius+u.radius).length;
     const arrowCluster=enemies.filter(u=>distance(u,threat)<=UNITS.arrowrain.radius+u.radius).length;
@@ -1146,11 +1223,11 @@ export function runBot(g,owner=1){
   if(!threat&&id==='cannon'&&choices.length>1)id=choices.find(k=>k!=='cannon')||id;
   if(id==='tigger'){
     const target=g.towers.filter(t=>t.owner!==owner&&t.hp>0).sort((a,b)=>(a.kind==='core')-(b.kind==='core')||a.hp-b.hp)[0];
-    if(target){const y=clamp(target.y+(owner===1?-1:1)*(target.radius+34),60,980),x=clamp(target.x+(random(g)-.5)*70,55,665);if(deploy(g,owner,id,x,y).ok)return;}
+    if(target){const y=clampInsideArena(target.y+(owner===1?-1:1)*(target.radius+ARENA.cellSize),'y',UNITS[id]),x=clampInsideArena(target.x+(random(g)-.5)*ARENA.cellSize*1.75,'x',UNITS[id]);if(deploy(g,owner,id,x,y).ok)return;}
   }
-  const lane=threat?(threat.x<360?190:530):(random(g)<.5?190:530),baseY=owner===1?(threat?360:145):(threat?680:895);
+  const lane=threat?(threat.x<ARENA.midX?ARENA.lanes[0]:ARENA.lanes[1]):(random(g)<.5?ARENA.lanes[0]:ARENA.lanes[1]),baseY=owner===1?(threat?ARENA.riverTop-ARENA.cellSize*3:ARENA.cellSize*4):(threat?ARENA.riverBottom+ARENA.cellSize*3:ARENA.height-ARENA.cellSize*4);
   for(let i=0;i<8;i++){
-    const x=clamp(lane+(random(g)-.5)*110,65,655),y=clamp(baseY+(random(g)-.5)*100,65,975);
+    const x=clampInsideArena(lane+(random(g)-.5)*ARENA.cellSize*3,'x',UNITS[id]),y=clampInsideArena(baseY+(random(g)-.5)*ARENA.cellSize*2.5,'y',UNITS[id]);
     if(deploy(g,owner,id,x,y).ok)break;
   }
 }
@@ -1206,28 +1283,29 @@ export function tick(g,dt=ARENA.tick){
     const target=getTarget(g,u,entities);
     if(!target){if(u.laserTower||u.laserUnit)resetLaserTower(u);if(u.drillUnit)resetDrill(u);if(u.crusherRamp)resetCrusher(u);resetFirstStrike(u);u.target=null;continue;}
     u.target=target.id;
-    if(u.iceSpirit&&distance(u,target)<=((u.iceLeapRange||70)+(target.radius||0))){beginIceSpiritLeap(g,u,target);continue;}
-    if(u.fireSpirit&&distance(u,target)<=((u.fireLeapRange||70)+(target.radius||0))){beginFireSpiritLeap(g,u,target);continue;}
+    if(u.iceSpirit&&distance(u,target)<=((u.iceLeapRange||cellsToWorld(2))+(target.radius||0))){beginIceSpiritLeap(g,u,target);continue;}
+    if(u.fireSpirit&&distance(u,target)<=((u.fireLeapRange||cellsToWorld(2))+(target.radius||0))){beginFireSpiritLeap(g,u,target);continue;}
     if(beginBoarRiverJump(g,u,target))continue;
-    const reach=u.range+target.radius;
+    const reach=u.range;
+    const attackGap=targetGap(u,target);
     if(u.megaKnight&&megaJumpReady(u,target)){beginMegaJumpWindup(g,u,target);continue;}
-    if(u.crusherRamp&&u.crusherTarget&&(u.crusherTarget!==target.id||distance(u,target)>reach))resetCrusher(u);
+    if(u.crusherRamp&&u.crusherTarget&&(u.crusherTarget!==target.id||attackGap>reach))resetCrusher(u);
     if(u.drillUnit){
-      if(distance(u,target)<=reach){
+      if(attackGap<=reach){
         faceToward(u,target.x,target.y);if(u.drillTarget&&u.drillTarget!==target.id)resetDrill(u);
         if(firstStrikeReady(g,u,target))updateDrill(g,u,target,dt);
       }else {resetFirstStrike(u);resetDrill(u);move(g,u,target,dt);}
       continue;
     }
     if(u.laserTower||u.laserUnit){
-      if(distance(u,target)<=reach){
+      if(attackGap<=reach){
         faceToward(u,target.x,target.y);if(u.laserTarget&&u.laserTarget!==target.id)resetLaserTower(u);
         if(firstStrikeReady(g,u,target))updateLaserTower(g,u,target,dt);
       }else {resetFirstStrike(u);resetLaserTower(u);if(u.laserUnit&&!u.kind&&!u.building)move(g,u,target,dt);}
       continue;
     }
     if(canShadowRush(g,u,target)){beginShadowWindup(g,u,target);continue;}
-    if(distance(u,target)<=reach){
+    if(attackGap<=reach){
       faceToward(u,target.x,target.y);
       // Start the short first-strike preparation as soon as a new target is in range.
       // It runs in parallel with any remaining ordinary attack cooldown so target changes
@@ -1260,10 +1338,10 @@ export function tick(g,dt=ARENA.tick){
 const rnd=v=>Math.round(v*100)/100;
 export function viewMatch(g,seat=0){
   const p=g.players[seat];
-  return {physicsVersion:PHYSICS_VERSION,phase:g.phase,countdown:g.countdown,time:rnd(g.time),overtime:g.overtime,winner:g.winner,reason:g.reason,
+  return {physicsVersion:PHYSICS_VERSION,mapTheme:g.mapTheme||'grass',phase:g.phase,countdown:g.countdown,time:rnd(g.time),overtime:g.overtime,winner:g.winner,reason:g.reason,
     scores:[towerScore(g,0),towerScore(g,1)],energy:rnd(p.energy),hand:[...p.hand],next:p.queue[0],deck:[...p.deck],
     units:g.units.map(u=>({id:u.id,type:u.type,owner:u.owner,x:rnd(u.x),y:rnd(u.y),hp:u.hp,maxHp:u.maxHp,radius:u.radius,air:u.air,building:!!u.building,anim:u.anim,hit:u.hit,walk:u.walk,spawn:u.spawn,face:u.face,facing:u.facing,moving:!!u.moving,mass:u.mass,age:u.age,target:u.target||null,firstStrikeRemaining:rnd(Math.max(0,(u.firstStrikeReadyAt||0)-g.time)),targetable:u.targetable!==false,deploying:!!u.deploying,deployTotal:rnd(u.deployTotal||0),deployRemaining:rnd(u.deployRemaining||0),collisionDisabled:!!u.collisionDisabled,laserStage:u.laserStage||0,laserDps:rnd(u.laserDps||0),laserLockTime:rnd(u.laserLockTime||0),charged:!!u.charged,chargeRun:rnd(u.chargeRun||0),ramChargeProgress:rnd(clamp((u.ramChargeTime||0)/Math.max(.01,u.ramChargeAfter||2),0,1)),sparkCharged:!!u.sparkCharged,sparkChargeProgress:rnd(u.sparkChargeProgress||0),stunned:(u.stunUntil||0)>g.time,stunRemaining:rnd(Math.max(0,(u.stunUntil||0)-g.time)),slowed:(u.slowUntil||0)>g.time,slowStage:(u.slowUntil||0)>g.time?(u.slowStage||1):0,slowRemaining:rnd(Math.max(0,(u.slowUntil||0)-g.time)),poisoned:(u.poisonUntil||0)>g.time,poisonOwner:Number.isFinite(u.poisonOwner)?u.poisonOwner:null,poisonRemaining:rnd(Math.max(0,(u.poisonUntil||0)-g.time)),mudded:(u.mudUntil||0)>g.time,mudRemaining:rnd(Math.max(0,(u.mudUntil||0)-g.time)),burrowState:u.burrowState||null,burrowProgress:rnd(u.burrowProgress||0),summonType:u.summonType||null,summonCount:u.summonCount||0,summonRemaining:u.summonInterval?rnd(Math.max(0,(u.summonNextAt||g.time)-g.time)):0,summonCasting:(u.summonCastingUntil||0)>g.time,summonWindupRemaining:rnd(Math.max(0,(u.summonCastingUntil||0)-g.time)),dashState:u.dashState||null,dashWindupRemaining:rnd(Math.max(0,(u.dashWindupUntil||0)-g.time)),dashCooldownRemaining:rnd(Math.max(0,(u.dashReadyAt||0)-g.time)),invulnerable:(u.invulnerableUntil||0)>g.time,shieldHp:rnd(u.shieldHp||0),maxShieldHp:rnd(u.maxShieldHp||0),stealthed:!!u.stealthed,stealthRemaining:rnd(Math.max(0,(u.stealthUntil||0)-g.time)),eggHatchRemaining:u.eggUnit?rnd(Math.max(0,(u.eggHatchAt||g.time)-g.time)):0,revived:!!u.revived,drillStage:u.drillStage||0,drillDps:rnd(u.drillDps||0),drillLockTime:rnd(u.drillLockTime||0),crusherStage:u.crusherStage||0,iceSpiritState:u.iceSpiritState||null,iceSpiritProgress:rnd(u.iceSpiritProgress||0),fireSpiritState:u.fireSpiritState||null,fireSpiritProgress:rnd(u.fireSpiritProgress||0),megaJumpState:u.megaJumpState||null,megaJumpProgress:rnd(u.megaJumpProgress||0),megaJumpWindupRemaining:rnd(Math.max(0,(u.megaJumpWindupUntil||0)-g.time)),megaJumpTargetX:Number.isFinite(u.megaJumpTargetX)?rnd(u.megaJumpTargetX):null,megaJumpTargetY:Number.isFinite(u.megaJumpTargetY)?rnd(u.megaJumpTargetY):null,megaJumpStartX:Number.isFinite(u.megaJumpStartX)?rnd(u.megaJumpStartX):null,megaJumpStartY:Number.isFinite(u.megaJumpStartY)?rnd(u.megaJumpStartY):null,megaJumpEndX:Number.isFinite(u.megaJumpEndX)?rnd(u.megaJumpEndX):null,megaJumpEndY:Number.isFinite(u.megaJumpEndY)?rnd(u.megaJumpEndY):null,jumpRadius:u.jumpRadius||0,riverJumpMode:u.riverJumpMode||null,riverJumpState:u.riverJumpState||null,riverJumpProgress:rnd(u.riverJumpProgress||0),riverJumpEndX:Number.isFinite(u.riverJumpEndX)?rnd(u.riverJumpEndX):null,riverJumpEndY:Number.isFinite(u.riverJumpEndY)?rnd(u.riverJumpEndY):null,ironSpinUsed:!!u.ironSpinUsed,ironSpinState:u.ironSpinState||null,ironSpinProgress:rnd(u.ironSpinProgress||0),ironSpinEndX:Number.isFinite(u.ironSpinEndX)?rnd(u.ironSpinEndX):null,ironSpinEndY:Number.isFinite(u.ironSpinEndY)?rnd(u.ironSpinEndY):null,ironMarked:!!u.ironMarked,ironMarkOwner:Number.isFinite(u.ironMarkOwner)?u.ironMarkOwner:null,ironMarkProgress:u.ironMarked?rnd(clamp((u.ironMarkDamage||0)/Math.max(1,u.ironMarkThreshold||500),0,1)):0,hookState:u.hookState||null,hookProgress:rnd(u.hookProgress||0),hookCooldownRemaining:rnd(Math.max(0,(u.hookReadyAt||0)-g.time)),hookTargetX:Number.isFinite(u.hookTargetX)?rnd(u.hookTargetX):null,hookTargetY:Number.isFinite(u.hookTargetY)?rnd(u.hookTargetY):null,hookAirAttackRemaining:rnd(Math.max(0,(u.hookAirAttackUntil||0)-g.time)),turtleShellActive:!!(u.siegeTurtle&&u.moving)})),
-    towers:g.towers.map(t=>({id:t.id,kind:t.kind,owner:t.owner,x:t.x,y:t.y,hp:t.hp,maxHp:t.maxHp,radius:t.radius,anim:t.anim,hit:t.hit,facing:t.facing,awake:t.kind==='core'?!!t.awake:true,stunned:(t.stunUntil||0)>g.time,stunRemaining:rnd(Math.max(0,(t.stunUntil||0)-g.time))})),
+    towers:g.towers.map(t=>({id:t.id,kind:t.kind,slot:t.slot||null,owner:t.owner,x:t.x,y:t.y,hp:t.hp,maxHp:t.maxHp,radius:t.radius,footprintCols:t.footprintCols||0,footprintRows:t.footprintRows||0,rangeCells:t.rangeCells||0,anim:t.anim,hit:t.hit,facing:t.facing,awake:t.kind==='core'?!!t.awake:true,stunned:(t.stunUntil||0)>g.time,stunRemaining:rnd(Math.max(0,(t.stunUntil||0)-g.time))})),
     projectiles:g.projectiles.map(p=>({id:p.id,owner:p.owner,x:rnd(p.x),y:rnd(p.y),tx:rnd(p.tx),ty:rnd(p.ty),kind:p.kind,spell:p.spell||null,progress:rnd(p.progress||0),radius:p.splash||0})),
     zones:(g.zones||[]).map(z=>({id:z.id,owner:z.owner,kind:z.kind,spell:z.spell,x:rnd(z.x),y:rnd(z.y),radius:z.radius,remaining:rnd(z.remaining),total:z.total,active:z.kind==='skeletonrush'?g.time+1e-8>=z.activateAt:true,activationRemaining:z.kind==='skeletonrush'?rnd(Math.max(0,z.activateAt-g.time)):0,detonateRemaining:z.kind==='giantskeletonbomb'?rnd(Math.max(0,z.detonateAt-g.time)):0})),
     events:g.events.map(e=>({...e})),bot:g.bot,difficulty:g.difficulty};
