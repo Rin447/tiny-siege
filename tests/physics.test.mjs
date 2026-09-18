@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {ARENA,TOWER_GRID,GRID_COLS,GRID_ROWS,GRID_CELL,UNITS,DECK,VERSION,VISION_BY_SIZE,visionSizeFor,visionRangeFor} from '../public/game/units.js';
 import {createMatch,tick,deploy,canPlace,viewMatch,distance,runBot} from '../public/game/engine.js';
-import {staticFree,terrainFree,staticLineFree,resolveBodies,pairDistance,bodyRadius,footprintRect,moveBody,navigationWaypoint,faceToward,PHYSICS_VERSION,solidStructures} from '../public/game/physics.js';
+import {staticFree,terrainFree,staticLineFree,resolveBodies,pairDistance,bodyRadius,footprintRect,hitboxRect,moveBody,navigationWaypoint,faceToward,PHYSICS_VERSION,solidStructures} from '../public/game/physics.js';
 import {visualFacing,renderOrder} from '../public/game/art.js';
 import {RoomModel,newRoom} from '../src/room-model.js';
 function game(){const g=createMatch({seed:719});g.phase='battle';for(const t of g.towers)t.damage=0;return g;}
@@ -12,10 +12,10 @@ function advance(g,n){for(let i=0;i<n;i++)tick(g,.1);}
 function body(g,type,owner,x,y){const u={...UNITS[type],id:`u${g.nextId++}`,type,owner,x,y,maxHp:UNITS[type].hp,spawn:0,cd:999,walk:0,age:0,anim:0,hit:0,lane:x<ARENA.midX?ARENA.lanes[0]:ARENA.lanes[1],face:owner===0?-1:1};g.units.push(u);return u;}
 function checkStatics(g){for(const u of g.units)if(!u.building&&u.burrowState!=='burrow')assert.ok(staticFree(g,u,u),`${u.id} ${u.type} in static at ${u.x},${u.y}`);}
 
-test('v37.2 physics version and 18x32 grid geometry are explicit',()=>{
- assert.equal(VERSION,'37.2.0');assert.equal(PHYSICS_VERSION,63);assert.equal(GRID_COLS,18);assert.equal(GRID_ROWS,32);assert.equal(GRID_CELL,40);
+test('v37.3 physics version and 18x32 grid geometry are explicit',()=>{
+ assert.equal(VERSION,'38.0.0');assert.equal(PHYSICS_VERSION,72);assert.equal(GRID_COLS,18);assert.equal(GRID_ROWS,32);assert.equal(GRID_CELL,40);
  assert.equal(ARENA.width,720);assert.equal(ARENA.height,1280);assert.deepEqual(ARENA.riverRows,[16,17]);assert.deepEqual(TOWER_GRID.blue.core,[8,11,2,5]);
- assert.equal(createMatch().physicsVersion,63);
+ assert.equal(createMatch().physicsVersion,72);
 });
 
 test('vision classes are cell based: small 4, medium 5, large 6',()=>{
@@ -72,6 +72,33 @@ test('default placed building occupies a real 3x3-cell rectangular footprint',()
  const g=game(),c=unit(g,'cannon',0,300,860),r=footprintRect(c);assert.deepEqual([r.l,r.r,r.t,r.b],[240,360,800,920]);
  card(g,'cannon',0);assert.ok(canPlace(g,0,'cannon',300,860),'overlapping footprint must be rejected');
 });
+
+test('v37.5 placement footprint and physical structure hitbox are separate',()=>{
+ const g=game(),c=unit(g,'cannon',0,300,860),fp=footprintRect(c),hb=hitboxRect(c);
+ assert.deepEqual([fp.r-fp.l,fp.b-fp.t],[120,120]);
+ assert.equal(c.footprintCells,'3x3');assert.ok(c.hitboxCols<3&&c.hitboxRows<3);
+ assert.ok(hb.r-hb.l<fp.r-fp.l);assert.ok(hb.b-hb.t<fp.b-fp.t);
+ assert.equal(UNITS.cannon.rangeCells,6.5,'range value is unchanged');
+});
+
+test('v37.6.0 towers keep layout metadata but no longer reserve 3x3/4x4 land during building placement',()=>{
+ const g=game(),side=g.towers.find(t=>t.owner===0&&t.slot==='left'),core=g.towers.find(t=>t.owner===0&&t.kind==='core');
+ const sideFp=footprintRect(side),sideHb=hitboxRect(side),coreFp=footprintRect(core),coreHb=hitboxRect(core);
+ assert.deepEqual([side.footprintCols,side.footprintRows],[3,3]);assert.deepEqual([core.footprintCols,core.footprintRows],[4,4]);
+ assert.equal(side.placementFootprint,false);assert.equal(core.placementFootprint,false);
+ assert.ok(sideHb.r-sideHb.l<sideFp.r-sideFp.l);assert.ok(coreHb.r-coreHb.l<coreFp.r-coreFp.l);
+ card(g,'cannon',0);assert.equal(canPlace(g,0,'cannon',248,1020),null,'3x3 building may enter old tower reservation when its own 3x3 area clears the tower body hitbox');
+ assert.equal(side.rangeCells,7);assert.equal(core.rangeCells,7);
+});
+
+test('v37.6.0 buildings snap to grid centres and still require a full 3x3 clear placement area',()=>{
+ const g=game();card(g,'cannon',0);const x=317,y=843,r=deploy(g,0,'cannon',x,y);assert.ok(r.ok,r.error);
+ const c=g.units.find(u=>u.type==='cannon');assert.equal(c.x,300);assert.equal(c.y,860,'building snaps to the containing 40px grid-cell centre');
+ const fp=footprintRect(c);assert.equal(fp.r-fp.l,120);assert.equal(fp.b-fp.t,120);
+ card(g,'oven',0);assert.ok(canPlace(g,0,'oven',419,843),'same/adjacent snapped 3x3 placement reservation remains invalid even when building bodies would fit');
+ card(g,'oven',0);assert.equal(canPlace(g,0,'oven',460,843),null,'placement becomes valid once the snapped 3x3 reservation clears');
+});
+
 test('five-air-unit group deploys legally without overlap on the new field',()=>{
  const g=game();card(g,'bat',0);assert.ok(deploy(g,0,'bat',80,800).ok);assert.equal(g.units.length,5);checkStatics(g);
  for(const a of g.units)for(const b of g.units)if(a!==b)assert.ok(distance(a,b)>=pairDistance(a,b)-.01);
@@ -148,7 +175,7 @@ test('rendering depth mixes towers and ground troops; air is always after ground
  assert.deepEqual(renderOrder(g,1).map(x=>x.entity.id),['front','tower','rear','air']);
 });
 test('server snapshots expose facing/mass/layer but not pathfinding internals',()=>{
- const g=game(),u=unit(g,'knight',0,190,930);advance(g,15);const snap=viewMatch(g,0);assert.equal(snap.physicsVersion,63);
+ const g=game(),u=unit(g,'knight',0,190,930);advance(g,15);const snap=viewMatch(g,0);assert.equal(snap.physicsVersion,72);
  assert.equal(snap.units[0].mass,6);assert.equal(typeof snap.units[0].facing,'number');assert.ok(!('_nav' in snap.units[0]));
 });
 test('legacy active matches terminate safely instead of resuming inside new obstacles',()=>{

@@ -1,4 +1,9 @@
-# TINY SIEGE v37.2.0 architecture
+# TINY SIEGE architecture
+
+- Current release: v38.0.0 / physicsVersion 72 / 73 cards (65 units/buildings + 8 spells).
+- v38 adds authoritative delayed Air Balloon death bombs and Lumberjack death-triggered Rage zones; the 18x32 arena geometry remains unchanged.
+
+## v37.2 grid architecture baseline
 
 - Authoritative arena: 18 columns x 32 rows, 40 world units per cell (720 x 1280 world units).
 - Blue coordinates count from the bottom in design documents. Runtime world Y is top-down and is converted by the grid helpers in `public/game/units.js`.

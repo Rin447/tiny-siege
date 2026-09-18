@@ -177,6 +177,14 @@ test('v34 Ice Spirit has snowball limb art and leap progress rendering',()=>{
 });
 
 
+
+test('v37.4 Princess uses compact two-head art and Barbarians render smaller in battle',()=>{
+ const art=fs.readFileSync(new URL('../public/game/art.js',import.meta.url),'utf8');
+ const p0=art.indexOf('function drawPrincessArcher');const p1=art.indexOf('function drawSparky',p0);const princess=art.slice(p0,p1);
+ assert.ok(p0>0);assert.match(princess,/Compact two-head-tall silhouette/);assert.match(princess,/Large head makes the in-battle model/);
+ assert.match(art,/u\.type==='barbarian'\?\.84/);assert.match(art,/u\.type==='princess'\?\.82/);
+});
+
 test('v35 Fire Spirit has magma limb art and leap progress rendering',()=>{
  const art=fs.readFileSync(new URL('../public/game/art.js',import.meta.url),'utf8');
  const start=art.indexOf('function drawFireSpirit');const end=art.indexOf('function drawShieldKnight',start);const fire=art.slice(start,end);
@@ -190,9 +198,25 @@ test('v35 Oven has a square stove, oversized pot, and dedicated dispatch',()=>{
 });
 
 
-test('v36 Barbarians have dedicated bare-chested gold-hair art and Siege Barbarian has a wooden charged ram',()=>{
+test('v37.4 Barbarians stay gold-haired while Siege Barbarian carries an overhead reinforced log',()=>{
  const art=fs.readFileSync(new URL('../public/game/art.js',import.meta.url),'utf8');
  const b0=art.indexOf('function drawBarbarian');const b1=art.indexOf('function drawSiegeBarbarian',b0);const barb=art.slice(b0,b1);const s0=b1,s1=art.indexOf('function drawOven',s0);const ram=art.slice(s0,s1);
  assert.ok(b0>0&&s0>0);assert.match(barb,/Big bare-chested veteran/);assert.match(barb,/hair='#f2c84e'/);assert.match(barb,/Gold hair and huge moustache\/beard/);
- assert.match(ram,/Two barbarians are visibly tucked inside a hollow wooden ram/);assert.match(ram,/const charged=!!opts\.charged/);assert.match(art,/type==='barbarian'\|\|type==='barbarians'\)\{drawBarbarian/);assert.match(art,/type==='siegebarbarian'\)\{drawSiegeBarbarian/);
+ assert.match(ram,/Two barbarians carry one huge reinforced log overhead/);assert.match(ram,/feet and legs visibly/);assert.match(ram,/const charged=!!opts\.charged/);assert.match(art,/type==='barbarian'\|\|type==='barbarians'\)\{drawBarbarian/);assert.match(art,/type==='siegebarbarian'\)\{drawSiegeBarbarian/);
+});
+
+test('v37.5 placed buildings render at footprint-scale while gameplay keeps separate hitboxes',()=>{
+ const units=fs.readFileSync(new URL('../public/game/units.js',import.meta.url),'utf8');
+ const art=fs.readFileSync(new URL('../public/game/art.js',import.meta.url),'utf8');
+ assert.match(units,/cannon:Object\.freeze\(\{visualScale:1\.90,hitboxCols:2\.20,hitboxRows:1\.90\}\)/);
+ assert.match(units,/oven:Object\.freeze\(\{visualScale:1\.62,hitboxCols:2\.35,hitboxRows:2\.30\}\)/);
+ assert.match(art,/UNITS\.cannon\.visualScale/);assert.match(art,/UNITS\.tombstone\.visualScale/);assert.match(art,/d\.building\?\.9\*\(d\.visualScale\|\|1\):\.9/);
+});
+
+
+test('v38 Air Balloon and Lumberjack use dedicated procedural art and battle dispatch',()=>{
+ const art=fs.readFileSync(new URL('../public/game/art.js',import.meta.url),'utf8');
+ const b0=art.indexOf('function drawAirBalloon');const b1=art.indexOf('function drawLumberjack',b0);const balloon=art.slice(b0,b1);const l0=b1,l1=art.indexOf('function drawGiantSkeleton',l0);const lumber=art.slice(l0,l1);
+ assert.ok(b0>0&&l0>0);assert.match(balloon,/owner===0/);assert.match(balloon,/#4f9dff/);assert.match(balloon,/#ff5f68/);assert.match(balloon,/Skeleton pilot/);assert.match(balloon,/Large dropped bomb/);
+ assert.match(lumber,/Rage bottle/);assert.match(lumber,/hair='#d8a83f'/);assert.match(lumber,/rage='#e24fab'/);assert.match(art,/type==='airballoon'\)\{drawAirBalloon/);assert.match(art,/type==='lumberjack'\)\{drawLumberjack/);assert.match(art,/p\.kind==='airballoon_bomb'/);
 });

@@ -1,4 +1,4 @@
-TINY SIEGE v37.2.0 - MAP VARIATION & TOWER RANGE UPDATE
+TINY SIEGE v38.0.0 - AIR BALLOON / LUMBERJACK UPDATE
 
 1) すぐCPU戦: START-PRACTICE-WINDOWS.bat または PLAY-OFFLINE.html
 2) ローカル対戦: START-LOCAL-WINDOWS.bat
@@ -8,10 +8,25 @@ CHECK
 - Arena: 18 columns x 32 rows / 1 cell = 40 world units.
 - River: Y16-17 (grid hidden) / bridges: X3-5 (center X4) and X14-16 (center X15), two cells wide.
 - Blue side towers: X3-5,Y6-8 / X14-16,Y6-8. Blue core: X8-11,Y2-5. Red side is mirrored.
-- Side towers are 3x3, core is 4x4, ordinary placed buildings are 3x3.
+- Side/core tower layout cells are visual/map layout only and do not reserve placement land. Ordinary player buildings require a 3x3 clearance area and snap to a grid-cell centre.
 - Archer attack range is the 5-cell reference. Vision: small 4 / medium 5 / large 6 cells.
-- Structure range uses the nearest footprint edge, not the structure centre.
-- 66 cards / 59 units / 7 spells / physicsVersion 63.
+- Structure collision / target distance uses the physical building body HitBox, separate from the placement footprint.
+- 73 cards / 65 units/buildings / 8 spells / physicsVersion 72.
 
-- Tower attack range: 7 cells measured from the outer edge of the 3x3/4x4 tower footprint.
+- Tower attack range: numeric range remains 7 cells; distance is measured from the physical tower-body HitBox edge.
 - Visual map themes: grass / stone / lava / snow / desert.
+
+- Outer decoration: rendered outside the 18x32 rules arena; no collision/placement effect.
+- Legacy inner frame / perimeter grid outline removed.
+
+- Princess: HP261 / range 9 cells / vision 9 cells / compact two-head visual.
+- Barbarians: smaller battle art. Siege Barbarian: overhead reinforced log carried by two barbarians.
+
+- v37.6.0 combat/spell: Laser Tower starts at 42 DPS with visible continuous beam and 0.2s damage ticks; Fireball is R2.5 with 1.26s warning + core flight and radial 1-cell knockback on small/medium units; Arrow Rain is R3.5 with 1.1s warning and visible core-to-target flight; Elixir Pump is 6 cost / HP1070 / +1 energy every 13s / 11.5 HP decay per second / +1 on destruction.
+- Current totals: 73 cards (65 units/buildings + 8 spells), physicsVersion 72.
+- v38.0.0: Air Balloon (5 cost, building-only flying attacker, delayed 240 death bomb) and Lumberjack (4 cost, very-fast melee, death Rage).
+
+- v37.6.0 building placement: player buildings snap to 40px grid-cell centres and show a 3x3 clearance preview. Side/core tower 3x3/4x4 layout areas no longer block placement; only tower body hitboxes do.
+- v37.5 building visuals: ordinary 3x3 placed buildings are enlarged to match their reserved land, while physical collision remains limited to the visible building body.
+
+- Laser Tower: HP2000 / natural decay 60 per second / damage ticks every 0.2s / ramp remains x2 every 1s.

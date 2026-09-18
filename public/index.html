@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#182f39">
-<title>TINY SIEGE — 66枚から8枚を選ぶ小さな攻城戦</title>
+<title>TINY SIEGE — 67枚から8枚を選ぶ小さな攻城戦</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/styles.css">
 </head>
@@ -87,7 +87,7 @@
   <aside class="battle-sidebar">
     <div class="eyebrow">THE CROSSING / ARENA 01</div><h2>橋を越えて、<br>本拠地へ。</h2>
     <div id="matchType" class="battle-tag">CPU PRACTICE</div>
-    <div class="field-instructions"><span>1</span><p>下のカードを選ぶ</p><span>2</span><p>自分の陣地をタップ</p><span>3</span><p>仲間が自動で攻撃！</p></div>
+    <div class="field-instructions"><span>1</span><p>下のカードを選ぶ</p><span>2</span><p>押したまま位置を調整</p><span>3</span><p>指を離して配置確定！</p></div>
     <div class="tip-panel"><small>TACTICAL NOTE</small><p id="tacticalTip">衛士の後ろに弓兵。前衛と後衛を組み合わせよう。</p></div>
     <button id="surrenderBtn" class="textbtn">この対戦を終了 / 降参</button>
     <p class="muted keyboard-note">1〜4：カード選択<br>Esc：選択解除<br>ドラッグ配置にも対応</p>
@@ -95,7 +95,8 @@
   <section class="play-column">
     <div class="scorebar"><div><span class="team-dot enemy"></span><strong id="enemyName">CPU</strong><span id="enemyScore">0</span></div><div id="clock" class="clock">3:00</div><span id="energyMode" class="energy-mode">×1</span></div>
     <div class="arena-wrap">
-      <canvas id="arenaCanvas" width="720" height="1280" aria-label="対戦フィールド。カードを選び、自分の陣地をタップして配置" tabindex="0"></canvas>
+      <canvas id="arenaDecorCanvas" class="arena-decor" aria-hidden="true"></canvas>
+      <canvas id="arenaCanvas" width="720" height="1280" aria-label="対戦フィールド。カードを選び、押したまま位置を調整して指を離すと配置" tabindex="0"></canvas>
       <div id="countdownOverlay" class="arena-overlay countdown" hidden><small>GET READY</small><strong id="countdownNum">3</strong><span>カードを選んで、陣地に配置</span></div>
       <div id="pausedOverlay" class="arena-overlay paused" hidden><span class="spinner"></span><h3 id="pausedTitle">再接続を待っています</h3><p id="pausedText"></p></div>
       <div id="resultOverlay" class="arena-overlay result" hidden><small id="resultLabel">VICTORY</small><strong id="resultTitle">勝利！</strong><p id="resultReason"></p><div id="resultStats"></div><button id="rematchBtn" class="btn primary">もう一度対戦</button><button id="backHomeBtn" class="textbtn">ホームへ戻る</button></div>
@@ -114,7 +115,7 @@
     <div class="match-rules"><h4>この一戦のルール</h4><p>本拠地を壊せば即勝利。3分で同数なら延長戦。延長後も同数なら残りタワーHPで決着。</p><p>残り1分からエナジー回復が2倍。切り札を重ねて攻めよう。</p></div>
   </aside>
 </main>
-<footer id="footer"><span>ひとつのURLから、小さな戦場へ。</span><span>TINY SIEGE <i>/</i> v37.2.0 · MAP VARIATION & TOWER RANGE UPDATE</span></footer>
+<footer id="footer"><span>ひとつのURLから、小さな戦場へ。</span><span>TINY SIEGE <i>/</i> v38.0.0 · AIR BALLOON / LUMBERJACK UPDATE</span></footer>
 
 <div id="toast" class="toast" role="status" hidden></div>
 <dialog id="deckModal" class="deck-modal">
@@ -161,7 +162,7 @@
 <dialog id="helpModal"><div class="modal-head"><div><span class="eyebrow">HOW TO PLAY</span><h2>3分でわかる、攻城戦。</h2></div><button class="close-modal iconbtn" aria-label="閉じる">×</button></div>
   <div class="help-steps">
     <section><b>01</b><div><h3>まずはCPU戦から</h3><p>名前を入れて「CPUと対戦する」。オンラインはルームを作り、URLと6桁PASSを友だちへ共有します。</p></div></section>
-    <section><b>02</b><div><h3>カード → 自分の陣地</h3><p>手札4枚から1枚を選び、画面下側の自陣にタップで配置。カードをフィールドへドラッグしてもOK。ユニットは自動で移動・攻撃します。砲台などの設置物も1回タップで位置が確定し、その場で建設ゲージが始まります。</p></div></section>
+    <section><b>02</b><div><h3>カード → 自分の陣地</h3><p>手札4枚から1枚を選び、戦場を押したまま位置を調整して指・マウスを離すと配置確定。カードをフィールドへ直接ドラッグして離してもOK。戦場外へ戻して離すとキャンセルできます。通常ユニットと設置物は召喚・建設中から敵の攻撃を受けますが、完成するまでは移動・攻撃・能力発動を行いません。メガナイトの降下召喚だけは着地まで無敵です。</p></div></section>
     <section><b>03</b><div><h3>エナジーを使い分ける</h3><p>カード左上の数字が必要コスト。エナジーは最大10まで回復します。使ったカードは待機列へ入り、次の1枚が手札に補充されます。</p></div></section>
     <section><b>04</b><div><h3>60枚から8枚を選ぶ</h3><p>「デッキ」はPC・スマホとも3列表示。カードを押すと「デッキに入れる / 外す」と「詳細を見る」を選べます。詳細では本番と同じ戦闘エンジンのLIVE BATTLE DEMOを確認でき、気に入った8枚はマイリストへ最大10個保存できます。</p></div></section>
     <section><b>05</b><div><h3>本拠地は最初は休眠</h3><p>中央本拠地は4560HP・攻撃85、左右タワーは各3200HP・攻撃105。中央は試合開始時は攻撃せず、左右どちらかのサイドタワーが壊れるか、中央自身が1度でもダメージを受けると起動して試合終了まで反撃します。本拠地を壊せば即勝利です。</p></div></section>

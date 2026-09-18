@@ -2,9 +2,9 @@ import {ARENA} from './units.js';
 
 /** Shared deterministic navigation and collision geometry. No browser APIs.
  * Ground bodies live on the lawn/bridges. Air bodies share a separate layer.
- * Buildings and towers use rectangular grid footprints; tree/grass artwork is decorative only.
+ * Structures separate their placement footprint from the smaller physical hitbox.
  */
-export const PHYSICS_VERSION=63;
+export const PHYSICS_VERSION=72;
 export const FIELD={left:0,right:ARENA.width,top:0,bottom:ARENA.height};
 const EPS=0.001,GRID=ARENA.cellSize/2,COLS=Math.floor(ARENA.width/GRID)+1,ROWS=Math.floor(ARENA.height/GRID)+1;
 const worldCaches=new WeakMap();
@@ -18,6 +18,14 @@ export const solidStructures=g=>[...g.towers,...g.units.filter(u=>u.building&&!u
 export function footprintRect(u,p=u){
   if(!(u?.kind||u?.building))return null;
   const cols=u.footprintCols||ARENA.defaultBuildingCells,rows=u.footprintRows||ARENA.defaultBuildingCells;
+  const hw=cols*ARENA.cellSize/2,hh=rows*ARENA.cellSize/2;
+  return {l:p.x-hw,r:p.x+hw,t:p.y-hh,b:p.y+hh,hw,hh};
+}
+export function hitboxRect(u,p=u){
+  if(!(u?.kind||u?.building))return null;
+  const fallbackCols=Math.max(.5,Math.min(u.footprintCols||ARENA.defaultBuildingCells,((u.radius||20)*2)/ARENA.cellSize));
+  const fallbackRows=Math.max(.5,Math.min(u.footprintRows||ARENA.defaultBuildingCells,((u.radius||20)*2)/ARENA.cellSize));
+  const cols=u.hitboxCols||fallbackCols,rows=u.hitboxRows||fallbackRows;
   const hw=cols*ARENA.cellSize/2,hh=rows*ARENA.cellSize/2;
   return {l:p.x-hw,r:p.x+hw,t:p.y-hh,b:p.y+hh,hw,hh};
 }
@@ -42,6 +50,7 @@ export const deploymentWater=(x,y)=>y>ARENA.riverTop&&y<ARENA.riverBottom&&!brid
  */
 export function snapDeploymentPoint(owner,u,x,y,{correctWater=false}={}){
   const p={x,y};if(owner!==0&&owner!==1)return p;
+  // v37.5.2: buildings snap to the nearest 40px grid-cell centre. The 3x3 footprint remains a required clear placement area.
   if(u?.building){
     p.x=(Math.floor(clampP(x,0,ARENA.width-EPS)/ARENA.cellSize)+.5)*ARENA.cellSize;
     p.y=(Math.floor(clampP(y,0,ARENA.height-EPS)/ARENA.cellSize)+.5)*ARENA.cellSize;
@@ -96,13 +105,19 @@ export function staticFree(g,u,p,margin=0,structures=null){
   if(u.building){
     if(!buildingFootprintTerrainFree(u,p,margin))return false;
     const own=footprintRect(u,p);
-    return blockers.every(s=>{if(s.id===u.id)return true;const sr=footprintRect(s);return sr?!rectsOverlap(own,sr,margin):pointRectDistance(s,own)>=bodyRadius(s)+margin-EPS;});
+    return blockers.every(s=>{
+      if(s.id===u.id)return true;
+      // Player-placed buildings keep their 3x3 placement reservation. Towers/core no longer reserve 3x3/4x4 land for placement;
+      // only their visible physical hitbox blocks a new building.
+      const sr=s.kind?hitboxRect(s):footprintRect(s);
+      return sr?!rectsOverlap(own,sr,margin):pointRectDistance(s,own)>=bodyRadius(s)+margin-EPS;
+    });
   }
   if(!terrainFree(u,p,margin))return false;
   if(u.air)return true;
   return blockers.every(s=>{
     if(s.id===u.id)return true;
-    const sr=footprintRect(s);return sr?pointRectDistance(p,sr)>=bodyRadius(u)+margin-EPS:dist(p,s)>=bodyRadius(u)+bodyRadius(s)+margin-EPS;
+    const sr=hitboxRect(s);return sr?pointRectDistance(p,sr)>=bodyRadius(u)+margin-EPS:dist(p,s)>=bodyRadius(u)+bodyRadius(s)+margin-EPS;
   });
 }
 function segmentPointDistance(a,b,p){
@@ -120,7 +135,7 @@ export function staticLineFree(g,u,a,b,margin=0,structures=null){
 
 function topology(g){
   const structures=solidStructures(g);
-  const key=structures.map(s=>`${s.id}:${s.x}:${s.y}:${s.radius}:${s.footprintCols||0}:${s.footprintRows||0}`).join('|');
+  const key=structures.map(s=>`${s.id}:${s.x}:${s.y}:${s.radius}:${s.footprintCols||0}:${s.footprintRows||0}:${s.hitboxCols||0}:${s.hitboxRows||0}`).join('|');
   let cache=worldCaches.get(g);
   if(!cache||cache.key!==key){cache={key,structures,grids:new Map()};worldCaches.set(g,cache);}
   return cache;
@@ -255,7 +270,7 @@ function projectStatic(g,u){
   for(let pass=0;pass<8;pass++){
     let changed=false;
     for(const s of solidStructures(g)){
-      const sr=footprintRect(s);
+      const sr=hitboxRect(s);
       if(sr){
         const d=pointRectDistance(u,sr);
         if(d<r+.02){

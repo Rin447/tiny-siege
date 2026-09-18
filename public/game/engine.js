@@ -1,4 +1,4 @@
-import {ARENA, TOWER_GRID, MAP_THEMES, gridRectCenter, cellsToWorld, UNITS, DECK, DEFAULT_DECK, MAX_DECK, normalizeDeck, summonDelayFor, visionRangeFor} from './units.js';
+import {ARENA, TOWER_GRID, MAP_THEMES, gridRectCenter, cellsToWorld, UNITS, DECK, DEFAULT_DECK, MAX_DECK, normalizeDeck, summonDelayFor, visionRangeFor, visionSizeFor} from './units.js';
 import {PHYSICS_VERSION, staticFree, staticLineFree, spawnPositions, navigationWaypoint, moveBody, displaceBody, resolveBodies, faceToward, deploymentAllowed, deploymentWater, snapDeploymentPoint} from './physics.js';
 
 export function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
@@ -25,7 +25,8 @@ export function createMatch({seed=12345,bot=false,difficulty='normal',decks=[DEF
     for(let i=0;i<specs.length;i++){
       const [slot,core]=specs[i],rect=layout[slot],pos=gridRectCenter(...rect),footprintCells=core?ARENA.coreTowerCells:ARENA.sideTowerCells;
       g.towers.push({id:`t${owner}${i}`,kind:core?'core':'tower',slot,owner,x:pos.x,y:pos.y,
-      footprintCols:footprintCells,footprintRows:footprintCells,footprintCells:`${footprintCells}x${footprintCells}`,
+      footprintCols:footprintCells,footprintRows:footprintCells,footprintCells:`${footprintCells}x${footprintCells}`,placementFootprint:false,
+      hitboxCols:core?2.7:2.1,hitboxRows:3.0,
       hp:core?4560:3200,maxHp:core?4560:3200,radius:core?40:32,rangeCells:7,range:cellsToWorld(7),damage:core?85:105,cd:0,
       cooldown:core?0.9:1.0,targetsAir:true,projectile:'tower',hit:0,anim:0,awake:!core});
     }
@@ -58,11 +59,12 @@ export function canPlace(g,owner,id,x,y){
     if(!staticFree(g,d,{x,y},1))return '水上や建物の中には出現できません。少し離してください。';
     return null;
   }
-  if(!deploymentAllowed(g,owner,x,y))return '自分の陣地、または破壊した敵サイドタワー側の前線に配置してください。';
-  if(deploymentWater(x,y))return '川の上には配置できません。橋か芝生を指定してください。';
+  const placementPoint=d.building?snapDeploymentPoint(owner,d,x,y):{x,y};
+  if(!deploymentAllowed(g,owner,placementPoint.x,placementPoint.y))return '自分の陣地、または破壊した敵サイドタワー側の前線に配置してください。';
+  if(deploymentWater(placementPoint.x,placementPoint.y))return '川の上には配置できません。橋か芝生を指定してください。';
   const deployCount=d.count+(d.summonOnDeploy?(d.summonCount||0):0);
   if(g.units.filter(u=>u.hp>0).length+deployCount>ARENA.maxUnits)return 'フィールドのユニット上限です。';
-  const blockers=placementStructures(g),p=snapDeploymentPoint(owner,d,x,y);
+  const blockers=placementStructures(g),p=d.building?placementPoint:snapDeploymentPoint(owner,d,x,y);
   if(!staticFree(g,d,p,1,blockers))return '建物や岸から少し離して配置してください。';
   if(!spawnPositions(g,owner,d,p.x,p.y,blockers))return '配置する空間がありません。少し離してください。';
   return null;
@@ -76,13 +78,13 @@ function makeUnit(g,owner,type,x,y){
   const d=UNITS[type];
   return {...d,id:`u${g.nextId++}`,type,owner,x,y,hp:d.hp,maxHp:d.hp,cd:0,spawn:0.5,anim:0,hit:0,walk:0,target:null,targetLock:null,firstStrikeTarget:null,firstStrikeReadyAt:0,targetable:true,collisionDisabled:false,deploying:false,deployTotal:0,deployRemaining:0,face:owner===0?-1:1,
     lane:x<ARENA.midX?ARENA.lanes[0]:ARENA.lanes[1],age:0,facing:owner===0?-Math.PI/2:Math.PI/2,moving:false,
-    summonNextAt:d.summonInterval?g.time+d.summonInterval:null,summonCastingUntil:0,
+    summonNextAt:d.summonInterval?g.time+d.summonInterval:null,summonCastingUntil:0,energyNextAt:null,
     stunUntil:0,sparkCharged:false,sparkChargeStartAt:d.sparkChargeTime?g.time:null,sparkChargeProgress:0,
     shieldHp:d.shieldMax||0,maxShieldHp:d.shieldMax||0,stealthed:false,stealthUntil:0,revived:false,
     iceSpiritState:null,iceSpiritTarget:null,iceSpiritStartedAt:0,iceSpiritProgress:0,iceSpiritStartX:null,iceSpiritStartY:null,iceSpiritEndX:null,iceSpiritEndY:null,
     fireSpiritState:null,fireSpiritTarget:null,fireSpiritStartedAt:0,fireSpiritProgress:0,fireSpiritStartX:null,fireSpiritStartY:null,fireSpiritEndX:null,fireSpiritEndY:null,
-    ramChargeTime:0,
-    drillTarget:null,drillLockTime:0,drillStage:0,drillDps:d.drillBaseDps||0,crusherTarget:null,crusherStage:0,
+    ramChargeTime:0,charged:false,chargeRun:0,axeInFlight:false,
+    drillTarget:null,drillLockTime:0,drillStage:0,drillDps:d.drillBaseDps||0,laserDamageElapsed:0,crusherTarget:null,crusherStage:0,
     megaJumpState:null,megaJumpTarget:null,megaJumpWindupUntil:0,megaJumpTargetX:null,megaJumpTargetY:null,megaJumpProgress:0,megaJumpStartedAt:0,megaJumpStartX:null,megaJumpStartY:null,megaJumpEndX:null,megaJumpEndY:null,
     riverJumpMode:d.riverJumper?boarRiverRouteForSpawn(d,owner,x,y):null,riverJumpState:null,riverJumpProgress:0,riverJumpStartedAt:0,riverJumpStartX:null,riverJumpStartY:null,riverJumpEndX:null,riverJumpEndY:null,
     ironSpinUsed:false,ironSpinState:null,ironSpinStartedAt:0,ironSpinProgress:0,ironSpinStartX:null,ironSpinStartY:null,ironSpinEndX:null,ironSpinEndY:null,ironSpinTarget:null,ironSpinHitIds:[],
@@ -93,10 +95,15 @@ function makeUnit(g,owner,type,x,y){
 function startDeployment(g,u,cardData){
   const total=summonDelayFor(cardData);
   if(total<=0)return false;
-  u.deploying=true;u.deployTotal=total;u.deployRemaining=total;u.targetable=false;u.collisionDisabled=true;u.spawn=0;u.target=null;u.targetLock=null;
+  // Deployment is part of combat now: normal units/buildings can be targeted,
+  // damaged, stunned and hit by area effects from the moment placement is confirmed.
+  // Mega Knight keeps its special drop protection until landing completes.
+  const protectedDrop=!!u.megaKnight;
+  u.deploying=true;u.deployTotal=total;u.deployRemaining=total;u.targetable=!protectedDrop;u.collisionDisabled=protectedDrop;u.spawn=0;u.target=null;u.targetLock=null;
   if(u.summonInterval)u.summonNextAt=null;
+  if(u.energyPump)u.energyNextAt=null;
   if(u.sparkUnit){u.sparkCharged=false;u.sparkChargeProgress=0;u.sparkChargeStartAt=null;}
-  event(g,'deploy-start',{x:u.x,y:u.y,owner:u.owner,unitType:u.type,card:cardData.id,duration:total,building:!!u.building});
+  event(g,'deploy-start',{x:u.x,y:u.y,owner:u.owner,unitType:u.type,card:cardData.id,duration:total,building:!!u.building,protectedDrop});
   if(u.megaKnight)event(g,'mega-drop-zone',{x:u.x,y:u.y,owner:u.owner,radius:u.dropRadius||48,duration:total,life:total});
   return true;
 }
@@ -104,6 +111,7 @@ function completeDeployment(g,u){
   u.deploying=false;u.deployRemaining=0;u.targetable=true;u.collisionDisabled=false;u.target=null;u.targetLock=null;
   if(u.sparkUnit)u.sparkChargeStartAt=g.time;
   if(u.summonInterval)u.summonNextAt=g.time+u.summonInterval;
+  if(u.energyPump&&u.energyInterval)u.energyNextAt=g.time+u.energyInterval;
   if(u.stealthDuration){u.stealthed=true;u.stealthUntil=g.time+u.stealthDuration;event(g,'stealth-start',{x:u.x,y:u.y,owner:u.owner,duration:u.stealthDuration});}
   event(g,'deploy-ready',{x:u.x,y:u.y,owner:u.owner,unitType:u.type,building:!!u.building});
   if(u.megaKnight&&u.dropDamage){megaAreaDamage(g,u,u.x,u.y,u.dropDamage,u.dropRadius||48,'mega-drop-impact',false);u.cd=Math.max(u.cd,u.cooldown||1.6);}
@@ -111,14 +119,23 @@ function completeDeployment(g,u){
 }
 function updateDeployment(g,u,dt){
   if(!u.deploying)return false;
-  u.moving=false;u.target=null;u.targetLock=null;u.targetable=false;u.collisionDisabled=true;
+  const protectedDrop=!!u.megaKnight;
+  // A summoning unit never acts on its own, but normal deployments remain real
+  // combat bodies so enemies and spells can interact with them before completion.
+  u.moving=false;u.target=null;u.targetLock=null;u.targetable=!protectedDrop;u.collisionDisabled=protectedDrop;
   u.deployRemaining=Math.max(0,(u.deployRemaining||0)-dt);
   if(u.deployRemaining<=1e-8){completeDeployment(g,u);return true;}
   return true;
 }
 function fireballTravelTime(core,target){return clamp(.45+distance(core,target)/620,.6,2);}
-function arrowRainTravelTime(core,target){return clamp(.2+distance(core,target)/1150,.35,1);}
+function arrowRainTravelTime(core,target){return clamp(.32+distance(core,target)/500,.55,2.4);}
 function burrowTravelTime(d,core,target){return clamp((d.burrowBase??.45)+distance(core,target)/(d.burrowSpeedDivisor||500),d.burrowMin??.7,d.burrowMax??2.2);}
+function deployRageZone(g,owner,x,y,d=UNITS.rage,source='spell'){
+  g.zones??=[];const delay=d.activationDelay||1.5;
+  const z={id:`z${g.nextId++}`,owner,kind:'rage',spell:'rage',x,y,radius:d.radius,remaining:d.zoneDuration,total:d.zoneDuration,activated:false,activateAt:g.time+delay,
+    placementTime:d.placementTime||.5,boostMultiplier:d.boostMultiplier||1.3,damage:d.damage,buildingDamage:d.buildingDamage,source};
+  g.zones.push(z);event(g,'rage-deploy',{x,y,owner,radius:d.radius,duration:delay,placementTime:d.placementTime||.5,source});return z;
+}
 function castSpell(g,owner,id,x,y){
   const err=canPlace(g,owner,id,x,y);if(err)return {ok:false,error:err};
   const d=UNITS[id],core=g.towers.find(t=>t.owner===owner&&t.kind==='core'&&t.hp>0);
@@ -145,11 +162,19 @@ function castSpell(g,owner,id,x,y){
     event(g,'poison-deploy',{x,y,owner,radius:d.radius});
     return {ok:true,spell:true,travelTime:0};
   }
+  if(d.spell==='rage'){
+    const z=deployRageZone(g,owner,x,y,d,'spell');const delay=Math.max(0,z.activateAt-g.time);
+    return {ok:true,spell:true,travelTime:delay,activationDelay:delay};
+  }
   if(d.spell==='cyclone'){
     g.zones??=[];
-    g.zones.push({id:`z${g.nextId++}`,owner,kind:'cyclone',spell:'cyclone',x,y,radius:d.radius,remaining:d.zoneDuration,total:d.zoneDuration,
-      pullSpeed:d.pullSpeed||70,outerDps:d.outerDps||10,midDps:d.midDps||20,innerDps:d.innerDps||35});
-    event(g,'cyclone-deploy',{x,y,owner,radius:d.radius,duration:d.zoneDuration});
+    g.zones.push({id:`z${g.nextId++}`,owner,kind:'cyclone',spell:'cyclone',x,y,radius:d.radius,remaining:d.zoneDuration,total:d.zoneDuration,pullSpeed:d.pullSpeed||210});
+    event(g,'cyclone-deploy',{x,y,owner,radius:d.radius,duration:d.zoneDuration,damage:d.damage,buildingDamage:d.buildingDamage});
+    const centre={x,y};
+    for(const t of [...alive(g)]){
+      if(t.owner===owner||t.hp<=0||distance(centre,t)>d.radius+(t.radius||12)*.35)continue;
+      damage(g,t,(t.kind||t.building)?d.buildingDamage:d.damage,owner,{spell:true,zone:'cyclone'});
+    }
     return {ok:true,spell:true,travelTime:0};
   }
   if(d.spell==='zap'){
@@ -162,11 +187,12 @@ function castSpell(g,owner,id,x,y){
     }
     return {ok:true,spell:true,travelTime:0};
   }
-  const arrow=d.spell==='arrowrain',travel=arrow?arrowRainTravelTime(core,{x,y}):fireballTravelTime(core,{x,y});
+  const arrow=d.spell==='arrowrain',travel=arrow?arrowRainTravelTime(core,{x,y}):fireballTravelTime(core,{x,y}),launchDelay=d.launchDelay||0;
   g.projectiles.push({id:`p${g.nextId++}`,owner,kind:arrow?'arrowrain':'fireball',spell:d.spell,x:core.x,y:core.y,sx:core.x,sy:core.y,tx:x,ty:y,
-    total:travel,remaining:travel,progress:0,damage:d.damage,buildingDamage:d.buildingDamage,splash:d.radius,targetsAir:true,life:travel+.2});
-  event(g,arrow?'arrowrain-launch':'fireball-launch',{x:core.x,y:core.y,tx:x,ty:y,owner,travel});
-  return {ok:true,spell:true,travelTime:travel};
+    flightTotal:travel,total:travel,remaining:travel,launchDelay,delayRemaining:launchDelay,launched:launchDelay<=0,progress:0,damage:d.damage,buildingDamage:d.buildingDamage,splash:d.radius,knockbackCells:d.knockbackCells||0,targetsAir:true,life:launchDelay+travel+.3});
+  event(g,arrow?'arrowrain-aim':'fireball-aim',{x,y,owner,radius:d.radius,duration:launchDelay,travel});
+  if(launchDelay<=0)event(g,arrow?'arrowrain-launch':'fireball-launch',{x:core.x,y:core.y,tx:x,ty:y,owner,travel});
+  return {ok:true,spell:true,travelTime:launchDelay+travel,launchDelay,flightTime:travel};
 }
 export function deploy(g,owner,id,x,y){
   const err=canPlace(g,owner,id,x,y);if(err)return {ok:false,error:err};
@@ -187,6 +213,12 @@ export function deploy(g,owner,id,x,y){
   return {ok:true};
 }
 function alive(g){return [...g.units,...g.towers].filter(v=>v.hp>0);}
+function rageZoneActive(g,z){return z?.kind==='rage'&&z.activated&&z.remaining>1e-8;}
+function rageSpeedFactor(g,t){
+  if(!t||t.hp<=0)return 1;
+  for(const z of g.zones||[])if(rageZoneActive(g,z)&&z.owner===t.owner&&distance(z,t)<=z.radius+(t.radius||12)*.25)return z.boostMultiplier||1.3;
+  return 1;
+}
 function targetable(source,target){return target.owner!==source.owner&&target.hp>0&&target.targetable!==false&&!target.stealthed&&(!target.air||source.targetsAir);}
 function areaTargetable(source,target){return target.owner!==source.owner&&target.hp>0&&target.targetable!==false&&target.burrowState!=='burrow'&&(!target.air||source.targetsAir);}
 function megaAreaDamage(g,u,x,y,amount,radius,eventType='mega-impact',shieldable=false){
@@ -446,7 +478,9 @@ function updateTrackerHook(g,u,entities,dt){
 }
 export function structureFootprintRect(t){
   if(!(t?.kind||t?.building))return null;
-  const cols=t.footprintCols||ARENA.defaultBuildingCells,rows=t.footprintRows||ARENA.defaultBuildingCells;
+  const fallbackCols=Math.max(.5,Math.min(t.footprintCols||ARENA.defaultBuildingCells,((t.radius||20)*2)/ARENA.cellSize));
+  const fallbackRows=Math.max(.5,Math.min(t.footprintRows||ARENA.defaultBuildingCells,((t.radius||20)*2)/ARENA.cellSize));
+  const cols=t.hitboxCols||fallbackCols,rows=t.hitboxRows||fallbackRows;
   const hw=cols*ARENA.cellSize/2,hh=rows*ARENA.cellSize/2;
   return {l:t.x-hw,r:t.x+hw,t:t.y-hh,b:t.y+hh,hw,hh};
 }
@@ -496,8 +530,8 @@ function nearestMobileCombatTarget(u,entities){
   let best=null,bestD=Infinity;
   for(const t of entities){
     if(!targetable(u,t))continue;
-    // Size vision is centre-to-centre. Explicit specialist sight (Yuno) keeps its tuned edge-gap contract.
-    const raw=distance(u,t),d=explicit?Math.max(0,raw-(t.radius||0)-(u.range||0)):raw;
+    // Size vision is centre-to-centre. Specialist sight keeps its tuned contract; Princess uses exactly the same edge-gap as her attack range.
+    const raw=distance(u,t),d=u.visionMatchesRange?targetGap(u,t):(explicit?Math.max(0,raw-(t.radius||0)-(u.range||0)):raw);
     if(d<=sight&&d<bestD){best=t;bestD=d;}
   }
   return best;
@@ -677,19 +711,28 @@ function move(g,u,t,dt){
   const frostFactor=(u.slowUntil||0)>g.time?(u.slowMoveFactor||1):1;
   const mudFactor=(u.mudUntil||0)>g.time?(u.mudSlowFactor||1):1;
   const ramSpeedFactor=u.siegeRam&&u.charged?(u.ramChargeSpeedMultiplier||1.35):1;
-  const moved=moveBody(g,u,dest,dt*frostFactor*mudFactor*ramSpeedFactor);
+  const mountedSpeedFactor=u.mountedCharge&&u.charged?(u.chargeSpeedMultiplier||1.25):1;
+  const rageFactor=rageSpeedFactor(g,u);
+  const moved=moveBody(g,u,dest,dt*frostFactor*mudFactor*ramSpeedFactor*mountedSpeedFactor*rageFactor);
   if(moved>.025){
     faceToward(u,u.x+(u.x-start.x),u.y+(u.y-start.y));u.walk+=moved/Math.max(1,u.speed)*7;u.moving=true;
     if(u.siegeRam){
       u.ramChargeTime=(u.ramChargeTime||0)+dt;
       if(!u.charged&&u.ramChargeTime+1e-8>=(u.ramChargeAfter||2)){u.charged=true;event(g,'charge',{x:u.x,y:u.y,owner:u.owner,kind:'siege-ram'});}
+    }else if(u.mountedCharge){
+      if(!u.charged){
+        u.chargeRun=(u.chargeRun||0)+moved;
+        if(u.chargeRun+1e-8>=u.chargeDistance){u.chargeRun=u.chargeDistance;u.charged=true;event(g,'charge',{x:u.x,y:u.y,owner:u.owner,kind:u.type,distance:u.chargeDistance});}
+      }
     }else if(u.chargeDistance&&u.buildingOnly){
       u.chargeRun=(u.chargeRun||0)+moved;
       if(!u.charged&&u.chargeRun>=u.chargeDistance){u.charged=true;event(g,'charge',{x:u.x,y:u.y,owner:u.owner});}
     }
   }else if(u.siegeRam&&!u.charged){
     u.ramChargeTime=0;
-  }else if(u.chargeDistance){
+  }else if(u.mountedCharge&&!u.charged){
+    resetMountedCharge(u);
+  }else if(u.chargeDistance&&!u.mountedCharge){
     u.chargeRun=Math.max(0,(u.chargeRun||0)-dt*90);
     if(u.chargeRun<u.chargeDistance*.55)u.charged=false;
   }
@@ -710,7 +753,7 @@ function summonMinions(g,parent,initial=false){
   const d=UNITS[parent.summonType];if(!d||!parent.summonCount)return 0;
   const available=Math.max(0,ARENA.maxUnits-g.units.filter(u=>u.hp>0).length),count=Math.min(parent.summonCount,available);if(!count)return 0;
   const f=parent.owner===0?1:-1;
-  const cs=ARENA.cellSize,buildingClear=parent.building?((parent.footprintRows||ARENA.defaultBuildingCells)*cs/2+(d.radius||10)+cs*.25):0;
+  const cs=ARENA.cellSize,buildingClear=parent.building?((parent.hitboxRows||Math.min(parent.footprintRows||ARENA.defaultBuildingCells,2))*cs/2+(d.radius||10)+cs*.25):0;
   const forward=buildingClear||cs*.30;
   const base=count===2?[[-cs*.55,-forward],[cs*.55,-forward]]:count===3?[[0,-Math.max(cs*.75,forward)],[-cs*.60,Math.max(cs*.30,buildingClear?forward*.20:cs*.30)],[cs*.60,Math.max(cs*.30,buildingClear?forward*.20:cs*.30)]]:Array.from({length:count},(_,i)=>{const a=-Math.PI/2+i*Math.PI*2/count;const r=Math.max(cs*.70,buildingClear);return [Math.cos(a)*r,Math.sin(a)*r];});
   const candidates=[];
@@ -725,7 +768,8 @@ function summonMinions(g,parent,initial=false){
   }
   return made;
 }
-function updateSummoner(g,u){
+function updateSummoner(g,u,dt=0){
+  const rage=rageSpeedFactor(g,u);if(rage>1&&dt>0&&Number.isFinite(u.summonNextAt))u.summonNextAt-=dt*(rage-1);if(rage>1&&dt>0&&(u.summonCastingUntil||0)>g.time)u.summonCastingUntil-=dt*(rage-1);
   if(!u.summonType||!u.summonInterval||!Number.isFinite(u.summonNextAt)||u.hp<=0)return false;
   if((u.summonCastingUntil||0)>g.time+1e-8)return true;
   if(u.summonCastingUntil&&g.time+1e-8>=u.summonCastingUntil){
@@ -804,6 +848,21 @@ function spawnPhoenixEgg(g,t){
 function hatchEgg(g,egg){
   const d=UNITS[egg.hatchType||'phoenix'];if(!d||egg.hp<=0)return false;const u=makeUnit(g,egg.owner,d.id,egg.x,egg.y);u.hp=Math.round(d.hp*.5);u.maxHp=d.hp;u.spawn=.35;u.revived=true;u.lane=egg.lane;egg._hatched=true;egg.hp=0;g.units.push(u);event(g,'phoenix-revive',{x:u.x,y:u.y,owner:u.owner,hp:u.hp});return true;
 }
+function updateRageZones(g,dt){
+  g.zones??=[];
+  for(const z of g.zones){
+    if(z.kind!=='rage'||z.remaining<=0)continue;
+    if(!z.activated&&g.time+1e-8>=z.activateAt){
+      z.activated=true;event(g,'rage-activate',{x:z.x,y:z.y,owner:z.owner,radius:z.radius,duration:z.total,boost:z.boostMultiplier||1.3});
+      for(const t of [...alive(g)]){
+        if(t.owner===z.owner||t.hp<=0||distance(z,t)>z.radius+(t.radius||12)*.35)continue;
+        damage(g,t,(t.kind||t.building)?z.buildingDamage:z.damage,z.owner,{spell:true,zone:'rage'});
+      }
+    }
+    if(z.activated)z.remaining=Math.max(0,z.remaining-dt);
+  }
+  g.zones=g.zones.filter(z=>z.kind!=='rage'||z.remaining>1e-8);
+}
 function updateCycloneZones(g,dt){
   g.zones??=[];const units=g.units.filter(u=>u.hp>0&&!u.kind&&!u.building&&!u.eggUnit&&u.targetable!==false&&u.burrowState!=='burrow');
   for(const z of g.zones){
@@ -811,11 +870,10 @@ function updateCycloneZones(g,dt){
     z.remaining=Math.max(0,z.remaining-dt);
     for(const t of units){
       if(t.owner===z.owner||t.hp<=0)continue;const d=distance(z,t);if(d>z.radius+(t.radius||12)*.25)continue;
-      const m=t.mass||1,factor=m>=12?.1:m<=1.5?1:m<=5?.65:.3,step=(z.pullSpeed||70)*factor*dt;forceToward(g,t,z.x,z.y,Math.min(step,Math.max(0,d-2)));
-      const ratio=Math.min(1,d/Math.max(1,z.radius)),dps=ratio<=.33?(z.innerDps||35):ratio<=.66?(z.midDps||20):(z.outerDps||10);damage(g,t,dps*dt,z.owner,{spell:true,zone:'cyclone'});
+      const m=t.mass||1,factor=m>=12?.1:m<=1.5?1:m<=5?.65:.3,step=(z.pullSpeed||210)*factor*dt;forceToward(g,t,z.x,z.y,Math.min(step,Math.max(0,d-2)));
     }
   }
-  g.zones=g.zones.filter(z=>z.remaining>1e-8);
+  g.zones=g.zones.filter(z=>z.kind!=='cyclone'||z.remaining>1e-8);
 }
 function skeletonRushSpawnPoint(g,z){
   const d=UNITS[z.spawnType||'skeleton'];if(!d)return null;
@@ -845,19 +903,19 @@ function updateSkeletonRushZones(g,dt){
     z.remaining=Math.max(0,z.expiresAt-g.time);
   }
 }
-function updateGiantSkeletonBombs(g,dt){
+function updateDelayedDeathBombs(g,dt){
   for(const z of g.zones||[]){
-    if(z.kind!=='giantskeletonbomb')continue;
+    if(z.kind!=='giantskeletonbomb'&&z.kind!=='airballoonbomb')continue;
     z.remaining=Math.max(0,z.detonateAt-g.time);
     if(z.detonated||g.time+1e-8<z.detonateAt)continue;
-    z.detonated=true;event(g,'giantskeleton-bomb-explode',{x:z.x,y:z.y,owner:z.owner,radius:z.radius,damage:z.damage});
+    const balloon=z.kind==='airballoonbomb';z.detonated=true;event(g,balloon?'airballoon-bomb-explode':'giantskeleton-bomb-explode',{x:z.x,y:z.y,owner:z.owner,radius:z.radius,damage:z.damage});
     const centre={x:z.x,y:z.y};
     for(const v of [...alive(g)]){
       if(v.owner===z.owner||v.hp<=0)continue;
       const gap=(v.kind||v.building)?targetGap(centre,v):distance(centre,v);
       if(gap>z.radius+(v.kind||v.building?0:(v.radius||12)*.35))continue;
       if(v.air&&!v.kind&&!v.building)continue;
-      damage(g,v,z.damage,z.owner,{spell:true,giantSkeletonBomb:true});
+      damage(g,v,z.damage,z.owner,{spell:true,giantSkeletonBomb:!balloon,airBalloonBomb:balloon});
     }
     z.remaining=0;
   }
@@ -866,14 +924,20 @@ function handleUnitDeath(g,t){
   if(t._deathHandled)return;t._deathHandled=true;
   event(g,'death',{x:t.x,y:t.y,owner:t.owner,large:t.type==='golem'});
   if(t.deathBombDamage&&t.deathBombRadius&&t.deathBombDelay){
-    g.zones??=[];g.zones.push({id:`z${g.nextId++}`,owner:t.owner,kind:'giantskeletonbomb',x:t.x,y:t.y,radius:t.deathBombRadius,damage:t.deathBombDamage,total:t.deathBombDelay,remaining:t.deathBombDelay,detonateAt:g.time+t.deathBombDelay,detonated:false});
-    event(g,'giantskeleton-bomb-place',{x:t.x,y:t.y,owner:t.owner,radius:t.deathBombRadius,duration:t.deathBombDelay});
+    const kind=t.deathBombKind||'giantskeletonbomb',balloon=kind==='airballoonbomb';
+    g.zones??=[];g.zones.push({id:`z${g.nextId++}`,owner:t.owner,kind,x:t.x,y:t.y,radius:t.deathBombRadius,damage:t.deathBombDamage,total:t.deathBombDelay,remaining:t.deathBombDelay,detonateAt:g.time+t.deathBombDelay,detonated:false});
+    event(g,balloon?'airballoon-bomb-place':'giantskeleton-bomb-place',{x:t.x,y:t.y,owner:t.owner,radius:t.deathBombRadius,duration:t.deathBombDelay});
   }
+  if(t.deathRage){deployRageZone(g,t.owner,t.x,t.y,UNITS.rage,'lumberjack');event(g,'lumberjack-rage-drop',{x:t.x,y:t.y,owner:t.owner,radius:UNITS.rage.radius,duration:UNITS.rage.activationDelay||1.5});}
   if(Number.isFinite(t.enemyEnergyOnDeath)&&t.enemyEnergyOnDeath>0){
     const enemy=t.owner===0?1:0,p=g.players[enemy],before=p.energy;
     p.energy=Math.min(ARENA.maxEnergy,p.energy+t.enemyEnergyOnDeath);
     const granted=p.energy-before;
     if(granted>1e-8)event(g,'energy-gift',{x:t.x,y:t.y,owner:enemy,sourceOwner:t.owner,amount:granted});
+  }
+  if(Number.isFinite(t.ownerEnergyOnDeath)&&t.ownerEnergyOnDeath>0){
+    const p=g.players[t.owner],before=p.energy;p.energy=Math.min(ARENA.maxEnergy,p.energy+t.ownerEnergyOnDeath);const granted=p.energy-before;
+    event(g,'pump-break-energy',{x:t.x,y:t.y,owner:t.owner,amount:granted,requested:t.ownerEnergyOnDeath});
   }
   if(t.deathDamage&&t.deathRadius){
     event(g,'death-blast',{x:t.x,y:t.y,owner:t.owner,radius:t.deathRadius,damage:t.deathDamage,unitType:t.type});
@@ -904,7 +968,7 @@ function damage(g,t,amount,owner,meta={}){
     event(g,'turtle-shell',{x:t.x,y:t.y,owner:t.owner,reduction});
   }
   if(t.shieldAll&&t.shieldHp>0&&amount>0){
-    absorbed=Math.min(t.shieldHp,amount);t.shieldHp=Math.max(0,t.shieldHp-absorbed);hpAmount=Math.max(0,amount-absorbed);
+    absorbed=Math.min(t.shieldHp,amount);t.shieldHp=Math.max(0,t.shieldHp-absorbed);hpAmount=t.shieldNoOverflow?0:Math.max(0,amount-absorbed);
     event(g,'shield-hit',{x:t.x,y:t.y,owner:t.owner,absorbed,shieldHp:t.shieldHp,maxShieldHp:t.maxShieldHp||t.shieldMax||0});if(t.shieldHp<=1e-8)event(g,'shield-break',{x:t.x,y:t.y,owner:t.owner});
   }else if(meta.shieldable&&!meta.spell&&t.shieldHp>0&&frontShieldHit(t,meta.sourceX,meta.sourceY)){
     const wanted=amount*(t.shieldAbsorb||.65);absorbed=Math.min(t.shieldHp,wanted);t.shieldHp=Math.max(0,t.shieldHp-absorbed);hpAmount=Math.max(0,amount-absorbed);
@@ -976,7 +1040,7 @@ function applySlow(g,t,p){
   else t.slowMoveFactor=Math.min(t.slowMoveFactor||1,p.slowMove||1);
   if(attackStages)t.slowAttackFactor=attackStages[Math.min(stage-1,attackStages.length-1)];
   else t.slowAttackFactor=Math.min(t.slowAttackFactor||1,p.slowAttack||1);
-  if(t.chargeDistance){
+  if(t.chargeDistance&&t.buildingOnly&&!t.mountedCharge){
     t.chargeRun=Math.max(0,(t.chargeRun||0)-45);
     if(t.chargeRun<t.chargeDistance*.8)t.charged=false;
   }
@@ -985,6 +1049,10 @@ function applySlow(g,t,p){
 function resetSparkyCharge(g,u,delayUntil=g.time){
   if(!u.sparkUnit)return;
   u.sparkCharged=false;u.sparkChargeProgress=0;u.sparkChargeStartAt=delayUntil;
+}
+function resetMountedCharge(u){
+  if(!u?.mountedCharge)return;
+  u.chargeRun=0;u.charged=false;
 }
 function applyStun(g,t,duration,owner){
   const until=Math.max(t.stunUntil||0,g.time+(duration||0)),keepMegaLock=t.megaKnight?t.targetLock:null;t.stunUntil=until;t.target=null;t.targetLock=keepMegaLock;
@@ -995,6 +1063,7 @@ function applyStun(g,t,duration,owner){
   if(t.crusherRamp)resetCrusher(t);
   if(t.sparkUnit)resetSparkyCharge(g,t,until);
   if(t.siegeRam){t.charged=false;t.ramChargeTime=0;}
+  if(t.mountedCharge)resetMountedCharge(t);
   if(t.dashState){t.dashState=null;t.dashTarget=null;t.dashEnd=null;t.invulnerableUntil=0;t.dashReadyAt=Math.max(t.dashReadyAt||0,until+.35);}
   event(g,'stun',{x:t.x,y:t.y,owner,targetOwner:t.owner,duration});
 }
@@ -1005,13 +1074,23 @@ function updateSparkyCharge(g,u){
   const total=Math.max(.1,u.sparkChargeTime||3.5),progress=clamp((g.time-u.sparkChargeStartAt)/total,0,1);u.sparkChargeProgress=progress;
   if(progress>=1-1e-8){u.sparkCharged=true;u.sparkChargeProgress=1;event(g,'sparky-ready',{x:u.x,y:u.y,owner:u.owner});}
 }
+function fireballKnockback(g,p,t,centre){
+  if(!p.knockbackCells||t.hp<=0||t.kind||t.building||t.eggUnit||visionSizeFor(t)==='large')return 0;
+  let dx=t.x-centre.x,dy=t.y-centre.y,len=Math.hypot(dx,dy);
+  if(len<.001){dx=centre.x-p.sx;dy=centre.y-p.sy;len=Math.hypot(dx,dy);}
+  if(len<.001){dx=0;dy=p.owner===0?-1:1;len=1;}
+  const amount=cellsToWorld(p.knockbackCells),moved=displaceBody(g,t,dx/len*amount,dy/len*amount);
+  if(moved>0)event(g,'fireball-knockback',{x:t.x,y:t.y,owner:p.owner,amount:moved,sourceX:centre.x,sourceY:centre.y});
+  return moved;
+}
 function spellAreaImpact(g,p,type){
   event(g,type==='arrowrain'?'arrowrain-impact':'fireball-impact',{x:p.tx,y:p.ty,owner:p.owner,radius:p.splash,damage:p.damage});
   const centre={x:p.tx,y:p.ty};
   for(const t of [...alive(g)]){
     if(t.owner===p.owner||t.hp<=0)continue;
     if(distance(centre,t)>p.splash+(t.radius||12)*.35)continue;
-    damage(g,t,(t.kind||t.building)?p.buildingDamage:p.damage,p.owner);
+    damage(g,t,(t.kind||t.building)?p.buildingDamage:p.damage,p.owner,{spell:true});
+    if(type==='fireball'&&t.hp>0)fireballKnockback(g,p,t,centre);
   }
 }
 function insideEnemyPoison(g,t,owner){
@@ -1093,10 +1172,38 @@ function impact(g,p,entities){
   }
 }
 function projectileSpeed(kind){
-  return ({bomb:180,sky_bomb:260,lightning:520,electro:450,wind:430,gravity:360,phoenix_fire:420,thrown_spear:480,dart:560,iron_arrow:500,mud:300,royal_arrow:470,royal_shell:310,sparkblast:340})[kind]||390;
+  return ({bomb:180,sky_bomb:260,airballoon_bomb:250,lightning:520,electro:450,wind:430,gravity:360,phoenix_fire:420,thrown_spear:480,dart:560,iron_arrow:500,mud:300,royal_arrow:470,royal_shell:310,sparkblast:340})[kind]||390;
+}
+function beginFalcheAxe(g,u,t){
+  const dx=t.x-u.x,dy=t.y-u.y,len=Math.hypot(dx,dy)||1,nx=dx/len,ny=dy/len,range=u.axeTravelRange||cellsToWorld(7);
+  const ex=clamp(u.x+nx*range,0,ARENA.width),ey=clamp(u.y+ny*range,0,ARENA.height),rage=rageSpeedFactor(g,u);
+  commitMobileTarget(u,t);faceToward(u,t.x,t.y);u.cd=u.cooldown;u.anim=.35;u.target=t.id;u.axeInFlight=true;u.moving=false;
+  g.projectiles.push({id:`p${g.nextId++}`,owner:u.owner,kind:'executioner_axe',x:u.x,y:u.y,sx:u.x,sy:u.y,tx:ex,ty:ey,ex,ey,phase:'out',speed:(u.axeSpeed||260)*rage,damage:u.damage,hitWidth:u.axeHitWidth||cellsToWorld(2),sourceUnitId:u.id,outHits:[],backHits:[],progress:0,life:6});
+  event(g,'falche-throw',{x:u.x,y:u.y,tx:ex,ty:ey,owner:u.owner,range,damage:u.damage});
+}
+function falcheAxeHits(g,p,a,b,entities){
+  const hits=p.phase==='out'?p.outHits:p.backHits,half=(p.hitWidth||cellsToWorld(2))/2;
+  for(const t of entities){
+    if(t.owner===p.owner||t.hp<=0||t.targetable===false||t.burrowState==='burrow'||hits.includes(t.id))continue;
+    if(pointSegmentDistance(t.x,t.y,a.x,a.y,b.x,b.y)>half+(t.radius||12)*.35)continue;
+    hits.push(t.id);damage(g,t,p.damage,p.owner,{shieldable:true,ranged:true,sourceX:a.x,sourceY:a.y});event(g,'falche-hit',{x:t.x,y:t.y,owner:p.owner,phase:p.phase,damage:p.damage});
+  }
+}
+function updateFalcheAxe(g,p,dt,entities){
+  const a={x:p.x,y:p.y},target=p.phase==='out'?{x:p.ex,y:p.ey}:{x:p.sx,y:p.sy},d=Math.hypot(target.x-p.x,target.y-p.y),step=(p.speed||260)*dt;
+  if(d<=step+1e-8){p.x=target.x;p.y=target.y;falcheAxeHits(g,p,a,p,entities);
+    if(p.phase==='out'){p.phase='back';p.progress=1;event(g,'falche-return',{x:p.x,y:p.y,tx:p.sx,ty:p.sy,owner:p.owner});}
+    else {p.life=0;const source=g.units.find(u=>u.id===p.sourceUnitId&&u.hp>0);if(source){source.axeInFlight=false;event(g,'falche-catch',{x:source.x,y:source.y,owner:source.owner});}}
+    return;
+  }
+  p.x+=(target.x-p.x)/d*step;p.y+=(target.y-p.y)/d*step;falcheAxeHits(g,p,a,p,entities);
+  const full=Math.max(1,Math.hypot(p.ex-p.sx,p.ey-p.sy)),leg=Math.hypot(p.x-p.sx,p.y-p.sy)/full;p.progress=p.phase==='out'?clamp(leg,0,1):clamp(2-leg,1,2);
 }
 function attack(g,u,t){
   if(u.sparkUnit&&!u.sparkCharged)return;
+  if(u.executionerAxe){beginFalcheAxe(g,u,t);return;}
+  const mountedChargeHit=!!(u.mountedCharge&&u.charged);
+  if(u.mountedCharge)resetMountedCharge(u); // Any attack interrupts the continuous-walk charge gauge.
   // First actual attack commits ordinary mobile units to this target.
   commitMobileTarget(u,t);
   const attackFactor=(u.slowUntil||0)>g.time?(u.slowAttackFactor||1):1;
@@ -1112,6 +1219,7 @@ function attack(g,u,t){
     event(g,'suicide-hit',{x:t.x,y:t.y,owner:u.owner,amount});u._carrierReachedTarget=true;u.hp=0;handleUnitDeath(g,u);return;
   }
   let amount=(t.kind||t.building)&&Number.isFinite(u.structureDamage)?u.structureDamage:u.damage;
+  if(mountedChargeHit)amount=u.chargeDamage||amount*2;
   if(u.crusherRamp&&(t.kind||t.building)){
     if(u.crusherTarget!==t.id){u.crusherTarget=t.id;u.crusherStage=0;}
     const stages=Array.isArray(u.crusherDamages)?u.crusherDamages:[u.damage];
@@ -1133,6 +1241,7 @@ function attack(g,u,t){
     if(u.valkyrieSpin&&u.meleeSplash)megaAreaDamage(g,u,u.x,u.y,amount,u.meleeSplash,'valkyrie-spin',true);
     else if(u.meleeSplash)megaAreaDamage(g,u,t.x,t.y,amount,u.meleeSplash,u.megaKnight?'mega-smash':'slash-splash',true);
     else damage(g,t,amount,u.owner,{shieldable:true,sourceX:u.x,sourceY:u.y});
+    if(mountedChargeHit)event(g,'mounted-charge-hit',{x:t.x,y:t.y,owner:u.owner,amount,kind:u.type,radius:u.meleeSplash||24});
     event(g,'slash',{x:t.x,y:t.y,owner:u.owner,angle:Math.atan2(t.y-u.y,t.x-u.x),kind:u.type});
     if(u.crusherRamp){
       const stages=Array.isArray(u.crusherDamages)?u.crusherDamages:[u.damage];u.crusherStage=Math.min((u.crusherStage||0)+1,stages.length-1);
@@ -1151,22 +1260,38 @@ function updateDrill(g,u,t,dt){
   if(stage!==(u.drillStage||0))event(g,'drill-ramp',{x:u.x,y:u.y,tx:t.x,ty:t.y,owner:u.owner,stage,dps:stages[stage]});
   u.drillStage=stage;u.drillDps=stages[stage];u.target=t.id;u.anim=.12;faceToward(u,t.x,t.y);damage(g,t,u.drillDps*dt,u.owner,{shieldable:false,sourceX:u.x,sourceY:u.y});return true;
 }
+function grantPumpEnergy(g,u,reason='cycle'){
+  if(!u.energyPump||u.hp<=0)return 0;const p=g.players[u.owner],amount=u.energyAmount||1,before=p.energy;p.energy=Math.min(ARENA.maxEnergy,p.energy+amount);const granted=p.energy-before;
+  event(g,'pump-energy',{x:u.x,y:u.y,owner:u.owner,amount:granted,requested:amount,reason});return granted;
+}
+function updateEnergyPump(g,u,dt=0){
+  const rage=rageSpeedFactor(g,u);if(rage>1&&dt>0&&Number.isFinite(u.energyNextAt))u.energyNextAt-=dt*(rage-1);
+  if(!u.energyPump||u.hp<=0||!u.energyInterval||!Number.isFinite(u.energyNextAt))return;
+  while(g.time+1e-8>=u.energyNextAt&&u.hp>0){grantPumpEnergy(g,u,'cycle');u.energyNextAt+=u.energyInterval;}
+}
 function resetCrusher(u){u.crusherTarget=null;u.crusherStage=0;}
 function resetLaserTower(u){
-  u.laserTarget=null;u.laserLockTime=0;u.laserStage=0;u.laserDps=u.laserBaseDps||20;
+  u.laserTarget=null;u.laserLockTime=0;u.laserStage=0;u.laserDps=u.laserBaseDps||20;u.laserDamageElapsed=0;
 }
 function updateLaserTower(g,u,t,dt){
   if(!u.laserTower&&!u.laserUnit)return false;
   if(!t){resetLaserTower(u);u.target=null;return true;}
   if(u.laserTarget!==t.id){
     if(u.laserUnit)commitMobileTarget(u,t);
-    u.laserTarget=t.id;u.laserLockTime=0;u.laserStage=0;u.laserDps=u.laserBaseDps||20;
+    u.laserTarget=t.id;u.laserLockTime=0;u.laserStage=0;u.laserDps=u.laserBaseDps||20;u.laserDamageElapsed=0;
     event(g,'laser-lock',{x:u.x,y:u.y,tx:t.x,ty:t.y,owner:u.owner});
   }else u.laserLockTime=(u.laserLockTime||0)+dt;
   const every=u.laserRampEvery||1.5,mult=u.laserMultiplier||2,stage=Math.max(0,Math.floor((u.laserLockTime+1e-9)/every));
   if(stage!==(u.laserStage||0))event(g,'laser-ramp',{x:u.x,y:u.y,tx:t.x,ty:t.y,owner:u.owner,stage});
   u.laserStage=stage;u.laserDps=(u.laserBaseDps||20)*Math.pow(mult,stage);u.target=t.id;u.anim=.12;faceToward(u,t.x,t.y);
-  damage(g,t,u.laserDps*dt,u.owner,{shieldable:true,ranged:true,sourceX:u.x,sourceY:u.y});
+  const damageTick=Number.isFinite(u.laserDamageTick)?Math.max(.01,u.laserDamageTick):0;
+  if(damageTick>0){
+    u.laserDamageElapsed=(u.laserDamageElapsed||0)+dt;
+    while(u.laserDamageElapsed+1e-9>=damageTick&&t.hp>0){
+      u.laserDamageElapsed=Math.max(0,u.laserDamageElapsed-damageTick);
+      damage(g,t,u.laserDps*damageTick,u.owner,{shieldable:true,ranged:true,sourceX:u.x,sourceY:u.y});
+    }
+  }else damage(g,t,u.laserDps*dt,u.owner,{shieldable:true,ranged:true,sourceX:u.x,sourceY:u.y});
   return true;
 }
 function healingPulse(g,u,entities){
@@ -1243,7 +1368,7 @@ export function tick(g,dt=ARENA.tick){
   g.time+=dt;g.step++;
   for(const p of g.players)p.energy=Math.min(10,p.energy+dt*(g.time>=120?1.25:.625));
   g.events=g.events.map(e=>({...e,life:e.life-dt})).filter(e=>e.life>0);
-  g.zones??=[];updateSkeletonRushZones(g,dt);updateGiantSkeletonBombs(g,dt);updatePoisonZones(g,dt);decayMudZones(g,dt);updateMudZones(g);updateCycloneZones(g,dt);
+  g.zones??=[];updateSkeletonRushZones(g,dt);updateDelayedDeathBombs(g,dt);updatePoisonZones(g,dt);decayMudZones(g,dt);updateMudZones(g);updateRageZones(g,dt);updateCycloneZones(g,dt);
   refreshCoreWake(g);
   if(g.bot&&g.time>=g.botNext){
     runBot(g,1);g.botNext=g.time+(g.difficulty==='easy'?2.6:g.difficulty==='hard'?.65:1.3)+random(g)*.7;
@@ -1255,8 +1380,8 @@ export function tick(g,dt=ARENA.tick){
     u.moving=false;
     if(u.eggUnit){if(Number.isFinite(u.eggHatchAt)&&g.time+1e-8>=u.eggHatchAt)hatchEgg(g,u);continue;}
     updateStealth(g,u);
-    const stunnedNow=(u.stunUntil||0)>g.time;
-    u.hit=Math.max(0,(u.hit||0)-dt);u.anim=Math.max(0,(u.anim||0)-dt);if(!stunnedNow)u.cd=Math.max(0,u.cd-dt);u.healCd=Math.max(0,(u.healCd||0)-dt);
+    const stunnedNow=(u.stunUntil||0)>g.time,rageFactor=rageSpeedFactor(g,u),actionDt=dt*rageFactor;
+    u.hit=Math.max(0,(u.hit||0)-dt);u.anim=Math.max(0,(u.anim||0)-dt);if(!stunnedNow)u.cd=Math.max(0,u.cd-actionDt);u.healCd=Math.max(0,(u.healCd||0)-actionDt);
     updateLingeringPoison(g,u);if(u.hp<=0)continue;
     if(u.kind==='core'&&!u.awake){u.target=null;continue;}
     if(!u.kind){
@@ -1266,11 +1391,13 @@ export function tick(g,dt=ARENA.tick){
       if(u.sparkUnit)updateSparkyCharge(g,u);
       if(u.spawn>0){u.spawn=Math.max(0,u.spawn-dt);continue;}
       if(u.decayPerSecond){decayStructure(g,u,u.decayPerSecond*dt);if(u.hp<=0)continue;}
+      if(u.energyPump)updateEnergyPump(g,u,dt);
       if(updateBoarRiverJump(g,u,dt))continue;
     }
     if((u.hookControlUntil||0)>g.time){u.target=null;u.moving=false;continue;}
     if((u.stunUntil||0)>g.time){u.target=null;if(u.laserTower||u.laserUnit)resetLaserTower(u);if(u.drillUnit)resetDrill(u);if(u.crusherRamp)resetCrusher(u);continue;}
-    if(!u.kind&&updateSummoner(g,u)){u.target=null;if(u.laserTower||u.laserUnit)resetLaserTower(u);continue;}
+    if(u.executionerAxe&&u.axeInFlight){u.moving=false;u.target=null;continue;}
+    if(!u.kind&&updateSummoner(g,u,dt)){u.target=null;if(u.laserTower||u.laserUnit)resetLaserTower(u);continue;}
     if(updateMegaJump(g,u,entities,dt))continue;
     if(updateIceSpiritLeap(g,u,entities,dt))continue;
     if(updateFireSpiritLeap(g,u,entities,dt))continue;
@@ -1281,7 +1408,7 @@ export function tick(g,dt=ARENA.tick){
     const hookTarget=trackerHookCandidate(g,u,entities);if(hookTarget){beginTrackerHook(g,u,hookTarget);continue;}
     healingPulse(g,u,entities);
     const target=getTarget(g,u,entities);
-    if(!target){if(u.laserTower||u.laserUnit)resetLaserTower(u);if(u.drillUnit)resetDrill(u);if(u.crusherRamp)resetCrusher(u);resetFirstStrike(u);u.target=null;continue;}
+    if(!target){if(u.laserTower||u.laserUnit)resetLaserTower(u);if(u.drillUnit)resetDrill(u);if(u.crusherRamp)resetCrusher(u);if(u.mountedCharge&&!u.charged)resetMountedCharge(u);resetFirstStrike(u);u.target=null;continue;}
     u.target=target.id;
     if(u.iceSpirit&&distance(u,target)<=((u.iceLeapRange||cellsToWorld(2))+(target.radius||0))){beginIceSpiritLeap(g,u,target);continue;}
     if(u.fireSpirit&&distance(u,target)<=((u.fireLeapRange||cellsToWorld(2))+(target.radius||0))){beginFireSpiritLeap(g,u,target);continue;}
@@ -1293,19 +1420,20 @@ export function tick(g,dt=ARENA.tick){
     if(u.drillUnit){
       if(attackGap<=reach){
         faceToward(u,target.x,target.y);if(u.drillTarget&&u.drillTarget!==target.id)resetDrill(u);
-        if(firstStrikeReady(g,u,target))updateDrill(g,u,target,dt);
+        if(firstStrikeReady(g,u,target))updateDrill(g,u,target,actionDt);
       }else {resetFirstStrike(u);resetDrill(u);move(g,u,target,dt);}
       continue;
     }
     if(u.laserTower||u.laserUnit){
       if(attackGap<=reach){
         faceToward(u,target.x,target.y);if(u.laserTarget&&u.laserTarget!==target.id)resetLaserTower(u);
-        if(firstStrikeReady(g,u,target))updateLaserTower(g,u,target,dt);
+        if(firstStrikeReady(g,u,target))updateLaserTower(g,u,target,actionDt);
       }else {resetFirstStrike(u);resetLaserTower(u);if(u.laserUnit&&!u.kind&&!u.building)move(g,u,target,dt);}
       continue;
     }
     if(canShadowRush(g,u,target)){beginShadowWindup(g,u,target);continue;}
     if(attackGap<=reach){
+      if(u.mountedCharge&&!u.charged&&(u.chargeRun||0)>0)resetMountedCharge(u);
       faceToward(u,target.x,target.y);
       // Start the short first-strike preparation as soon as a new target is in range.
       // It runs in parallel with any remaining ordinary attack cooldown so target changes
@@ -1316,8 +1444,15 @@ export function tick(g,dt=ARENA.tick){
   }
   for(const p of g.projectiles){
     p.life-=dt;
+    if(p.kind==='executioner_axe'){updateFalcheAxe(g,p,dt,entities);continue;}
     if(p.spell==='fireball'||p.spell==='arrowrain'){
-      p.remaining=Math.max(0,p.remaining-dt);p.progress=clamp(1-p.remaining/p.total,0,1);
+      let flightDt=dt;
+      if((p.delayRemaining||0)>1e-8){const used=Math.min(flightDt,p.delayRemaining);p.delayRemaining=Math.max(0,p.delayRemaining-used);flightDt-=used;p.x=p.sx;p.y=p.sy;p.progress=0;
+        if(p.delayRemaining<=1e-8&&!p.launched){p.launched=true;event(g,p.spell==='arrowrain'?'arrowrain-launch':'fireball-launch',{x:p.sx,y:p.sy,tx:p.tx,ty:p.ty,owner:p.owner,travel:p.flightTotal||p.total});}
+        if(flightDt<=1e-8)continue;
+      }
+      if(!p.launched){p.launched=true;event(g,p.spell==='arrowrain'?'arrowrain-launch':'fireball-launch',{x:p.sx,y:p.sy,tx:p.tx,ty:p.ty,owner:p.owner,travel:p.flightTotal||p.total});}
+      p.remaining=Math.max(0,p.remaining-flightDt);p.progress=clamp(1-p.remaining/Math.max(.001,p.flightTotal||p.total),0,1);
       p.x=p.sx+(p.tx-p.sx)*p.progress;p.y=p.sy+(p.ty-p.sy)*p.progress;
       if(p.remaining<=1e-8){p.x=p.tx;p.y=p.ty;spellAreaImpact(g,p,p.spell);p.life=0;}
       continue;
@@ -1340,9 +1475,9 @@ export function viewMatch(g,seat=0){
   const p=g.players[seat];
   return {physicsVersion:PHYSICS_VERSION,mapTheme:g.mapTheme||'grass',phase:g.phase,countdown:g.countdown,time:rnd(g.time),overtime:g.overtime,winner:g.winner,reason:g.reason,
     scores:[towerScore(g,0),towerScore(g,1)],energy:rnd(p.energy),hand:[...p.hand],next:p.queue[0],deck:[...p.deck],
-    units:g.units.map(u=>({id:u.id,type:u.type,owner:u.owner,x:rnd(u.x),y:rnd(u.y),hp:u.hp,maxHp:u.maxHp,radius:u.radius,air:u.air,building:!!u.building,anim:u.anim,hit:u.hit,walk:u.walk,spawn:u.spawn,face:u.face,facing:u.facing,moving:!!u.moving,mass:u.mass,age:u.age,target:u.target||null,firstStrikeRemaining:rnd(Math.max(0,(u.firstStrikeReadyAt||0)-g.time)),targetable:u.targetable!==false,deploying:!!u.deploying,deployTotal:rnd(u.deployTotal||0),deployRemaining:rnd(u.deployRemaining||0),collisionDisabled:!!u.collisionDisabled,laserStage:u.laserStage||0,laserDps:rnd(u.laserDps||0),laserLockTime:rnd(u.laserLockTime||0),charged:!!u.charged,chargeRun:rnd(u.chargeRun||0),ramChargeProgress:rnd(clamp((u.ramChargeTime||0)/Math.max(.01,u.ramChargeAfter||2),0,1)),sparkCharged:!!u.sparkCharged,sparkChargeProgress:rnd(u.sparkChargeProgress||0),stunned:(u.stunUntil||0)>g.time,stunRemaining:rnd(Math.max(0,(u.stunUntil||0)-g.time)),slowed:(u.slowUntil||0)>g.time,slowStage:(u.slowUntil||0)>g.time?(u.slowStage||1):0,slowRemaining:rnd(Math.max(0,(u.slowUntil||0)-g.time)),poisoned:(u.poisonUntil||0)>g.time,poisonOwner:Number.isFinite(u.poisonOwner)?u.poisonOwner:null,poisonRemaining:rnd(Math.max(0,(u.poisonUntil||0)-g.time)),mudded:(u.mudUntil||0)>g.time,mudRemaining:rnd(Math.max(0,(u.mudUntil||0)-g.time)),burrowState:u.burrowState||null,burrowProgress:rnd(u.burrowProgress||0),summonType:u.summonType||null,summonCount:u.summonCount||0,summonRemaining:u.summonInterval?rnd(Math.max(0,(u.summonNextAt||g.time)-g.time)):0,summonCasting:(u.summonCastingUntil||0)>g.time,summonWindupRemaining:rnd(Math.max(0,(u.summonCastingUntil||0)-g.time)),dashState:u.dashState||null,dashWindupRemaining:rnd(Math.max(0,(u.dashWindupUntil||0)-g.time)),dashCooldownRemaining:rnd(Math.max(0,(u.dashReadyAt||0)-g.time)),invulnerable:(u.invulnerableUntil||0)>g.time,shieldHp:rnd(u.shieldHp||0),maxShieldHp:rnd(u.maxShieldHp||0),stealthed:!!u.stealthed,stealthRemaining:rnd(Math.max(0,(u.stealthUntil||0)-g.time)),eggHatchRemaining:u.eggUnit?rnd(Math.max(0,(u.eggHatchAt||g.time)-g.time)):0,revived:!!u.revived,drillStage:u.drillStage||0,drillDps:rnd(u.drillDps||0),drillLockTime:rnd(u.drillLockTime||0),crusherStage:u.crusherStage||0,iceSpiritState:u.iceSpiritState||null,iceSpiritProgress:rnd(u.iceSpiritProgress||0),fireSpiritState:u.fireSpiritState||null,fireSpiritProgress:rnd(u.fireSpiritProgress||0),megaJumpState:u.megaJumpState||null,megaJumpProgress:rnd(u.megaJumpProgress||0),megaJumpWindupRemaining:rnd(Math.max(0,(u.megaJumpWindupUntil||0)-g.time)),megaJumpTargetX:Number.isFinite(u.megaJumpTargetX)?rnd(u.megaJumpTargetX):null,megaJumpTargetY:Number.isFinite(u.megaJumpTargetY)?rnd(u.megaJumpTargetY):null,megaJumpStartX:Number.isFinite(u.megaJumpStartX)?rnd(u.megaJumpStartX):null,megaJumpStartY:Number.isFinite(u.megaJumpStartY)?rnd(u.megaJumpStartY):null,megaJumpEndX:Number.isFinite(u.megaJumpEndX)?rnd(u.megaJumpEndX):null,megaJumpEndY:Number.isFinite(u.megaJumpEndY)?rnd(u.megaJumpEndY):null,jumpRadius:u.jumpRadius||0,riverJumpMode:u.riverJumpMode||null,riverJumpState:u.riverJumpState||null,riverJumpProgress:rnd(u.riverJumpProgress||0),riverJumpEndX:Number.isFinite(u.riverJumpEndX)?rnd(u.riverJumpEndX):null,riverJumpEndY:Number.isFinite(u.riverJumpEndY)?rnd(u.riverJumpEndY):null,ironSpinUsed:!!u.ironSpinUsed,ironSpinState:u.ironSpinState||null,ironSpinProgress:rnd(u.ironSpinProgress||0),ironSpinEndX:Number.isFinite(u.ironSpinEndX)?rnd(u.ironSpinEndX):null,ironSpinEndY:Number.isFinite(u.ironSpinEndY)?rnd(u.ironSpinEndY):null,ironMarked:!!u.ironMarked,ironMarkOwner:Number.isFinite(u.ironMarkOwner)?u.ironMarkOwner:null,ironMarkProgress:u.ironMarked?rnd(clamp((u.ironMarkDamage||0)/Math.max(1,u.ironMarkThreshold||500),0,1)):0,hookState:u.hookState||null,hookProgress:rnd(u.hookProgress||0),hookCooldownRemaining:rnd(Math.max(0,(u.hookReadyAt||0)-g.time)),hookTargetX:Number.isFinite(u.hookTargetX)?rnd(u.hookTargetX):null,hookTargetY:Number.isFinite(u.hookTargetY)?rnd(u.hookTargetY):null,hookAirAttackRemaining:rnd(Math.max(0,(u.hookAirAttackUntil||0)-g.time)),turtleShellActive:!!(u.siegeTurtle&&u.moving)})),
-    towers:g.towers.map(t=>({id:t.id,kind:t.kind,slot:t.slot||null,owner:t.owner,x:t.x,y:t.y,hp:t.hp,maxHp:t.maxHp,radius:t.radius,footprintCols:t.footprintCols||0,footprintRows:t.footprintRows||0,rangeCells:t.rangeCells||0,anim:t.anim,hit:t.hit,facing:t.facing,awake:t.kind==='core'?!!t.awake:true,stunned:(t.stunUntil||0)>g.time,stunRemaining:rnd(Math.max(0,(t.stunUntil||0)-g.time))})),
-    projectiles:g.projectiles.map(p=>({id:p.id,owner:p.owner,x:rnd(p.x),y:rnd(p.y),tx:rnd(p.tx),ty:rnd(p.ty),kind:p.kind,spell:p.spell||null,progress:rnd(p.progress||0),radius:p.splash||0})),
-    zones:(g.zones||[]).map(z=>({id:z.id,owner:z.owner,kind:z.kind,spell:z.spell,x:rnd(z.x),y:rnd(z.y),radius:z.radius,remaining:rnd(z.remaining),total:z.total,active:z.kind==='skeletonrush'?g.time+1e-8>=z.activateAt:true,activationRemaining:z.kind==='skeletonrush'?rnd(Math.max(0,z.activateAt-g.time)):0,detonateRemaining:z.kind==='giantskeletonbomb'?rnd(Math.max(0,z.detonateAt-g.time)):0})),
+    units:g.units.map(u=>({id:u.id,type:u.type,owner:u.owner,x:rnd(u.x),y:rnd(u.y),hp:u.hp,maxHp:u.maxHp,radius:u.radius,air:u.air,building:!!u.building,footprintCols:u.footprintCols||0,footprintRows:u.footprintRows||0,hitboxCols:u.hitboxCols||0,hitboxRows:u.hitboxRows||0,anim:u.anim,hit:u.hit,walk:u.walk,spawn:u.spawn,face:u.face,facing:u.facing,moving:!!u.moving,mass:u.mass,age:u.age,target:u.target||null,firstStrikeRemaining:rnd(Math.max(0,(u.firstStrikeReadyAt||0)-g.time)),targetable:u.targetable!==false,deploying:!!u.deploying,deployTotal:rnd(u.deployTotal||0),deployRemaining:rnd(u.deployRemaining||0),collisionDisabled:!!u.collisionDisabled,laserStage:u.laserStage||0,laserDps:rnd(u.laserDps||0),laserLockTime:rnd(u.laserLockTime||0),charged:!!u.charged,chargeRun:rnd(u.chargeRun||0),mountedCharge:!!u.mountedCharge,chargeProgress:u.mountedCharge&&u.chargeDistance?rnd(clamp((u.chargeRun||0)/u.chargeDistance,0,1)):0,axeInFlight:!!u.axeInFlight,rageActive:rageSpeedFactor(g,u)>1,ramChargeProgress:rnd(clamp((u.ramChargeTime||0)/Math.max(.01,u.ramChargeAfter||2),0,1)),sparkCharged:!!u.sparkCharged,sparkChargeProgress:rnd(u.sparkChargeProgress||0),stunned:(u.stunUntil||0)>g.time,stunRemaining:rnd(Math.max(0,(u.stunUntil||0)-g.time)),slowed:(u.slowUntil||0)>g.time,slowStage:(u.slowUntil||0)>g.time?(u.slowStage||1):0,slowRemaining:rnd(Math.max(0,(u.slowUntil||0)-g.time)),poisoned:(u.poisonUntil||0)>g.time,poisonOwner:Number.isFinite(u.poisonOwner)?u.poisonOwner:null,poisonRemaining:rnd(Math.max(0,(u.poisonUntil||0)-g.time)),mudded:(u.mudUntil||0)>g.time,mudRemaining:rnd(Math.max(0,(u.mudUntil||0)-g.time)),burrowState:u.burrowState||null,burrowProgress:rnd(u.burrowProgress||0),summonType:u.summonType||null,summonCount:u.summonCount||0,summonRemaining:u.summonInterval?rnd(Math.max(0,(u.summonNextAt||g.time)-g.time)):0,summonCasting:(u.summonCastingUntil||0)>g.time,summonWindupRemaining:rnd(Math.max(0,(u.summonCastingUntil||0)-g.time)),energyPump:!!u.energyPump,energyPumpProgress:u.energyPump&&u.energyInterval&&Number.isFinite(u.energyNextAt)?rnd(clamp(1-(u.energyNextAt-g.time)/u.energyInterval,0,1)):0,energyPumpRemaining:u.energyPump&&Number.isFinite(u.energyNextAt)?rnd(Math.max(0,u.energyNextAt-g.time)):0,dashState:u.dashState||null,dashWindupRemaining:rnd(Math.max(0,(u.dashWindupUntil||0)-g.time)),dashCooldownRemaining:rnd(Math.max(0,(u.dashReadyAt||0)-g.time)),invulnerable:(u.invulnerableUntil||0)>g.time,shieldHp:rnd(u.shieldHp||0),maxShieldHp:rnd(u.maxShieldHp||0),stealthed:!!u.stealthed,stealthRemaining:rnd(Math.max(0,(u.stealthUntil||0)-g.time)),eggHatchRemaining:u.eggUnit?rnd(Math.max(0,(u.eggHatchAt||g.time)-g.time)):0,revived:!!u.revived,drillStage:u.drillStage||0,drillDps:rnd(u.drillDps||0),drillLockTime:rnd(u.drillLockTime||0),crusherStage:u.crusherStage||0,iceSpiritState:u.iceSpiritState||null,iceSpiritProgress:rnd(u.iceSpiritProgress||0),fireSpiritState:u.fireSpiritState||null,fireSpiritProgress:rnd(u.fireSpiritProgress||0),megaJumpState:u.megaJumpState||null,megaJumpProgress:rnd(u.megaJumpProgress||0),megaJumpWindupRemaining:rnd(Math.max(0,(u.megaJumpWindupUntil||0)-g.time)),megaJumpTargetX:Number.isFinite(u.megaJumpTargetX)?rnd(u.megaJumpTargetX):null,megaJumpTargetY:Number.isFinite(u.megaJumpTargetY)?rnd(u.megaJumpTargetY):null,megaJumpStartX:Number.isFinite(u.megaJumpStartX)?rnd(u.megaJumpStartX):null,megaJumpStartY:Number.isFinite(u.megaJumpStartY)?rnd(u.megaJumpStartY):null,megaJumpEndX:Number.isFinite(u.megaJumpEndX)?rnd(u.megaJumpEndX):null,megaJumpEndY:Number.isFinite(u.megaJumpEndY)?rnd(u.megaJumpEndY):null,jumpRadius:u.jumpRadius||0,riverJumpMode:u.riverJumpMode||null,riverJumpState:u.riverJumpState||null,riverJumpProgress:rnd(u.riverJumpProgress||0),riverJumpEndX:Number.isFinite(u.riverJumpEndX)?rnd(u.riverJumpEndX):null,riverJumpEndY:Number.isFinite(u.riverJumpEndY)?rnd(u.riverJumpEndY):null,ironSpinUsed:!!u.ironSpinUsed,ironSpinState:u.ironSpinState||null,ironSpinProgress:rnd(u.ironSpinProgress||0),ironSpinEndX:Number.isFinite(u.ironSpinEndX)?rnd(u.ironSpinEndX):null,ironSpinEndY:Number.isFinite(u.ironSpinEndY)?rnd(u.ironSpinEndY):null,ironMarked:!!u.ironMarked,ironMarkOwner:Number.isFinite(u.ironMarkOwner)?u.ironMarkOwner:null,ironMarkProgress:u.ironMarked?rnd(clamp((u.ironMarkDamage||0)/Math.max(1,u.ironMarkThreshold||500),0,1)):0,hookState:u.hookState||null,hookProgress:rnd(u.hookProgress||0),hookCooldownRemaining:rnd(Math.max(0,(u.hookReadyAt||0)-g.time)),hookTargetX:Number.isFinite(u.hookTargetX)?rnd(u.hookTargetX):null,hookTargetY:Number.isFinite(u.hookTargetY)?rnd(u.hookTargetY):null,hookAirAttackRemaining:rnd(Math.max(0,(u.hookAirAttackUntil||0)-g.time)),turtleShellActive:!!(u.siegeTurtle&&u.moving)})),
+    towers:g.towers.map(t=>({id:t.id,kind:t.kind,slot:t.slot||null,owner:t.owner,x:t.x,y:t.y,hp:t.hp,maxHp:t.maxHp,radius:t.radius,footprintCols:t.footprintCols||0,footprintRows:t.footprintRows||0,hitboxCols:t.hitboxCols||0,hitboxRows:t.hitboxRows||0,rangeCells:t.rangeCells||0,anim:t.anim,hit:t.hit,facing:t.facing,awake:t.kind==='core'?!!t.awake:true,stunned:(t.stunUntil||0)>g.time,stunRemaining:rnd(Math.max(0,(t.stunUntil||0)-g.time)),rageActive:rageSpeedFactor(g,t)>1})),
+    projectiles:g.projectiles.map(p=>({id:p.id,owner:p.owner,x:rnd(p.x),y:rnd(p.y),sx:rnd(p.sx||p.x),sy:rnd(p.sy||p.y),tx:rnd(p.tx),ty:rnd(p.ty),kind:p.kind,spell:p.spell||null,phase:p.phase||null,hitWidth:rnd(p.hitWidth||0),progress:rnd(p.progress||0),radius:p.splash||0,launched:p.launched!==false,delayRemaining:rnd(p.delayRemaining||0),launchDelay:rnd(p.launchDelay||0),flightTotal:rnd(p.flightTotal||p.total||0)})),
+    zones:(g.zones||[]).map(z=>({id:z.id,owner:z.owner,kind:z.kind,spell:z.spell,x:rnd(z.x),y:rnd(z.y),radius:z.radius,remaining:rnd(z.remaining),total:z.total,boostMultiplier:z.boostMultiplier||1,active:(z.kind==='skeletonrush'||z.kind==='rage')?g.time+1e-8>=z.activateAt:true,activationRemaining:(z.kind==='skeletonrush'||z.kind==='rage')?rnd(Math.max(0,z.activateAt-g.time)):0,detonateRemaining:(z.kind==='giantskeletonbomb'||z.kind==='airballoonbomb')?rnd(Math.max(0,z.detonateAt-g.time)):0})),
     events:g.events.map(e=>({...e})),bot:g.bot,difficulty:g.difficulty};
 }

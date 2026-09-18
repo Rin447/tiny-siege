@@ -110,16 +110,16 @@ async def main():
         await close_detail(page)
         await ok('Tracker detail shows 4-second hook cooldown plus ground, air and building hook behavior')
 
-        # New unit: Princess Archer
+        # Updated unit: Princess
         await open_detail(page,'princess')
         stats=await page.locator('#cardDetailStats').inner_text()
         desc=await page.locator('#cardDetailDesc').inner_text()
         canvas=page.locator('#cardDetailDemo')
-        assert '3' in stats and '300' in stats and '275' in stats and '350' in stats and '3秒' in stats, stats
+        assert '3' in stats and '261' in stats and '275' in stats and '9マス' in stats and '3秒' in stats, stats
         assert '地上＋空中' in stats, stats
-        assert '橋を渡らず' in desc and '矢の雨なら一撃' in desc, desc
+        assert '射程9マス' in desc and '視界9マス' in desc and '矢の雨なら一撃' in desc, desc
         assert await canvas.get_attribute('data-demo-scenario')=='princess-cross-river-shot'
-        await ok('Princess Archer detail shows cost 3, HP 300, attack 275, 3-second fire rate and cross-river range 350')
+        await ok('Princess detail shows cost 3, HP 261, attack 275, 9-cell range and matching 9-cell vision')
         await close_detail(page)
 
         # New unit: Sparky

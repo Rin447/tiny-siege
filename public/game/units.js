@@ -1,5 +1,5 @@
 /** Balance data: original prototype values. Both browser and server import this file. */
-export const VERSION = '37.2.0';
+export const VERSION = '38.0.0';
 export const MAX_DECK = 8;
 export const MAP_THEMES = Object.freeze(['grass','stone','lava','snow','desert']);
 export const GRID_COLS = 18;
@@ -34,6 +34,24 @@ export const TOWER_GRID = Object.freeze({
 });
 export const SUMMON_DELAY_BY_COST = Object.freeze({1:.4,2:.5,3:.7,4:.9,5:1.2,6:1.5,7:1.8,8:2.1});
 export const VISION_CELLS_BY_SIZE = Object.freeze({small:4,medium:5,large:6});
+export const MELEE_RANGE_CELLS = Object.freeze({close:1,medium:1.5,long:2});
+export const MELEE_RANGE_LABELS = Object.freeze({close:'\u8fd1\u8ddd\u96e2',medium:'\u4e2d\u8ddd\u96e2',long:'\u9577\u8ddd\u96e2'});
+export function meleeRangeTierFor(data){
+  if(!data||data.spell||data.building||data.projectile||data.laserUnit||data.sparkUnit)return null;
+  const cells=Number.isFinite(data.rangeCells)?data.rangeCells:worldToCells(data.range||0);
+  if(cells<=MELEE_RANGE_CELLS.close+1e-6)return 'close';
+  if(cells<=MELEE_RANGE_CELLS.medium+1e-6)return 'medium';
+  if(cells<=MELEE_RANGE_CELLS.long+1e-6)return 'long';
+  return null;
+}
+export function meleeRangeLabelFor(data){const tier=data?.meleeTier||meleeRangeTierFor(data);return tier?MELEE_RANGE_LABELS[tier]||null:null;}
+const BUILDING_GEOMETRY = Object.freeze({
+  cannon:Object.freeze({visualScale:1.90,hitboxCols:2.20,hitboxRows:1.90}),
+  tombstone:Object.freeze({visualScale:1.72,hitboxCols:1.85,hitboxRows:2.45}),
+  oven:Object.freeze({visualScale:1.62,hitboxCols:2.35,hitboxRows:2.30}),
+  lasertower:Object.freeze({visualScale:1.68,hitboxCols:2.05,hitboxRows:2.45}),
+  elixirpump:Object.freeze({visualScale:1.72,hitboxCols:2.30,hitboxRows:2.45})
+});
 export const VISION_BY_SIZE = Object.freeze(Object.fromEntries(Object.entries(VISION_CELLS_BY_SIZE).map(([k,v])=>[k,cellsToWorld(v)])));
 export function visionSizeFor(data){
   if(!data)return 'small';
@@ -43,6 +61,7 @@ export function visionSizeFor(data){
 }
 export function visionRangeFor(data){
   if(!data)return VISION_BY_SIZE.small;
+  if(data.visionMatchesRange)return Math.max(0,data.range||0);
   if(Number.isFinite(data.aggroRange))return Math.max(0,data.aggroRange);
   const base=VISION_BY_SIZE[visionSizeFor(data)]||VISION_BY_SIZE.medium;
   // Long-range weapons can acquire targets one grid cell beyond their firing range.
@@ -109,29 +128,36 @@ const RAW_UNITS = {
   dosranboss:{id:'dosranboss',mass:2.35,name:'ドスランボス',short:'ドスラン',role:'近接前衛・群れ召喚',cost:6,hp:1100,damage:170,speed:36,range:32,cooldown:1.45,radius:19,count:1,air:false,targetsAir:false,summonType:'ranbos',summonCount:3,summonInterval:10,summonWindup:3,summonOnDeploy:true,color:'#4c79a8',desc:'大型ラプトルの首領。移動速度は遅め。1.5秒の本体召喚が完了した瞬間にランボス3体を呼び、その後も10秒ごとに3秒足を止めてランボス3体を追加召喚する。'},
   ranbos:{id:'ranbos',mass:0.88,name:'ランボス',short:'ランボス',role:'召喚子分',cost:0,hp:360,damage:58,speed:66,range:22,cooldown:1.15,radius:11,count:1,air:false,targetsAir:false,hidden:true,color:'#6f9cc9',desc:'ドスランボスに付き従う小型ラプター。性能は本体のおよそ3分の1で、素早く噛みついて前線をかく乱する。'},
   ashsquad:{id:'ashsquad',mass:2,name:'アッシュ部隊',short:'アッシュ隊',role:'近接部隊・3体編成',cost:5,hp:780,damage:112,speed:50,range:34,cooldown:1.05,radius:16,count:3,air:false,targetsAir:false,spawnType:'blade',color:'#d8b56f',desc:'アッシュ剣士3体を一度に展開する部隊カード。敵方向へ1体を前、2体を後ろにした三角陣形で出現し、後衛ユニットへ重ねる防衛や一斉近接攻撃に向く。'},
-  princess:{id:'princess',mass:1.1,name:'プリンセスアーチャー',short:'プリンセス',role:'超長射程・範囲対空',cost:3,hp:300,damage:275,speed:25,range:350,cooldown:3,radius:14,count:1,air:false,targetsAir:true,projectile:'royal_arrow',splash:70,color:'#e5b7c9',desc:'巨大な弓を扱う超長射程の範囲射手。橋を渡らず自陣側から敵サイドタワーを狙える射程350を持ち、地上・空中へ3秒ごとに275ダメージ。着弾地点の半径70にも攻撃が広がる。HP300と非常に脆く、矢の雨なら一撃で倒される。'},
+  princess:{id:'princess',mass:1.1,name:'プリンセス',short:'プリンセス',role:'超長射程・範囲対空',cost:3,hp:261,damage:275,speed:25,range:297,cooldown:3,radius:14,count:1,air:false,targetsAir:true,projectile:'royal_arrow',splash:70,visionMatchesRange:true,color:'#e5b7c9',desc:'小柄な二頭身シルエットの超長射程プリンセス。射程9マス・視界9マスで、見えている相手だけを長距離から狙う。地上・空中へ3秒ごとに275ダメージを与え、着弾地点の半径70にも攻撃が広がる。HP261と非常に脆く、矢の雨なら一撃で倒される。'},
   sparky:{id:'sparky',mass:8.8,name:'スパーキー',short:'スパーキー',role:'常時充電・超火力範囲',cost:6,hp:1500,damage:1200,speed:23,summonDelay:1.8,range:145,cooldown:0,radius:23,count:1,air:false,targetsAir:false,projectile:'sparkblast',splash:90,sparkUnit:true,sparkChargeTime:3.5,color:'#d8b45c',desc:'地上のみを狙う6コストの超火力兵器。1.8秒の召喚完了後から敵がいなくても3.5秒充電し、満充電なら敵が射程へ入った瞬間に1200の広範囲攻撃を放つ。発射後は再充電。ザップを受けると充電が0へ戻り、スタン解除後に最初から充電し直す。'},
 
   blowdart:{id:'blowdart',mass:.9,name:'吹き矢ゴブリン',short:'吹き矢',role:'長射程・高速対空',cost:3,hp:240,damage:110,speed:46,range:195,cooldown:.5,radius:12,count:1,air:false,targetsAir:true,projectile:'dart',color:'#8fbd63',desc:'HP240と非常に脆い代わりに、0.5秒ごとに110ダメージを放つ長射程射手。v16で射程を220から195へ短縮し、タワーの反撃が届かない位置から一方的に攻撃できないよう調整。地上・空中の両方に対応する。'},
-  lasertower:{id:'lasertower',mass:1000000,name:'レーザー塔',short:'レーザー塔',role:'防衛建物・単体増幅レーザー',cost:5,hp:2000,damage:20,speed:0,range:220,cooldown:.1,radius:26,count:1,air:false,targetsAir:true,building:true,laserTower:true,laserBaseDps:20,laserRampEvery:1,laserMultiplier:2,color:'#9c8ed0',desc:'同じ敵へ照射し続けるほど1秒ごとに威力が倍化する5コスト防衛建物。初期火力はボーン1体すらすぐ倒せないほど低いが、上限はない。対象が死亡・射程外・攻撃対象外になると次の対象へ切り替わり、火力は初期値へ戻る。'},
+  lasertower:{id:'lasertower',mass:1000000,name:'レーザー塔',short:'レーザー塔',role:'防衛建物・単体増幅レーザー',cost:5,hp:2000,damage:42,speed:0,range:220,cooldown:.1,radius:26,count:1,air:false,targetsAir:true,building:true,decayPerSecond:60,laserTower:true,laserBaseDps:42,laserDamageTick:.2,laserRampEvery:1,laserMultiplier:2,color:'#9c8ed0',desc:'同じ敵へレーザーを常時照射し、0.2秒ごとにダメージを与える5コスト防衛建物。初期42 DPSから始まり、同じ対象へ1秒照射するごとに火力が2倍化する。レーザー線は常時表示され、現在狙っている相手が分かる。HPは毎秒60ずつ自然減少し、対象変更・射程外・攻撃対象外になると火力は42 DPSへ戻る。'},
+  elixirpump:{id:'elixirpump',mass:1000000,name:'エリクサーポンプ',short:'ポンプ',role:'設置物・エリクサー生成',cost:6,hp:1070,damage:0,speed:0,range:0,cooldown:99,radius:27,count:1,air:false,targetsAir:false,building:true,decayPerSecond:11.5,energyPump:true,energyInterval:13,energyAmount:1,ownerEnergyOnDeath:1,color:'#d979bd',desc:'6コストの資源生成設置物。HP1070で毎秒11.5ずつ自然減少する。建設完了後から13秒かけてタンクへピンク色のエリクサーが溜まり、満タンになるたび自分へ1エリクサーを生成して空に戻る。破壊・自然崩壊のどちらでも最後に1エリクサーを得る。'},
   laserdragon:{id:'laserdragon',mass:4.2,name:'レーザードラゴン',short:'レーザー竜',role:'飛行・単体増幅レーザー',cost:5,hp:1300,damage:20,speed:41,range:145,cooldown:.1,radius:21,count:1,air:true,targetsAir:true,laserUnit:true,laserBaseDps:20,laserRampEvery:1.5,laserMultiplier:2,color:'#71a4d6',desc:'地上・空中の両方を狙える5コスト飛行ドラゴン。移動速度は標準、射程145の中距離。レーザー塔と同じく同じ敵へ照射し続けるほど1.5秒ごとに火力が倍化し、対象変更・射程外・スタンで増幅が初期値へ戻る。'},
   shieldknight:{id:'shieldknight',mass:6.5,name:'シールドナイト',short:'盾騎士',role:'正面防御・前衛タンク',cost:4,hp:1400,damage:110,speed:38,range:34,cooldown:1.2,radius:22,count:1,air:false,targetsAir:false,shieldMax:650,shieldAbsorb:.65,shieldArcDeg:120,color:'#8ea7b5',desc:'大盾で正面約120度からの通常攻撃を受け止める4コスト前衛。盾耐久650が残る間は正面ダメージの65%を盾が吸収し、35%だけ本体へ通す。横・背後からの攻撃やスペル・継続ダメージは盾を無視する。'},
+  prince:{id:'prince',mass:5.8,name:'プリンス',short:'プリンス',role:'近接（長距離）・距離突進',cost:5,hp:1920,damage:392,speed:40,range:66,cooldown:1.4,radius:20,count:1,air:false,targetsAir:false,meleeTier:'long',mountedCharge:true,chargeDistance:82.5,chargeDamage:784,chargeSpeedMultiplier:1.25,color:'#d8b65d',desc:'金色の鎧と長いランスを持つ騎馬戦士。2.5マスを連続で歩くとランスを前に構えて突進。突進中は少し加速し、次の地上対象へ784ダメージ。通常攻撃・移動中断・スタン・突進命中で走行距離は0へ戻る。'},
+  darkprince:{id:'darkprince',mass:6.0,name:'ダークプリンス',short:'ダークプリンス',role:'近接（中距離）・範囲突進・シールド',cost:4,hp:1200,damage:266,speed:40,range:50,cooldown:1.4,radius:20,count:1,air:false,targetsAir:false,meleeTier:'medium',meleeSplash:40,mountedCharge:true,chargeDistance:66,chargeDamage:532,chargeSpeedMultiplier:1.25,shieldMax:240,shieldAll:true,shieldNoOverflow:true,color:'#3e4348',desc:'黒い鎧・黒い金棒・盾を持つ騎馬戦士。2マス連続で歩くと金棒を掲げて突進し、次の攻撃は半径1マスへ532ダメージ。通常攻撃も半径1マスの範囲攻撃。シールド240は本体HPと別で、一撃が残りシールドを超えてもその一撃の余剰ダメージは本体に貫通しない。'},
   windmage:{id:'windmage',mass:1.55,name:'ウィンドメイジ',short:'風術師',role:'遠距離・ノックバック',cost:4,hp:570,damage:95,speed:39,range:175,cooldown:1.6,radius:15,count:1,air:false,targetsAir:true,projectile:'wind',knockback:true,color:'#8bc7b0',desc:'地上・空中へ風弾を放つ位置操作術師。命中した敵を攻撃方向へ押し戻し、軽量ほど大きく飛ばす。小型約34px・中型約20px・大型約8px、超重量と建物は動かせない。'},
   phoenix:{id:'phoenix',mass:2.1,name:'フェニックス',short:'フェニックス',role:'飛行・一度だけ復活',cost:5,hp:900,damage:130,speed:54,range:110,cooldown:1.2,radius:18,count:1,air:true,targetsAir:true,projectile:'phoenix_fire',phoenixRevive:true,eggType:'phoenix_egg',color:'#e57d4b',desc:'地上・空中へ炎を放つ飛行ユニット。最初に倒されると地上へHP600の卵を残し、4秒間壊されなければHP450で一度だけ復活する。川上で倒れた場合は最寄りの安全な地面へ卵が落ちる。'},
   phoenix_egg:{id:'phoenix_egg',hidden:true,mass:1000,name:'フェニックスの卵',short:'卵',role:'復活待機',cost:0,hp:600,damage:0,speed:0,range:0,cooldown:99,radius:16,count:1,air:false,targetsAir:false,eggUnit:true,eggHatchTime:4,hatchType:'phoenix',color:'#e6a65b',desc:'フェニックスが最初に倒された場所へ残る卵。4秒守り切るとフェニックスがHP50%で一度だけ復活する。'},
   mirage:{id:'mirage',mass:1.8,name:'ロイヤルゴースト',short:'ゴースト',role:'ステルス・小範囲近接',cost:3,hp:1210,damage:261,speed:68,range:30,cooldown:1.8,radius:15,count:1,air:false,targetsAir:false,meleeSplash:40,stealthDuration:3,stealthFirstMultiplier:1.4,color:'#d7e5df',desc:'白く透けた身体、もじゃもじゃの白髭、王冠、短剣が特徴のやる気なさげな老王の幽霊。召喚完了後に最大3秒ステルスして半透明になり、直接狙われず接近。攻撃・3秒経過・被弾で実体化し、短剣の一撃は半径40の小範囲へ261ダメージ。ステルス初撃は1.4倍。'},
+  falche:{id:'falche',mass:3.4,name:'執行人ファルチェ',short:'ファルチェ',role:'遠距離・往復貫通斧',cost:5,hp:1280,damage:179,speed:40,range:149,cooldown:2.4,radius:18,count:1,air:false,targetsAir:true,executionerAxe:true,axeTravelRange:231,axeHitWidth:66,axeSpeed:260,color:'#6f7376',desc:'黒いマスクを被った上半身裸の執行人。射程4.5マスへ地上・空中の敵を狙い、巨大な斧を一直線に最大7マス投げる。斧は軌道上の敵全員へ179ダメージを与え、最大距離から同じ軌道を戻る際にも179ダメージ。斧が手元へ戻るまでファルチェ本人はその場から動けない。'},
   skybomber:{id:'skybomber',mass:2.4,name:'スカイボマー',short:'空爆兵',role:'飛行・長射程全対象爆撃',cost:4,hp:650,damage:175,speed:51,range:170,cooldown:1.6,radius:17,count:1,air:true,targetsAir:true,projectile:'sky_bomb',color:'#7ba0ad',desc:'地上ユニット・空中ユニット・建物を狙える4コスト飛行爆撃兵。HP650、攻撃175、速度51、射程170、攻撃間隔1.6秒。長い射程から上空より爆弾を投下する。'},
   scrapdrill:{id:'scrapdrill',mass:3.4,name:'スクラップドリル',short:'ドリル',role:'建物特攻・張り付き増幅',cost:4,hp:900,damage:90,speed:46,range:24,cooldown:.1,radius:18,count:1,air:false,targetsAir:false,buildingOnly:true,drillUnit:true,drillBaseDps:90,drillRampEvery:1.5,drillDpsStages:[90,135,180,240],color:'#9b815d',desc:'建物へ張り付いてドリルを回し続ける4コスト特攻兵。接触直後90 DPSから始まり、1.5秒ごとに135→180→240 DPSへ上昇。建物から離される・対象変更・スタンで90 DPSへ戻る。'},
   bombcarrier:{id:'bombcarrier',mass:1.3,name:'ボムキャリア',short:'爆弾運び',role:'建物特攻・高速自爆',cost:3,hp:430,damage:480,speed:79,range:18,cooldown:99,radius:13,count:1,air:false,targetsAir:false,buildingOnly:true,suicideUnit:true,suicideDamage:480,carrierDeathDamage:80,carrierDeathRadius:55,color:'#b98956',desc:'建物だけを狙って全速力で走る3コスト使い捨て特攻兵。建物へ到達すると自爆して480ダメージを与えて消滅。途中で倒されても周囲の敵ユニットへ80ダメージの小爆発を残す。'},
   skeletonbarrel:{id:'skeletonbarrel',mass:1.15,name:'スケルトンバレル',short:'スケバレ',role:'飛行・建物特攻・撃破展開',cost:3,hp:532,damage:145,speed:56,range:20,cooldown:99,radius:15,count:1,air:true,targetsAir:false,buildingOnly:true,suicideUnit:true,suicideDamage:145,carrierDeathDamage:145,carrierDeathRadius:60,deathSummonType:'skeleton',deathSummonCount:7,color:'#8fb6da',desc:'髑髏模様の樽を3つの風船で吊るした3コスト飛行攻城ユニット。HP532、少し速い移動で建物だけを狙い、到達時は樽を落として145ダメージを与えつつスケルトン7体を展開。途中で倒されてもその場で風船が割れ、周囲へ145ダメージを与えてからスケルトン7体が飛び出す。'},
+  airballoon:{id:'airballoon',mass:4.8,name:'\u30a8\u30a2\u30d0\u30eb\u30fc\u30f3',short:'\u30d0\u30eb\u30fc\u30f3',role:'\u98db\u884c\u30fb\u5efa\u7269\u7279\u653b\u30fb\u6b7b\u4ea1\u6642\u9045\u5ef6\u7206\u5f3e',cost:5,hp:1676,damage:640,speed:40,range:33,cooldown:2,radius:23,count:1,air:true,targetsAir:false,buildingOnly:true,projectile:'airballoon_bomb',deathBombDamage:240,deathBombRadius:33,deathBombDelay:2,deathBombKind:'airballoonbomb',color:'#4f9dff',desc:'\u9752\u3044\u6c17\u7403\uff08\u6575\u5074\u306f\u8d64\uff09\u306b\u30b9\u30b1\u30eb\u30c8\u30f3\u304c\u4e57\u308b5\u30b3\u30b9\u30c8\u98db\u884c\u30e6\u30cb\u30c3\u30c8\u3002HP1676\u30fb\u653b\u6483640\u30fb\u653b\u6483\u9593\u96942\u79d2\u3067\u5efa\u7269\u3060\u3051\u3092\u72d9\u3044\u3001\u63a5\u8fd1\u3057\u3066\u7206\u5f3e\u3092\u771f\u4e0b\u3078\u843d\u3068\u3059\u3002\u5012\u3055\u308c\u308b\u3068\u6b7b\u4ea1\u5730\u70b9\u306b\u7206\u5f3e\u3092\u6b8b\u3057\u30012\u79d2\u5f8c\u306b\u534a\u5f841\u30de\u30b9\u306e\u5730\u4e0a\u30e6\u30cb\u30c3\u30c8\u3068\u5efa\u7269\u3078240\u30c0\u30e1\u30fc\u30b8\u3002'},
+  lumberjack:{id:'lumberjack',mass:2.4,name:'\u30e9\u30f3\u30d0\u30fc\u30b8\u30e3\u30c3\u30af',short:'\u30e9\u30f3\u30d0\u30fc',role:'\u9ad8\u901f\u8fd1\u63a5\u30fb\u6b7b\u4ea1\u6642\u30ec\u30a4\u30b8',cost:4,hp:1282,damage:255,speed:79,range:33,cooldown:.8,radius:16,count:1,air:false,targetsAir:false,deathRage:true,color:'#d6a557',desc:'\u91d1\u9aea\u3068\u3072\u3052\u3082\u3058\u3083\u306e\u5c0f\u67c4\u306a4\u30b3\u30b9\u30c8\u5730\u4e0a\u30e6\u30cb\u30c3\u30c8\u3002HP1282\u30fb\u653b\u6483255\u30fb\u653b\u6483\u9593\u96940.8\u79d2\u30fb\u79fb\u52d5\u306f\u3068\u3066\u3082\u901f\u3044\u3002\u5c0f\u578b\u306e\u65a7\u3067\u5730\u4e0a\u306e\u6575\u3092\u653b\u6483\u3057\u3001\u5012\u3055\u308c\u308b\u3068\u62b1\u3048\u3066\u3044\u305f\u30ec\u30a4\u30b8\u74f6\u3092\u6b7b\u4ea1\u5730\u70b9\u3078\u843d\u3068\u3059\u30021.5\u79d2\u5f8c\u306b\u65e2\u5b58\u306e\u30ec\u30a4\u30b8\u3068\u540c\u3058\u52b9\u679c\u3092\u767a\u52d5\u3059\u308b\u3002'},
   giantskeleton:{id:'giantskeleton',mass:9.4,name:'\u5de8\u5927\u30b9\u30b1\u30eb\u30c8\u30f3',short:'\u5de8\u5927\u30b9\u30b1',role:'\u5730\u4e0a\u524d\u885b\u30fb\u6b7b\u4ea1\u6642\u6642\u9650\u7206\u5f3e',cost:6,hp:3361,damage:276,speed:40,range:36,cooldown:1.3,radius:25,count:1,air:false,targetsAir:false,deathBombDamage:688,deathBombRadius:58,deathBombDelay:3,color:'#c9c1ad',desc:'6\u30b3\u30b9\u30c8\u306e\u5927\u578b\u5730\u4e0a\u30b9\u30b1\u30eb\u30c8\u30f3\u3002HP3361\u30fb\u653b\u6483276\u30fb\u653b\u6483\u9593\u96941.3\u79d2\u3067\u3001\u5730\u4e0a\u30e6\u30cb\u30c3\u30c8\u3068\u5efa\u7269\u3092\u653b\u6483\u3002\u6b69\u884c\u4e2d\u306f\u4e21\u8155\u3092\u7e26\u306b\u632f\u308b\u3002\u5012\u3055\u308c\u308b\u3068\u6b7b\u4ea1\u5730\u70b9\u306b\u7206\u5f3e\u3092\u6b8b\u3057\u30013\u79d2\u5f8c\u306b\u534a\u5f8458\u3078688\u30c0\u30e1\u30fc\u30b8\u3002'},
   skeletonrush:{id:'skeletonrush',cardType:'spell',spell:'skeletonrush',name:'スケルトンラッシュ',short:'スケラッシュ',role:'呪文・継続スケルトン召喚',cost:5,damage:0,buildingDamage:0,radius:110,count:0,targetsAir:false,activationDelay:1.2,zoneDuration:9,firstSpawnDelay:3,spawnEvery:.5,spawnType:'skeleton',offscreenFraction:.4,color:'#8f67bc',desc:'指定範囲を1.2秒後に紫色の召喚エリアへ変化。発動後3秒でスケルトン1体を出し、その後0.5秒ごとに召喚。効果は9秒。建物に範囲を重ねられるが建物内部には出現しない。範囲は最大40%まで画面外へはみ出せ、画面内の有効地点だけに出現する。'},
-  fireball:{id:'fireball',cardType:'spell',spell:'fireball',name:'ファイヤーボール',short:'火球',role:'呪文・範囲爆撃',cost:4,damage:689,buildingDamage:159,radius:90,count:0,targetsAir:true,color:'#ed7a47',desc:'戦場の好きな場所へ本拠地から火球を放つ。半径90にユニット689ダメージ、建物159ダメージ。遠いほど着弾が遅く、追尾しないため偏差撃ちが必要。'},
+  fireball:{id:'fireball',cardType:'spell',spell:'fireball',name:'ファイヤーボール',short:'火球',role:'呪文・予告範囲爆撃・ノックバック',cost:4,damage:689,buildingDamage:159,radius:100,count:0,targetsAir:true,launchDelay:1.26,knockbackCells:1,color:'#ed7a47',desc:'指定地点を1.26秒予告した後、自軍中央本拠地から火球を発射する。半径2.5マスへユニット689・建物159ダメージ。小型・中型ユニットは爆心地から外側へ約1マス吹き飛ばす。発射後の飛行時間は従来どおり本拠地からの距離で変化する。'},
   poison:{id:'poison',cardType:'spell',spell:'poison',name:'ポイズン',short:'ポイズン',role:'呪文・8秒継続毒エリア',cost:3,damage:91,buildingDamage:21,radius:90,count:0,targetsAir:true,zoneDuration:8,tickEvery:1,lingerDuration:0,lingerDamage:0,color:'#c94f5c',desc:'指定地点へ遅延なしで毒エリアを8秒展開。範囲内の敵ユニットへ毎秒91ダメージ、建物へ毎秒21ダメージ。範囲を離れた後の残留毒は発生しない。'},
-  arrowrain:{id:'arrowrain',cardType:'spell',spell:'arrowrain',name:'矢の雨',short:'矢の雨',role:'呪文・広範囲一斉射撃',cost:3,damage:366,buildingDamage:75,radius:130,count:0,targetsAir:true,color:'#c89b68',desc:'ファイヤーボールより広い半径130へ矢を降らせる。ユニットへ366ダメージ、建物へ75ダメージ。着弾が速く、散らばった小型群体の緊急処理に向く。'},
+  arrowrain:{id:'arrowrain',cardType:'spell',spell:'arrowrain',name:'矢の雨',short:'矢の雨',role:'呪文・予告遠距離一斉射撃',cost:3,damage:366,buildingDamage:75,radius:140,count:0,targetsAir:true,launchDelay:1.1,color:'#c89b68',desc:'指定地点を1.1秒予告した後、自軍中央本拠地から多数の矢を一斉発射する。半径3.5マスへユニット366・建物75ダメージ。矢は本拠地から指定地点まで実際に飛び、橋付近なら約1.45秒、敵中央本拠地付近なら約2.4秒で着弾する。'},
   lightning:{id:'lightning',cardType:'spell',spell:'lightning',name:'ライトニング',short:'ライトニング',role:'呪文・高HP4体雷撃',cost:6,damage:1056,buildingDamage:265,radius:105,maxTargets:4,count:0,targetsAir:true,color:'#69aee8',desc:'半径105の範囲内にいる敵から現在HPが高い順に最大4体を選び、ユニットへ1056ダメージ、建物へ265ダメージの落雷を同時に与える6コスト呪文。'},
   zap:{id:'zap',cardType:'spell',spell:'zap',name:'ザップ',short:'ザップ',role:'呪文・瞬間スタン＋思考リセット',cost:2,damage:225,buildingDamage:225,radius:78,count:0,targetsAir:true,stunDuration:1.5,color:'#75bde8',desc:'指定地点へ瞬時に電撃を落とし、半径78の敵ユニット・建物へ225ダメージと1.5秒スタン。現在の攻撃対象を解除し、レーザー塔の火力上昇やスパーキーの充電も0へリセットする。スタン解除後に対象を選び直す。'},
-  cyclone:{id:'cyclone',cardType:'spell',spell:'cyclone',name:'サイクロン',short:'サイクロン',role:'呪文・大範囲継続吸引',cost:3,damage:10,buildingDamage:0,radius:130,count:0,targetsAir:true,zoneDuration:3,pullSpeed:70,outerDps:10,midDps:20,innerDps:35,color:'#8bc8cf',desc:'指定地点に半径130の巨大な渦を3秒間生成。範囲内の敵ユニットを中心へ吸い寄せ続け、軽量ほど強く引き込む。建物・タワーは動かない。渦のダメージはおまけで、外周10・中間20・中心35 DPSと中心ほど少し痛い。吸引中も敵は攻撃・能力使用ができる。'}
+  rage:{id:'rage',cardType:'spell',spell:'rage',name:'レイジ',short:'レイジ',role:'呪文・速度強化フィールド',cost:2,damage:179,buildingDamage:45,radius:99,count:0,targetsAir:true,placementTime:.5,activationDelay:1.5,zoneDuration:4.5,boostMultiplier:1.3,color:'#d94fba',desc:'台形の瓶に入ったピンク色の液体を指定地点へ展開する2コスト呪文。指定から1.5秒後に半径3マスへ敵ユニット179・建物45ダメージを与え、その後4.5秒間、範囲内の味方の移動・攻撃・生成など時間系の進行を30%高速化する。HP・一発の攻撃力・射程・建物の自然HP減少量は変化しない。'},
+  cyclone:{id:'cyclone',cardType:'spell',spell:'cyclone',name:'サイクロン',short:'サイクロン',role:'呪文・超広範囲瞬間吸引',cost:3,damage:84,buildingDamage:58,radius:182,count:0,targetsAir:true,zoneDuration:1,pullSpeed:210,color:'#8bc8cf',desc:'指定地点に半径5.5マスの巨大な渦を1秒間生成。従来3秒分の総吸引量を1秒へ圧縮するため、1秒あたりの吸引速度は3倍。範囲内の敵ユニットへ84、タワー・建物へ58ダメージを発動時に1回だけ与える。建物・タワーは吸い込まれず、敵ユニットだけが中心へ引き寄せられる。'}
 
 };
 
@@ -142,27 +168,28 @@ const RANGE_CELL_OVERRIDES = Object.freeze({
   megagargoyle:2,apprenticeguards:1.5,apprenticeguard:1.5,icespirit:1,firespirit:1,skeleton:1,boneswarm:1,
   tombstone:0,oven:0,barbarian:1,barbarians:1,siegebarbarian:1,elixirgolem:1,elixir_golem_mid:1,elixir_blob:1,
   royalgiant:5,lumina:4,frost:5,harpy:5,electrowizard:5,necromancer:5,darknecro:1,dosranboss:1,ranbos:1,
-  ashsquad:1,princess:10.5,sparky:4.5,blowdart:6,lasertower:6.5,laserdragon:4.5,shieldknight:1,
-  windmage:5.5,phoenix:3.5,phoenix_egg:0,mirage:1,skybomber:5,scrapdrill:1,bombcarrier:1,skeletonbarrel:1,giantskeleton:1
+  ashsquad:1,princess:9,sparky:4.5,blowdart:6,lasertower:6.5,laserdragon:4.5,shieldknight:1,prince:2,darkprince:1.5,
+  windmage:5.5,falche:4.5,phoenix:3.5,phoenix_egg:0,mirage:1,skybomber:5,scrapdrill:1,bombcarrier:1,skeletonbarrel:1,airballoon:1,lumberjack:1,giantskeleton:1
 });
-const SPELL_RADIUS_CELLS = Object.freeze({skeletonrush:3.5,fireball:2.5,poison:2.5,arrowrain:4,lightning:3,zap:2.5,cyclone:4});
+const SPELL_RADIUS_CELLS = Object.freeze({skeletonrush:3.5,fireball:2.5,poison:2.5,arrowrain:3.5,lightning:3,zap:2.5,rage:3,cyclone:5.5});
 const DISTANCE_KEY_TO_CELL_KEY = Object.freeze({
   splash:'splashCells',deathRadius:'deathRadiusCells',dropRadius:'dropRadiusCells',jumpMinRange:'jumpMinRangeCells',jumpMaxRange:'jumpMaxRangeCells',
   jumpRadius:'jumpRadiusCells',hookRange:'hookRangeCells',hookMinRange:'hookMinRangeCells',spinTriggerRange:'spinTriggerRangeCells',spinDistance:'spinDistanceCells',
   spinHitRadius:'spinHitRadiusCells',chargeDistance:'chargeDistanceCells',carrierDeathRadius:'carrierDeathRadiusCells',chainRange:'chainRangeCells',
   dashAggroRange:'dashAggroRangeCells',dashMinRange:'dashMinRangeCells',dashMaxRange:'dashMaxRangeCells',deathBombRadius:'deathBombRadiusCells',
   fireBlastRadius:'fireBlastRadiusCells',fireLeapRange:'fireLeapRangeCells',iceBlastRadius:'iceBlastRadiusCells',iceLeapRange:'iceLeapRangeCells',
-  healOnHitRange:'healOnHitRangeCells',mudRadius:'mudRadiusCells',riverJumpSpawnBand:'riverJumpSpawnBandCells',riverJumpTrigger:'riverJumpTriggerCells'
+  healOnHitRange:'healOnHitRangeCells',mudRadius:'mudRadiusCells',riverJumpSpawnBand:'riverJumpSpawnBandCells',riverJumpTrigger:'riverJumpTriggerCells',axeTravelRange:'axeTravelRangeCells',axeHitWidth:'axeHitWidthCells'
 });
 const DISTANCE_CELL_OVERRIDES = Object.freeze({
   'megaknight.jumpMinRange':2.5,'megaknight.jumpMaxRange':5,'megaknight.jumpRadius':1.5,'megaknight.dropRadius':1.5,
   'tracker.hookRange':6,'tracker.hookMinRange':2,
   'nightshade.aggroRange':3,'nightshade.dashAggroRange':3,'nightshade.dashMinRange':2.5,'nightshade.dashMaxRange':6,
-  'giantskeleton.deathBombRadius':1.5,
+  'giantskeleton.deathBombRadius':1.5,'airballoon.deathBombRadius':1,
   'icespirit.iceLeapRange':2,'icespirit.iceBlastRadius':1.5,
   'firespirit.fireLeapRange':2,'firespirit.fireBlastRadius':1.5,
   'apprenticeguards.wideFormationSpacing':2.5,
-  'boar.riverJumpSpawnBand':2.5,'boar.riverJumpTrigger':1
+  'boar.riverJumpSpawnBand':2.5,'boar.riverJumpTrigger':1,
+  'prince.chargeDistance':2.5,'darkprince.chargeDistance':2,'falche.axeTravelRange':7,'falche.axeHitWidth':2
 });
 function quantizeCells(px,{min=.5}={}){
   if(!Number.isFinite(px)||px<=0)return 0;
@@ -173,7 +200,13 @@ function gridizeCard(id,d){
   const rangeCells=RANGE_CELL_OVERRIDES[id]??quantizeCells(d.range||0,{min:1});
   out.rangeCells=rangeCells;out.range=cellsToWorld(rangeCells);
   if(d.spell){const rc=SPELL_RADIUS_CELLS[id]??quantizeCells(d.radius||0);out.radiusCells=rc;out.radius=cellsToWorld(rc);}
-  if(d.building){out.footprintCols=d.footprintCols||ARENA.defaultBuildingCells;out.footprintRows=d.footprintRows||ARENA.defaultBuildingCells;out.footprintCells=`${out.footprintCols}x${out.footprintRows}`;}
+  if(d.building){
+    const geo=BUILDING_GEOMETRY[id]||{};
+    out.footprintCols=d.footprintCols||ARENA.defaultBuildingCells;out.footprintRows=d.footprintRows||ARENA.defaultBuildingCells;out.footprintCells=`${out.footprintCols}x${out.footprintRows}`;
+    out.hitboxCols=d.hitboxCols||geo.hitboxCols||Math.max(1,Math.min(out.footprintCols,((d.radius||20)*2)/GRID_CELL));
+    out.hitboxRows=d.hitboxRows||geo.hitboxRows||Math.max(1,Math.min(out.footprintRows,((d.radius||20)*2)/GRID_CELL));
+    out.visualScale=d.visualScale||geo.visualScale||1;
+  }
   for(const [key,cellKey] of Object.entries(DISTANCE_KEY_TO_CELL_KEY)){
     if(!Number.isFinite(d[key]))continue;
     const cells=DISTANCE_CELL_OVERRIDES[`${id}.${key}`]??quantizeCells(d[key]);
@@ -187,7 +220,8 @@ function gridizeCard(id,d){
     const cells=DISTANCE_CELL_OVERRIDES[`${id}.wideFormationSpacing`]??quantizeCells(d.wideFormationSpacing);
     out.wideFormationSpacingCells=cells;out.wideFormationSpacing=cellsToWorld(cells);
   }
-  out.visionSize=visionSizeFor(out);out.visionCells=Number.isFinite(out.aggroRangeCells)?out.aggroRangeCells:VISION_CELLS_BY_SIZE[out.visionSize];
+  out.meleeTier=d.meleeTier||meleeRangeTierFor(out);out.meleeRangeLabel=out.meleeTier?(MELEE_RANGE_LABELS[out.meleeTier]||null):null;
+  out.visionSize=visionSizeFor(out);out.visionCells=out.visionMatchesRange?out.rangeCells:(Number.isFinite(out.aggroRangeCells)?out.aggroRangeCells:VISION_CELLS_BY_SIZE[out.visionSize]);
   if((out.count||0)>1){
     out.summonFormationRadiusCells=out.wideFormation?((out.count-1)*(out.wideFormationSpacingCells||2.5)/2):Math.min(2.5,.5+Math.ceil(out.count/3)*.5);
   }else out.summonFormationRadiusCells=0;
@@ -197,14 +231,16 @@ export const UNITS = Object.freeze(Object.fromEntries(Object.entries(RAW_UNITS).
 export function cardDamageInfo(data){
   if(!data)return {unit:'-',tower:'-'};
   if(data.spell==='skeletonrush')return {unit:'スケルトン召喚',tower:'召喚'};
-  if(data.spell==='cyclone')return {unit:`${data.outerDps||0}〜${data.innerDps||0} DPS`,tower:'0'};
+  if(data.spell==='cyclone')return {unit:String(data.damage||0),tower:String(data.buildingDamage||0)};
   if(data.spell==='poison')return {unit:`${data.damage} / ${data.tickEvery}秒`,tower:`${data.buildingDamage} / ${data.tickEvery}秒`};
   if(data.laserTower||data.laserUnit)return {unit:`${data.laserBaseDps||data.damage} DPS〜`,tower:`${data.laserBaseDps||data.damage} DPS〜`};
+  if(data.energyPump)return {unit:'攻撃不可',tower:'攻撃不可'};
   if(data.drillUnit)return {unit:'攻撃不可',tower:`${(data.drillDpsStages||[data.damage]).join('→')} DPS`};
   if(data.crusherRamp)return {unit:'攻撃不可',tower:(data.crusherDamages||[data.damage]).join('→')};
   if(data.buildingOnly){
     let unit='攻撃不可';
     if(Number.isFinite(data.carrierDeathDamage))unit=`撃破時爆発 ${data.carrierDeathDamage}`;
+    else if(Number.isFinite(data.deathBombDamage))unit=`撃破時爆発 ${data.deathBombDamage}`;
     else if(Number.isFinite(data.deathDamage))unit=`死亡爆発 ${data.deathDamage}`;
     const tower=Number.isFinite(data.suicideDamage)?data.suicideDamage:(Number.isFinite(data.structureDamage)?data.structureDamage:data.damage);
     return {unit,tower:String(tower??0)};
