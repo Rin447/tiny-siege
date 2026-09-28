@@ -1,7 +1,7 @@
 import {VERSION,ARENA,UNITS,DECK,DEFAULT_DECK,MAX_DECK,normalizeDeck,summonDelayFor,cardDamageInfo,visionSizeFor,visionRangeFor} from './game/units.js';
 import {createMatch,tick,runBot,deploy,viewMatch,clamp,canPlace} from './game/engine.js';
 import {drawArena,drawPortrait,orient} from './game/art.js';
-import {snapDeploymentPoint} from './game/physics.js';
+import {deploymentPreviewPoint} from './game/physics.js';
 
 const $=s=>document.querySelector(s);
 // Keep the whole game surface free from browser text-selection/copy callouts so touch dragging stays game-controlled.
@@ -13,6 +13,42 @@ document.addEventListener('cut',blockNativeTextActions,{capture:true});
 document.addEventListener('dragstart',blockNativeTextActions,{capture:true});
 document.addEventListener('selectionchange',()=>{const sel=window.getSelection?.();if(sel&&!sel.isCollapsed)sel.removeAllRanges();});
 const PATCH_NOTES = Object.freeze([
+  {version:'41.2.0',date:'2026-09-28',title:'SUMMON PREVIEW BOUNDARY LOCK',items:[
+    '通常ユニットと設置物の召喚ゴーストを配置可能範囲の内側だけに制限。敵陣・川・配置禁止地点へ指を進めても、ゴーストは最後に配置できた地点で止まるよう変更。',
+    '有効地点から配置禁止側へドラッグした場合は境界でピタッと停止し、そのまま離すと停止位置へ召喚。最初から配置不能地点を触った場合はキャラ予測を表示しない。',
+    '設置物は3×3などの配置Footprint全体が有効範囲に収まる地点だけを予測位置として使用。画面外で離したときのキャンセル仕様は維持。',
+    'スペルは従来の照準・個別発動範囲を維持。戦闘ロジックは変更せず、カード総数77枚・physicsVersion 76を維持。'
+  ]},
+  {version:'41.1.0',date:'2026-09-28',title:'LIGHTNING SEQUENCE / ROLL SPEED UPDATE',items:[
+    'ライトニングを即時同時落雷から変更。指定後1.0秒の予告を挟み、発動時点で範囲内の現在HPが高い敵を最大4体選び、タワー・建物を含め0.2秒間隔で1体ずつ上空から順番に落雷。',
+    'ライトニングのダメージはユニット1056 / 建物265、対象数最大4体、範囲は従来どおり。',
+    'ローリングウッドとローリングバーバリアンの転がる速度を従来比30%低下。ウッド520→364、ローリングバーバリアン440→308。',
+    'カード総数77枚（66ユニット/設置物＋11スペル）は変更なし。戦闘同期変更に伴いphysicsVersion 76。'
+  ]},
+  {version:'41.0.0',date:'2026-09-28',title:'ROLLING SPELLS UPDATE',items:[
+    '新2コストスペル「ローリングウッド」を追加。ユニット配置可能エリアから敵陣方向へ10.1マス転がり、幅3.9マスの地上対象へ1体につき1回だけ268ダメージ。タワー・建物には35ダメージ。',
+    'ローリングウッド命中時は地上ユニットを進行方向へ0.5マス押し戻す。小型・中型・大型を問わず同じ基準距離でノックバックし、空中ユニットには当たらない。',
+    '新2コストスペル「ローリングバーバリアン」を追加。ユニット配置可能エリアから4.5マス、幅2.6マスで転がり、地上対象へ232ダメージ。タワーにはダメージを与えず、ノックバックもしない。',
+    'ローリングバーバリアンは終点で樽が壊れ、通常のバーバリアン1体を召喚。カード総数77枚（66ユニット/設置物＋11スペル）、physicsVersion 75。'
+  ]},
+  {version:'40.0.0',date:'2026-09-28',title:'GOBLIN BARREL / SIEGE BARBARIAN VISUAL UPDATE',items:[
+    '新3コストスペル「ゴブリンバレル」を追加。半径2.2マスをマップ上のどこでも指定でき、1.1秒の発射予告後に自軍中央タワーから木樽が回転しながら飛翔。飛行速度はファイヤーボールと同じ距離依存速度。',
+    'ゴブリンバレル着弾時に通常ゴブリン3体を三角形で展開。タワー中央付近へ重ねると3体が塔を囲み、左右へ寄せて落とすと指定した側へ3体がまとまって出現。着弾時は樽が砕ける専用演出。',
+    '攻城バーバリアンの戦闘モデルを、2人が横並びで木材を担ぐ見た目から、レーン方向へ前後・縦に並んで1本の攻城ラムを運ぶ見た目へ変更。性能は変更なし。',
+    'カード総数75枚（66ユニット/設置物＋9スペル）、physicsVersion 74。'
+  ]},
+  {version:'39.1.0',date:'2026-09-28',title:'HP BAR TEAM VISIBILITY UPDATE',items:[
+    '戦闘中のキャラ本体に付いていた青/赤の細い所属識別帯を廃止。通常時の足元に出ていた青/赤の所属リングも削除。',
+    '非建物ユニットのHPバーを満タン時でも常時表示し、自分側は青・相手側は赤のHPバーで敵味方を判別する方式へ変更。',
+    'エアバルーンの青/赤い気球など、キャラ固有デザインとして敵味方で色が変わる見た目はそのまま維持。スペルや状態異常などの専用エフェクト色も変更なし。',
+    '描画/UIのみの変更。カード性能・戦闘ロジックは変更せず、physicsVersion 73を維持。'
+  ]},
+  {version:'39.0.0',date:'2026-09-28',title:'GIANT / BALLOON / SPELL SPEED UPDATE',items:[
+    '新5コスト「ジャイアント」を追加。HP3968 / 攻撃254 / 攻撃間隔1.5秒 / 建物のみ / 近接（中距離）1.5マス / 移動速度27。大型の体格でボロボロの茶色い服を着たおじさんが、腕を大きく振ってゆっくり歩き、拳で建物を殴る。',
+    'エアバルーンの攻撃位置を建物中心から0.25マス以内へ変更。建物の端では止まらず、ほぼ真上まで飛んでから640ダメージの爆弾を落とす。移動速度は40→38へ少し低下。',
+    'ファイヤーボールの発射前予告を1.26秒→1.1秒、矢の雨を1.1秒→0.9秒へ短縮。ダメージ・範囲・発射後の距離依存飛行時間は変更なし。',
+    'カード総数74枚（66ユニット/設置物＋8スペル）、physicsVersion 73。'
+  ]},
   {version:'38.0.0',date:'2026-09-18',title:'AIR BALLOON / LUMBERJACK UPDATE',items:[
     '\u65b05\u30b3\u30b9\u30c8\u300c\u30a8\u30a2\u30d0\u30eb\u30fc\u30f3\u300d\u3092\u8ffd\u52a0\u3002HP1676 / \u653b\u6483640 / 2.0\u79d2 / \u98db\u884c / \u5efa\u7269\u306e\u307f / \u8fd1\u63a51\u30de\u30b9 / \u901f\u5ea640\u3002\u9752\u3044\u6c17\u7403\uff08\u6575\u306f\u8d64\uff09\u306b\u30b9\u30b1\u30eb\u30c8\u30f3\u304c\u4e57\u308a\u3001\u7206\u5f3e\u3092\u771f\u4e0b\u3078\u843d\u3068\u3057\u3066\u653b\u6483\u3002',
     '\u30a8\u30a2\u30d0\u30eb\u30fc\u30f3\u306e\u6b7b\u4ea1\u6642\u306f\u305d\u306e\u5834\u6240\u306b\u7206\u5f3e\u3092\u6b8b\u3057\u30012\u79d2\u5f8c\u306b\u534a\u5f841\u30de\u30b9\u3078240\u30c0\u30e1\u30fc\u30b8\u3002\u5730\u4e0a\u30e6\u30cb\u30c3\u30c8\u3068\u5efa\u7269\u306b\u547d\u4e2d\u3002',
@@ -783,7 +819,7 @@ function updateHUD(){
     el('rematchBtn').textContent=gameMode==='cpu'?'もう一度対戦':seat===room?.host?'再戦の待機ルームへ':'ホストの再戦操作を待っています';
     el('rematchBtn').disabled=gameMode==='online'&&seat!==room?.host;
   }
-  el('battleHint').textContent=selected?(()=>{const d=UNITS[selected];if(!d.spell){if(d.tunnelAnywhere)return `${d.name}：戦場の好きな地上地点を指定 / コスト ${d.cost}。自軍本拠地から地下移動し、遠いほど到着が遅れます。`;if(d.building)return `${d.name}を配置 / 必要エナジー ${d.cost}。戦場を押したまま位置を調整し、指を離した場所で設置。戦場外で離すとキャンセル。`;return `${d.name}を配置 / 必要エナジー ${d.cost}。押したまま位置を調整し、離して召喚。戦場外で離すとキャンセル。`;}if(d.spell==='poison')return `${d.name}：地点を指定すると8秒間展開 / コスト ${d.cost}。範囲内へ毎秒ダメージを与えます。`;if(d.spell==='lightning')return `${d.name}：半径${d.radius}内のHPが高い敵を最大${d.maxTargets||4}体へ即時落雷 / コスト ${d.cost}。`;if(d.spell==='cyclone')return `${d.name}：半径5.5マスを1秒だけ強吸引 / コスト ${d.cost}。敵ユニット84・タワー/建物58ダメージ。`;if(d.spell==='rage')return `${d.name}：半径3マス / コスト ${d.cost}。1.5秒後に発動し、敵へ179/建物45ダメージ＋味方を4.5秒間30%高速化。`;if(d.spell==='arrowrain')return `${d.name}：半径3.5マスを指定 / コスト ${d.cost}。1.1秒予告後、本陣から矢群が距離依存で飛んで着弾します。`;if(d.spell==='fireball')return `${d.name}：半径2.5マスを指定 / コスト ${d.cost}。1.26秒予告後に本陣から発射し、小・中型を爆心地から約1マス吹き飛ばします。`;return `${d.name}：着弾地点を指定 / コスト ${d.cost}。遠いほど着弾が遅れます。`;})():'カードを選択。長押しで対ユニット/対タワーDMGを確認できます。片塔破壊はそのレーン＋中央細帯、両塔破壊後は敵陣前半を横いっぱい使えます。';
+  el('battleHint').textContent=selected?(()=>{const d=UNITS[selected];if(!d.spell){if(d.tunnelAnywhere)return `${d.name}：戦場の好きな地上地点を指定 / コスト ${d.cost}。自軍本拠地から地下移動し、遠いほど到着が遅れます。`;if(d.building)return `${d.name}を配置 / 必要エナジー ${d.cost}。戦場を押したまま位置を調整。配置禁止範囲へ進むと予測位置は最後の有効地点で止まり、そこで離すと設置。戦場外で離すとキャンセル。`;return `${d.name}を配置 / 必要エナジー ${d.cost}。押したまま位置を調整。配置禁止範囲へ進むと予測位置は最後の有効地点で止まり、そこで離すと召喚。戦場外で離すとキャンセル。`;}if(d.spell==='poison')return `${d.name}：地点を指定すると8秒間展開 / コスト ${d.cost}。範囲内へ毎秒ダメージを与えます。`;if(d.spell==='lightning')return `${d.name}：半径${d.radius}内を指定 / コスト ${d.cost}。${d.activationDelay||1}秒後、HPが高い敵を最大${d.maxTargets||4}体選び、${d.strikeInterval||.2}秒間隔で1体ずつ落雷。`;if(d.spell==='cyclone')return `${d.name}：半径5.5マスを1秒だけ強吸引 / コスト ${d.cost}。敵ユニット84・タワー/建物58ダメージ。`;if(d.spell==='rage')return `${d.name}：半径3マス / コスト ${d.cost}。1.5秒後に発動し、敵へ179/建物45ダメージ＋味方を4.5秒間30%高速化。`;if(d.spell==='goblinbarrel')return `${d.name}：半径2.2マス / コスト ${d.cost}。1.1秒予告後、本陣から回転する樽がファイヤーボールと同じ速度で飛び、着弾時にゴブリン3体を展開。タワー中央は包囲、左右寄せはその側へ集合。`;if(d.spell==='rollingwood')return `${d.name}：召喚可能エリアから発動 / コスト ${d.cost}。幅3.9マスで前方10.1マスを転がり、地上へ268・建物へ35＋全サイズ共通0.5マスノックバック。`;if(d.spell==='rollingbarbarian')return `${d.name}：召喚可能エリアから発動 / コスト ${d.cost}。幅2.6マスで前方4.5マスを転がり地上へ232。終点でバーバリアン1体、タワーダメージとノックバックはなし。`;if(d.spell==='arrowrain')return `${d.name}：半径3.5マスを指定 / コスト ${d.cost}。0.9秒予告後、本陣から矢群が距離依存で飛んで着弾します。`;if(d.spell==='fireball')return `${d.name}：半径2.5マスを指定 / コスト ${d.cost}。1.1秒予告後に本陣から発射し、小・中型を爆心地から約1マス吹き飛ばします。`;return `${d.name}：着弾地点を指定 / コスト ${d.cost}。遠いほど着弾が遅れます。`;})():'カードを選択。長押しで対ユニット/対タワーDMGを確認できます。片塔破壊はそのレーン＋中央細帯、両塔破壊後は敵陣前半を横いっぱい使えます。';
 }
 for(let i=0;i<10;i++){const seg=document.createElement('i'),fill=document.createElement('b');seg.append(fill);el('energyTrack').append(seg);}
 function choose(id){
@@ -853,7 +889,7 @@ function updateInspector(id){
   el('inspectorRole').textContent=d.role;el('inspectorName').textContent=d.name;el('inspectorDesc').textContent=d.desc;
   el('inspectorStats').replaceChildren();
   const rangeCells=d.rangeCells ?? (d.range/ARENA.cellSize),rangeText=d.meleeRangeLabel?`近接（${d.meleeRangeLabel}） ${rangeCells}マス`:`${rangeCells}マス`;
-  const stats=d.spell?[['COST',d.cost],['AREA',`${d.radiusCells ?? (d.radius/ARENA.cellSize)}マス`],['DMG',`${d.damage}/${d.buildingDamage}`]]:[['COST',d.cost],['HP',d.hp+(d.count>1?` ×${d.count}`:'')],['RANGE',rangeText]];
+  const stats=d.spell?(d.spell==='goblinbarrel'?[['COST',d.cost],['AREA',`${d.radiusCells ?? (d.radius/ARENA.cellSize)}マス`],['SPAWN','ゴブリン ×3']]:d.spell==='rollingwood'?[['COST',d.cost],['WIDTH',`${d.widthCells}マス`],['RANGE',`${d.travelCells}マス`],['DMG',`${d.damage}/${d.towerDamage}`]]:d.spell==='rollingbarbarian'?[['COST',d.cost],['WIDTH',`${d.widthCells}マス`],['RANGE',`${d.travelCells}マス`],['SPAWN','バーバリアン ×1']]:[['COST',d.cost],['AREA',`${d.radiusCells ?? (d.radius/ARENA.cellSize)}マス`],['DMG',`${d.damage}/${d.buildingDamage}`]]):[['COST',d.cost],['HP',d.hp+(d.count>1?` ×${d.count}`:'')],['RANGE',rangeText]];
   for(const [label,value] of stats){const div=document.createElement('div'),s=document.createElement('small'),strong=document.createElement('strong');s.textContent=label;strong.textContent=value;div.append(s,strong);el('inspectorStats').append(div);}
   el('tacticalTip').textContent=d.desc;
 }
@@ -861,15 +897,25 @@ function pointFromEvent(e,inside=false){
   const r=el('arenaCanvas').getBoundingClientRect(),x=(e.clientX-r.left)/r.width*ARENA.width,y=(e.clientY-r.top)/r.height*ARENA.height;
   if(inside&&(x<0||x>ARENA.width||y<0||y>ARENA.height))return null;
   let p={x:clamp(x,0,ARENA.width),y:clamp(y,0,ARENA.height)},world=orient(p,seat);
-  let valid=false;
+  let valid=false,placementLocked=false;
   if(snapshot&&selected){
     const players=[{hand:[],energy:0},{hand:[],energy:0}];players[seat]={hand:snapshot.hand,energy:snapshot.energy};
     const d=UNITS[selected];
-    if(d.building&&!d.spell&&!d.tunnelAnywhere){const snapped=snapDeploymentPoint(seat,d,world.x,world.y);world=snapped;p=orient(snapped,seat);}
+    if(!d.spell&&!d.tunnelAnywhere){
+      const projected=deploymentPreviewPoint(snapshot,seat,d,world.x,world.y);
+      if(!projected){
+        // Normal summons never draw inside a forbidden region. While dragging
+        // from a legal point, keep the previous ghost fixed at that last legal
+        // point so the boundary feels like a physical stop.
+        if(hover?.card===selected&&hover?.summonPreview)return {...hover,placementLocked:true};
+        return null;
+      }
+      placementLocked=Math.abs(projected.x-world.x)>.01||Math.abs(projected.y-world.y)>.01;
+      world=projected;p=orient(projected,seat);
+    }
     valid=!canPlace({...snapshot,players},seat,selected,world.x,world.y);
-    if(valid&&!d.building&&!d.spell&&!d.tunnelAnywhere){const snapped=snapDeploymentPoint(seat,d,world.x,world.y);p=orient(snapped,seat);}
   }
-  return {...p,valid};
+  return {...p,valid,card:selected,summonPreview:!!(selected&&!UNITS[selected].spell&&!UNITS[selected].tunnelAnywhere),placementLocked};
 }
 const arenaCanvas=el('arenaCanvas');
 function cancelArenaPlacement({deselect=false}={}){
@@ -1098,7 +1144,7 @@ function toggleDeckCard(id,{fromDetail=false}={}){
 }
 function targetLabel(d){if(d.buildingOnly)return '建物のみ';if(d.id==='mossling')return '地上＋空中（槍3）';return d.targetsAir?'地上＋空中':'地上のみ';}
 function detailStatsFor(d){
-  if(d.spell){const stats=[['COST',d.cost],['TYPE','SPELL'],['範囲',`${d.radiusCells ?? (d.radius/ARENA.cellSize)}マス`]];if(d.spell==='cyclone'){stats.push(['効果時間',`${d.zoneDuration}秒`],['吸引','従来の3倍/秒・総吸引量は従来相当'],['兵ダメージ',d.damage],['建物ダメージ',d.buildingDamage]);return stats;}if(d.spell==='rage'){stats.push(['発動まで',`${d.activationDelay}秒（配置演出${d.placementTime}秒）`],['効果時間',`${d.zoneDuration}秒`],['兵ダメージ',d.damage],['建物ダメージ',d.buildingDamage],['ブースト',`+${Math.round((d.boostMultiplier-1)*100)}%：移動/攻撃/生成など`],['変化なし','HP・一発ダメージ・射程・自然HP減少']);return stats;}stats.push(['兵ダメージ',d.damage],['建物ダメージ',d.buildingDamage]);if(d.spell==='poison')stats.push(['効果時間',`${d.zoneDuration}秒`],['ダメージ間隔',`${d.tickEvery}秒`]);if(d.spell==='lightning')stats.push(['対象',`現在HPが高い順 最大${d.maxTargets||4}体`]);if(d.stunDuration)stats.push(['スタン',`${d.stunDuration}秒`]);return stats;}
+  if(d.spell){if(d.spell==='rollingwood')return [['COST',d.cost],['TYPE','SPELL'],['対象','地上のみ'],['幅',`${d.widthCells}マス`],['射程',`${d.travelCells}マス`],['ユニットダメージ',d.damage],['タワー・建物',d.towerDamage],['ノックバック',`${d.knockbackCells}マス・全サイズ共通`],['発動範囲','ユニット召喚可能エリアのみ'],['命中','1対象につき1回']];if(d.spell==='rollingbarbarian')return [['COST',d.cost],['TYPE','SPELL'],['対象','地上のみ'],['幅',`${d.widthCells}マス`],['射程',`${d.travelCells}マス`],['範囲ダメージ',d.damage],['タワーダメージ','なし'],['ノックバック','なし'],['終点','バーバリアン ×1'],['発動範囲','ローリングウッドと同じ']];const stats=[['COST',d.cost],['TYPE','SPELL'],['範囲',`${d.radiusCells ?? (d.radius/ARENA.cellSize)}マス`]];if(d.spell==='cyclone'){stats.push(['効果時間',`${d.zoneDuration}秒`],['吸引','従来の3倍/秒・総吸引量は従来相当'],['兵ダメージ',d.damage],['建物ダメージ',d.buildingDamage]);return stats;}if(d.spell==='rage'){stats.push(['発動まで',`${d.activationDelay}秒（配置演出${d.placementTime}秒）`],['効果時間',`${d.zoneDuration}秒`],['兵ダメージ',d.damage],['建物ダメージ',d.buildingDamage],['ブースト',`+${Math.round((d.boostMultiplier-1)*100)}%：移動/攻撃/生成など`],['変化なし','HP・一発ダメージ・射程・自然HP減少']);return stats;}if(d.spell==='goblinbarrel'){stats.push(['発射予告',`${d.launchDelay}秒`],['飛行','自軍中央タワーから回転する樽 / ファイヤーボールと同速'],['着弾','通常ゴブリン ×3'],['基本配置','三角形'],['タワー中央','塔を囲むように3体'],['タワー左右寄せ','指定側へ3体が集合'],['指定','マップ上のどこでも可']);return stats;}stats.push(['兵ダメージ',d.damage],['建物ダメージ',d.buildingDamage]);if(d.spell==='poison')stats.push(['効果時間',`${d.zoneDuration}秒`],['ダメージ間隔',`${d.tickEvery}秒`]);if(d.spell==='lightning')stats.push(['発動まで',`${d.activationDelay||1}秒`],['対象',`発動時点の現在HPが高い順 最大${d.maxTargets||4}体（タワー含む）`],['落雷間隔',`${d.strikeInterval||.2}秒・1体ずつ順番`]);if(d.stunDuration)stats.push(['スタン',`${d.stunDuration}秒`]);return stats;}
   const dmg=d.id==='mossling'?'地上125 / 槍81':d.id==='falche'?`${d.damage} × 往復`:d.drillUnit?`${d.drillBaseDps} DPS〜`:(d.laserTower||d.laserUnit)?`${d.laserBaseDps} DPS〜`:d.damage;const interval=d.energyPump?'攻撃なし':d.drillUnit?'継続':(d.laserTower||d.laserUnit)?'継続':d.suicideUnit?'到達時に自爆':d.sparkUnit?`${d.sparkChargeTime}秒チャージ`:d.cooldown?`${d.cooldown.toFixed(2).replace(/0+$/,'').replace(/\.$/,'')}秒`:'—';
   const deployTime=d.tunnelAnywhere?'地下移動（追加待機なし）':`${summonDelayFor(d).toFixed(1)}秒`;
   const rangeCells=d.rangeCells ?? (d.range/ARENA.cellSize),rangeDisplay=d.meleeRangeLabel?`近接（${d.meleeRangeLabel}） ${rangeCells}マス`:`${rangeCells}マス`;
@@ -1143,7 +1189,8 @@ function detailStatsFor(d){
   if(d.id==='elixirgolem')stats.push(['分裂','大1 → 中2（HP784 / 攻撃127）→ 小4（HP392 / 攻撃64）'],['敵エリクサー','大+1 / 中1体+1 / 小1体+0.5']);
   if(d.id==='icegolem')stats.push(['攻撃対象','建物のみ'],['死亡時',`${d.deathRadiusCells}マスへ${d.deathDamage}ダメージ`],['特徴','低速・建物特攻']);
   if(d.id==='skeletonbarrel')stats.push(['攻撃対象','建物のみ（飛行）'],['到達/死亡時','145ダメージ'],['破壊時召喚','スケルトン7体'],['特徴','少し速い建物特攻']);
-  if(d.id==='airballoon')stats.push(['\u30b5\u30a4\u30ba','\u4e2d\u578b\u301c\u3084\u3084\u5927\u578b'],['\u653b\u6483\u5bfe\u8c61','\u5efa\u7269\u306e\u307f'],['\u6b7b\u4ea1\u7206\u5f3e',`2\u79d2\u5f8c / ${d.deathBombDamage}\u30c0\u30e1\u30fc\u30b8 / ${d.deathBombRadiusCells}\u30de\u30b9`],['\u6b7b\u4ea1\u7206\u5f3e\u5bfe\u8c61','\u5730\u4e0a\u30e6\u30cb\u30c3\u30c8\uff0b\u5efa\u7269'],['\u79fb\u52d5\u901f\u5ea6','40\uff08\u666e\u901a\uff09']);
+  if(d.id==='airballoon')stats.push(['サイズ','中型〜やや大型'],['攻撃対象','建物のみ'],['攻撃位置',`建物中心から${d.rangeCells}マス以内（ほぼ真上）`],['死亡爆弾',`2秒後 / ${d.deathBombDamage}ダメージ / ${d.deathBombRadiusCells}マス`],['死亡爆弾対象','地上ユニット＋建物'],['移動速度','38（普通より少し遅い）']);
+  if(d.id==='giant')stats.push(['サイズ','大型'],['役割','高耐久・建物特攻'],['移動速度','27（遅い）'],['攻撃','拳で建物を殴る']);
   if(d.id==='lumberjack')stats.push(['\u79fb\u52d5\u901f\u5ea6','79\uff08\u3068\u3066\u3082\u901f\u3044\uff09'],['\u6b7b\u4ea1\u6642','1.5\u79d2\u5f8c\u306b\u30ec\u30a4\u30b8\u767a\u52d5'],['\u30ec\u30a4\u30b8\u52b9\u679c','\u534a\u5f843\u30de\u30b9 / 179\u30fb45\u30c0\u30e1\u30fc\u30b8 / 4.5\u79d2 / +30%']);
   if(d.id==='giantskeleton')stats.push(['\u653b\u6483\u5bfe\u8c61','\u5730\u4e0a\u30e6\u30cb\u30c3\u30c8\uff0b\u5efa\u7269'],['\u6b7b\u4ea1\u7206\u5f3e',`3\u79d2\u5f8c / 688\u30c0\u30e1\u30fc\u30b8 / ${d.deathBombRadiusCells}\u30de\u30b9`],['\u79fb\u52d5\u901f\u5ea6','40\uff08\u666e\u901a\uff09']);
   if(d.id==='skeletonrush')stats.push(['\u767a\u52d5','1.2\u79d2\u5f8c\u306b\u7d2b\u8272\u30a8\u30ea\u30a2'],['\u52b9\u679c\u6642\u9593','9\u79d2'],['\u53ec\u559a','\u767a\u52d53\u79d2\u5f8c\u21920.5\u79d2\u3054\u30681\u4f53'],['\u7279\u6027','\u5efa\u7269\u3068\u91cd\u306d\u53ef / 40%\u753b\u9762\u5916\u53ef']);
@@ -1181,13 +1228,22 @@ function createDetailDemo(id){
       label='レーザー塔＋満充電スパーキーへ電撃 → 1.5秒スタン＋攻撃対象/増幅/充電をリセット';scenarioKey='zap-reset-stun';duration=7;
     }else if(id==='lightning'){
       g.towers.forEach(t=>t.damage=0);const [golem]=enemy('golem',lane,420),[mega]=enemy('megaknight',485,420),[guard]=enemy('knight',565,420),[archer]=enemy('archer',520,420),[blade]=enemy('blade',450,420);const staged=[golem,mega,guard,archer,blade].filter(Boolean);staged.forEach((u,i)=>{demoStageUnit(u,460+i*30,500+(i%2)*24);u.speed=0;u.damage=0;});demoDeploy(g,0,id,520,510);
-      label='半径105内の敵を現在HPが高い順に選択 → 上位4体へ同時落雷（ユニット1056 / 建物265）';scenarioKey='lightning-top-hp-four';duration=6;
+      label='1.0秒予告 → 発動時点の現在HPが高い上位4体へ0.2秒間隔で1体ずつ上空から落雷（ユニット1056 / 建物265）';scenarioKey='lightning-top-hp-four';duration=6;
     }else if(id==='poison'){
       const [guard]=enemy('knight',lane,420);demoStageUnit(guard,lane,505);demoDeploy(g,0,id,lane,500);
       label='8秒間の毒エリア → 範囲内のユニットへ毎秒91、建物へ毎秒21ダメージ';scenarioKey='poison-zone-8s';duration=10;
+    }else if(id==='goblinbarrel'){
+      g.towers.forEach(t=>{t.damage=0;t.range=0;});const tower=g.towers.find(t=>t.owner===1&&t.kind==='tower'&&Math.abs(t.x-lane)<2)||g.towers.find(t=>t.owner===1&&t.kind==='core');if(tower)demoDeploy(g,0,id,tower.x,tower.y/DEMO_Y_SCALE);
+      label='1.1秒予告 → 自軍中央タワーから樽が回転飛翔 → 敵タワー中央へ着弾 → ゴブリン3体が塔を囲む';scenarioKey='goblinbarrel-tower-surround';duration=8;
+    }else if(id==='rollingwood'){
+      g.towers.forEach(t=>{t.damage=0;t.range=0;});const targets=enemy('barbarians',lane,420);targets.forEach((u,i)=>{demoStageUnit(u,lane+(i-2)*25,565-i*18,{cd:99});u.speed=0;u.damage=0;});demoDeploy(g,0,id,lane,700);
+      label='召喚可能エリアから発動 → 幅3.9マスのトゲ丸太が10.1マス直進 → 地上268＋全サイズ共通0.5マスノックバック';scenarioKey='rollingwood-ground-knockback';duration=5;
+    }else if(id==='rollingbarbarian'){
+      g.towers.forEach(t=>{t.damage=0;t.range=0;});const targets=enemy('boneswarm',lane,420);targets.forEach((u,i)=>{demoStageUnit(u,lane+(i%3-1)*24,610-Math.floor(i/3)*20,{cd:99});u.speed=0;u.damage=0;});demoDeploy(g,0,id,lane,700);
+      label='召喚可能エリアから樽が4.5マス転がる → 地上232 → 終点で通常バーバリアン1体が出現';scenarioKey='rollingbarbarian-spawn';duration=5;
     }else if(id==='arrowrain'){
       enemy('mossling',lane,420);enemy('boneswarm',470,410);demoDeploy(g,0,id,lane,455);
-      label='1.1秒予告 → 本陣から矢群が飛翔 → 半径3.5マスへ一斉着弾';scenarioKey='arrowrain-core-flight';duration=8;
+      label='0.9秒予告 → 本陣から矢群が飛翔 → 半径3.5マスへ一斉着弾';scenarioKey='arrowrain-core-flight';duration=8;
     }else if(id==='rage'){
       g.towers.forEach(t=>{t.damage=0;t.range=0;});const [ally]=own('barbarian',lane,650);demoStageUnit(ally,lane,590);const [enemyUnit]=enemy('knight',lane,420);demoStageUnit(enemyUnit,lane,520,{hp:1500});if(enemyUnit){enemyUnit.speed=0;enemyUnit.damage=0;}demoDeploy(g,0,'rage',lane,585);
       label='1.5\u79d2\u4e88\u544a \u2192 179/45\u30c0\u30e1\u30fc\u30b8 \u2192 4.5\u79d2\u9593\u3001\u5473\u65b9\u306e\u79fb\u52d5\u30fb\u653b\u6483\u30fb\u751f\u6210\u901f\u5ea6\u309230%\u30d6\u30fc\u30b9\u30c8';scenarioKey='rage-speed-zone';duration=8;
@@ -1196,11 +1252,11 @@ function createDetailDemo(id){
       label='半径5.5マスを1秒だけ強吸引 → ユニット84 / タワー58を固定ダメージ。総吸引量は従来3秒版と同等';scenarioKey='cyclone-pull-field';duration=5;
     }else{
       enemy('knight',lane,420);enemy('archer',485,405);demoDeploy(g,0,id,lane,475);
-      label='1.26秒予告 → 本陣から飛翔 → 半径2.5マス爆発＋小中型を放射ノックバック';scenarioKey='fireball-delay-knockback';duration=8;
+      label='1.1秒予告 → 本陣から飛翔 → 半径2.5マス爆発＋小中型を放射ノックバック';scenarioKey='fireball-delay-knockback';duration=8;
     }
   }else if(id==='airballoon'){
     g.towers.forEach(t=>{t.range=0;t.damage=0;});const [balloon]=own(id,lane,650),archers=enemy('archer',lane,420),[guard]=enemy('knight',lane+34,420);demoStageUnit(balloon,lane,520,{hp:90,cd:0});if(balloon)balloon.speed=0;archers.forEach((u,i)=>{demoStageUnit(u,lane-25+i*50,462,{cd:.05});u.speed=0;u.damage=220;});if(guard){demoStageUnit(guard,lane+34,520,{cd:99});guard.speed=0;guard.damage=0;}
-    label='\u5efa\u7269\u3060\u3051\u3092\u72d9\u3046640\u7206\u5f3e \u2192 \u6483\u7834\u3055\u308c\u308b\u3068\u6b7b\u4ea1\u5730\u70b9\u306b\u7206\u5f3e \u2192 2\u79d2\u5f8c\u306b\u534a\u5f841\u30de\u30b9\u3078240';scenarioKey='airballoon-death-bomb';duration=7;
+    label='建物のほぼ真上まで飛行 → 640爆弾。撃破時は死亡地点に爆弾 → 2秒後に半径1マスへ240';scenarioKey='airballoon-overhead-death-bomb';duration=7;
   }else if(id==='lumberjack'){
     g.towers.forEach(t=>{t.range=0;t.damage=0;});const [jack]=own(id,lane,650),[ally]=own('barbarian',lane+42,650),[killer]=enemy('knight',lane,420),[victim]=enemy('blade',lane+45,420);demoStageUnit(jack,lane,520,{hp:80,cd:99});demoStageUnit(ally,lane+42,555,{cd:99});demoStageUnit(killer,lane,480,{cd:0});demoStageUnit(victim,lane+45,520,{cd:99});if(jack)jack.speed=0;if(ally){ally.speed=0;ally.damage=0;}if(killer){killer.speed=0;killer.damage=900;}if(victim){victim.speed=0;victim.damage=0;}
     label='\u9ad8\u901f\u65a7\u653b\u6483 \u2192 \u6b7b\u4ea1\u5730\u70b9\u3078\u30ec\u30a4\u30b8\u74f6 \u2192 1.5\u79d2\u5f8c\u306b\u65e2\u5b58\u30ec\u30a4\u30b8\u3068\u540c\u3058\u52b9\u679c';scenarioKey='lumberjack-death-rage';duration=8;
@@ -1232,6 +1288,9 @@ function createDetailDemo(id){
   }else if(id==='oven'){
     g.towers.forEach(t=>{t.range=0;t.damage=0;});const [oven]=own(id,lane,650);demoStageUnit(oven,lane,610);if(oven){oven.summonNextAt=g.time+2.2;}const [guard]=enemy('knight',lane,420);demoStageUnit(guard,lane,485,{cd:99});if(guard){guard.speed=0;guard.damage=0;}
     label='配置時にファイヤスピリット2体 → その後10秒ごとに2体ずつ鍋から追加召喚';scenarioKey='oven-fire-spirit-spawner';duration=12;
+  }else if(id==='giant'){
+    g.towers.forEach(t=>{t.damage=0;});const [giant]=own(id,lane,650),[guard]=enemy('knight',lane,420);demoStageUnit(giant,lane,445);demoStageUnit(guard,lane+30,445,{cd:99});if(guard){guard.speed=0;guard.damage=0;}
+    label='敵兵を無視してゆっくり建物へ進軍 → 近接（中距離）1.5マスから254ダメージの拳を1.5秒ごとに叩き込む';scenarioKey='giant-building-tank';duration=10;
   }else if(id==='giantskeleton'){
     g.towers.forEach(t=>{t.range=0;t.damage=0;});const [giant]=own(id,lane,650),[killer]=enemy('knight',lane,420),[victim]=enemy('blade',lane+38,420);demoStageUnit(giant,lane,520,{hp:80,cd:99});demoStageUnit(killer,lane,482,{cd:0});demoStageUnit(victim,lane+42,520,{cd:99});if(giant){giant.speed=0;}if(killer){killer.speed=0;killer.damage=900;}if(victim){victim.speed=0;victim.damage=0;}
     label='巨大スケルトンが倒れる → 死亡地点に爆弾 → 3秒後に半径1.5マスへ688ダメージ';scenarioKey='giantskeleton-death-bomb';duration=7;
@@ -1436,7 +1495,7 @@ for(const id of DECK){
   const role=document.createElement('small');role.textContent=d.role;
   const h=document.createElement('h3');h.textContent=d.name;
   const p=document.createElement('p');p.textContent=d.desc;
-  const stat=document.createElement('div');stat.className='library-stat';stat.textContent=d.spell?(d.spell==='cyclone'?`範囲 R${d.radius}　${d.zoneDuration}秒吸引`:`範囲 R${d.radius}　兵 ${d.damage} / 建物 ${d.buildingDamage}`):`HP ${d.hp}${d.count>1?` ×${d.count}`:''}　攻撃 ${d.damage}`;
+  const stat=document.createElement('div');stat.className='library-stat';stat.textContent=d.spell?(d.spell==='cyclone'?`範囲 R${d.radius}　${d.zoneDuration}秒吸引`:d.spell==='rollingwood'?`幅 ${d.widthCells}　射程 ${d.travelCells}　兵 ${d.damage} / 建物 ${d.towerDamage}`:d.spell==='rollingbarbarian'?`幅 ${d.widthCells}　射程 ${d.travelCells}　兵 ${d.damage} / 終点ババ×1`:`範囲 R${d.radius}　兵 ${d.damage} / 建物 ${d.buildingDamage}`):`HP ${d.hp}${d.count>1?` ×${d.count}`:''}　攻撃 ${d.damage}`;
   card.append(badge,can,role,h,p,stat);el('libraryGrid').append(card);
 }
 function interpolate(g,now){

@@ -47,6 +47,10 @@ export function canPlace(g,owner,id,x,y){
   }else {const margin=ARENA.cellSize*.5;if(x<margin||x>ARENA.width-margin||y<margin||y>ARENA.height-margin)return '\u30d5\u30a3\u30fc\u30eb\u30c9\u306e\u5185\u5074\u3092\u6307\u5b9a\u3057\u3066\u304f\u3060\u3055\u3044\u3002';}
   if(!g.players[owner].hand.includes(id))return 'そのカードは手札にありません。';
   if(g.players[owner].energy+0.00001<d.cost)return 'エナジーが足りません。';
+  if(d.deploymentZoneOnly){
+    if(!deploymentAllowed(g,owner,x,y))return 'このスペルはユニットを召喚できる範囲からだけ発動できます。';
+    if(deploymentWater(x,y))return 'このスペルはユニットを召喚できる地面または橋から発動してください。';
+  }
   if(d.spell){
     const core=g.towers.find(t=>t.owner===owner&&t.kind==='core'&&t.hp>0);
     if(!core)return '本拠地が破壊されているため呪文を使えません。';
@@ -141,13 +145,12 @@ function castSpell(g,owner,id,x,y){
   const d=UNITS[id],core=g.towers.find(t=>t.owner===owner&&t.kind==='core'&&t.hp>0);
   spendCard(g,owner,id);
   if(d.spell==='lightning'){
-    const centre={x,y},targets=alive(g)
-      .filter(t=>t.owner!==owner&&t.hp>0&&t.targetable!==false&&t.burrowState!=='burrow'&&distance(centre,t)<=d.radius+(t.radius||12)*.35)
-      .sort((a,b)=>b.hp-a.hp||String(a.id).localeCompare(String(b.id)))
-      .slice(0,d.maxTargets||4);
-    event(g,'lightning-cast',{x,y,owner,radius:d.radius,targets:targets.length});
-    for(const t of targets){const amount=(t.kind||t.building)?d.buildingDamage:d.damage;event(g,'lightning-hit',{x:t.x,y:t.y,owner,targetOwner:t.owner,building:!!(t.kind||t.building),damage:amount});damage(g,t,amount,owner,{spell:true});}
-    return {ok:true,spell:true,travelTime:0,targets:targets.length};
+    g.zones??=[];
+    const delay=d.activationDelay??1,strikeInterval=d.strikeInterval??.2;
+    g.zones.push({id:`z${g.nextId++}`,owner,kind:'lightning',spell:'lightning',x,y,radius:d.radius,damage:d.damage,buildingDamage:d.buildingDamage,
+      maxTargets:d.maxTargets||4,activateAt:g.time+delay,activated:false,targetIds:[],strikeIndex:0,strikeInterval,nextStrikeAt:null,total:delay,remaining:delay});
+    event(g,'lightning-cast',{x,y,owner,radius:d.radius,duration:delay,life:delay,targets:0});
+    return {ok:true,spell:true,travelTime:delay,activationDelay:delay,strikeInterval};
   }
   if(d.spell==='skeletonrush'){
     g.zones??=[];const delay=d.activationDelay||1.2,duration=d.zoneDuration||9;
@@ -186,6 +189,24 @@ function castSpell(g,owner,id,x,y){
       if(t.hp>0)applyStun(g,t,d.stunDuration,owner);
     }
     return {ok:true,spell:true,travelTime:0};
+  }
+  if(d.spell==='rollingwood'||d.spell==='rollingbarbarian'){
+    const dir=owner===0?-1:1,travelDistance=d.travelDistance||cellsToWorld(d.travelCells||0),edge=ARENA.cellSize*.5;
+    const ty=clamp(y+dir*travelDistance,edge,ARENA.height-edge),actualDistance=Math.abs(ty-y),travel=Math.max(.05,actualDistance/Math.max(1,d.rollSpeed||480));
+    g.projectiles.push({id:`p${g.nextId++}`,owner,kind:d.spell,spell:d.spell,x,y,sx:x,sy:y,tx:x,ty,
+      flightTotal:travel,total:travel,remaining:travel,progress:0,damage:d.damage,buildingDamage:d.buildingDamage,towerDamage:d.towerDamage??d.buildingDamage,
+      hitWidth:d.width||cellsToWorld(d.widthCells||0),widthCells:d.widthCells||0,travelCells:d.travelCells||0,knockbackCells:d.knockbackCells||0,hitIds:[],
+      spawnType:d.spawnType||null,spawnCount:d.spawnCount||0,targetsAir:false,life:travel+.5});
+    event(g,`${d.spell}-cast`,{x,y,tx:x,ty,owner,width:d.width,range:actualDistance,damage:d.damage});
+    return {ok:true,spell:true,travelTime:travel,flightTime:travel};
+  }
+  if(d.spell==='goblinbarrel'){
+    const travel=fireballTravelTime(core,{x,y}),launchDelay=d.launchDelay||UNITS.fireball.launchDelay||0;
+    g.projectiles.push({id:`p${g.nextId++}`,owner,kind:'goblinbarrel',spell:'goblinbarrel',x:core.x,y:core.y,sx:core.x,sy:core.y,tx:x,ty:y,
+      flightTotal:travel,total:travel,remaining:travel,launchDelay,delayRemaining:launchDelay,launched:launchDelay<=0,progress:0,splash:d.radius,spawnType:d.spawnType||'goblin_melee',spawnCount:d.spawnCount||3,targetsAir:false,life:launchDelay+travel+.4});
+    event(g,'goblinbarrel-aim',{x,y,owner,radius:d.radius,duration:launchDelay,travel});
+    if(launchDelay<=0)event(g,'goblinbarrel-launch',{x:core.x,y:core.y,tx:x,ty:y,owner,travel});
+    return {ok:true,spell:true,travelTime:launchDelay+travel,launchDelay,flightTime:travel};
   }
   const arrow=d.spell==='arrowrain',travel=arrow?arrowRainTravelTime(core,{x,y}):fireballTravelTime(core,{x,y}),launchDelay=d.launchDelay||0;
   g.projectiles.push({id:`p${g.nextId++}`,owner,kind:arrow?'arrowrain':'fireball',spell:d.spell,x:core.x,y:core.y,sx:core.x,sy:core.y,tx:x,ty:y,
@@ -491,6 +512,8 @@ export function targetEdgePoint(source,target){
 }
 export function targetGap(source,target){
   const sourceRect=source?.kind?structureFootprintRect(source):null,targetRect=structureFootprintRect(target);
+  // Air Balloon is an overhead bomber: its attack distance is measured to the structure centre, not its hitbox edge.
+  if(source?.overheadAttack&&targetRect)return distance(source,target);
   if(sourceRect&&targetRect){
     const dx=Math.max(targetRect.l-sourceRect.r,sourceRect.l-targetRect.r,0),dy=Math.max(targetRect.t-sourceRect.b,sourceRect.t-targetRect.b,0);
     return Math.hypot(dx,dy);
@@ -703,9 +726,9 @@ function buildingLaneCoreWaypoint(g,u,t){
 }
 function move(g,u,t,dt){
   if(!u.speed)return;
-  const lanePoint=buildingLaneCoreWaypoint(g,u,t),edge=(t.kind||t.building)?targetEdgePoint(u,t):null;
+  const lanePoint=buildingLaneCoreWaypoint(g,u,t),edge=(t.kind||t.building)&&!u.overheadAttack?targetEdgePoint(u,t):null;
   const navTarget=edge?{id:`edge-${t.id}`,x:edge.x,y:edge.y,radius:0}:t;
-  const navReach=edge?u.range:u.range+(t.radius||0);
+  const navReach=u.overheadAttack?u.range:(edge?u.range:u.range+(t.radius||0));
   const dest=boarRiverApproachPoint(u,t)||(lanePoint?navigationWaypoint(g,u,lanePoint,2):navigationWaypoint(g,u,navTarget,navReach));
   const start={x:u.x,y:u.y};
   const frostFactor=(u.slowUntil||0)>g.time?(u.slowMoveFactor||1):1;
@@ -862,6 +885,35 @@ function updateRageZones(g,dt){
     if(z.activated)z.remaining=Math.max(0,z.remaining-dt);
   }
   g.zones=g.zones.filter(z=>z.kind!=='rage'||z.remaining>1e-8);
+}
+function updateLightningZones(g,dt){
+  g.zones??=[];
+  for(const z of g.zones){
+    if(z.kind!=='lightning')continue;
+    if(!z.activated){
+      z.remaining=Math.max(0,z.activateAt-g.time);
+      if(g.time+1e-8<z.activateAt)continue;
+      const centre={x:z.x,y:z.y};
+      const targets=alive(g)
+        .filter(t=>t.owner!==z.owner&&t.hp>0&&t.targetable!==false&&t.burrowState!=='burrow'&&distance(centre,t)<=z.radius+(t.radius||12)*.35)
+        .sort((a,b)=>b.hp-a.hp||String(a.id).localeCompare(String(b.id)))
+        .slice(0,z.maxTargets||4);
+      z.activated=true;z.targetIds=targets.map(t=>t.id);z.strikeIndex=0;z.nextStrikeAt=z.activateAt;
+      z.total=Math.max(0,(z.targetIds.length-1)*(z.strikeInterval||.2));z.remaining=z.total;
+      event(g,'lightning-activate',{x:z.x,y:z.y,owner:z.owner,radius:z.radius,targets:z.targetIds.length});
+    }
+    while(z.strikeIndex<z.targetIds.length&&z.nextStrikeAt<=g.time+1e-8){
+      const id=z.targetIds[z.strikeIndex++],t=alive(g).find(v=>v.id===id&&v.hp>0);
+      if(t){
+        const amount=(t.kind||t.building)?z.buildingDamage:z.damage;
+        event(g,'lightning-hit',{x:t.x,y:t.y,owner:z.owner,targetOwner:t.owner,targetId:t.id,building:!!(t.kind||t.building),damage:amount,order:z.strikeIndex,total:z.targetIds.length});
+        damage(g,t,amount,z.owner,{spell:true,lightning:true});
+      }
+      z.nextStrikeAt+=z.strikeInterval||.2;
+    }
+    z.remaining=z.strikeIndex>=z.targetIds.length?0:Math.max(0,z.nextStrikeAt-g.time+(z.targetIds.length-z.strikeIndex-1)*(z.strikeInterval||.2));
+  }
+  g.zones=g.zones.filter(z=>z.kind!=='lightning'||z.remaining>1e-8||(!z.activated&&g.time+1e-8<z.activateAt));
 }
 function updateCycloneZones(g,dt){
   g.zones??=[];const units=g.units.filter(u=>u.hp>0&&!u.kind&&!u.building&&!u.eggUnit&&u.targetable!==false&&u.burrowState!=='burrow');
@@ -1074,6 +1126,37 @@ function updateSparkyCharge(g,u){
   const total=Math.max(.1,u.sparkChargeTime||3.5),progress=clamp((g.time-u.sparkChargeStartAt)/total,0,1);u.sparkChargeProgress=progress;
   if(progress>=1-1e-8){u.sparkCharged=true;u.sparkChargeProgress=1;event(g,'sparky-ready',{x:u.x,y:u.y,owner:u.owner});}
 }
+function rollingStripIntersects(a,b,p,halfWidth,lateralRadius=0,longitudinalRadius=lateralRadius){
+  const dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy);if(len<1e-9)return Math.hypot(p.x-a.x,p.y-a.y)<=halfWidth+lateralRadius;
+  const ux=dx/len,uy=dy/len,px=p.x-a.x,py=p.y-a.y,along=px*ux+py*uy,side=Math.abs(px*(-uy)+py*ux);
+  return side<=halfWidth+lateralRadius&&along>=-longitudinalRadius&&along<=len+longitudinalRadius;
+}
+function rollingSpellHit(g,p,a,b){
+  p.hitIds??=[];const hit=new Set(p.hitIds),half=Math.max(1,(p.hitWidth||0)/2),dir=p.owner===0?-1:1;
+  for(const t of [...alive(g)]){
+    if(t.owner===p.owner||t.hp<=0||t.air||t.targetable===false||hit.has(t.id))continue;
+    if(p.spell==='rollingbarbarian'&&t.kind)continue;
+    const structure=!!(t.kind||t.building),lateralRadius=structure?(t.hitboxCols||t.footprintCols||1)*ARENA.cellSize/2:(t.radius||12)*.45,longitudinalRadius=structure?(t.hitboxRows||t.footprintRows||1)*ARENA.cellSize/2:(t.radius||12)*.45;if(!rollingStripIntersects(a,b,t,half,lateralRadius,longitudinalRadius))continue;
+    let amount=p.damage;
+    if(t.kind)amount=p.towerDamage??p.buildingDamage??0;
+    else if(t.building)amount=p.buildingDamage??p.damage;
+    if(amount<=0)continue;
+    hit.add(t.id);p.hitIds.push(t.id);
+    const dealt=damage(g,t,amount,p.owner,{spell:true,rollingSpell:p.spell});
+    let moved=0;
+    if(p.spell==='rollingwood'&&dealt>0&&t.hp>0&&!t.kind&&!t.building&&p.knockbackCells){
+      const push=cellsToWorld(p.knockbackCells);moved=displaceBody(g,t,0,dir*push);
+      if(moved>0)event(g,'rollingwood-knockback',{x:t.x,y:t.y,owner:p.owner,amount:moved,direction:dir});
+    }
+    event(g,`${p.spell}-hit`,{x:t.x,y:t.y,owner:p.owner,targetOwner:t.owner,targetId:t.id,building:!!(t.kind||t.building),damage:amount,knockback:moved});
+  }
+}
+function rollingBarbarianSpawn(g,p){
+  const minion=UNITS[p.spawnType||'barbarian'];if(!minion||g.units.filter(u=>u.hp>0).length>=ARENA.maxUnits)return 0;
+  const q=goblinBarrelSpawnPoint(g,minion,{x:p.tx,y:p.ty},[],{x:p.tx,y:p.ty},ARENA.cellSize*2);if(!q)return 0;
+  const u=makeUnit(g,p.owner,minion.id,q.x,q.y);u.spawn=.18;u.summonedBy=p.id;u.lane=q.x<ARENA.midX?ARENA.lanes[0]:ARENA.lanes[1];g.units.push(u);
+  event(g,'rollingbarbarian-spawn',{x:u.x,y:u.y,owner:u.owner,minion:minion.id});return 1;
+}
 function fireballKnockback(g,p,t,centre){
   if(!p.knockbackCells||t.hp<=0||t.kind||t.building||t.eggUnit||visionSizeFor(t)==='large')return 0;
   let dx=t.x-centre.x,dy=t.y-centre.y,len=Math.hypot(dx,dy);
@@ -1092,6 +1175,51 @@ function spellAreaImpact(g,p,type){
     damage(g,t,(t.kind||t.building)?p.buildingDamage:p.damage,p.owner,{spell:true});
     if(type==='fireball'&&t.hp>0)fireballKnockback(g,p,t,centre);
   }
+}
+function goblinBarrelTowerTarget(g,x,y){
+  let best=null,bestScore=Infinity;const margin=ARENA.cellSize*.35;
+  for(const t of g.towers){
+    if(t.hp<=0)continue;
+    const hw=(t.footprintCols||ARENA.sideTowerCells)*ARENA.cellSize/2,hh=(t.footprintRows||ARENA.sideTowerCells)*ARENA.cellSize/2;
+    if(x<t.x-hw-margin||x>t.x+hw+margin||y<t.y-hh-margin||y>t.y+hh+margin)continue;
+    const score=Math.hypot(x-t.x,y-t.y);if(score<bestScore){best=t;bestScore=score;}
+  }
+  return best;
+}
+function goblinBarrelFormation(g,p,d){
+  const minion=UNITS[p.spawnType||d.spawnType||'goblin_melee'],spacing=Math.min(d.radius*.34,ARENA.cellSize*.72),tower=goblinBarrelTowerTarget(g,p.tx,p.ty),forward=p.owner===0?-1:1;
+  if(tower){
+    const rect=structureFootprintRect(tower),hw=rect?.hw||tower.radius||32,hh=rect?.hh||tower.radius||32,gap=(minion?.radius||9)+8;
+    const visualHalf=(tower.footprintCols||ARENA.sideTowerCells)*ARENA.cellSize/2,centreBand=Math.min(ARENA.cellSize*.6,visualHalf*.36);
+    if(Math.abs(p.tx-tower.x)<=centreBand){
+      return {mode:'surround',tower,points:[{x:tower.x-hw-gap,y:tower.y},{x:tower.x+hw+gap,y:tower.y},{x:tower.x,y:tower.y+forward*(hh+gap)}]};
+    }
+    const side=p.tx<tower.x?-1:1,baseX=tower.x+side*(hw+gap+2);
+    return {mode:side<0?'left-cluster':'right-cluster',tower,points:[{x:baseX,y:tower.y-spacing*.62},{x:baseX,y:tower.y+spacing*.62},{x:baseX+side*spacing*.72,y:tower.y}]};
+  }
+  return {mode:'triangle',tower:null,points:[{x:p.tx,y:p.ty+forward*spacing},{x:p.tx-spacing*.86,y:p.ty-forward*spacing*.52},{x:p.tx+spacing*.86,y:p.ty-forward*spacing*.52}]};
+}
+function goblinBarrelSpawnPoint(g,d,wanted,chosen,centre,radius){
+  const valid=q=>staticFree(g,d,q,0)&&chosen.every(v=>distance(q,v)>=Math.max(12,(d.radius||9)*1.55));
+  const clampPoint=q=>({x:clampInsideArena(q.x,'x',d),y:clampInsideArena(q.y,'y',d)});
+  let q=clampPoint(wanted);if(valid(q))return q;
+  for(const r of [10,18,28,40,54,70,Math.max(82,radius||0)])for(let i=0;i<16;i++){
+    const a=i*Math.PI*2/16,q2=clampPoint({x:wanted.x+Math.cos(a)*r,y:wanted.y+Math.sin(a)*r});if(valid(q2))return q2;
+  }
+  for(const r of [18,32,48,66,84])for(let i=0;i<20;i++){
+    const a=i*Math.PI*2/20,q2=clampPoint({x:centre.x+Math.cos(a)*r,y:centre.y+Math.sin(a)*r});if(valid(q2))return q2;
+  }
+  return null;
+}
+function goblinBarrelImpact(g,p){
+  const d=UNITS.goblinbarrel,minion=UNITS[p.spawnType||d.spawnType||'goblin_melee'];if(!minion)return 0;
+  const available=Math.max(0,ARENA.maxUnits-g.units.filter(u=>u.hp>0).length),count=Math.min(p.spawnCount||d.spawnCount||3,available),formation=goblinBarrelFormation(g,p,d),chosen=[];let made=0;
+  for(const wanted of formation.points){
+    if(made>=count)break;const q=goblinBarrelSpawnPoint(g,minion,wanted,chosen,{x:p.tx,y:p.ty},d.radius);if(!q)continue;
+    const u=makeUnit(g,p.owner,minion.id,q.x,q.y);u.spawn=.18;u.lane=q.x<ARENA.midX?ARENA.lanes[0]:ARENA.lanes[1];u.summonedBy=p.id;g.units.push(u);chosen.push(q);made++;
+    event(g,'goblinbarrel-spawn',{x:u.x,y:u.y,owner:u.owner,minion:minion.id,mode:formation.mode});
+  }
+  event(g,'goblinbarrel-impact',{x:p.tx,y:p.ty,owner:p.owner,radius:d.radius,spawned:made,mode:formation.mode,towerId:formation.tower?.id||null});return made;
 }
 function insideEnemyPoison(g,t,owner){
   return (g.zones||[]).some(z=>z.kind==='poison'&&z.owner===owner&&z.remaining>0&&distance(z,t)<=z.radius+(t.radius||12)*.25);
@@ -1333,14 +1461,16 @@ export function runBot(g,owner=1){
     if(aff.includes('lightning')&&(threat.hp>=900||fireCluster>=3)){deploy(g,owner,'lightning',threat.x,threat.y);return;}
     if(aff.includes('poison')&&((threat.type==='boneswarm'||threat.type==='skeleton')||fireCluster>=4)){deploy(g,owner,'poison',threat.x,threat.y);return;}
     if(aff.includes('skeletonrush')&&random(g)<.35){const tower=g.towers.find(t=>t.owner!==owner&&t.kind==='tower'&&t.hp>0)||g.towers.find(t=>t.owner!==owner&&t.kind==='core'&&t.hp>0);if(tower){deploy(g,owner,'skeletonrush',tower.x,tower.y);return;}}
+    if(aff.includes('goblinbarrel')&&random(g)<.42){const tower=g.towers.find(t=>t.owner!==owner&&t.kind==='tower'&&t.hp>0)||g.towers.find(t=>t.owner!==owner&&t.kind==='core'&&t.hp>0);if(tower){deploy(g,owner,'goblinbarrel',tower.x,tower.y);return;}}
+    if(!threat.air&&(aff.includes('rollingwood')||aff.includes('rollingbarbarian'))){const sy=owner===0?ARENA.deployBottom+ARENA.cellSize:ARENA.deployTop-ARENA.cellSize;const id=aff.includes('rollingwood')&&fireCluster>=2?'rollingwood':aff.includes('rollingbarbarian')?'rollingbarbarian':null;if(id&&deploy(g,owner,id,threat.x,sy).ok)return;}
     if(aff.includes('cyclone')&&arrowCluster>=3){deploy(g,owner,'cyclone',threat.x,threat.y);return;}
     if(aff.includes('arrowrain')&&arrowCluster>=3){deploy(g,owner,'arrowrain',threat.x,threat.y);return;}
     if(aff.includes('fireball')&&(fireCluster>=2||threat.type==='frost'||threat.type==='lumina')){deploy(g,owner,'fireball',threat.x,threat.y);return;}
   }
   let choices=aff.filter(id=>!UNITS[id].spell);if(!choices.length){
     const target=threat||g.towers.find(t=>t.owner!==owner&&t.kind==='tower'&&t.hp>0)||g.towers.find(t=>t.owner!==owner&&t.kind==='core'&&t.hp>0);
-    const spell=aff.includes('skeletonrush')?'skeletonrush':aff.includes('lightning')?'lightning':aff.includes('zap')?'zap':aff.includes('cyclone')?'cyclone':aff.includes('arrowrain')?'arrowrain':aff.includes('fireball')?'fireball':aff.includes('poison')?'poison':null;
-    if(target&&spell)deploy(g,owner,spell,target.x,target.y);return;
+    const spell=aff.includes('skeletonrush')?'skeletonrush':aff.includes('goblinbarrel')?'goblinbarrel':aff.includes('rollingwood')?'rollingwood':aff.includes('rollingbarbarian')?'rollingbarbarian':aff.includes('lightning')?'lightning':aff.includes('zap')?'zap':aff.includes('cyclone')?'cyclone':aff.includes('arrowrain')?'arrowrain':aff.includes('fireball')?'fireball':aff.includes('poison')?'poison':null;
+    if(target&&spell){if(spell==='rollingwood'||spell==='rollingbarbarian'){const sy=owner===0?ARENA.deployBottom+ARENA.cellSize:ARENA.deployTop-ARENA.cellSize;deploy(g,owner,spell,target.x,sy);}else deploy(g,owner,spell,target.x,target.y);}return;
   }
   if(threat?.air&&choices.some(id=>UNITS[id].targetsAir))choices=choices.filter(id=>UNITS[id].targetsAir);
   else if(!threat&&p.energy<7&&g.difficulty!=='hard'&&random(g)<.5)return;
@@ -1368,7 +1498,7 @@ export function tick(g,dt=ARENA.tick){
   g.time+=dt;g.step++;
   for(const p of g.players)p.energy=Math.min(10,p.energy+dt*(g.time>=120?1.25:.625));
   g.events=g.events.map(e=>({...e,life:e.life-dt})).filter(e=>e.life>0);
-  g.zones??=[];updateSkeletonRushZones(g,dt);updateDelayedDeathBombs(g,dt);updatePoisonZones(g,dt);decayMudZones(g,dt);updateMudZones(g);updateRageZones(g,dt);updateCycloneZones(g,dt);
+  g.zones??=[];updateSkeletonRushZones(g,dt);updateDelayedDeathBombs(g,dt);updatePoisonZones(g,dt);decayMudZones(g,dt);updateMudZones(g);updateRageZones(g,dt);updateLightningZones(g,dt);updateCycloneZones(g,dt);
   refreshCoreWake(g);
   if(g.bot&&g.time>=g.botNext){
     runBot(g,1);g.botNext=g.time+(g.difficulty==='easy'?2.6:g.difficulty==='hard'?.65:1.3)+random(g)*.7;
@@ -1445,16 +1575,22 @@ export function tick(g,dt=ARENA.tick){
   for(const p of g.projectiles){
     p.life-=dt;
     if(p.kind==='executioner_axe'){updateFalcheAxe(g,p,dt,entities);continue;}
-    if(p.spell==='fireball'||p.spell==='arrowrain'){
-      let flightDt=dt;
+    if(p.spell==='rollingwood'||p.spell==='rollingbarbarian'){
+      const prev={x:p.x,y:p.y};p.remaining=Math.max(0,p.remaining-dt);p.progress=clamp(1-p.remaining/Math.max(.001,p.flightTotal||p.total),0,1);
+      p.x=p.sx+(p.tx-p.sx)*p.progress;p.y=p.sy+(p.ty-p.sy)*p.progress;rollingSpellHit(g,p,prev,{x:p.x,y:p.y});
+      if(p.remaining<=1e-8){p.x=p.tx;p.y=p.ty;const spawned=p.spell==='rollingbarbarian'?rollingBarbarianSpawn(g,p):0;event(g,`${p.spell}-end`,{x:p.tx,y:p.ty,owner:p.owner,spawned});p.life=0;}
+      continue;
+    }
+    if(p.spell==='fireball'||p.spell==='arrowrain'||p.spell==='goblinbarrel'){
+      const launchType=p.spell==='arrowrain'?'arrowrain-launch':p.spell==='goblinbarrel'?'goblinbarrel-launch':'fireball-launch';let flightDt=dt;
       if((p.delayRemaining||0)>1e-8){const used=Math.min(flightDt,p.delayRemaining);p.delayRemaining=Math.max(0,p.delayRemaining-used);flightDt-=used;p.x=p.sx;p.y=p.sy;p.progress=0;
-        if(p.delayRemaining<=1e-8&&!p.launched){p.launched=true;event(g,p.spell==='arrowrain'?'arrowrain-launch':'fireball-launch',{x:p.sx,y:p.sy,tx:p.tx,ty:p.ty,owner:p.owner,travel:p.flightTotal||p.total});}
+        if(p.delayRemaining<=1e-8&&!p.launched){p.launched=true;event(g,launchType,{x:p.sx,y:p.sy,tx:p.tx,ty:p.ty,owner:p.owner,travel:p.flightTotal||p.total});}
         if(flightDt<=1e-8)continue;
       }
-      if(!p.launched){p.launched=true;event(g,p.spell==='arrowrain'?'arrowrain-launch':'fireball-launch',{x:p.sx,y:p.sy,tx:p.tx,ty:p.ty,owner:p.owner,travel:p.flightTotal||p.total});}
+      if(!p.launched){p.launched=true;event(g,launchType,{x:p.sx,y:p.sy,tx:p.tx,ty:p.ty,owner:p.owner,travel:p.flightTotal||p.total});}
       p.remaining=Math.max(0,p.remaining-flightDt);p.progress=clamp(1-p.remaining/Math.max(.001,p.flightTotal||p.total),0,1);
       p.x=p.sx+(p.tx-p.sx)*p.progress;p.y=p.sy+(p.ty-p.sy)*p.progress;
-      if(p.remaining<=1e-8){p.x=p.tx;p.y=p.ty;spellAreaImpact(g,p,p.spell);p.life=0;}
+      if(p.remaining<=1e-8){p.x=p.tx;p.y=p.ty;if(p.spell==='goblinbarrel')goblinBarrelImpact(g,p);else spellAreaImpact(g,p,p.spell);p.life=0;}
       continue;
     }
     const t=entities.find(e=>e.id===p.target&&e.hp>0);if(t){p.tx=t.x;p.ty=t.y;}
@@ -1478,6 +1614,6 @@ export function viewMatch(g,seat=0){
     units:g.units.map(u=>({id:u.id,type:u.type,owner:u.owner,x:rnd(u.x),y:rnd(u.y),hp:u.hp,maxHp:u.maxHp,radius:u.radius,air:u.air,building:!!u.building,footprintCols:u.footprintCols||0,footprintRows:u.footprintRows||0,hitboxCols:u.hitboxCols||0,hitboxRows:u.hitboxRows||0,anim:u.anim,hit:u.hit,walk:u.walk,spawn:u.spawn,face:u.face,facing:u.facing,moving:!!u.moving,mass:u.mass,age:u.age,target:u.target||null,firstStrikeRemaining:rnd(Math.max(0,(u.firstStrikeReadyAt||0)-g.time)),targetable:u.targetable!==false,deploying:!!u.deploying,deployTotal:rnd(u.deployTotal||0),deployRemaining:rnd(u.deployRemaining||0),collisionDisabled:!!u.collisionDisabled,laserStage:u.laserStage||0,laserDps:rnd(u.laserDps||0),laserLockTime:rnd(u.laserLockTime||0),charged:!!u.charged,chargeRun:rnd(u.chargeRun||0),mountedCharge:!!u.mountedCharge,chargeProgress:u.mountedCharge&&u.chargeDistance?rnd(clamp((u.chargeRun||0)/u.chargeDistance,0,1)):0,axeInFlight:!!u.axeInFlight,rageActive:rageSpeedFactor(g,u)>1,ramChargeProgress:rnd(clamp((u.ramChargeTime||0)/Math.max(.01,u.ramChargeAfter||2),0,1)),sparkCharged:!!u.sparkCharged,sparkChargeProgress:rnd(u.sparkChargeProgress||0),stunned:(u.stunUntil||0)>g.time,stunRemaining:rnd(Math.max(0,(u.stunUntil||0)-g.time)),slowed:(u.slowUntil||0)>g.time,slowStage:(u.slowUntil||0)>g.time?(u.slowStage||1):0,slowRemaining:rnd(Math.max(0,(u.slowUntil||0)-g.time)),poisoned:(u.poisonUntil||0)>g.time,poisonOwner:Number.isFinite(u.poisonOwner)?u.poisonOwner:null,poisonRemaining:rnd(Math.max(0,(u.poisonUntil||0)-g.time)),mudded:(u.mudUntil||0)>g.time,mudRemaining:rnd(Math.max(0,(u.mudUntil||0)-g.time)),burrowState:u.burrowState||null,burrowProgress:rnd(u.burrowProgress||0),summonType:u.summonType||null,summonCount:u.summonCount||0,summonRemaining:u.summonInterval?rnd(Math.max(0,(u.summonNextAt||g.time)-g.time)):0,summonCasting:(u.summonCastingUntil||0)>g.time,summonWindupRemaining:rnd(Math.max(0,(u.summonCastingUntil||0)-g.time)),energyPump:!!u.energyPump,energyPumpProgress:u.energyPump&&u.energyInterval&&Number.isFinite(u.energyNextAt)?rnd(clamp(1-(u.energyNextAt-g.time)/u.energyInterval,0,1)):0,energyPumpRemaining:u.energyPump&&Number.isFinite(u.energyNextAt)?rnd(Math.max(0,u.energyNextAt-g.time)):0,dashState:u.dashState||null,dashWindupRemaining:rnd(Math.max(0,(u.dashWindupUntil||0)-g.time)),dashCooldownRemaining:rnd(Math.max(0,(u.dashReadyAt||0)-g.time)),invulnerable:(u.invulnerableUntil||0)>g.time,shieldHp:rnd(u.shieldHp||0),maxShieldHp:rnd(u.maxShieldHp||0),stealthed:!!u.stealthed,stealthRemaining:rnd(Math.max(0,(u.stealthUntil||0)-g.time)),eggHatchRemaining:u.eggUnit?rnd(Math.max(0,(u.eggHatchAt||g.time)-g.time)):0,revived:!!u.revived,drillStage:u.drillStage||0,drillDps:rnd(u.drillDps||0),drillLockTime:rnd(u.drillLockTime||0),crusherStage:u.crusherStage||0,iceSpiritState:u.iceSpiritState||null,iceSpiritProgress:rnd(u.iceSpiritProgress||0),fireSpiritState:u.fireSpiritState||null,fireSpiritProgress:rnd(u.fireSpiritProgress||0),megaJumpState:u.megaJumpState||null,megaJumpProgress:rnd(u.megaJumpProgress||0),megaJumpWindupRemaining:rnd(Math.max(0,(u.megaJumpWindupUntil||0)-g.time)),megaJumpTargetX:Number.isFinite(u.megaJumpTargetX)?rnd(u.megaJumpTargetX):null,megaJumpTargetY:Number.isFinite(u.megaJumpTargetY)?rnd(u.megaJumpTargetY):null,megaJumpStartX:Number.isFinite(u.megaJumpStartX)?rnd(u.megaJumpStartX):null,megaJumpStartY:Number.isFinite(u.megaJumpStartY)?rnd(u.megaJumpStartY):null,megaJumpEndX:Number.isFinite(u.megaJumpEndX)?rnd(u.megaJumpEndX):null,megaJumpEndY:Number.isFinite(u.megaJumpEndY)?rnd(u.megaJumpEndY):null,jumpRadius:u.jumpRadius||0,riverJumpMode:u.riverJumpMode||null,riverJumpState:u.riverJumpState||null,riverJumpProgress:rnd(u.riverJumpProgress||0),riverJumpEndX:Number.isFinite(u.riverJumpEndX)?rnd(u.riverJumpEndX):null,riverJumpEndY:Number.isFinite(u.riverJumpEndY)?rnd(u.riverJumpEndY):null,ironSpinUsed:!!u.ironSpinUsed,ironSpinState:u.ironSpinState||null,ironSpinProgress:rnd(u.ironSpinProgress||0),ironSpinEndX:Number.isFinite(u.ironSpinEndX)?rnd(u.ironSpinEndX):null,ironSpinEndY:Number.isFinite(u.ironSpinEndY)?rnd(u.ironSpinEndY):null,ironMarked:!!u.ironMarked,ironMarkOwner:Number.isFinite(u.ironMarkOwner)?u.ironMarkOwner:null,ironMarkProgress:u.ironMarked?rnd(clamp((u.ironMarkDamage||0)/Math.max(1,u.ironMarkThreshold||500),0,1)):0,hookState:u.hookState||null,hookProgress:rnd(u.hookProgress||0),hookCooldownRemaining:rnd(Math.max(0,(u.hookReadyAt||0)-g.time)),hookTargetX:Number.isFinite(u.hookTargetX)?rnd(u.hookTargetX):null,hookTargetY:Number.isFinite(u.hookTargetY)?rnd(u.hookTargetY):null,hookAirAttackRemaining:rnd(Math.max(0,(u.hookAirAttackUntil||0)-g.time)),turtleShellActive:!!(u.siegeTurtle&&u.moving)})),
     towers:g.towers.map(t=>({id:t.id,kind:t.kind,slot:t.slot||null,owner:t.owner,x:t.x,y:t.y,hp:t.hp,maxHp:t.maxHp,radius:t.radius,footprintCols:t.footprintCols||0,footprintRows:t.footprintRows||0,hitboxCols:t.hitboxCols||0,hitboxRows:t.hitboxRows||0,rangeCells:t.rangeCells||0,anim:t.anim,hit:t.hit,facing:t.facing,awake:t.kind==='core'?!!t.awake:true,stunned:(t.stunUntil||0)>g.time,stunRemaining:rnd(Math.max(0,(t.stunUntil||0)-g.time)),rageActive:rageSpeedFactor(g,t)>1})),
     projectiles:g.projectiles.map(p=>({id:p.id,owner:p.owner,x:rnd(p.x),y:rnd(p.y),sx:rnd(p.sx||p.x),sy:rnd(p.sy||p.y),tx:rnd(p.tx),ty:rnd(p.ty),kind:p.kind,spell:p.spell||null,phase:p.phase||null,hitWidth:rnd(p.hitWidth||0),progress:rnd(p.progress||0),radius:p.splash||0,launched:p.launched!==false,delayRemaining:rnd(p.delayRemaining||0),launchDelay:rnd(p.launchDelay||0),flightTotal:rnd(p.flightTotal||p.total||0)})),
-    zones:(g.zones||[]).map(z=>({id:z.id,owner:z.owner,kind:z.kind,spell:z.spell,x:rnd(z.x),y:rnd(z.y),radius:z.radius,remaining:rnd(z.remaining),total:z.total,boostMultiplier:z.boostMultiplier||1,active:(z.kind==='skeletonrush'||z.kind==='rage')?g.time+1e-8>=z.activateAt:true,activationRemaining:(z.kind==='skeletonrush'||z.kind==='rage')?rnd(Math.max(0,z.activateAt-g.time)):0,detonateRemaining:(z.kind==='giantskeletonbomb'||z.kind==='airballoonbomb')?rnd(Math.max(0,z.detonateAt-g.time)):0})),
+    zones:(g.zones||[]).map(z=>({id:z.id,owner:z.owner,kind:z.kind,spell:z.spell,x:rnd(z.x),y:rnd(z.y),radius:z.radius,remaining:rnd(z.remaining),total:z.total,boostMultiplier:z.boostMultiplier||1,active:(z.kind==='skeletonrush'||z.kind==='rage'||z.kind==='lightning')?g.time+1e-8>=z.activateAt:true,activationRemaining:(z.kind==='skeletonrush'||z.kind==='rage'||z.kind==='lightning')?rnd(Math.max(0,z.activateAt-g.time)):0,detonateRemaining:(z.kind==='giantskeletonbomb'||z.kind==='airballoonbomb')?rnd(Math.max(0,z.detonateAt-g.time)):0})),
     events:g.events.map(e=>({...e})),bot:g.bot,difficulty:g.difficulty};
 }

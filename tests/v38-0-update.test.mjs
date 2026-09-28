@@ -12,10 +12,10 @@ function spawn(g,owner,id,x,y){ready(g,owner,id);const n=g.units.length,r=deploy
 function advance(g,s){let left=s;while(left>1e-9){const dt=Math.min(.05,left);tick(g,dt);left-=dt;}}
 function inert(u,hp=5000){Object.assign(u,{hp,maxHp:hp,speed:0,damage:0,range:0,cd:99,collisionDisabled:true});return u;}
 
- test('v38.0 roster and Air Balloon/Lumberjack values are exact',()=>{
-  assert.equal(VERSION,'38.0.0');assert.equal(PHYSICS_VERSION,72);
-  assert.equal(DECK.length,73);assert.equal(UNIT_IDS.length,65);assert.equal(SPELL_IDS.length,8);
-  const b=UNITS.airballoon;assert.equal(b.cost,5);assert.equal(b.hp,1676);assert.equal(b.damage,640);assert.equal(b.cooldown,2);assert.equal(b.speed,40);assert.equal(b.rangeCells,1);assert.equal(b.range,cellsToWorld(1));assert.equal(b.air,true);assert.equal(b.buildingOnly,true);assert.equal(b.targetsAir,false);assert.equal(b.deathBombDamage,240);assert.equal(b.deathBombRadiusCells,1);assert.equal(b.deathBombDelay,2);assert.equal(b.deathBombKind,'airballoonbomb');
+ test('v39 roster retains Air Balloon/Lumberjack with the adjusted Balloon values',()=>{
+  assert.equal(VERSION,'41.2.0');assert.equal(PHYSICS_VERSION,76);
+  assert.equal(DECK.length,77);assert.equal(UNIT_IDS.length,66);assert.equal(SPELL_IDS.length,11);
+  const b=UNITS.airballoon;assert.equal(b.cost,5);assert.equal(b.hp,1676);assert.equal(b.damage,640);assert.equal(b.cooldown,2);assert.equal(b.speed,38);assert.equal(b.rangeCells,.25);assert.equal(b.range,cellsToWorld(.25));assert.equal(b.overheadAttack,true);assert.equal(b.air,true);assert.equal(b.buildingOnly,true);assert.equal(b.targetsAir,false);assert.equal(b.deathBombDamage,240);assert.equal(b.deathBombRadiusCells,1);assert.equal(b.deathBombDelay,2);assert.equal(b.deathBombKind,'airballoonbomb');
   const l=UNITS.lumberjack;assert.equal(l.cost,4);assert.equal(l.hp,1282);assert.equal(l.damage,255);assert.equal(l.cooldown,.8);assert.equal(l.speed,79);assert.equal(l.rangeCells,1);assert.equal(l.air,false);assert.equal(l.targetsAir,false);assert.equal(l.deathRage,true);
 });
 
@@ -45,7 +45,7 @@ test('Lumberjack death drops the existing Rage with a 1.5 second delay and norma
 
 test('Air Balloon ignores nearby troops and attacks the lane structure',()=>{
   const g=battle(3803),tower=g.towers.find(t=>t.owner===1&&t.kind==='tower'&&t.x===ARENA.lanes[0]);
-  const balloon=spawn(g,0,'airballoon',tower.x,tower.y+20);balloon.lane=tower.x;Object.assign(balloon,{speed:0,cd:0,firstStrikeReadyAt:0});
+  const balloon=spawn(g,0,'airballoon',tower.x,tower.y+5);balloon.lane=tower.x;Object.assign(balloon,{speed:0,cd:0,firstStrikeReadyAt:0});
   const troop=inert(spawn(g,1,'knight',tower.x,tower.y+18));troop.hp=5000;troop.maxHp=5000;
   const th=tower.hp;advance(g,.60);
   assert.equal(tower.hp,th-640);assert.equal(troop.hp,5000);assert.equal(balloon.target,tower.id);

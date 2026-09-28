@@ -1,7 +1,7 @@
-# Cloudflare deploy - v38.0.0
+# Cloudflare deploy - v41.2.0
 
-Use the included setup/login/deploy BAT files or `npm run deploy` after Cloudflare authentication.
+Use the included setup/login/deploy BAT files or the npm scripts from this folder.
 
-After deployment, verify `/api/config` reports: `version=38.0.0`, `cards=73`, `units=65`, `spells=8`, `physicsVersion=72`, `maxDeck=8`.
+After deployment, verify `/api/config` reports: `version=41.2.0`, `cards=77`, `units=66`, `spells=11`, `physicsVersion=76`, `maxDeck=8`.
 
-Also verify Air Balloon's delayed death bomb and Lumberjack's death Rage are identical for both WebSocket seats, and that the existing grid placement and structure collision rules still behave normally.
+This release changes placement-preview UI only: normal unit/building ghosts stay at the last legal deployment point when the pointer enters forbidden terrain or territory. Spell targeting is unchanged.

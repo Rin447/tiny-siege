@@ -1,7 +1,10 @@
 # TINY SIEGE architecture
 
-- Current release: v38.0.0 / physicsVersion 72 / 73 cards (65 units/buildings + 8 spells).
-- v38 adds authoritative delayed Air Balloon death bombs and Lumberjack death-triggered Rage zones; the 18x32 arena geometry remains unchanged.
+- Current release: v41.2.0 / physicsVersion 76 / 77 cards (66 units/buildings + 11 spells).
+- v41 adds authoritative forward-travel strip spells: Rolling Wood uses one-hit swept collision plus equal nominal knockback across unit sizes; Rolling Barbarian uses the same strip model and deploys one normal Barbarian at the endpoint.
+- v40 adds Goblin Barrel as an authoritative core-launched projectile spell with deterministic three-Goblin formations around ordinary points and tower hitboxes; Siege Barbarian receives a visual-only front/back carrier layout.
+- v39 adds the Giant, overhead-centre Air Balloon attack geometry, and shorter Fireball/Arrow Rain launch warnings; the 18x32 arena geometry remains unchanged.
+- v38 added authoritative delayed Air Balloon death bombs and Lumberjack death-triggered Rage zones.
 
 ## v37.2 grid architecture baseline
 

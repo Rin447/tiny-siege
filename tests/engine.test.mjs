@@ -14,7 +14,7 @@ function forceReady(g,u){
 function spawn(g,o,id,x=ARENA.lanes[0],y=o===0?ARENA.riverBottom+ARENA.cellSize*3:ARENA.riverTop-ARENA.cellSize*3){ready(g,o,id);const before=g.units.length,safeX=x<ARENA.midX?ARENA.lanes[0]:ARENA.lanes[1],safeY=o===0?ARENA.riverBottom+ARENA.cellSize*3:ARENA.riverTop-ARENA.cellSize*3,r=deploy(g,o,id,safeX,safeY);assert.ok(r.ok,r.error);const created=g.units.slice(before);created.forEach(u=>{forceReady(g,u);u.x=x;u.y=y;u.lane=x<ARENA.midX?ARENA.lanes[0]:ARENA.lanes[1];});return created.at(-1);}
 function advance(g,seconds){for(let i=0;i<Math.round(seconds*10);i++)tick(g,.1);}
 test('v37.2 grid roster, widened lane-centred bridges, cell ranges and eight-card deck rule',()=>{
- assert.equal(DECK.length,73);assert.equal(new Set(DECK).size,73);assert.equal(UNIT_IDS.length,65);assert.deepEqual(SPELL_IDS,['skeletonrush','fireball','poison','arrowrain','lightning','zap','rage','cyclone']);
+ assert.equal(DECK.length,77);assert.equal(new Set(DECK).size,77);assert.equal(UNIT_IDS.length,66);assert.deepEqual(SPELL_IDS,['skeletonrush','fireball','goblinbarrel','rollingwood','rollingbarbarian','poison','arrowrain','lightning','zap','rage','cyclone']);
  assert.equal(MAX_DECK,8);assert.equal(DEFAULT_DECK.length,8);assert.deepEqual(normalizeDeck(DEFAULT_DECK),[...DEFAULT_DECK]);
  assert.equal(GRID_COLS,18);assert.equal(GRID_ROWS,32);assert.equal(GRID_CELL,40);assert.equal(ARENA.width,720);assert.equal(ARENA.height,1280);
  assert.deepEqual(ARENA.riverRows,[16,17]);assert.equal(ARENA.riverTop,600);assert.equal(ARENA.riverBottom,680);assert.deepEqual(ARENA.bridgeColumns,[[3,5],[14,16]]);assert.deepEqual(ARENA.bridgeCenterColumns,[4,15]);assert.deepEqual(ARENA.bridges,[140,580]);assert.equal(ARENA.bridgeHalf,40);
@@ -447,7 +447,7 @@ test('destroying either side tower wakes the owning central core',()=>{
 test('fireball can target anywhere and flight time grows with distance without tracking',()=>{
  const near=battle();near.towers.forEach(t=>{t.damage=0;});ready(near,0,'fireball');
  assert.equal(canPlace(near,0,'fireball',190,235),null);ready(near,0,'blade');assert.ok(canPlace(near,0,'blade',190,235));
- ready(near,0,'fireball');const rn=deploy(near,0,'fireball',360,760);assert.ok(rn.ok);assert.equal(rn.launchDelay,1.26);assert.ok(rn.flightTime>=.6&&rn.flightTime<=2);assert.ok(rn.travelTime>=1.86&&rn.travelTime<=3.26);
+ ready(near,0,'fireball');const rn=deploy(near,0,'fireball',360,760);assert.ok(rn.ok);assert.equal(rn.launchDelay,1.1);assert.ok(rn.flightTime>=.6&&rn.flightTime<=2);assert.ok(rn.travelTime>=1.7&&rn.travelTime<=3.1);
  const far=battle();far.towers.forEach(t=>{t.damage=0;});ready(far,0,'fireball');const rf=deploy(far,0,'fireball',360,80);assert.ok(rf.ok);assert.ok(rf.flightTime>rn.flightTime);assert.ok(rf.flightTime<=2);assert.ok(rf.travelTime>rn.travelTime);
  const p=far.projectiles.find(p=>p.spell==='fireball'),tx=p.tx,ty=p.ty;advance(far,.5);assert.equal(p.tx,tx);assert.equal(p.ty,ty);
 });
@@ -476,20 +476,24 @@ test('poison chips towers for 21 per second and wakes the central core',()=>{
 });
 test('arrow rain is broader, lower damage and faster than fireball while still hitting air and towers',()=>{
  const timing=battle();timing.towers.forEach(t=>{t.damage=0;});const core=timing.towers.find(t=>t.owner===0&&t.kind==='core');
- ready(timing,0,'arrowrain');const ar=deploy(timing,0,'arrowrain',190,235);assert.ok(ar.ok);assert.equal(ar.launchDelay,1.1);assert.ok(ar.flightTime>=.55&&ar.flightTime<=2.4);
+ ready(timing,0,'arrowrain');const ar=deploy(timing,0,'arrowrain',190,235);assert.ok(ar.ok);assert.equal(ar.launchDelay,.9);assert.ok(ar.flightTime>=.55&&ar.flightTime<=2.4);
  const fbFlight=Math.max(.6,Math.min(2,.45+distance(core,{x:190,y:235})/620));assert.ok(ar.flightTime>0);assert.ok(ar.travelTime>ar.flightTime);assert.ok(fbFlight>0);
  const g=battle();g.towers.forEach(t=>{t.damage=0;});const frost=spawn(g,1,'frost',190,390),bone=spawn(g,1,'skeleton',190,390),harpy=spawn(g,1,'harpy',190,390);for(const u of [frost,bone,harpy]){u.spawn=0;u.x=190;u.y=235;u.speed=0;u.damage=0;}
  const tower=g.towers.find(t=>t.owner===1&&t.kind==='tower'&&t.slot==='left'),towerHp=tower.hp,frostHp=frost.hp;
  ready(g,0,'arrowrain');const r=deploy(g,0,'arrowrain',190,235);advance(g,r.travelTime+.2);
  assert.equal(frost.hp,frostHp-366);assert.equal(bone.hp,0);assert.equal(harpy.hp,Math.max(0,UNITS.harpy.hp-366));assert.equal(tower.hp,towerHp-75);
 });
-test('lightning instantly strikes the four highest-current-HP enemies in radius and uses reduced building damage',()=>{
+test('lightning waits one second, then strikes the four highest-current-HP enemies one by one including towers',()=>{
  const g=battle();g.towers.forEach(t=>{t.damage=0;t.range=0;});const tower=g.towers.find(t=>t.owner===1&&t.kind==='tower'&&t.slot==='left');
  const golem=spawn(g,1,'golem',120,390),mega=spawn(g,1,'megaknight',260,390),guard=spawn(g,1,'knight',400,390),blade=spawn(g,1,'blade',600,390);
  const units=[golem,mega,guard,blade];units.forEach((u,i)=>{forceReady(g,u);u.x=170+i*13;u.y=245+(i%2)*10;u.speed=0;u.damage=0;});
- const th=tower.hp,before=Object.fromEntries(units.map(u=>[u.id,u.hp]));ready(g,0,'lightning');const r=deploy(g,0,'lightning',190,245);assert.ok(r.ok,r.error);assert.equal(r.travelTime,0);assert.equal(r.targets,4);
- assert.equal(tower.hp,th-265);assert.equal(golem.hp,before[golem.id]-1056);assert.equal(mega.hp,before[mega.id]-1056);assert.equal(guard.hp,before[guard.id]-1056);assert.equal(blade.hp,before[blade.id]);
- assert.ok(g.events.some(e=>e.type==='lightning-cast'));assert.equal(g.events.filter(e=>e.type==='lightning-hit').length,4);
+ const th=tower.hp,before=Object.fromEntries(units.map(u=>[u.id,u.hp]));ready(g,0,'lightning');const r=deploy(g,0,'lightning',190,245);assert.ok(r.ok,r.error);assert.equal(r.activationDelay,1);assert.equal(r.strikeInterval,.2);
+ advance(g,.9);assert.equal(tower.hp,th);for(const u of units)assert.equal(u.hp,before[u.id]);assert.equal(g.events.filter(e=>e.type==='lightning-hit').length,0);
+ advance(g,.1);assert.equal(g.events.filter(e=>e.type==='lightning-hit').length,1);assert.equal(golem.hp,before[golem.id]-1056);assert.equal(mega.hp,before[mega.id]);assert.equal(tower.hp,th);
+ advance(g,.2);assert.equal(g.events.filter(e=>e.type==='lightning-hit').length,2);assert.equal(mega.hp,before[mega.id]-1056);assert.equal(tower.hp,th);
+ advance(g,.2);assert.equal(g.events.filter(e=>e.type==='lightning-hit').length,3);assert.equal(tower.hp,th-265);assert.equal(guard.hp,before[guard.id]);
+ advance(g,.2);assert.ok(g.events.some(e=>e.type==='lightning-hit'&&e.order===4));assert.equal(guard.hp,before[guard.id]-1056);assert.equal(blade.hp,before[blade.id]);
+ assert.ok(g.events.some(e=>e.type==='lightning-activate')||g.time>1);assert.equal(golem.hp,before[golem.id]-1056);assert.equal(mega.hp,before[mega.id]-1056);assert.equal(tower.hp,th-265);
 });
 
 

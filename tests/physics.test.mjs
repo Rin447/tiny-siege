@@ -13,9 +13,9 @@ function body(g,type,owner,x,y){const u={...UNITS[type],id:`u${g.nextId++}`,type
 function checkStatics(g){for(const u of g.units)if(!u.building&&u.burrowState!=='burrow')assert.ok(staticFree(g,u,u),`${u.id} ${u.type} in static at ${u.x},${u.y}`);}
 
 test('v37.3 physics version and 18x32 grid geometry are explicit',()=>{
- assert.equal(VERSION,'38.0.0');assert.equal(PHYSICS_VERSION,72);assert.equal(GRID_COLS,18);assert.equal(GRID_ROWS,32);assert.equal(GRID_CELL,40);
+ assert.equal(VERSION,'41.2.0');assert.equal(PHYSICS_VERSION,76);assert.equal(GRID_COLS,18);assert.equal(GRID_ROWS,32);assert.equal(GRID_CELL,40);
  assert.equal(ARENA.width,720);assert.equal(ARENA.height,1280);assert.deepEqual(ARENA.riverRows,[16,17]);assert.deepEqual(TOWER_GRID.blue.core,[8,11,2,5]);
- assert.equal(createMatch().physicsVersion,72);
+ assert.equal(createMatch().physicsVersion,76);
 });
 
 test('vision classes are cell based: small 4, medium 5, large 6',()=>{
@@ -175,7 +175,7 @@ test('rendering depth mixes towers and ground troops; air is always after ground
  assert.deepEqual(renderOrder(g,1).map(x=>x.entity.id),['front','tower','rear','air']);
 });
 test('server snapshots expose facing/mass/layer but not pathfinding internals',()=>{
- const g=game(),u=unit(g,'knight',0,190,930);advance(g,15);const snap=viewMatch(g,0);assert.equal(snap.physicsVersion,72);
+ const g=game(),u=unit(g,'knight',0,190,930);advance(g,15);const snap=viewMatch(g,0);assert.equal(snap.physicsVersion,76);
  assert.equal(snap.units[0].mass,6);assert.equal(typeof snap.units[0].facing,'number');assert.ok(!('_nav' in snap.units[0]));
 });
 test('legacy active matches terminate safely instead of resuming inside new obstacles',()=>{

@@ -10,7 +10,7 @@ function battle(seed=7801){const g=createMatch({seed});g.phase='battle';g.countd
 function makeReady(u){Object.assign(u,{deploying:false,targetable:true,collisionDisabled:false,spawn:0,firstStrikeDelay:0});}
 
 test('v37.8 melee range tiers and Prince stats are exact',()=>{
-  assert.equal(VERSION,'38.0.0');assert.equal(PHYSICS_VERSION,72);
+  assert.equal(VERSION,'41.2.0');assert.equal(PHYSICS_VERSION,76);
   assert.deepEqual(MELEE_RANGE_CELLS,{close:1,medium:1.5,long:2});
   assert.equal(UNITS.knight.meleeTier,'close');assert.equal(UNITS.spear.meleeTier,'medium');assert.equal(UNITS.megagargoyle.meleeTier,'long');
   const p=UNITS.prince;assert.equal(p.cost,5);assert.equal(p.hp,1920);assert.equal(p.damage,392);assert.equal(p.cooldown,1.4);assert.equal(p.rangeCells,2);assert.equal(p.meleeRangeLabel,'\u9577\u8ddd\u96e2');

@@ -4,7 +4,7 @@ import {ARENA} from './units.js';
  * Ground bodies live on the lawn/bridges. Air bodies share a separate layer.
  * Structures separate their placement footprint from the smaller physical hitbox.
  */
-export const PHYSICS_VERSION=72;
+export const PHYSICS_VERSION=76;
 export const FIELD={left:0,right:ARENA.width,top:0,bottom:ARENA.height};
 const EPS=0.001,GRID=ARENA.cellSize/2,COLS=Math.floor(ARENA.width/GRID)+1,ROWS=Math.floor(ARENA.height/GRID)+1;
 const worldCaches=new WeakMap();
@@ -354,4 +354,18 @@ export function spawnPositions(g,owner,data,x,y,structures=null){
     if(!found)return null;points.push(found);
   }
   return points;
+}
+
+/** Placement-preview projection used only by the client drag UI.
+ * It never changes battle simulation rules. Normal units/buildings return the
+ * exact legal centre that the summon ghost may occupy, or null when the pointer
+ * is outside the currently summonable geometry. Water-edge overlap is nudged
+ * back to the nearest legal bank, matching the authoritative spawn logic.
+ */
+export function deploymentPreviewPoint(g,owner,data,x,y){
+  if(!g||!data||data.spell||data.tunnelAnywhere)return null;
+  const p=snapDeploymentPoint(owner,data,x,y,{correctWater:true});
+  if(!deploymentAllowed(g,owner,p.x,p.y))return null;
+  if(!spawnPositions(g,owner,data,p.x,p.y))return null;
+  return p;
 }

@@ -32,7 +32,7 @@ test('v37.7 Mega Knight stays protected during its special drop summon',()=>{
 
 test('v37.7 incoming area damage can hit a unit while it is still summoning',()=>{
   const g=battle(7704);ready(g,1,'golem');assert.ok(deploy(g,1,'golem',360,480).ok);const golem=g.units.find(u=>u.type==='golem'),hp=golem.hp;
-  assert.ok(golem.deploying);ready(g,0,'lightning');assert.ok(deploy(g,0,'lightning',golem.x,golem.y).ok);assert.ok(golem.hp<hp);assert.ok(golem.deploying,'being hit does not finish summon early');
+  assert.ok(golem.deploying);ready(g,0,'lightning');assert.ok(deploy(g,0,'lightning',golem.x,golem.y).ok);advance(g,1.05);assert.ok(golem.hp<hp);assert.ok(golem.deploying,'being hit does not finish summon early');
 });
 
 test('v37.7 battlefield placement confirms on pointer release and cancels outside the arena',async()=>{

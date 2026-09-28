@@ -12,8 +12,8 @@ function spawn(g,owner,id,x,y){ready(g,owner,id);const n=g.units.length,r=deploy
 function advance(g,s){for(let i=0;i<Math.round(s*10);i++)tick(g,.1);}
 
 test('v37.9 roster and Cyclone/Falche/Rage card values are explicit',()=>{
-  assert.equal(VERSION,'38.0.0');assert.equal(PHYSICS_VERSION,72);
-  assert.equal(DECK.length,73);assert.equal(UNIT_IDS.length,65);assert.equal(SPELL_IDS.length,8);assert.ok(SPELL_IDS.includes('rage'));
+  assert.equal(VERSION,'41.2.0');assert.equal(PHYSICS_VERSION,76);
+  assert.equal(DECK.length,77);assert.equal(UNIT_IDS.length,66);assert.equal(SPELL_IDS.length,11);assert.ok(SPELL_IDS.includes('rage'));
   assert.equal(UNITS.cyclone.radiusCells,5.5);assert.equal(UNITS.cyclone.radius,cellsToWorld(5.5));assert.equal(UNITS.cyclone.zoneDuration,1);assert.equal(UNITS.cyclone.damage,84);assert.equal(UNITS.cyclone.buildingDamage,58);assert.equal(UNITS.cyclone.pullSpeed,210);
   assert.equal(UNITS.falche.cost,5);assert.equal(UNITS.falche.hp,1280);assert.equal(UNITS.falche.damage,179);assert.equal(UNITS.falche.cooldown,2.4);assert.equal(UNITS.falche.rangeCells,4.5);assert.equal(UNITS.falche.axeTravelRangeCells,7);assert.equal(UNITS.falche.axeHitWidthCells,2);
   assert.equal(UNITS.rage.cost,2);assert.equal(UNITS.rage.radiusCells,3);assert.equal(UNITS.rage.damage,179);assert.equal(UNITS.rage.buildingDamage,45);assert.equal(UNITS.rage.placementTime,.5);assert.equal(UNITS.rage.activationDelay,1.5);assert.equal(UNITS.rage.zoneDuration,4.5);assert.equal(UNITS.rage.boostMultiplier,1.3);

@@ -52,11 +52,15 @@ test('deck builder portraits use a common layout frame with per-unit adjustments
   assert.match(app,/portrait\.dataset\.portraitMode='deck'/);
 });
 
-test('team ownership bands are hidden in deck and library portraits but remain available in battle art',()=>{
+test('battle unit ownership uses HP-bar color instead of generic body bands or ground rings',()=>{
   const art=fs.readFileSync(new URL('../public/game/art.js',import.meta.url),'utf8');
   const app=fs.readFileSync(new URL('../public/app.js',import.meta.url),'utf8');
   assert.match(art,/c\.__hideTeamBands===true&&TEAM_COLORS\.includes\(color\)/);
   assert.match(art,/c\.__hideTeamBands=deckMode\|\|portraitMode==='library'/);
+  assert.ok((art.match(/previousHideTeamBands=c\.__hideTeamBands;c\.__hideTeamBands=true;drawUnit/g)||[]).length>=2);
+  assert.doesNotMatch(art,/TEAM_COLORS\[owner\]\+'b0'[\s\S]{0,140}ellipse\(p\.x,p\.y\+4,u\.radius\+4/);
+  assert.match(art,/if\(!u\.building\|\|hp<\.999\)\{const hpY=/);
+  assert.match(art,/function drawAirBalloon[\s\S]{0,260}owner===0\?\{base:'#4f9dff'[\s\S]{0,100}base:'#ff5f68'/);
   assert.match(app,/can\.dataset\.portraitMode='library'/);
 });
 test('v26.2 Valkyrie stays upright while the axe spins and Leaf Archer portrait shows a duo',()=>{
@@ -198,11 +202,11 @@ test('v35 Oven has a square stove, oversized pot, and dedicated dispatch',()=>{
 });
 
 
-test('v37.4 Barbarians stay gold-haired while Siege Barbarian carries an overhead reinforced log',()=>{
+test('v40 Siege Barbarian keeps gold-haired carriers but stacks the pair front-to-back',()=>{
  const art=fs.readFileSync(new URL('../public/game/art.js',import.meta.url),'utf8');
  const b0=art.indexOf('function drawBarbarian');const b1=art.indexOf('function drawSiegeBarbarian',b0);const barb=art.slice(b0,b1);const s0=b1,s1=art.indexOf('function drawOven',s0);const ram=art.slice(s0,s1);
  assert.ok(b0>0&&s0>0);assert.match(barb,/Big bare-chested veteran/);assert.match(barb,/hair='#f2c84e'/);assert.match(barb,/Gold hair and huge moustache\/beard/);
- assert.match(ram,/Two barbarians carry one huge reinforced log overhead/);assert.match(ram,/feet and legs visibly/);assert.match(ram,/const charged=!!opts\.charged/);assert.match(art,/type==='barbarian'\|\|type==='barbarians'\)\{drawBarbarian/);assert.match(art,/type==='siegebarbarian'\)\{drawSiegeBarbarian/);
+ assert.match(ram,/front-to-back \(vertical on the lane\)/);assert.match(ram,/carrierRows=\[\{x:2,y:-25/);assert.match(ram,/\{x:-2,y:8/);assert.doesNotMatch(ram,/translate\(side\*12,-17\)/);assert.match(ram,/const charged=!!opts\.charged/);assert.match(art,/type==='barbarian'\|\|type==='barbarians'\)\{drawBarbarian/);assert.match(art,/type==='siegebarbarian'\)\{drawSiegeBarbarian/);
 });
 
 test('v37.5 placed buildings render at footprint-scale while gameplay keeps separate hitboxes',()=>{
@@ -219,4 +223,12 @@ test('v38 Air Balloon and Lumberjack use dedicated procedural art and battle dis
  const b0=art.indexOf('function drawAirBalloon');const b1=art.indexOf('function drawLumberjack',b0);const balloon=art.slice(b0,b1);const l0=b1,l1=art.indexOf('function drawGiantSkeleton',l0);const lumber=art.slice(l0,l1);
  assert.ok(b0>0&&l0>0);assert.match(balloon,/owner===0/);assert.match(balloon,/#4f9dff/);assert.match(balloon,/#ff5f68/);assert.match(balloon,/Skeleton pilot/);assert.match(balloon,/Large dropped bomb/);
  assert.match(lumber,/Rage bottle/);assert.match(lumber,/hair='#d8a83f'/);assert.match(lumber,/rage='#e24fab'/);assert.match(art,/type==='airballoon'\)\{drawAirBalloon/);assert.match(art,/type==='lumberjack'\)\{drawLumberjack/);assert.match(art,/p\.kind==='airballoon_bomb'/);
+});
+
+
+test('v39 Giant has dedicated ragged-brown heavyweight art, arm swing, punch, and dispatch',()=>{
+ const art=fs.readFileSync(new URL('../public/game/art.js',import.meta.url),'utf8');
+ const g0=art.indexOf('function drawGiant(c,opts={})');const g1=art.indexOf('function drawGiantSkeleton',g0);const giant=art.slice(g0,g1);
+ assert.ok(g0>0);assert.match(giant,/torn brown clothes/);assert.match(giant,/armSwing=moving\?Math\.sin\(walk\)\*10:0/);assert.match(giant,/right arm becomes a forward punch/);
+ assert.match(art,/type==='giant'\)\{drawGiant\(c,opts\)/);assert.match(art,/giant:\{scale:\.88,y:10\}/);
 });

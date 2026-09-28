@@ -12,14 +12,14 @@ test('v37.6 laser tower starts at 42 DPS and deals damage every 0.2 seconds',()=
   const hp=target.hp;tick(g,.1);assert.equal(target.hp,hp);tick(g,.1);assert.ok(Math.abs(target.hp-(hp-8.4))<.02,`${target.hp}`);assert.equal(laser.laserBaseDps,42);assert.equal(laser.laserDamageTick,.2);
 });
 
-test('v37.6 fireball waits 1.26 seconds, then flies from core and radially knocks small/medium survivors',()=>{
-  const g=createMatch({seed:7602});g.phase='battle';g.towers.forEach(t=>{t.damage=0;t.range=0;});ready(g,0,'fireball');const targetX=360,targetY=760;const result=deploy(g,0,'fireball',targetX,targetY);assert.ok(result.ok);assert.equal(result.launchDelay,1.26);assert.equal(UNITS.fireball.radiusCells,2.5);
-  const p=g.projectiles.find(p=>p.spell==='fireball');assert.equal(p.launched,false);advance(g,1.2);assert.equal(p.launched,false);advance(g,.08);assert.equal(p.launched,true);
+test('Fireball now waits 1.1 seconds, then flies from core and radially knocks small/medium survivors',()=>{
+  const g=createMatch({seed:7602});g.phase='battle';g.towers.forEach(t=>{t.damage=0;t.range=0;});ready(g,0,'fireball');const targetX=360,targetY=760;const result=deploy(g,0,'fireball',targetX,targetY);assert.ok(result.ok);assert.equal(result.launchDelay,1.1);assert.equal(UNITS.fireball.radiusCells,2.5);
+  const p=g.projectiles.find(p=>p.spell==='fireball');assert.equal(p.launched,false);advance(g,1.0);assert.equal(p.launched,false);advance(g,.15);assert.equal(p.launched,true);
   const g2=createMatch({seed:7603});g2.phase='battle';g2.towers.forEach(t=>{t.damage=0;t.range=0;});ready(g2,1,'knight');assert.ok(deploy(g2,1,'knight',500,520).ok);const victim=g2.units.find(u=>u.owner===1&&u.type==='knight');victim.deploying=false;victim.targetable=true;victim.collisionDisabled=false;victim.spawn=0;victim.hp=2000;victim.maxHp=2000;victim.x=400;victim.y=760;ready(g2,0,'fireball');deploy(g2,0,'fireball',360,760);const beforeX=victim.x;advance(g2,4);assert.ok(victim.x>beforeX+20,`expected radial knockback, ${beforeX} -> ${victim.x}`);
 });
 
-test('v37.6 arrow rain has 3.5-cell radius, 1.1s launch delay, and distance-based core flight',()=>{
-  assert.equal(UNITS.arrowrain.radiusCells,3.5);const g=createMatch({seed:7604});g.phase='battle';g.towers.forEach(t=>{t.damage=0;t.range=0;});ready(g,0,'arrowrain');const r=deploy(g,0,'arrowrain',ARENA.lanes[0],640);assert.ok(r.ok);assert.equal(r.launchDelay,1.1);assert.ok(r.flightTime>1.4&&r.flightTime<1.5,`bridge flight ${r.flightTime}`);
+test('v39 arrow rain keeps 3.5-cell radius with a 0.9s launch delay, and distance-based core flight',()=>{
+  assert.equal(UNITS.arrowrain.radiusCells,3.5);const g=createMatch({seed:7604});g.phase='battle';g.towers.forEach(t=>{t.damage=0;t.range=0;});ready(g,0,'arrowrain');const r=deploy(g,0,'arrowrain',ARENA.lanes[0],640);assert.ok(r.ok);assert.equal(r.launchDelay,.9);assert.ok(r.flightTime>1.4&&r.flightTime<1.5,`bridge flight ${r.flightTime}`);
   const g2=createMatch({seed:7605});g2.phase='battle';g2.towers.forEach(t=>{t.damage=0;t.range=0;});ready(g2,0,'arrowrain');const enemyCore=g2.towers.find(t=>t.owner===1&&t.kind==='core'),r2=deploy(g2,0,'arrowrain',enemyCore.x,enemyCore.y);assert.ok(r2.ok);assert.ok(Math.abs(r2.flightTime-2.4)<.001,`enemy core flight ${r2.flightTime}`);
 });
 

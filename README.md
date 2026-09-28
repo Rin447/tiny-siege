@@ -1,4 +1,46 @@
-# TINY SIEGE v38.0.0 - AIR BALLOON / LUMBERJACK UPDATE
+# TINY SIEGE v41.2.0 - SUMMON PREVIEW BOUNDARY LOCK
+
+## v41.2.0 SUMMON PREVIEW BOUNDARY LOCK
+
+- Normal unit/building summon ghosts remain inside legal deployment geometry.
+- Dragging into enemy territory, river/open water, blocked terrain or another invalid placement keeps the ghost at the last legal point instead of drawing it in the forbidden area.
+- Releasing while the pointer is beyond the boundary deploys at that stopped legal point; releasing outside the arena still cancels.
+- Building previews require the full placement footprint to fit legally.
+- Spell targeting is unchanged and keeps each spell's existing placement rules.
+- 77 cards (66 units/buildings + 11 spells); physicsVersion remains 76 because battle simulation did not change.
+
+
+## v41.1.0 LIGHTNING SEQUENCE / ROLL SPEED UPDATE
+
+- Lightning now waits 1.0 second after placement, then selects up to four highest-current-HP enemies in range and strikes them one-by-one at 0.2 second intervals. Towers/buildings are valid targets.
+- Lightning damage remains 1056 to units and 265 to towers/buildings; radius and maximum target count remain unchanged.
+- Rolling Wood speed reduced 30% from 520 to 364. Damage, width, range and 0.5-cell equal knockback are unchanged.
+- Rolling Barbarian speed reduced 30% from 440 to 308. Damage, width, range, no-knockback rule and endpoint Barbarian spawn are unchanged.
+- Card total remains 77 (66 units/buildings + 11 spells), physicsVersion 76.
+
+## v40.0.0 GOBLIN BARREL / SIEGE BARBARIAN VISUAL UPDATE
+
+- Added Goblin Barrel: 3-cost spell, radius 2.2 cells, targetable across the battlefield. After the same 1.1s launch warning as Fireball, a wooden barrel launches from the owner's core and rotates while following the same distance-based flight speed as Fireball.
+- On impact the barrel breaks and deploys three normal Goblins. Ordinary casts use a triangle. A cast near a tower centre surrounds it; an offset cast clusters all three Goblins on the selected left/right side.
+- Siege Barbarian visual changed from a side-by-side pair to two carriers arranged front-to-back along the lane, carrying one reinforced siege ram. Combat stats are unchanged.
+- Added dedicated barrel flight/impact art, spell portrait/placement preview, live detail demo, CPU usage and regression coverage.
+- Card total: 75 (66 units/buildings + 9 spells), physicsVersion 74.
+
+## v39.1.0 HP BAR TEAM VISIBILITY UPDATE
+
+- Removed the generic blue/red ownership bands drawn across battle unit bodies.
+- Removed the generic blue/red ground ownership ring shown under active units.
+- Non-building unit HP bars are now visible even at full HP: own units use blue HP bars and enemy units use red HP bars.
+- Inherent team-colored character designs such as Air Balloon remain unchanged, as do spell/status effect colors.
+- Visual/UI-only update; card stats and combat logic are unchanged. Card total: 74; physicsVersion 73.
+
+## v39.0.0 GIANT / BALLOON / SPELL SPEED UPDATE
+
+- Added Giant: 5 cost, HP3968, 254 damage every 1.5s, building-only ground tank, slow speed 27, medium melee range 1.5 cells.
+- Air Balloon now flies to the structure centre and attacks only within 0.25 cells, so it must be almost directly above the building. Speed 40 -> 38.
+- Fireball launch warning 1.26s -> 1.1s. Arrow Rain launch warning 1.1s -> 0.9s. Damage, radius and post-launch distance-based flight remain unchanged.
+- Added dedicated Giant procedural art and live detail demo.
+- Card total: 74 (66 units/buildings + 8 spells), physicsVersion 73.
 
 ## v38.0.0 AIR BALLOON / LUMBERJACK UPDATE
 
