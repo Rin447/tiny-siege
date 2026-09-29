@@ -1,14 +1,12 @@
-# Cloudflare deploy - v29.0.0
+# Cloudflare deploy
 
-1. GitHub の TINY SIEGE リポジトリへ、このフォルダの中身をそのまま上書きアップロードします。
-2. `main` に Commit（例: `Update Tiny Siege Lightning Necro to v29.0.0`）。
-3. Cloudflare の自動 Build / Deploy を待ちます。
-4. `/api/config` で `version: 29.0.0`, `cards: 56`, `units: 50`, `spells: 6`, `physicsVersion: 45`, `maxDeck: 8` を確認します。
+Windows users can use the included batch files in this order:
 
-## v29.0.0 verification
-- ネクロマンサー 5コスト / HP839 / 攻撃間隔1.1秒、ダークネクロマンサー 4コスト / HP907 / 攻撃304。
-- ポイズンが8秒間、ユニット91/秒・建物21/秒。ファイヤーボール689/159、矢の雨366/75。
-- ライトニングが6コスト・半径105で、現在HPが高い順の最大4体へユニット1056 / 建物265。
-- エリクサーゴーレム詳細映像でタワーダメージが実際に入り、分裂時にピンクの破裂演出が見えること。
-- カード総数56（50ユニット＋6呪文）、`physicsVersion=45`。
-- オンライン対戦ではクライアントとWorkerを同じv29.0.0へ揃えてください。
+1. `01-SETUP-CLOUDFLARE.bat`
+2. `02-LOGIN-CLOUDFLARE.bat`
+3. `03-DEPLOY-CLOUDFLARE.bat`
+
+The deploy batch runs the source check and tests before `wrangler deploy`.
+The Worker name is `tiny-siege`, static files come from `public/`, and room state uses the `BATTLES` Durable Object.
+
+If `public/index.html` is edited manually, `npm run check` regenerates `src/game-core.js` before validation.

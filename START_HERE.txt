@@ -1,37 +1,39 @@
-TINY SIEGE v41.2.0 - SUMMON PREVIEW BOUNDARY LOCK
+TINY SIEGE v46.0.0 - HUNTER & ROCKET UPDATE (FULL PACKAGE)
 
-1) すぐCPU戦: START-PRACTICE-WINDOWS.bat または PLAY-OFFLINE.html
-2) ローカル対戦: START-LOCAL-WINDOWS.bat
-3) Cloudflare: 01-SETUP-CLOUDFLARE.bat -> 02-LOGIN-CLOUDFLARE.bat -> 03-DEPLOY-CLOUDFLARE.bat
+QUICK START
+1) CPU practice: double-click START-PRACTICE-WINDOWS.bat
+   - Or open PLAY-OFFLINE.html directly.
+2) Local server / online-room test on your PC: double-click START-LOCAL-WINDOWS.bat
+   - Browser: http://localhost:3000
+3) Cloudflare deploy:
+   01-SETUP-CLOUDFLARE.bat
+   02-LOGIN-CLOUDFLARE.bat
+   03-DEPLOY-CLOUDFLARE.bat
 
-CHECK
-- Arena: 18 columns x 32 rows / 1 cell = 40 world units.
-- River: Y16-17 (grid hidden) / bridges: X3-5 (center X4) and X14-16 (center X15), two cells wide.
-- Blue side towers: X3-5,Y6-8 / X14-16,Y6-8. Blue core: X8-11,Y2-5. Red side is mirrored.
-- Side/core tower layout cells are visual/map layout only and do not reserve placement land. Ordinary player buildings require a 3x3 clearance area and snap to a grid-cell centre.
-- Archer attack range is the 5-cell reference. Vision: small 4 / medium 5 / large 6 cells.
-- Structure collision / target distance uses the physical building body HitBox, separate from the placement footprint.
-- 77 cards / 66 units/buildings / 11 spells / physicsVersion 76.
+DEVELOPER COMMANDS
+- npm run check
+- npm test
+- npm run build:offline
+- npm start
 
-- Tower attack range: numeric range remains 7 cells; distance is measured from the physical tower-body HitBox edge.
-- Visual map themes: grass / stone / lava / snow / desert.
+SOURCE LAYOUT
+- public/index.html : current v46 browser game (canonical client source)
+- src/game-core.js : deterministic server-side core generated from public/index.html
+- src/room-model.js : authoritative 1v1 room logic
+- src/worker.js : Cloudflare Worker / Durable Object entry
+- server/dev.mjs : zero-dependency local Node server
+- scripts/sync-game-core.mjs : regenerates current server core
+- scripts/build-offline.mjs : regenerates PLAY-OFFLINE.html
+- tests/ : package/current-core smoke tests
 
-- Outer decoration: rendered outside the 18x32 rules arena; no collision/placement effect.
-- Legacy inner frame / perimeter grid outline removed.
+IMPORTANT
+When public/index.html is edited, run `npm run sync:core` before testing/deploying.
+`npm run check` automatically runs this synchronization first.
 
-- Princess: HP261 / range 9 cells / vision 9 cells / compact two-head visual.
-- Barbarians: smaller battle art. Siege Barbarian: two carriers now line up front-to-back along the lane around one reinforced ram.
-
-- v37.6.0 combat/spell: Laser Tower starts at 42 DPS with visible continuous beam and 0.2s damage ticks; Fireball is R2.5 with 1.26s warning + core flight and radial 1-cell knockback on small/medium units; Arrow Rain is R3.5 with 1.1s warning and visible core-to-target flight; Elixir Pump is 6 cost / HP1070 / +1 energy every 13s / 11.5 HP decay per second / +1 on destruction.
-- Current totals: 77 cards (66 units/buildings + 11 spells), physicsVersion 76.
-- v41.2.0: Normal unit/building summon previews stop at the last legal deployment point instead of entering forbidden territory. Spells keep their existing targeting rules; physicsVersion remains 76.
-- v41.1.0: Rolling Wood (2 cost / ground / width3.9 / range10.1 / 268 unit / 35 tower-building / 0.5-cell equal knockback) and Rolling Barbarian (2 cost / ground / width2.6 / range4.5 / 232 / no tower damage / no knockback / summons 1 Barbarian at the endpoint). Both start only in the normal unit deployment zone.
-- v40.0.0: Goblin Barrel (3 cost / R2.2) launches a spinning wooden barrel from the core at Fireball speed, then deploys 3 Goblins; tower-centre casts surround and side-offset casts cluster. Siege Barbarian art is front-to-back.
-- v39.1.0: battle unit body ownership bands and normal ground team rings removed; non-building HP bars are always visible and identify own blue / enemy red. Air Balloon team-colored balloon art remains.
-- v39.0.0: Giant (5 cost, HP3968, building-only tank), Air Balloon overhead attack at 0.25 cells / speed38, Fireball 1.1s and Arrow Rain 0.9s launch warnings.
-- v38.0.0: Air Balloon (5 cost, building-only flying attacker, delayed 240 death bomb) and Lumberjack (4 cost, very-fast melee, death Rage).
-
-- v37.6.0 building placement: player buildings snap to 40px grid-cell centres and show a 3x3 clearance preview. Side/core tower 3x3/4x4 layout areas no longer block placement; only tower body hitboxes do.
-- v37.5 building visuals: ordinary 3x3 placed buildings are enlarged to match their reserved land, while physical collision remains limited to the visible building body.
-
-- Laser Tower: HP2000 / natural decay 60 per second / damage ticks every 0.2s / ramp remains x2 every 1s.
+CURRENT
+- v46.0.0
+- 83 cards: 71 units/buildings + 12 spells
+- physicsVersion 83
+- Hunter and Rocket included.
+- Rolling Wood speed 165 / Rolling Barbarian speed 140.
+- Player-placed buildings receive normal spell damage; towers alone use reduced tower damage.

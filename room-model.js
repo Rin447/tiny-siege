@@ -1,5 +1,5 @@
-import {PHYSICS_VERSION} from '../public/game/physics.js';
-import {createMatch, deploy, tick, viewMatch, finish, validateDeck} from '../public/game/engine.js';
+import {PHYSICS_VERSION} from './game-core.js';
+import {createMatch, deploy, tick, viewMatch, finish, validateDeck} from './game-core.js';
 
 export const ROOM_TTL = 2*60*60*1000;
 export const RECONNECT_MS = 45_000;

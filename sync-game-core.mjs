@@ -1,0 +1,10 @@
+import fs from 'node:fs/promises';
+const base=new URL('../',import.meta.url);
+const html=await fs.readFile(new URL('public/index.html',base),'utf8');
+const start=html.indexOf('/** Balance data: original prototype values. Both browser and server import this file. */');
+const end=html.indexOf('// Lightweight procedural cut-out rig: hips, knees, shoulders, hands and equipment.');
+if(start<0||end<0||end<=start)throw new Error('Could not locate the deterministic game-core block in public/index.html');
+let core=html.slice(start,end).trimEnd();
+core+='\n\nexport {VERSION,MAX_DECK,DECK,UNIT_IDS,SPELL_IDS,PHYSICS_VERSION,UNITS,ARENA,createMatch,deploy,tick,viewMatch,finish,validateDeck};\n';
+await fs.writeFile(new URL('src/game-core.js',base),core);
+console.log('Synced src/game-core.js from public/index.html');
