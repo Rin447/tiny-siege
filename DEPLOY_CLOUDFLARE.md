@@ -1,12 +1,40 @@
-# Cloudflare deploy
+# Cloudflare deployment
 
-Windows users can use the included batch files in this order:
+TINY SIEGE v46.0.0 uses Cloudflare Workers, Static Assets and a Durable Object named `BATTLES`.
 
-1. `01-SETUP-CLOUDFLARE.bat`
-2. `02-LOGIN-CLOUDFLARE.bat`
-3. `03-DEPLOY-CLOUDFLARE.bat`
+## Requirements
 
-The deploy batch runs the source check and tests before `wrangler deploy`.
-The Worker name is `tiny-siege`, static files come from `public/`, and room state uses the `BATTLES` Durable Object.
+- Node.js 22+
+- npm
+- Cloudflare account
 
-If `public/index.html` is edited manually, `npm run check` regenerates `src/game-core.js` before validation.
+## Local validation
+
+```bash
+npm install
+npm run ci
+```
+
+## Cloudflare login
+
+```bash
+npx wrangler login
+```
+
+## Deploy
+
+```bash
+npm run deploy
+```
+
+The `predeploy` hook runs `npm run check`, which synchronizes `src/game-core.js` from the canonical `public/index.html` and validates the current v46 source before Wrangler uploads it.
+
+Worker entry point: `src/worker.js`
+
+Static asset directory: `public/`
+
+Durable Object binding: `BATTLES`
+
+## GitHub integration
+
+This repository is ready to connect directly to a GitHub repository. GitHub Actions runs the source, unit and local-network checks on push and pull request. Cloudflare can either be deployed manually with `npm run deploy` or connected to the repository using Cloudflare's Git integration.

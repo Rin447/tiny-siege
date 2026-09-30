@@ -1,61 +1,116 @@
-# TINY SIEGE v46.0.0 - HUNTER & ROCKET UPDATE
+# TINY SIEGE v46.0.0 — GitHub Ready
 
-## v46.0.0 highlights
-- Added Hunter: 4 cost / HP884 / normal speed40 / ground unit / ground+air targeting. Every 2.2 seconds it fires ten 84-damage pellets in a 40-degree fan. Attack acquisition range is 4 cells while pellets can travel up to 6.5 cells. Pellets do not pierce and disappear on first collision, so point-blank hits can reach 840 total damage.
-- Added Rocket: 6 cost / radius 2 cells / 1484 damage to units and player-placed buildings / 343 damage to side/core towers. It launches immediately from the owner's Core Tower with no pre-launch delay. Flight time is distance based: about 3.16s to bridge centre and 4.8s to the enemy Core Tower.
-- Spell structure damage is now consistent: player-placed buildings receive the spell's full normal damage, while only side/core towers use the reduced tower-damage value. This applies to Fireball, Arrow Rain, Poison, Lightning, Zap, Rage, Cyclone, Rolling Wood and Rocket.
-- Rolling Wood speed: 182 -> 165. Rolling Barbarian speed: 154 -> 140. Their range, damage and deployment-line boundary lock are unchanged.
-- CPU random decks can include both new cards, and CPU spell scoring recognizes Rocket as a normal high-cost damage spell.
-- Card count is now 83 (71 units/buildings + 12 spells). Authoritative combat rules changed, so physicsVersion is now 83.
+GitHubへそのまま登録して、ローカル開発・自動テスト・Cloudflare Workersへのデプロイを行うためのソース一式です。
 
-## v45.4.0 highlights
-- Goblin Hut immediately spawns one Spear Goblin when an enemy unit first enters its 6-cell trigger range, then continues at the existing 2.2-second interval. Leaving and re-entering triggers another immediate spawn.
-- Goblin Hut spawns one Spear Goblin immediately when destroyed. Existing cost 4 / HP1180 / 3x3 footprint / 40 HP-per-second decay remain unchanged.
-- Mobile-unit HP bars are hidden while HP is full; they appear after damage and hide again after a full heal. Buildings and towers remain always visible.
-- HP bars use a slimmer 6px outer height while retaining size-based widths (small 22 / medium 34 / large 48) and overhead positioning for air units.
-- A damaging hit briefly glows the character and visible HP bar for about 0.15 seconds.
-- Combat ability changed, so physicsVersion is now 82. Card count remains 81 (70 units/buildings + 11 spells).
+- Game version: **46.0.0**
+- physicsVersion: **83**
+- Cards: **83**（71 units/buildings + 12 spells）
+- Runtime: **Node.js 22+**
+- Hosting: **Cloudflare Workers + Static Assets + Durable Objects**
 
-## v45.3.0 highlights
-- Rolling Wood speed: 364 -> 182. Rolling Barbarian speed: 308 -> 154.
-- Rolling-spell drag previews now stop at the last legal deployment point instead of moving beyond the active cast line.
-- Unit HP bars keep the thicker v45.2 height and air-unit overhead placement, but return to the softer pre-v45.2 background with no extra outline.
-- Mobile-unit HP-bar widths are standardized by size: small 22 / medium 34 / large 48.
-- Combat timing changed, so physicsVersion is now 81. Card count remains 81 (70 units/buildings + 11 spells).
+## このZIPの方針
 
-## v45.2.0 highlights
+v38のZIPには、過去バージョン用ブラウザテスト、プレビュー画像、コンセプト画像、配布用HTML、Windows専用BATなどが多数含まれていました。v46のGitHubリポジトリでは、それらを無条件にコピーせず、**現在のv46を開発・検証・デプロイするために必要なファイルだけ**を残しています。
 
-- Enemy Core Tower HP is always readable; its bar is no longer clipped above the arena.
-- Air-unit HP bars now sit above the unit instead of overlapping the body.
-- Unit, deployment, and tower HP bars are slightly thicker with stronger contrast.
-- UI-only change: 81 selectable cards and physicsVersion 80 are unchanged.
+`public/index.html` が現在のクライアント側の正本です。戦闘の決定論的コアは `scripts/sync-game-core.mjs` により `src/game-core.js` へ同期され、Cloudflare Workerとローカルサーバーが同じ戦闘ルールを利用します。
 
-## v45.1.0 highlights
+## リポジトリ構成
 
-- Home preview is now a full HARD-vs-HARD AI spectator battle.
-- Blue and Red independently roll one of the five CPU personalities for every match.
-- Both sides receive separately auto-generated eight-card decks and independent deck archetypes every match.
-- The preview displays each side's personality and archetype, then holds the result for three seconds before automatically starting a fresh matchup.
-- CPU decision logic now supports per-owner personalities so two AI players can genuinely use different styles in the same simulation.
-- Current release: 81 selectable cards and physicsVersion 81.
+```text
+.
+├─ .github/workflows/ci.yml       GitHub Actions
+├─ public/
+│  ├─ index.html                  現行クライアント本体
+│  └─ _headers                    Cloudflare static headers
+├─ src/
+│  ├─ game-core.js                index.htmlから同期される権威戦闘コア
+│  ├─ room-model.js               2人対戦ルーム状態
+│  └─ worker.js                   Cloudflare Worker / Durable Object
+├─ server/dev.mjs                 Node.jsローカルサーバー
+├─ scripts/
+│  ├─ sync-game-core.mjs          戦闘コア同期
+│  ├─ check.mjs                   構文・設定・現行カード検証
+│  └─ build-offline.mjs           必要時だけオフラインHTML生成
+├─ tests/
+│  ├─ release.test.mjs            v46カード/バージョン検証
+│  ├─ room.test.mjs               ルーム/再接続/開始条件
+│  ├─ worker.test.mjs             Worker API検証
+│  ├─ repository.test.mjs         GitHub必須ファイル検証
+│  └─ network.mjs                 実HTTP/WebSocketスモークテスト
+├─ docs/                          現行アーキテクチャ・デプロイ資料
+├─ package.json
+├─ wrangler.jsonc
+└─ .gitignore
+```
 
-## v45.0.0 highlights
+## セットアップ
 
-- Rebuilt CPU practice AI around three independent settings: difficulty, personality, and CPU deck.
-- CPU personality can be Random, Aggressive, Defensive, Combo, Counter, or Balanced. Random resolves to a new personality at the start of each match.
-- CPU deck modes: auto-generated balanced deck, mirror the player's current deck, use a saved My List deck, or use a separately editable CPU-only deck.
-- Auto deck generation creates a coherent eight-card deck from archetypes such as Air, Heavy, Swarm, Summon, Siege, Control, Cycle, and Balanced instead of using a fixed deck.
-- Spell AI evaluates troop clusters, card value, kill potential, utility targets, and tower overlap before casting. Tower-only spell cycling is heavily reduced.
-- CPU can reserve energy for two- or three-card pushes, choose defensive counters, attack weaker lanes, and turn surviving defenders into counter-pushes.
-- Difficulty changes decision quality and reaction cadence only. CPU receives no hidden stat or energy bonus.
-- Selectable roster remains 81 cards (70 units/buildings + 11 spells). Battle mechanics are unchanged, so physicsVersion remains 80.
+```bash
+npm install
+npm run ci
+npm start
+```
 
-## Previous v44.0.0 highlights
+`npm start` 後に `http://localhost:3000` を開きます。
 
-- Tesla placement footprint changed from 3x3 to 2x2 and its visual/hitbox was reduced.
-- Goblin Hut retained a 3x3 footprint with smaller art.
-- Spark Spearman was removed.
-- Baby Dragon and Musketeer were added.
+Cloudflareのローカル環境を使う場合:
 
-## Full package / Windows helpers
-This archive includes the Windows `.bat` launch/deploy helpers, Node local server, Cloudflare Worker/Durable Object source, package scripts, deterministic server core, and smoke tests. `public/index.html` is the canonical v46 client source. Run `npm run check` after editing it; the command regenerates `src/game-core.js` before validation.
+```bash
+npm run dev
+```
+
+## Cloudflareへデプロイ
+
+初回のみ:
+
+```bash
+npx wrangler login
+```
+
+その後:
+
+```bash
+npm run deploy
+```
+
+`predeploy` で `npm run check` が実行され、`public/index.html` から `src/game-core.js` を再同期してからデプロイします。
+
+GitHubとCloudflareを連携して自動デプロイする場合も、リポジトリルートはこのままで使用できます。Worker entry point は `src/worker.js`、Static Assets は `public/` です。
+
+## テスト
+
+```bash
+npm run check
+npm test
+npm run test:network
+```
+
+まとめて実行:
+
+```bash
+npm run ci
+```
+
+GitHub Actionsでも push / pull request ごとに同じCIを実行します。
+
+## v46主要仕様
+
+- Hunter: 4 cost / HP884 / 84×10 pellets / 2.2s / attack acquisition 4 cells / pellet reach 6.5 cells / ground+air.
+- Rocket: 6 cost / radius 2 cells / 1484 damage to units and placed buildings / 343 to side/core towers / immediate Core launch.
+- Rolling Wood speed 165 / Rolling Barbarian speed 140.
+- Spell damage rule: **player-placed buildings receive normal spell damage; only side/core towers use reduced tower damage**.
+- Goblin Hut: immediate Spear Goblin on enemy acquisition, then 2.2s cycle, plus one on destruction.
+
+## GitHub版から意図的に除外したもの
+
+以下はv38には含まれていましたが、現行GitHubソースには不要なので含めていません。
+
+- `PLAY-OFFLINE.html` — `npm run build:offline` で生成可能
+- `DEPLOY-GUIDE.html`, `UPDATE-HISTORY.html` — README/docsと内容が重複
+- `01/02/03-*.bat`, `START-*.bat` — GitHub/CI/Cloudflare実行には不要
+- `docs/previews-*`, `docs/concepts/*` — 過去版スクリーンショット/参考画像
+- `tests/browser-v16-*.py` など — 過去バージョン専用テスト
+- `tests/v37-*.test.mjs`, `tests/v38-*.test.mjs` — 過去リリース固定テスト
+- v38の `public/app.js`, `public/styles.css`, `public/game/*.js` — **v46では `public/index.html` + `src/game-core.js` の現行構成へ統合済み**
+
+これらを削除しても、v46のGitHub開発・CI・ローカル対戦・Cloudflareデプロイに必要な機能は失われません。
